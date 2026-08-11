@@ -1,0 +1,155 @@
+<odoo>
+    <data>
+        <record id="view_hr_conveyance_form" model="ir.ui.view">
+            <field name="name">view.hr.conveyance.form</field>
+            <field name="model">hr.conveyance</field>
+            <field name="arch" type="xml">
+                <form delete ="0" string="">
+                    <header>
+                        <button name="action_submit" type="object" string="Submit" invisible="state != 'draft'" class="oe_highlight" />
+                        <button name="action_done" type="object" string="Done" invisible="state != 'confirm'" class="oe_highlight" />
+                        <button name="action_cancel" type="object" string="Cancel" invisible="state not in ('draft','confirm')" class="oe_highlight" />
+                        <field name="state" widget="statusbar" statusbar_visible="draft,confirm,done,cancel"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" readonly="1" />
+                            </h1>
+                        </div>
+                        <group string="Employee Information">
+                            <group>
+                                <field name="employee_id" required="1" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1}" readonly="state != 'draft'"/>
+                                <field name="old_empid" readonly="1" force_save="1"/>
+                                <field name="work_location_id" readonly="1" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1}"/>
+                                <field name="department_id" readonly="1" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1}"/>
+                                <field name="job_position" readonly="1" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1}"/>
+                            </group>
+                            <group>
+                                <field name="company_id" readonly="1" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1}"/>
+                                <field name="date_requested" required="1" invisible="state != 'draft'"/>
+                            </group>
+                        </group>
+                        <group>
+                            <group string="Conveyance Information">
+                                <field name="conveyance_type" required="1" force_save="1"
+                                       options="{'no_open':True,'no_create':1,'no_create_edit':1}"
+                                       readonly="state != 'draft'"/>
+                                <field name="purpose_id" required="1" force_save="1"
+                                       options="{'no_open':True,'no_create':1,'no_create_edit':1}"
+                                       readonly="state != 'draft'"/>
+                            </group>
+                            <group>
+                            </group>
+                        </group>
+
+                        <group string="Travel and Conveyance Bill" invisible="conveyance_type != 'tc'">
+                            <field name="travel_conveyance_line_ids" nolabel="1"
+                                   readonly="state in ('confirm','done','cancel')" invisible="conveyance_type != 'tc'">
+                                <tree editable="bottom">
+                                    <field name="date" required="1"/>
+                                    <field name="purpose" required="1"/>
+                                    <field name="start_time" widget="float_time" required="1"/>
+                                    <field name="end_time" widget="float_time" required="1"/>
+                                    <field name="from_place" required="1"/>
+                                    <field name="to_place" required="1"/>
+                                    <field name="travel_by" required="1"/>
+                                    <field name="amount" sum="Total" required="1"/>
+                                </tree>
+                                <form>
+                                    <group>
+                                        <field name="date" required="1"/>
+                                        <field name="purpose" required="1"/>
+                                        <field name="start_time" widget="float_time" required="1"/>
+                                        <field name="end_time" widget="float_time" required="1"/>
+                                        <field name="from_place" required="1"/>
+                                        <field name="to_place" required="1"/>
+                                        <field name="travel_by" required="1"/>
+                                        <field name="amount" sum="Total" required="1"/>
+                                    </group>
+                                </form>
+                            </field>
+                        </group>
+
+                        <group string="Entertainment and Food Allowance Bill" invisible="conveyance_type != 'ef'">
+                            <field name="entertainment_food_allowance_ids"
+                                   readonly="state in ('confirm','done','cancel')" invisible="conveyance_type != 'ef'">
+                                <tree editable="bottom">
+                                    <field name="date" required="1"/>
+                                    <field name="description_details" required="1"/>
+                                    <field name="qty" required="1"/>
+                                    <field name="unit_price" required="1"/>
+                                    <field name="amount" sum="Total" required="1"/>
+                                </tree>
+                                <form>
+                                    <group>
+                                        <field name="date" required="1"/>
+                                        <field name="description_details" required="1"/>
+                                        <field name="qty" required="1"/>
+                                        <field name="unit_price" required="1"/>
+                                        <field name="amount" sum="Total" required="1"/>
+                                    </group>
+                                </form>
+                            </field>
+                        </group>
+
+                        <group string="IOU Bill" invisible="conveyance_type not in ('iou')">
+                            <field name="iou_ids" readonly="state in ('confirm','done','cancel')"
+                                   invisible="conveyance_type not in ('iou')">
+                                <tree editable="bottom">
+                                    <field name="date" required="1"/>
+                                    <field name="description_details" required="1"/>
+                                    <field name="amount" sum="Total" required="1"/>
+                                </tree>
+                                <form>
+                                    <group>
+                                        <field name="date" required="1"/>
+                                        <field name="description_details" required="1"/>
+                                        <field name="amount" sum="Total" required="1"/>
+                                    </group>
+                                </form>
+                            </field>
+                        </group>
+                        <group>
+                            <field name="remarks"/>
+                        </group>
+                        <group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_hr_conveyance_tree" model="ir.ui.view">
+            <field name="name">view.hr.conveyance.tree</field>
+            <field name="model">hr.conveyance</field>
+            <field name="arch" type="xml">
+                <tree delete ="0" string="HR Conveyance" decoration-muted="state=='cancel'" decoration-info="state=='draft'"
+					decoration-success="state=='done'">
+                    <field name="name"/>
+                    <field name="date_requested"/>
+                    <field name="employee_id"/>
+                    <field name="work_location_id"/>
+                    <field name="conveyance_type"/>
+                    <field name="purpose_id"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+
+        <record id="action_hr_conveyance" model="ir.actions.act_window">
+            <field name="name">HR Conveyance</field>
+            <field name="res_model">hr.conveyance</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create a Conveyance of a Employee
+                </p>
+            </field>
+        </record>
+
+        <menuitem id="menu_action_hr_conveyance" name="Conveyance" parent="hr_employee_travelling_menu_root"
+                  action="action_hr_conveyance" sequence="1"/>
+    </data>
+</odoo>

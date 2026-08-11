@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================
+         Inherit product.template form view to add Stationary Product
+         boolean field in the General Information tab
+    ============================================================ -->
+    <record id="product_template_form_view_stationary_inherit" model="ir.ui.view">
+        <field name="name">product.template.form.stationary.inherit</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <!-- Place the field after the 'sale_ok' field in General Information tab -->
+            <xpath expr="//field[@name='categ_id']" position="after">
+                <field name="is_stationary_product"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ============================================================
+         Action: Show ONLY Stationary Products
+         (used by HR Stationary Product menu)
+    ============================================================ -->
+    <record id="action_stationary_products" model="ir.actions.act_window">
+        <field name="name">Stationary Products</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">list,form,kanban</field>
+        <field name="domain">[('is_stationary_product', '=', True)]</field>
+        <field name="context">{
+            'default_is_stationary_product': True,
+            'default_detailed_type': 'product',
+            'default_type': 'product'
+            }
+        </field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No Stationary Products found!
+            </p>
+            <p>
+                Create a new product and tick the <b>Stationary Product</b> checkbox
+                to make it appear here.
+            </p>
+        </field>
+    </record>
+
+    <!-- ============================================================
+         Inherit Inventory Products action to EXCLUDE Stationary Products
+         XML ID: stock.product_template_action_product
+    ============================================================ -->
+    <record id="stock.product_template_action_product" model="ir.actions.act_window">
+        <field name="domain">[('is_stationary_product', '=', False)]</field>
+    </record>
+
+</odoo>

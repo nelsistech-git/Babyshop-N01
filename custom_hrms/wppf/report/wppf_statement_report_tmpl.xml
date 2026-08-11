@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+	<data>
+
+        <record id="wppf_statement_report_tmpl" model="ir.actions.report">
+            <field name="name">Employee WPPF Statement Report</field>
+            <field name="model">pf.statement.wizard</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">wppf.wppf_statement_report_report_view</field>
+            <field name="report_file">wppf.wppf_statement_report_report_view</field>
+        </record>
+
+		<template id="wppf_statement_report_report_view">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <style type="text/css">
+                            th, tr, td{
+                            background: white !important;
+                            border: 1px solid black !important;
+                            }
+
+                            .td_bold{
+                                font-weight:bold;
+                            }
+                        </style>
+
+                        <div>
+                            <h3 class="text-center head_font_color">
+                                <strong>
+                                    <span t-esc="form['company_id'][1]"/>
+                                    <br/>
+                                    WPPF Statement
+                                    <br/>
+                                    <strong>
+                                        <t t-esc="employee_name"/>
+                                    </strong>
+                                    <br/>
+                                </strong>
+                            </h3>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-6">
+                                <p style="color: #000; font-size: 20px;">
+                                    <strong>
+                                        Date From:
+                                        <t t-esc="from_date"/>
+                                    </strong>
+                                </p>
+                            </div>
+                            <div class="col-6 text-right">
+                                <p style="color: #000; font-size: 20px;">
+                                    <strong>Date To:
+                                        <t t-esc="to_date"/>
+                                    </strong>
+                                </p>
+                            </div>
+                        </div>
+
+                        <table style="border-collapse: collapse;width: 100%; margin-bottom: 2em;"
+                               class="table table-condensed">
+                            <thead>
+                                <tr>
+                                    <th class="text-center align-middle bg_color font_color">Sl.No.</th>
+                                    <th class="text-left align-middle bg_color font_color">Year</th>
+                                    <th class="text-left align-middle bg_color font_color">Month</th>
+                                    <th class="text-left align-middle bg_color font_color">Employee</th>
+                                    <th class="text-left align-middle bg_color font_color">Company</th>
+                                    <th class="text-right align-middle">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody class="consumed_tbody">
+                                <t t-set="opening_total" t-value="0"/>
+                                <tr class="td_bold">
+                                    <td colspan="3" class="text-left align-middle">
+                                        Opening Balance
+                                    </td>
+                                    <td class="text-right align-middle">
+                                        <span t-esc="'{0:,.2f}'.format(opening_pf)"/>
+                                    </td>
+                                    <td class="text-right align-middle">
+                                        <span t-esc="'{0:,.2f}'.format(opening_cpf)"/>
+                                    </td>
+                                    <td class="text-right align-middle">
+                                        <t t-set="opening_total" t-value="opening_pf+opening_cpf"/>
+                                        <span t-esc="'{0:,.2f}'.format(opening_total)"/>
+                                    </td>
+                                </tr>
+
+                                <!--During-->
+                                <t t-set="sl_no" t-value="1"/>
+                                <t t-set="total_pf_dur" t-value="0"/>
+                                <t t-set="total_cpf_dur" t-value="0"/>
+                                <t t-set="total_pf_cpf_dur" t-value="0"/>
+
+                                <t t-foreach="during_pf_list" t-as="pf_line">
+                                    <tr>
+                                        <td class="text-middle align-middle">
+                                            <span t-esc="sl_no"/>
+                                        </td>
+                                        <td class="text-middle align-middle">
+                                            <span t-esc="pf_line['year']"/>
+                                        </td>
+                                        <td class="text-middle align-middle">
+                                            <span t-esc="pf_line['month']"/>
+                                        </td>
+                                        <td class="text-right align-middle">
+                                            <span t-esc="pf_line['pf_amount']"/>
+                                            <t t-set="total_pf_dur" t-value="total_pf_dur + pf_line['pf_amount']"/>
+                                        </td>
+                                        <td class="text-right align-middle">
+                                            <span t-esc="pf_line['cpf_amount']"/>
+                                            <t t-set="total_cpf_dur" t-value="total_cpf_dur + pf_line['cpf_amount']"/>
+                                        </td>
+                                        <td class="text-right align-middle" style="border: 1px solid black;">
+                                            <t t-set="total_pf_cpf" t-value="pf_line['pf_amount'] + pf_line['cpf_amount']"/>
+                                            <span t-esc="total_pf_cpf"/>
+                                            <t t-set="total_pf_cpf_dur" t-value="total_pf_cpf_dur + total_pf_cpf"/>
+                                        </td>
+                                    </tr>
+                                    <t t-set="sl_no" t-value="sl_no + 1"/>
+                                </t>
+                                <tr class="td_bold">
+                                    <td colspan="3" class="text-middle align-middle">
+                                        During Contribution
+                                    </td>
+                                    <td class="text-right align-middle">
+                                        <span t-esc="'{0:,.2f}'.format(total_pf_dur)"/>
+                                    </td>
+                                    <td class="text-right align-middle">
+                                        <span t-esc="'{0:,.2f}'.format(total_cpf_dur)"/>
+                                    </td>
+                                    <td class="text-right align-middle">
+                                        <span t-esc="'{0:,.2f}'.format(total_pf_cpf_dur)"/>
+                                    </td>
+                                </tr>
+
+                                <!--Profit-->
+                                <t t-set="sl_no" t-value="1"/>
+                                <t t-set="total_pf_dur_profit" t-value="0"/>
+                                <t t-set="total_cpf_dur_profit" t-value="0"/>
+                                <t t-set="total_pf_cpf_dur_profit" t-value="0"/>
+
+                                <t t-foreach="during_profit_list" t-as="profit_line">
+                                    <tr>
+                                        <td class="text-middle align-middle">
+                                            <span t-esc="sl_no"/>
+                                        </td>
+                                        <td class="text-middle align-middle">
+                                            <span t-esc="profit_line['year']"/>
+                                        </td>
+                                        <td class="text-middle align-middle">
+                                            <span t-esc="profit_line['month']"/>
+                                        </td>
+                                        <td class="text-right align-middle">
+                                            <span t-esc="profit_line['pf_amount']"/>
+                                            <t t-set="total_pf_dur_profit" t-value="total_pf_dur_profit + profit_line['pf_amount']"/>
+                                        </td>
+                                        <td class="text-right align-middle">
+                                            <span t-esc="profit_line['cpf_amount']"/>
+                                            <t t-set="total_cpf_dur_profit" t-value="total_cpf_dur_profit + profit_line['cpf_amount']"/>
+                                        </td>
+                                        <td class="text-right align-middle" style="border: 1px solid black;">
+                                            <t t-set="total_pf_cpf_profit" t-value="profit_line['pf_amount'] + profit_line['cpf_amount']"/>
+                                            <span t-esc="total_pf_cpf_profit"/>
+                                            <t t-set="total_pf_cpf_dur_profit" t-value="total_pf_cpf_dur_profit + total_pf_cpf_profit"/>
+                                        </td>
+                                    </tr>
+                                    <t t-set="sl_no" t-value="sl_no + 1"/>
+                                </t>
+                                <tr class="td_bold">
+                                    <td colspan="3" class="text-middle align-middle">
+                                        During Profit
+                                    </td>
+                                    <td class="text-right align-middle">
+                                        <span t-esc="'{0:,.2f}'.format(total_pf_dur_profit)"/>
+                                    </td>
+                                    <td class="text-right align-middle">
+                                        <span t-esc="'{0:,.2f}'.format(total_cpf_dur_profit)"/>
+                                    </td>
+                                    <td class="text-right align-middle">
+                                        <span t-esc="'{0:,.2f}'.format(total_pf_cpf_dur_profit)"/>
+                                    </td>
+                                </tr>
+                                <!--Closing-->
+                                <tr>
+                                    <td colspan="3" class="text-middle align-middle td_bold">
+                                        Closing Balance
+                                    </td>
+                                    <td class="text-right align-middle td_bold">
+                                        <span t-esc="'{0:,.2f}'.format(opening_pf + total_pf_dur + total_pf_dur_profit)"/>
+
+                                    </td>
+                                    <td class="text-right align-middle td_bold">
+                                        <span t-esc="'{0:,.2f}'.format(opening_pf + total_cpf_dur + total_cpf_dur_profit)"/>
+                                    </td>
+                                    <td class="text-right align-middle td_bold">
+                                        <span t-esc="'{0:,.2f}'.format(opening_total + total_pf_cpf_dur + total_pf_cpf_dur_profit)"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!--Closing-->
+                        <div class="row">
+                            <div class="col-6">
+                                <p style="color: #000; font-size: 20px;">
+                                    Current Loan:
+                                     <t t-esc="'{0:,.2f}'.format(current_loan)"/>
+                                </p>
+                            </div>
+                            <div class="col-6 text-right">
+
+                            </div>
+                        </div>
+
+                        <br/>
+                        <p class="text-right" style="text-decoration: overline;"><strong>AUTHORIZED SIGNATURE</strong></p>
+                    </div>
+                </t>
+            </t>
+		</template>
+	</data>
+</odoo>

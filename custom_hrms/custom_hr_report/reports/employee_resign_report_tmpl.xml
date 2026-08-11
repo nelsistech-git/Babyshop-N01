@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+
+        <record model="ir.actions.report" id="employee_resign_report_id">
+            <field name="name">Employee Resign Report</field>
+            <field name="model">employee.resign.report.wizard</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">custom_hr_report.employee_resign_report_view</field>
+            <field name="report_file">custom_hr_report.employee_resign_report_view</field>
+            <field name="paperformat_id" ref="custom_common_settings.paperformat_custom_a4_bd"/>
+        </record>
+
+		<template id="employee_resign_report_view">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <style type="text/css">
+                            table, th, tr, td{
+                                background: white !important;
+                                border: 1px solid black;
+                            }
+                        </style>
+                        <div class="oe_structure"/>
+                        <div>
+                            <h3 class="text-center head_font_color">
+                                <strong>
+                                    <span t-esc="form['company_id'][1]"/>
+                                    <br/>
+                                    Employee Resign List
+                                    <span t-esc="month"/> - <span t-esc="year"/>
+                                </strong>
+                            </h3>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <p style="color: #000; font-size: 15px;"><strong>Work/Job Location:</strong> <t t-esc="work_loc_name"/></p>
+                            </div>
+                            <div class="col-6 text-right">
+                                <p style="color: #000; font-size: 15px;"><strong>Department Name:</strong>  <t t-esc="dept_name"/>
+                                    <t t-if="buisness_unit">
+                                        <br/>
+                                        <strong>Office/business Unit:</strong>  <t t-esc="buisness_unit"/>
+                                    </t>
+                                    <t t-if="tag_names_list">
+                                        <br/>
+                                        <strong>Tags:</strong>  <t t-esc="tag_names_list"/>
+                                    </t>
+                                </p>
+                            </div>
+                        </div>
+                        <br/>
+
+                        <t t-set="sl_no" t-value="1"/>
+
+                        <t t-foreach="csr" t-as="line">
+                            <t t-foreach="line" t-as="line2">
+                                <div>
+                                    <h6 class="text-left">
+                                        <strong>
+                                            Branch: <span t-esc="line[str(line2)][0]['location_name']"/><br/>
+                                        </strong>
+                                    </h6>
+                                </div>
+                                <table style="border-collapse: collapse;width: 100%; margin-bottom: 2em;" class="table table-condensed">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center align-middle bg_color font_color">Sl. No.</th>
+                                            <th class="text-center align-middle bg_color font_color">Employee ID No.</th>
+                                            <th class="text-left align-middle bg_color font_color">Name of Employee</th>
+                                            <th class="text-left align-middle bg_color font_color">Work/Job Location</th>
+                                            <th class="text-left align-middle bg_color font_color">Department</th>
+                                            <th class="text-left align-middle bg_color font_color">Designation</th>
+                                            <th class="text-center align-middle bg_color font_color">Resign Date</th>
+                                            <th class="text-right align-middle bg_color font_color">Gross Salary</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="consumed_tbody">
+                                        <t t-foreach="line[str(line2)]" t-as="line3">
+                                            <tr>
+                                                <td class="text-center align-middle">
+                                                    <span t-esc="sl_no"/>
+                                                </td>
+                                                <td class="text-center align-middle">
+                                                    <span t-esc="line3['id_card_no']"/>
+                                                </td>
+                                                <td class="text-left align-middle">
+                                                    <span t-esc="line3['emp_name']"/>
+                                                </td>
+                                                <td class="text-left align-middle">
+                                                    <span t-esc="line3['location_name']"/>
+                                                </td>
+                                                <td class="text-left align-middle">
+                                                    <span t-esc="line3['dept_name']"/>
+                                                </td>
+                                                <td class="text-left align-middle">
+                                                    <span t-esc="line3['designation_name']"/>
+                                                </td>
+                                                <td class="text-center align-middle">
+                                                    <span t-esc="line3['resign_date']" t-options='{"widget": "date"}'/>
+                                                </td>
+                                                <td class="text-right align-middle">
+                                                    <span t-esc="'{0:,.2f}'.format(line3['gross_salary'])"/>
+                                                </td>
+                                                <t t-set="sl_no" t-value="sl_no + 1"/>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                                <t t-set="sl_no" t-value="1"/>
+                            </t>
+                        </t>
+                    </div>
+                </t>
+            </t>
+		</template>
+	</data>
+</odoo>

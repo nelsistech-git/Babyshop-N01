@@ -1,0 +1,338 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+	<data>
+        <record id="act_coa_child" model="ir.actions.act_window">
+            <field name="name">Child COA</field>
+            <field name="res_model">account.account</field>
+            <field name="view_mode">tree,form</field>
+            <!--<field name="context">{'search_default_customer': active_id, 'default_customer': active_id}</field>-->
+            <field name="domain">[('parent_id', '=', active_id)]</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Child COA
+                </p>
+            </field>
+        </record>
+
+        <record id="inherited_account_inherit_dynamic_rpt_form" model="ir.ui.view">
+			<field name="name">account.account.form.inherit.dynamic.rpt</field>
+			<field name="model">account.account</field>
+			<field name="inherit_id" ref="account.view_account_form" />
+            <field name="priority">20</field>
+			<field name="arch" type="xml">
+                <xpath expr="//div[@name='button_box']" position="inside">
+                    <field name="parent_child_type" invisible="1"/>
+
+                    <button class="oe_stat_button" type="action" string="Child Accounts"
+                            name="%(dynamic_accounts_report.act_coa_child)d"
+                            icon="fa-sitemap" invisible="parent_child_type != 'parent'" >
+                        <!--<field string="Child" name="coa_child_count" widget="statinfo"/>-->
+                    </button>
+                </xpath>
+<!--                <xpath expr="//field[@name='parent_id']" position="replace">-->
+<!--                </xpath>-->
+                <xpath expr="//field[@name='account_type']" position="replace">
+                </xpath>
+                <xpath expr="//field[@name='tag_ids']" position="replace">
+                </xpath>
+
+
+                <xpath expr="//div[2]" position="replace">
+                    <group>
+                        <group>
+                            <field name="parent_child_type" required="1"/>
+                            <field name="parent_id"
+                                    domain="[('account_type','=','view')]"
+                                    groups="account_parent.group_coas_user"
+                                    context="{'show_parent_account':True}"
+                                    required="parent_child_type == 'child'"/>
+                            <field name="account_type" widget="account_type_selection"/>
+                            <field name="user_type_id_type" invisible="1"/>
+                            <field name="account_type_allow" invisible="account_type != 'view'"/>
+                            <field name="code" string="Code" placeholder="e.g. 101000" class="oe_inline"/>
+                            <field name="name" string="Account Name" placeholder="e.g. Current Assets" style="width:80% !important;"/>
+                            <field name="tag_ids" widget="many2many_tags" domain="[('applicability', '=', 'accounts')]" context="{'default_applicability': 'accounts'}" options="{'no_create_edit': True}"/>
+
+                        </group>
+                        <group>
+                            <field name="parent_hierarchy" readonly="1" decoration-info="parent_hierarchy!=''" style="font-weight:bold;"/>
+                            <field name="child_parent_child_type" required="1" invisible="parent_child_type == 'child'" />
+					        <field name="child_code_digit" required="1" invisible="parent_child_type == 'child'" />
+                        </group>
+
+                    </group>
+                </xpath>
+
+                <!--<xpath expr="//button[@name='account.action_move_line_select']" position="attributes">
+                    <attribute name="invisible">parent_child_type != 'child'</attribute>
+                </xpath>-->
+
+                <!--<xpath expr="//field[@name='parent_id']" position="before">
+                    <field name="user_type_id_type" invisible="1"/>
+                    &lt;!&ndash;<field name="allow_user_type_id"  options="{'no_open':1,'no_create':1,'no_create_edit':1}" required="1"/>&ndash;&gt;
+                </xpath>-->
+
+
+                <!--<xpath expr="//field[@name='account_type']" position="attributes">
+                    <attribute name="options">{'no_create_edit': True, 'no_create': True, 'no_open':True}</attribute>
+                    <attribute name="readonly">True</attribute>
+                    <attribute name="force_save">True</attribute>
+                </xpath>-->
+
+<!--                <xpath expr="//field[@name='parent_id']" position="replace">-->
+<!--                </xpath>-->
+                <!--<xpath expr="//field[@name='related_parent_id']" position="replace">
+                </xpath>-->
+                <!--<xpath expr="//field[@name='code']" position="replace">
+                </xpath>
+                <xpath expr="//field[@name='name']" position="replace">
+                </xpath>-->
+
+<!--               <xpath-->
+<!--                    expr="//form/sheet/group/group/field[@name='account_type']"-->
+<!--                    position="before">-->
+
+<!--                   <field name="user_type_id_type" invisible="1"/>-->
+
+<!--                    <field name="parent_id"-->
+<!--					domain="[('internal_type','=','view'),('allow_user_type_id','!=',None)]"-->
+<!--					groups="account_parent.group_coas_user"-->
+<!--					context="{'show_parent_account':True}" attrs="{'required': [('parent_child_type','=','child')]}" options="{'no_open':1,'no_create':1,'no_create_edit':1}"/>-->
+
+<!--                   <field name="related_parent_id" string="Parent of Parent" options="{'no_open':1,'no_create':1,'no_create_edit':1}" invisible="1"/>-->
+
+<!--                </xpath>-->
+                <!--<xpath
+                    expr="//field[@name='account_type']"
+                    position="after">
+
+                    <field name="allow_user_type_id"  options="{'no_open':1,'no_create':1,'no_create_edit':1}" attrs="{'invisible': [('user_type_id_type','!=','view')]}"/>
+                    <field name="code"/>
+				    <field name="name"/>
+                </xpath>-->
+
+<!--                <xpath expr="//field[@name='deprecated']" position="after">-->
+<!--                    <field name="report_by" invisible="1"/>-->
+<!--                </xpath>-->
+
+<!--                <xpath expr="//field[@name='name']" position="after">-->
+<!--                    <field name="cash_flow_category"-->
+<!--                           options="{'no_create_edit': True,'no_create': True, 'no_quick_create': True}" invisible="1"/>-->
+<!--                </xpath>-->
+
+                <xpath expr="//page[@name='accounting']" position="before">
+                    <page string="FS Recommendation And Settings" name="fs_recom_settings">
+                        <group>
+                            <field name="parent_rpt_config_line_ids" invisible="account_type != 'view'">
+                                <tree editable="bottom">
+                                    <field name="fs_particular_id" required="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                    <!--<field name="rec_type" />--> <!--required="1"-->
+                                    <!--<field name="rec_title_id" domain="[('acc_particular_id.type', '=', rec_type)]" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" required="1"/>-->
+                                    <field name="rec_title_id" domain="[('acc_particular_id', '=', fs_particular_id)]" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" required="1"/>
+                                    <field name="rec_amt_type" required="1"/>
+                                    <field name="rec_sign" required="1"/>
+                                </tree>
+                                <form >
+                                    <group>
+                                        <field name="fs_particular_id" readonly="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                        <!--<field name="rec_type" readonly="1"/>-->
+                                        <field name="rec_title_id" readonly="1" domain="[('acc_particular_id', '=', fs_particular_id)]" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                        <field name="rec_amt_type" readonly="1"/>
+                                        <field name="rec_sign" readonly="1"/>
+                                    </group>
+                                </form>
+                            </field>
+                        </group>
+                        <group>
+                            <field name="rpt_config_line_ids" invisible="account_type == 'view'">
+                                <tree editable="bottom">
+                                    <field name="fs_particular_id" required="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                    <!--<field name="rec_type" />-->
+                                    <field name="rec_title_id" domain="[('acc_particular_id', '=', fs_particular_id)]" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" required="1"/>
+                                    <field name="rec_amt_type" required="1"/>
+                                    <field name="rec_sign" required="1"/>
+
+                                    <field name="conf_fs_particular_id" readonly="1" style="background-color: #fae7e6;" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                    <!--<field name="conf_type" readonly="1" style="background-color: #fae7e6;"/>-->
+                                    <field name="conf_title_id" readonly="1" style="background-color: #fae7e6;"/>
+                                    <field name="conf_amt_type" readonly="1" style="background-color: #fae7e6;"/>
+                                    <field name="conf_sign" readonly="1" style="background-color: #fae7e6;"/>
+                                </tree>
+                                <form >
+                                    <group>
+                                        <field name="fs_particular_id" readonly="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                        <!--<field name="rec_type" readonly="1"/>-->
+                                        <field name="rec_title_id" readonly="1" domain="[('acc_particular_id', '=', fs_particular_id)]" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                        <field name="rec_amt_type" readonly="1"/>
+                                        <field name="rec_sign" readonly="1"/>
+
+                                        <field name="conf_fs_particular_id" readonly="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                        <!--<field name="conf_type" readonly="1"/>-->
+                                        <field name="conf_title_id" readonly="1"/>
+                                        <field name="conf_amt_type" readonly="1"/>
+                                        <field name="conf_sign" readonly="1"/>
+                                    </group>
+                                </form>
+                            </field>
+                        </group>
+                    </page>
+				</xpath>
+
+			</field>
+		</record>
+
+        <!--<record id="inherited_account_day_book_inherit_dynamic_rpt_form" model="ir.ui.view">
+			<field name="name">account.account.form.inherit.day.book.dynamic.rpt</field>
+			<field name="model">account.account</field>
+			<field name="inherit_id" ref="account.view_account_form" />
+			<field name="arch" type="xml">-->
+
+<!--                <xpath expr="//field[@name='tag_ids']" position="attributes">-->
+<!--                    <attribute name="readonly">1</attribute>-->
+<!--                    <attribute name="force_save">1</attribute>-->
+<!--                </xpath>-->
+
+                <!--<xpath expr="//field[@name='total_debit']" position="before">
+                    <field name="parent_hierarchy" readonly="1" decoration-info="parent_hierarchy!=''" style="font-weight:bold;"/>
+                </xpath>-->
+
+				<!--<xpath expr="//field[@name='acc_remarks']" position="after">
+					<field name="child_parent_child_type" required="1" invisible="parent_child_type == 'child'" />
+					<field name="child_code_digit" required="1" invisible="parent_child_type == 'child'" />
+                </xpath>-->
+
+				<!--<xpath expr="//page[@name='other_settings']" position="before">
+                    <page string="FS Recommendation And Settings" name="fs_recom_settings">
+                        <group>
+                            <field name="parent_rpt_config_line_ids" invisible="account_type != 'view'">
+                                <tree editable="bottom">
+                                    <field name="fs_particular_id" required="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                    &lt;!&ndash;<field name="rec_type" />&ndash;&gt; &lt;!&ndash;required="1"&ndash;&gt;
+                                    &lt;!&ndash;<field name="rec_title_id" domain="[('acc_particular_id.type', '=', rec_type)]" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" required="1"/>&ndash;&gt;
+                                    <field name="rec_title_id" domain="[('acc_particular_id', '=', fs_particular_id)]" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" required="1"/>
+                                    <field name="rec_amt_type" required="1"/>
+                                    <field name="rec_sign" required="1"/>
+                                </tree>
+                                <form >
+                                    <group>
+                                        <field name="fs_particular_id" readonly="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                        &lt;!&ndash;<field name="rec_type" readonly="1"/>&ndash;&gt;
+                                        <field name="rec_title_id" readonly="1" domain="[('acc_particular_id', '=', fs_particular_id)]" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                        <field name="rec_amt_type" readonly="1"/>
+                                        <field name="rec_sign" readonly="1"/>
+                                    </group>
+                                </form>
+                            </field>
+                        </group>
+                        <group>
+                            <field name="rpt_config_line_ids" invisible="account_type == 'view'">
+                                <tree editable="bottom">
+                                    <field name="fs_particular_id" required="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                    &lt;!&ndash;<field name="rec_type" />&ndash;&gt;
+                                    <field name="rec_title_id" domain="[('acc_particular_id', '=', fs_particular_id)]" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" required="1"/>
+                                    <field name="rec_amt_type" required="1"/>
+                                    <field name="rec_sign" required="1"/>
+
+                                    <field name="conf_fs_particular_id" readonly="1" style="background-color: #fae7e6;" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                    &lt;!&ndash;<field name="conf_type" readonly="1" style="background-color: #fae7e6;"/>&ndash;&gt;
+                                    <field name="conf_title_id" readonly="1" style="background-color: #fae7e6;"/>
+                                    <field name="conf_amt_type" readonly="1" style="background-color: #fae7e6;"/>
+                                    <field name="conf_sign" readonly="1" style="background-color: #fae7e6;"/>
+                                </tree>
+                                <form >
+                                    <group>
+                                        <field name="fs_particular_id" readonly="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                        &lt;!&ndash;<field name="rec_type" readonly="1"/>&ndash;&gt;
+                                        <field name="rec_title_id" readonly="1" domain="[('acc_particular_id', '=', fs_particular_id)]" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                        <field name="rec_amt_type" readonly="1"/>
+                                        <field name="rec_sign" readonly="1"/>
+
+                                        <field name="conf_fs_particular_id" readonly="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                        &lt;!&ndash;<field name="conf_type" readonly="1"/>&ndash;&gt;
+                                        <field name="conf_title_id" readonly="1"/>
+                                        <field name="conf_amt_type" readonly="1"/>
+                                        <field name="conf_sign" readonly="1"/>
+                                    </group>
+                                </form>
+                            </field>
+                        </group>
+                    </page>
+				</xpath>-->
+
+			<!--</field>
+		</record>-->
+
+        <record id="view_account_list_inherit_acc_dynamic_rpt" model="ir.ui.view">
+            <field name="name">view.account.list.inherit.acc.dynamic.rpt</field>
+            <field name="model">account.account</field>
+            <field name="inherit_id" ref="account.view_account_list"/>
+            <field name="arch" type="xml">
+                <xpath expr="//tree" position="attributes">
+                    <attribute name="decoration-info">parent_child_type == 'parent'</attribute>
+                    <attribute name="edit">false</attribute>
+                    <!--<attribute name="delete">false</attribute>-->
+                </xpath>
+
+                <xpath expr="//field[@name='name']" position="after">
+                    <!--<field name="parent_id" optional="hide"/>-->
+					<field name="rpt_config_line_ids" string="Report Mapping" optional="hide"/>
+                </xpath>
+                <xpath expr="//field[@name='code']" position="before">
+					<field name="parent_child_type"/>
+                </xpath>
+
+            </field>
+        </record>
+
+        <!--<record id="inherited_account_day_book_inherit_dynamic_rpt_form_access" model="ir.ui.view">
+            <field name="name">account.account.form.modify.access</field>
+            <field name="model">account.account</field>
+            <field name="inherit_id" ref="dynamic_accounts_report.inherited_account_day_book_inherit_dynamic_rpt_form"/>
+            <field name="groups_id" eval="[(6, 0, [ref('base_accounting_kit.group_coa_controller')])]"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='parent_rpt_config_line_ids']/tree" position="attributes">
+                    <attribute name="create">true</attribute>
+                    <attribute name="edit">true</attribute>
+                    <attribute name="delete">true</attribute>
+                    <attribute name="editable">bottom</attribute>
+                </xpath>
+                <xpath expr="//field[@name='rpt_config_line_ids']/tree" position="attributes">
+                    <attribute name="create">true</attribute>
+                    <attribute name="edit">true</attribute>
+                    <attribute name="delete">true</attribute>
+                    <attribute name="editable">bottom</attribute>
+                </xpath>
+                &lt;!&ndash;<xpath expr="//field[@name='tag_ids']" position="attributes">
+                    <attribute name="readonly">0</attribute>
+                    <attribute name="force_save">1</attribute>
+                </xpath>&ndash;&gt;
+
+            </field>
+        </record>-->
+
+        <!-- user type id readony false for coa controller-->
+<!--        <record id="inherited_account_inherit_dynamic_rpt_form_access" model="ir.ui.view">-->
+<!--            <field name="name">account.account.form.inherit.dynamic.rpt.access</field>-->
+<!--            <field name="model">account.account</field>-->
+<!--            <field name="inherit_id" ref="dynamic_accounts_report.inherited_account_inherit_dynamic_rpt_form"/>-->
+<!--            &lt;!&ndash;<field name="groups_id" eval="[(6, 0, [ref('base_accounting_kit.group_coa_controller')])]"/>&ndash;&gt;-->
+<!--            <field name="groups_id" eval="[Command.link(ref('base_accounting_kit.group_coa_controller'))]"/>-->
+<!--            <field name="arch" type="xml">-->
+<!--                <xpath expr="//field[@name='account_type']" position="attributes">-->
+<!--                    <attribute name="readonly">False</attribute>-->
+<!--                </xpath>-->
+<!--            </field>-->
+<!--        </record>-->
+
+	</data>
+</odoo>
+
+<!--
+update account_report_config_line accf set fs_particular_id=ap.id
+from acc_particular ap
+where accf.rec_type=ap.type and ap.fs_dept='accounts';
+
+update parent_account_report_config_line accf set fs_particular_id=ap.id
+from acc_particular ap
+where accf.rec_type=ap.type and ap.fs_dept='accounts';-->

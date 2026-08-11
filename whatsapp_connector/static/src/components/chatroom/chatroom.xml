@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="chatroom.Chatroom" owl="1">
+        <div class="o_Chatroom" t-ref="chatroomRef">
+            <div t-attf-class="{{ leftColumnClasses }}">
+                <ConversationList conversations="state.conversations"
+                    selectedConversation="state.selectedConversation"
+                    uiTick="state.uiTick"
+                    mobileNavigate="() => this.env.chatBus.trigger('mobileNavigate', 'middleSide')" />
+            </div>
+            <div class="o_sidebar o_sidebar_content col-12 col-md-8"
+                t-attf-class="{{ middleColumnClasses }} {{ state.currentMobileSide and middleSideMobile }}">
+                <ChatroomHeader>
+                    <i class="navbar-toggler-left d-md-none d-inline-flex align-items-center justify-content-center text-primary fa fa-fw fa-chevron-circle-left"
+                        t-on-click="() => this.env.chatBus.trigger('mobileNavigate', 'firstSide')" />
+                    <ConversationHeader selectedConversation="state.selectedConversation" />
+                    <i class="navbar-toggler-right d-lg-none d-inline-flex align-items-center justify-content-center text-primary fa fa-fw fa-chevron-circle-right"
+                        t-on-click="() => this.env.chatBus.trigger('mobileNavigate', 'lastSide')" />
+                    <button type="button" class="btn btn-sm btn-link text-muted px-2 d-none d-lg-inline-flex align-items-center justify-content-center"
+                        t-att-title="focusToggleTitle"
+                        t-on-click="cycleFocusChat">
+                        <i t-attf-class="fa fa-fw {{ focusToggleIcon }}"/>
+                    </button>
+                    <div class="d-lg-flex align-items-center d-none">
+                      <button class="btn btn-sm btn-link px-2 left-btn d-inline-flex align-items-center justify-content-center"
+                        t-att-title="'Reduce'"
+                        t-on-click="changeTabSize" t-if="chatroomTabSize &gt; -2">
+                          <i class="fa fa-fw fa-arrow-left"/>
+                      </button>
+                      <button class="btn btn-sm btn-link px-2 right-btn d-inline-flex align-items-center justify-content-center"
+                          t-att-title="'Increase'"
+                          t-on-click="changeTabSize" t-if="chatroomTabSize &lt; 2">
+                          <i class="fa fa-fw fa-arrow-right"/>
+                      </button>
+                    </div>
+                </ChatroomHeader>
+                <div class="o_Chatroom_thread_wrap">
+                    <ConversationThread selectedConversation="state.selectedConversation" uiTick="state.uiTick" />
+                </div>
+                <Toolbox selectedConversation="state.selectedConversation"
+                    user="state.user"
+                    defaultAnswers="defaultAnswers" />
+            </div>
+            <div class="o_sidebar o_sidebar_right"
+                t-attf-class="{{ rightColumnClasses }} {{ state.currentMobileSide and lastSideMobile }}">
+                <ChatroomHeader className="'d-lg-none'">
+                    <i class="navbar-toggler-left text-primary fa fa-chevron-circle-left"
+                        t-on-click="() => this.env.chatBus.trigger('mobileNavigate', 'middleSide')" />
+                    <div class="mx-3" >
+                        <ConversationName selectedConversation="state.selectedConversation" />
+                    </div>
+                </ChatroomHeader>
+                <TabsContainer selectedConversation="state.selectedConversation"
+                    defaultAnswers="defaultAnswers"
+                    conversationUsedFields="conversationUsedFields"
+                    conversationInfoForm="conversationInfoForm"
+                    conversationKanban="conversationKanban"
+                    aiIntefaceForm="aiIntefaceForm"
+                    tabSelected="state.tabSelected"
+                    user="state.user"
+                    t-if="state.renderForms" />
+            </div>
+        </div>
+    </t>
+
+</templates>

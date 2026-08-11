@@ -1,0 +1,198 @@
+<odoo>
+    <data>
+        <record id="view_employee_pf_settlement_form" model="ir.ui.view">
+            <field name="name">view.employee.pf.settlement.form</field>
+            <field name="model">employee.pf.settlement</field>
+            <field name="arch" type="xml">
+                <form delete ="0" string="">
+                    <header>
+                        <button name="action_draft" string="Send to Draft" type="object" groups="base.group_system" />
+
+                        <button name="action_submit" type="object" string="Submit" invisible="state not in  ['draft']" class="oe_highlight" />
+                        <button name="action_hr_approve"  type="object" string="HR Approve" invisible="state not in  ['confirm']" class="oe_highlight" confirm="Are you sure you want to Approve?"/>
+
+                        <button name="action_accounts_approve"  type="object" string="Accounts Approve" invisible="state not in  ['hr']"  class="oe_highlight" confirm="Are you sure you want to Approve?"/>
+                        <button name="action_admin_approve"  type="object" string="Trusty Approve" invisible="state not in ['account']"  class="oe_highlight" confirm="Are you sure you want to Approve?"/>
+
+                        <button name="action_settlement_done"  type="object" string="Settlement Done" invisible="state not in ['admin']" class="oe_highlight" confirm="Are you sure you want to Settlement?"/>
+                        <button name="action_done"  type="object" string="Payment Done" invisible="state not in ['settlement']" class="oe_highlight" confirm="Are you sure you want to Payment?"/>
+
+                        <button name="action_print"  type="object" string="Print Settlement" invisible="state in ['cancel']"/>
+                        <button name="action_cancel" type="object" string="Cancel" invisible="state in ['admin', 'settlement', 'done']" confirm="Are you sure you want to Cancel?" />
+                        <field name="state" widget="statusbar" statusbar_visible="draft,confirm,hr,account,admin,settlement,done,cancel"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box" groups="base.group_user">
+                            <button name="act_current_employee_pf" type="object" class="oe_stat_button" icon="fa-calendar" >
+                                <field name="pf_count" widget="statinfo" string="PF Details" />
+                            </button>
+                            <button name="act_current_employee_loan" string="Loan Details" type="object" class="oe_stat_button" icon="fa-calendar" >
+                            </button>
+
+                        </div>
+
+                        <group>
+                            <group>
+                                <field name="pf_policy_id" required="1" options="{'no_open':True,'no_create':1,'no_create_edit':1}" readonly="state != 'draft'"/>
+                                <field name="pf_profile_id" required="1" options="{'no_open':True,'no_create':1,'no_create_edit':1}" readonly="state != 'draft'"/>
+                                <field name="name" required="1" readonly="state != 'draft'"/>
+                            </group>
+                            <group></group>
+                        </group>
+
+                        <group>
+                            <group string="Employee Information">
+                                <field name="employee_id" required="1" readonly="1" force_save="1" domain="[('pf_settlement_status', '=', False)]" options="{'no_open':True,'no_create':1,'no_create_edit':1}"/>
+                                <field name="partner_id" required="1" readonly="1" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1}" />
+                                <field name="pf_board_id" readonly="1" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1}"/>
+                                <field name="company_id" readonly="1" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1}"/>
+                                <field name="job_position" readonly="1" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1}" />
+                                <field name="old_empid" readonly="1" force_save="1"/>
+                                <field name="user_work_location_id" readonly="1" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1}"/>
+                                <field name="department_id" readonly="1" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1}"/>
+                                <field name="initial_employment_date" readonly="1" force_save="1" />
+                                <field name="membership_date" readonly="1" force_save="1"/>
+
+
+
+                            </group>
+                            <group string="Effective Information">
+                                <field name="date_requested" readonly="1" force_save="1"/>
+                                <field name="last_day_of_work" required="1" readonly="state != 'draft'"/>
+                                <field name="length_of_service" readonly="1" force_save="1"/>
+                                <field name="membership_period" readonly="1" force_save="1"/>
+                                <field name="ref_id" readonly="1" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1}"/>
+                                <field name="date_of_separation" readonly="1" force_save="1"/>
+                                <field name="resignation_type_id" readonly="1" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1}"/>
+                                <field name="notice_served" readonly="state != 'draft'"/>
+                                <field name="notice_period" readonly="state != 'draft'"/>
+                                <field name="notice_period_days" invisible="notice_period == 'no'" readonly="state != 'draft'"/>
+                                <field name="date_of_notice" readonly="state != 'draft'"/>
+
+                            </group>
+                        </group>
+
+                        <group>
+                            <group string="Employee (PF)">
+                                <field name="contribution_pf" readonly="1" force_save="1"/>
+                                <field name="profit_pf" readonly="1" force_save="1"/>
+                                <field name="contribution_eligible_pf" readonly="1" force_save="1" decoration-success="(contribution_eligible_pf &gt; 0)"/>
+                                <field name="profit_eligible_pf" readonly="1" force_save="1" decoration-success="(profit_eligible_pf &gt; 0)"/>
+
+                            </group>
+                            <group string="Company (CPF)">
+                                <field name="contribution_cpf" readonly="1" force_save="1"/>
+                                <field name="profit_cpf" readonly="1" force_save="1"/>
+                                <field name="contribution_eligible_cpf" readonly="1" force_save="1" decoration-success="(contribution_eligible_cpf &gt; 0)"/>
+                                <field name="profit_eligible_cpf" readonly="1" force_save="1" decoration-success="(profit_eligible_cpf &gt; 0)"/>
+                            </group>
+                        </group>
+                        <group>
+                            <group string="Total Contribution and Eligible">
+                                <field name="total_contribution" readonly="1" force_save="1"/>
+                                <field name="total_eligible" readonly="1" force_save="1" decoration-success="(total_eligible &gt; 0)"/>
+                                <field name="reserve_amount" readonly="1" force_save="1" decoration-danger="(reserve_amount &gt; 0)"/>
+                            </group>
+                            <group string="Loan">
+                                <field name="current_loan" readonly="1" force_save="1" decoration-danger="(current_loan &gt; 0)"/>
+                            </group>
+                        </group>
+                        <group>
+                            <group string="Others ">
+                                <field name="other_deduction" readonly="state != 'draft'" decoration-danger="(other_deduction &gt; 0)"/>
+                                <field name="other_deduct_note" readonly="state != 'draft'" />
+                            </group>
+                            <group string="Total Amount">
+                                <field name="total_amount" readonly="1" force_save="1" style="font-weight:bold;" decoration-success="(total_amount &gt; 0)"/>
+                            </group>
+                        </group>
+
+                        <group invisible="state not in ['admin','settlement','done']">
+                            <group string="Settlement Journal Entry" >
+                                <field name="date_settlement" required="state == 'admin'" readonly="state not in ['admin']"/>
+                                <field name="journal_id_settlement" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" required="state == 'admin'" readonly="state not in ['admin']"/>
+                               <field name="payable_acc_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" required="state == 'admin'" readonly="state not in ['admin']"/>
+                               <field name="loan_acc_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" required="state == 'admin'" readonly="state not in ['admin']"/>
+                                <field name="reserve_acc_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" required="state == 'admin'" readonly="state not in ['admin']"/>
+                               <field name="other_acc_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" required="state == 'admin'" readonly="state not in ['admin']"/>
+                               <field name="payable_emp_acc_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" required="state == 'admin'" readonly="state not in ['admin']"/>
+                                <field name="settlement_move_id" readonly="1" />
+                           </group>
+                            <group string="Payment Journal Entry" invisible="state not in ['settlement','done']">
+                                <field name="date_payment" required="state == 'settlement'" readonly="state not in ['settlement']"/>
+                               <field name="journal_id_payment" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" required="state == 'settlement'" readonly="state not in ['settlement']"/>
+                               <field name="payment_acc_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" required="state == 'settlement'" readonly="state not in ['settlement']"/>
+                                <field name="payment_move_id" readonly="1" />
+
+                            </group>
+
+                        </group>
+
+                    </sheet>
+
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"
+                            groups="base.group_user" />
+                        <field name="message_ids" widget="mail_thread" />
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_employee_pf_settlement_tree" model="ir.ui.view">
+            <field name="name">view.employee.pf.settlement.tree</field>
+            <field name="model">employee.pf.settlement</field>
+            <field name="arch" type="xml">
+                <tree delete ="0" string="Final Settlement" decoration-muted="state=='cancel'" decoration-info="state=='draft'"
+					decoration-success="state=='done'">
+                    <field name="name"/>
+                    <field name="date_requested"/>
+                    <field name="employee_id"/>
+                    <field name="resignation_type_id"/>
+                    <field name="date_of_separation"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="search_employee_pf_settlement_search" model="ir.ui.view">
+			<field name="name">search.employee.pf.settlement.search</field>
+			<field name="model">employee.pf.settlement</field>
+			<field name="arch" type="xml">
+				<search string="Search Employee PF">
+                    <field name="name"/>
+                    <field name="employee_id"/>
+                    <field name="old_empid"/>
+                    <field name="user_work_location_id"/>
+                    <field name="department_id"/>
+                    <field name="date_requested"/>
+                    <field name="resignation_type_id"/>
+					<separator />
+					<filter name="state" string="Not Cancel"
+						domain="[('state', '!=', 'cancel')]" />
+					<separator />
+				</search>
+			</field>
+		</record>
+
+        <record id="employee_pf_settlement_action" model="ir.actions.act_window">
+            <field name="name">PF Final Settlement</field>
+            <field name="res_model">employee.pf.settlement</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{'search_default_state':1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create a Final Settlement of a Employee
+                </p>
+            </field>
+        </record>
+
+        <menuitem id="menu_employee_pf_settlement_action" name="PF Final Settlement" parent="custom_hr_employee.menu_hr_employee_operations"
+                  action="hr_final_settlement.employee_pf_settlement_action" groups="provident_fund.group_provident_fund_officer" sequence="11"/>
+
+        <menuitem id="menu_employee_pf_settlement_pf_menu" name="PF Settlement" parent="base.menu_hr_employee_pf_root"
+                  action="hr_final_settlement.employee_pf_settlement_action" groups="provident_fund.group_provident_fund_officer" sequence="10"/>
+
+
+    </data>
+</odoo>

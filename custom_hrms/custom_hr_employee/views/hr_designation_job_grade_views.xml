@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <!--Form View-->
+        <record id="hr_desig_job_grade_line_view_form" model="ir.ui.view">
+            <field name="name">hr.job.grade.line.form</field>
+            <field name="model">hr.job.grade.line</field>
+            <field name="arch" type="xml">
+                <form string="Designation-Job Grade">
+                    <sheet>
+                        <group name="main">
+                            <group>
+                                <field name="job_grade" options="{'no_open':True,'no_create':1,'no_create_edit':1}"/>
+                                <field name="grade_type" options="{'no_open':True,'no_create':1,'no_create_edit':1}"
+                                       readonly="1"/>
+                                <field name="job_level" options="{'no_open':True,'no_create':1,'no_create_edit':1}"
+                                       readonly="1"/>
+                            </group>
+                            <group>
+                                <field name="name" options="{'no_open':True,'no_create':1,'no_create_edit':1}"/>
+                                <field name="dept_name" options="{'no_open':True,'no_create':1,'no_create_edit':1}"
+                                       readonly="1"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!--Tree View-->
+        <record id="hr_desig_job_grade_line_view_tree" model="ir.ui.view">
+            <field name="name">hr.job.grade.line.tree</field>
+            <field name="model">hr.job.grade.line</field>
+            <!--            <field name="view_type">tree</field>-->
+            <field name="arch" type="xml">
+                <tree string="Grade Type">
+                    <field name="job_grade" options="{'no_open':True,'no_create':1,'no_create_edit':1}"/>
+                    <field name="grade_type" options="{'no_open':True,'no_create':1,'no_create_edit':1}"/>
+                    <field name="job_level" options="{'no_open':True,'no_create':1,'no_create_edit':1}"/>
+                    <field name="name" options="{'no_open':True,'no_create':1,'no_create_edit':1}"/>
+                    <field name="dept_name" options="{'no_open':True,'no_create':1,'no_create_edit':1}"/>
+                </tree>
+            </field>
+        </record>
+
+        <!--Search View-->
+        <!--        <record id="hr_desig_job_grade_line_view_search" model="ir.ui.view">-->
+        <!--			<field name="name">hr.job.grade.line.search</field>-->
+        <!--			<field name="model">hr.job.grade.line</field>-->
+        <!--			<field name="arch" type="xml">-->
+        <!--				<search string="Search Event">-->
+        <!--					<field name="job_grade" options="{'no_open':True,'no_create':1,'no_create_edit':1}"/>-->
+        <!--                	<field name="grade_type" options="{'no_open':True,'no_create':1,'no_create_edit':1}"/>-->
+        <!--                    <field name="job_level" options="{'no_open':True,'no_create':1,'no_create_edit':1}"/>-->
+        <!--                    <field name="name" options="{'no_open':True,'no_create':1,'no_create_edit':1}"/>-->
+        <!--                    <field name="dept_name" options="{'no_open':True,'no_create':1,'no_create_edit':1}"/>-->
+        <!--                    -->
+        <!--                    <group expand="0" string="Group By">-->
+        <!--                    	<filter string="Grade" domain="[]" context="{'group_by':'job_grade'}"/>-->
+        <!--                        <filter string="Department" domain="[]" context="{'group_by':'dept_name'}"/>-->
+        <!--                    </group>-->
+        <!--				</search>-->
+        <!--			</field>-->
+        <!--		</record>-->
+
+        <!--Action View Job grade-->
+        <record id="hr_desig_job_grade_line_view_list_action" model="ir.actions.act_window">
+            <field name="name">Designation-Job Grade</field>
+            <field name="res_model">hr.job.grade.line</field>
+            <!--            <field name="view_type">form</field>-->
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_mode">tree,form</field>
+            <!-- <field name="context">{'readonly_by_pass':['name', 'grade_type', 'job_level']}</field> -->
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">Create the first Designation-Job Grade</p>
+            </field>
+        </record>
+
+        <menuitem id="menu_hr_desig_job_grade_line"
+                  name="Designation-Job Grade" parent="menu_hr_job_grade_root"
+                  sequence="20" action="hr_desig_job_grade_line_view_list_action"
+                  groups="hr.group_hr_manager"/>
+
+    </data>
+</odoo>

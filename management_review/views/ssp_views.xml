@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="ssp_review_view_tree" model="ir.ui.view">
+        <field name="name">ssp.review.view.tree</field>
+        <field name="model">ssp.review</field>
+        <field name="arch" type="xml">
+            <tree string="Management Review">
+                <field name="name"/>
+                <field name="periodicity"/>
+                <field name="next_run_date" groups="base.group_no_one"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </tree>
+        </field>
+    </record>
+    <record id="ssp_review_view_form" model="ir.ui.view">
+        <field name="name">ssp.review.view.form</field>
+        <field name="model">ssp.review</field>
+        <field name="arch" type="xml">
+            <form string="Management Review">
+                <header>
+                    <button type="object" name="action_deactivate" string="Deactivate for everyone" class="oe_highlight" groups="base.group_system" invisible="state == &apos;deactivated&apos;"/>
+                    <button type="object" name="action_activate" string="Activate" class="oe_highlight" groups="base.group_system" invisible="state == &apos;activated&apos;"/>
+                    <button type="object" name="action_send" string="Send Now" class="oe_highlight" groups="base.group_system" invisible="state == &apos;deactivated&apos;"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="periodicity" widget="radio" options="{&apos;horizontal&apos;: true}" readonly="0"/>
+                            <field name="template_id" groups="base.group_no_one"/>
+                            <field name="next_run_date" groups="base.group_system"/>
+                            <field name="company_id" options="{&apos;no_create&apos;: True}"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="recipients" string="Recipients" groups="base.group_system">
+                            <group>
+                                <field name="user_ids" options="{&apos;no_create&apos;: True}">
+                                    <tree string="Recipients">
+                                        <field name="name"/>
+                                        <field name="email"/>
+                                    </tree>
+                                </field>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="ssp_review_view_search" model="ir.ui.view">
+        <field name="name">ssp.review.view.search</field>
+        <field name="model">ssp.review</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="user_ids"/>
+                <group expand="1" string="Group by">
+                    <filter string="Periodicity" name="periodicity" context="{&apos;group_by&apos;: &apos;periodicity&apos;}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    <record id="ssp_review_action" model="ir.actions.act_window">
+        <field name="name">Management Review Emails</field>
+        <field name="res_model">ssp.review</field>
+        <field name="search_view_id" ref="ssp_review_view_search"/>
+    </record>
+    <menuitem id="ssp_review_menu" action="ssp_review_action" parent="ssp_reveiw_daily_config" groups="management_review.group_ssp_review_dashboard_manager" sequence="93"/>
+</odoo>

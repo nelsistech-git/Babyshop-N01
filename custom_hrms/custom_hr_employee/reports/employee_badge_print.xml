@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<!--    <report id="po_barcode_rpt_format_1_label" model="po.barcode.report.wizard"-->
+<!--			string="PO Barcode Format-1" name="custom_barcode.po_barcode_rpt_format_1_qweb"-->
+<!--			file="custom_barcode.po_barcode_rpt_format_1" report_type="qweb-pdf" />-->
+
+<!--    <record id="paperformat_po_barcode_rpt_format_1"-->
+<!--        model="report.paperformat">-->
+<!--        <field name="name">PO Barcode Format-1</field>-->
+<!--        <field name="default" eval="True" />-->
+<!--        <field name="format">custom</field>-->
+<!--        <field name="page_height">290 </field>-->
+<!--        <field name="page_width">220</field>-->
+<!--        <field name="orientation">Portrait</field>-->
+<!--        <field name="margin_top">1</field>-->
+<!--        <field name="margin_bottom">0</field>-->
+<!--        <field name="margin_left">1</field>-->
+<!--        <field name="margin_right">1</field>-->
+<!--        <field name="header_line" eval="False" />-->
+<!--        <field name="header_spacing">0</field>-->
+<!--        <field name="dpi">90</field>-->
+<!--    </record>-->
+<!--    <record id="po_barcode_rpt_format_1_label" model="ir.actions.report">-->
+<!--        <field name="paperformat_id"-->
+<!--            ref="custom_barcode.paperformat_po_barcode_rpt_format_1" />-->
+<!--    </record>-->
+
+<!--    <template id="po_barcode_rpt_format_1_qweb">-->
+<!--    <report-->
+<!--        id="custom_hr_employee.employee_badge_print_format"-->
+<!--        string="Employee Badge Print"-->
+<!--        model="employee.badge.print.wizard"-->
+<!--        report_type="qweb-pdf"-->
+<!--        name="custom_hr_employee.employee_badge_print_format_line_qweb"-->
+<!--        file="custom_hr_employee.employee_badge_print_format_line"/>-->
+
+    <record id="employee_badge_print_format" model="ir.actions.report">
+        <field name="name">"Employee Badge Print</field>
+        <field name="model">employee.badge.print.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">custom_hr_employee.employee_badge_print_format_line_qweb</field>
+        <field name="report_file">custom_hr_employee.employee_badge_print_format_line_qweb</field>
+
+    </record>
+
+    <record id="paperformat_employee_badge_print_format_line"
+        model="report.paperformat">
+        <field name="name">Employee Badge Format</field>
+        <field name="default" eval="True" />
+        <field name="format">custom</field>
+        <field name="page_height">310 </field>
+        <field name="page_width">220</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">1</field>
+        <field name="margin_bottom">0</field>
+        <field name="margin_left">1</field>
+        <field name="margin_right">1</field>
+        <field name="header_line" eval="False" />
+        <field name="header_spacing">0</field>
+        <field name="dpi">90</field>
+    </record>
+    <record id="custom_hr_employee.employee_badge_print_format" model="ir.actions.report">
+        <field name="paperformat_id"
+            ref="custom_hr_employee.paperformat_employee_badge_print_format_line" />
+    </record>
+
+    <template id="employee_badge_print_format_line_qweb">
+        <t t-call="web.basic_layout">
+            <div class="page">
+                <t t-foreach="employee_list" t-as="employee">
+                    <div class="row">
+                        <div style="-webkit-transform: rotate(90deg);width: 60mm; height: 90mm; float:left; margin-top:0px; margin-left:100px;">
+<!--                            <table style="background-color: white; border: 1pt solid black; margin:5pt;">-->
+<!--                                <tr>-->
+<!--                                    <td>-->
+<!--                                        <div style="-webkit-transform: rotate(90deg);width: 60mm; height: 90mm;border: 1pt solid red;">-->
+                                            <table style="width: 60mm; height: 90mm; border: 1pt solid black;" >
+                                                <tr><td style=" padding-left: 5pt; padding-top: 0pt; padding-bottom: 0pt; font-size:9pt; color:black; text-align: left; font-weight:bold;">Ishwardi Matsuoka Bangladesh Limited</td></tr>
+                                                <tr><td style=" padding-left: 35pt; "><img t-if="employee['logo_base64']" t-att-src="'data:image/png;base64,'+employee['logo_base64']" style="max-height:30pt;max-width:90%;" alt="Company Logo"/></td></tr>
+                                                <tr><td style="padding-left: 50pt; "><img t-if="employee['image_base64']" t-att-src="'data:image/png;base64,'+employee['image_base64']" style="max-height:70pt;max-width:90%;" alt="Employee Photo"/></td></tr>
+                                                <tr><td style="padding-left: 5pt; padding-top: 0pt; padding-bottom: 0pt; font-size:8pt; color:black; text-align: left; font-weight:bold;">Name: <t t-esc="employee['name']"/></td></tr>
+                                                <tr><td style="padding-left: 5pt; padding-top: 0pt; padding-bottom: 0pt; font-size:8pt; color:black; text-align: left; font-weight:bold;">ID No: <t t-esc="employee['id_card_no']"/></td></tr>
+                                                <tr><td style="padding-left: 5pt; padding-top: 0pt; padding-bottom: 0pt; font-size:8pt; color:black; text-align: left; font-weight:bold;">Issue: <t t-esc="datetime.datetime.now().strftime('%d-%m-%Y')"/></td></tr>
+                                                <tr><td style="padding-left: 5pt; padding-top: 0pt; padding-bottom: 0pt; font-size:8pt; color:black; text-align: left; font-weight:bold;">Designation: <t t-esc="employee['job']"/></td></tr>
+<!--                                                <tr><td style="padding-left: 5pt; padding-top: 0pt; padding-bottom: 0pt; font-size:8pt; color:black; text-align: left; font-weight:bold;">Section: <t t-esc="employee['section']"/></td></tr>-->
+                                                <tr><td style="padding-left: 5pt; padding-top: 0pt; padding-bottom: 0pt; font-size:8pt; color:black; text-align: left; font-weight:bold;">Joining Date: <t t-esc="employee['joining_date']"/></td></tr>
+                                                <tr><td style=" padding-left: 15pt;"><img t-if="employee['signature_base64']" t-att-src="'data:image/png;base64,'+employee['signature_base64']" style="max-height:30pt;max-width:90%;top: 290px; left: 0px; position: absolute;" alt="Signature"/></td></tr>
+<!--                                                <tr><td style=" padding-left: 15pt;"><img t-if="employee['authority_base64']" t-att-src="'data:image/png;base64,'+employee['authority_base64']" style="max-height:30pt;max-width:90%;top: 290px; left: 120px; position: absolute;" alt="Authority"/></td></tr>-->
+                                                <tr><td style="padding-left: 10pt;padding-top: 15pt; font-size:8pt; color:black; text-align: left; font-weight:bold; text-decoration: overline; ">CardHolder</td></tr>
+                                                <tr><td style="padding-left: 10pt;padding-top: 10pt; font-size:8pt; color:black; text-align: left; font-weight:bold; text-decoration: overline; top: 305px; left: 130px; position: absolute;">Authority </td></tr>
+                                            </table>
+<!--                                        </div>-->
+<!--                                    </td>-->
+
+<!--                                </tr>-->
+<!--                            </table>-->
+                        </div>
+
+                        <div style="-webkit-transform: rotate(-90deg);width: 60mm; height: 90mm; float:right;margin-top:0px; margin-left:140px;">
+<!--                            <div style="-webkit-transform: rotate(-90deg);">-->
+                                            <table style="width: 60mm; height: 90mm; border: 1pt solid black;" >
+                                                <tr><td style=" padding-left: 10pt; max-width: 90mm; max-height: 60mm; font-size:12pt; color:black; text-align: left; font-weight:bold;">Address</td></tr>
+<!--                                                <tr><td style="padding-left: 10pt;max-width: 90mm; max-height: 60mm; font-size:10pt; color:black; text-align: left; font-weight:bold;">Village: <t t-esc="employee['village']"/></td></tr>-->
+<!--                                                <tr><td style="padding-left: 10pt;max-width: 90mm; max-height: 60mm; font-size:10pt; color:black; text-align: left; font-weight:bold;">Post Office: <t t-esc="employee['post_office']"/></td></tr>-->
+<!--                                                <tr><td style="padding-left: 10pt;max-width: 90mm; max-height: 60mm; font-size:10pt; color:black; text-align: left; font-weight:bold;">Police Station: <t t-esc="employee['thana']"/></td></tr>-->
+                                                <tr><td style="padding-left: 10pt;max-width: 90mm; max-height: 60mm; font-size:10pt; color:black; text-align: left; font-weight:bold;">District: <t t-esc="employee['district']"/></td></tr>
+                                                <tr><td style="padding-left: 10pt;max-width: 90mm; max-height: 60mm; font-size:10pt; color:black; text-align: left; font-weight:bold;">Blood Group: <t t-esc="employee['blood_group']"/></td></tr>
+                                                <tr><td style="padding-left: 10pt;max-width: 90mm; max-height: 60mm; font-size:10pt; color:black; text-align: left; font-weight:bold;">NID NO: <t t-esc="employee['nid']"/></td></tr>
+                                                <tr><td style="font-family: Times New Roman, serif !important;padding-left: 10pt;max-width: 90mm; max-height: 60mm; font-size:8pt; color:black; text-align: left; ">Tenure up to the end of Service.</td></tr>
+                                                <tr><td style="font-family: Times New Roman, serif !important;padding-left: 10pt;max-width: 90mm; max-height: 60mm; font-size:8pt; color:black; text-align: left; ">Hung the card during duty.</td></tr>
+                                                <tr><td style="font-family: Times New Roman, serif !important; padding-left: 10pt;max-width: 90mm; max-height: 60mm; font-size:8pt; color:red; text-align: left; font-weight:bold;">Please sent back the card to the <br/>address given below if otherwise found.</td></tr>
+                                                <tr><td style="font-family: Times New Roman, serif !important; padding-left: 10pt;max-width: 90mm; max-height: 60mm; font-size:8pt; color:black; text-align: left; font-weight:bold;">Ishwardi Matsuoka Bangladesh Ltd. <br/> Ishwardi EPZ Paksey, Pabna. <br/> Plot: 34-41,51-53.</td></tr>
+                                                <tr><td style="font-family: Times New Roman, serif !important; padding-left: 10pt;max-width: 90mm; max-height: 60mm; font-size:8pt; color:black; text-align: left; ">Emergency Contact No: 01738-915897</td></tr>
+                                            </table>
+<!--                                        </div>-->
+
+                        </div>
+                    </div>
+<!--                    <div class="row" style="margin-bottom:2px;">-->
+<!--                        <div class="col-xs-6">-->
+<!--&lt;!&ndash;                            <table style="background-color: white; border: 1pt solid black; margin:5pt;">&ndash;&gt;-->
+<!--&lt;!&ndash;                                <tr>&ndash;&gt;-->
+<!--&lt;!&ndash;                                    <td>&ndash;&gt;-->
+<!--                                        <div style="-webkit-transform: rotate(90deg);">-->
+<!--                                            <table style="width: 60mm; height: 90mm; border: 1pt solid black; margin-left:5pt" >-->
+<!--                                                <tr><td style=" padding-left: 10pt; max-width: 90mm; max-height: 60mm; font-size:10pt; color:black; text-align: left; font-weight:bold;">Ishwardi Matsuoka Bangladesh Limited</td></tr>-->
+<!--&lt;!&ndash;                                                <img t-if="employee.get('logo')" t-att-src="image_data_uri(employee['logo'])" style="max-height:45pt;max-width:90%;margin:3pt;" alt="Company Logo"/>&ndash;&gt;-->
+<!--&lt;!&ndash;                                                <img t-if="employee['image_base64']" t-att-src="'data:image/png;base64,'+employee['image_base64']" style="max-height:45pt;max-width:90%;margin:3pt;" alt="Employee Photo"/>&ndash;&gt;-->
+<!--&lt;!&ndash;                                                <tr><td style=" padding-left: 30pt; max-width: 90mm; max-height: 60mm; "><img t-if="employee['logo']" t-att-src="image_data_uri(employee['logo'])" style="max-height:45pt;max-width:90%;margin:3pt;" alt="Company Logo"/></td></tr>&ndash;&gt;-->
+<!--                                                <tr><td style=" padding-left: 30pt; max-width: 90mm; max-height: 60mm; "><img t-if="employee['logo_base64']" t-att-src="'data:image/png;base64,'+employee['logo_base64']" style="max-height:45pt;max-width:90%;margin:3pt;" alt="Company Logo"/></td></tr>-->
+<!--&lt;!&ndash;                                                <tr><td style="padding-left: 50pt; max-width: 90mm; max-height: 60mm; "><img t-if="employee['image']" t-att-src="image_data_uri(employee['image'])" style="max-height:85pt;max-width:90%;margin:3pt;" alt="Employee Image"/></td></tr>&ndash;&gt;-->
+<!--                                                <tr><td style="padding-left: 50pt; max-width: 90mm; max-height: 60mm; "><img t-if="employee['image_base64']" t-att-src="'data:image/png;base64,'+employee['image_base64']" style="max-height:45pt;max-width:90%;margin:3pt;" alt="Employee Photo"/></td></tr>-->
+<!--                                                <tr><td style="padding-left: 10pt;max-width: 90mm; max-height: 60mm; font-size:8pt; color:black; text-align: left; font-weight:bold;">Name: <t t-esc="employee['name']"/></td></tr>-->
+<!--                                                <tr><td style="padding-left: 10pt;max-width: 90mm; max-height: 60mm; font-size:8pt; color:black; text-align: left; font-weight:bold;">ID No: <t t-esc="employee['id_card_no']"/></td></tr>-->
+<!--                                                <tr><td style="padding-left: 10pt;max-width: 90mm; max-height: 60mm; font-size:8pt; color:black; text-align: left; font-weight:bold;">Issue:<t t-esc="datetime.datetime.now().strftime('%d-%m-%Y')"/></td></tr>-->
+<!--                                                <tr><td style="padding-left: 10pt;max-width: 90mm; max-height: 60mm; font-size:8pt; color:black; text-align: left; font-weight:bold;">Designation:<t t-esc="employee['job']"/></td></tr>-->
+<!--                                                <tr><td style="padding-left: 10pt;max-width: 90mm; max-height: 60mm; font-size:8pt; color:black; text-align: left; font-weight:bold;">Section:<t t-esc="employee['section']"/></td></tr>-->
+<!--                                                <tr><td style="padding-left: 10pt;max-width: 90mm; max-height: 60mm; font-size:8pt; color:black; text-align: left; font-weight:bold;">Joining Date:<t t-esc="employee['joining_date']"/></td></tr>-->
+<!--                                                <tr><td style="padding-left: 10pt;padding-top: 10pt;max-width: 90mm; max-height: 60mm; font-size:8pt; color:black; text-align: left; font-weight:bold; word-spacing: 20pt;">CardHolder             Authority </td></tr>-->
+<!--                                            </table>-->
+<!--                                        </div>-->
+<!--&lt;!&ndash;                                    </td>&ndash;&gt;-->
+
+<!--&lt;!&ndash;                                </tr>&ndash;&gt;-->
+<!--&lt;!&ndash;                            </table>&ndash;&gt;-->
+<!--                        </div>-->
+
+<!--                        <div class="col-xs-6">-->
+<!--                            <div style="-webkit-transform: rotate(-90deg);">-->
+<!--                                <table style="width: 60mm; height: 90mm; border: 1pt solid black; margin:5pt" >-->
+<!--                                    <tr><td style=" padding-left: 60pt; max-width: 90mm; max-height: 60mm; font-size:12pt; color:black; text-align: left; font-weight:bold;">Address</td></tr>-->
+<!--                                    <tr><td style="padding-left: 60pt;max-width: 90mm; max-height: 60mm; font-size:10pt; color:black; text-align: left; font-weight:bold;">Village: <t t-esc="employee['village']"/></td></tr>-->
+<!--                                    <tr><td style="padding-left: 60pt;max-width: 90mm; max-height: 60mm; font-size:10pt; color:black; text-align: left; font-weight:bold;">Post Office: <t t-esc="employee['post_office']"/></td></tr>-->
+<!--                                    <tr><td style="padding-left: 60pt;max-width: 90mm; max-height: 60mm; font-size:10pt; color:black; text-align: left; font-weight:bold;">Police Station: <t t-esc="employee['thana']"/></td></tr>-->
+<!--                                    <tr><td style="padding-left: 60pt;max-width: 90mm; max-height: 60mm; font-size:10pt; color:black; text-align: left; font-weight:bold;">District: <t t-esc="employee['district']"/></td></tr>-->
+<!--                                    <tr><td style="padding-left: 60pt;max-width: 90mm; max-height: 60mm; font-size:10pt; color:black; text-align: left; font-weight:bold;">Blood Group: <t t-esc="employee['blood_group']"/></td></tr>-->
+<!--                                    <tr><td style="padding-left: 60pt;max-width: 90mm; max-height: 60mm; font-size:10pt; color:black; text-align: left; font-weight:bold;">NID NO: <t t-esc="employee['nid']"/></td></tr>-->
+<!--                                    <tr><td style="font-family: Times New Roman, serif !important;padding-left: 60pt;max-width: 90mm; max-height: 60mm; font-size:8pt; color:black; text-align: left; ">Tenure up to the end of Service.</td></tr>-->
+<!--                                    <tr><td style="font-family: Times New Roman, serif !important;padding-left: 60pt;max-width: 90mm; max-height: 60mm; font-size:8pt; color:black; text-align: left; ">Hung the card during duty.</td></tr>-->
+<!--                                    <tr><td style="font-family: Times New Roman, serif !important; padding-left: 60pt;max-width: 90mm; max-height: 60mm; font-size:8pt; color:red; text-align: left; font-weight:bold;">Please sent back the card to the <br/>address given below if otherwise found.</td></tr>-->
+<!--                                    <tr><td style="font-family: Times New Roman, serif !important; padding-left: 60pt;max-width: 90mm; max-height: 60mm; font-size:8pt; color:black; text-align: left; font-weight:bold;">Ishwardi Matsuoka Bangladesh Ltd. <br/> Ishwardi EPZ Paksey, Pabna. <br/> Plot: 34-41,51-53.</td></tr>-->
+<!--                                    <tr><td style="font-family: Times New Roman, serif !important; padding-left: 60pt;max-width: 90mm; max-height: 60mm; font-size:8pt; color:black; text-align: left; ">Emergency Contact No: 01738-915897</td></tr>-->
+<!--                                </table>-->
+<!--                            </div>-->
+
+<!--                        </div>-->
+<!--                    </div>-->
+
+                </t>
+            </div>
+        </t>
+    </template>
+
+</odoo>

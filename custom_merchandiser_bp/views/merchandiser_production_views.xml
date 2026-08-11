@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Tree View -->
+    <record id="view_merchandiser_production_tree" model="ir.ui.view">
+        <field name="name">merchandiser.production.tree</field>
+        <field name="model">merchandiser.production</field>
+        <field name="arch" type="xml">
+            <tree string="Production"
+                decoration-success="state == 'shipment'"
+                decoration-info="state in ('cutting','sewing','finishing','packing')"
+                decoration-warning="state in ('order_confirm','material_receive')">
+                <field name="order_id"/>
+                <field name="buyer_id"/>
+                <field name="style_no"/>
+                <field name="order_qty"/>
+                <field name="shipment_date"/>
+                <field name="state" widget="badge"
+                    decoration-success="state == 'shipment'"
+                    decoration-info="state in ('cutting','sewing','finishing','packing')"
+                    decoration-warning="state in ('order_confirm','material_receive')"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_merchandiser_production_form" model="ir.ui.view">
+        <field name="name">merchandiser.production.form</field>
+        <field name="model">merchandiser.production</field>
+        <field name="arch" type="xml">
+            <form string="Production Tracking">
+                <header>
+                    <button name="action_to_material_receive"
+                        string="→ Material Receive"
+                        type="object" class="oe_highlight"
+                        invisible="state != 'order_confirm'"/>
+                    <button name="action_to_cutting"
+                        string="→ Cutting"
+                        type="object" class="oe_highlight"
+                        invisible="state != 'material_receive'"/>
+                    <button name="action_to_sewing"
+                        string="→ Sewing"
+                        type="object" class="oe_highlight"
+                        invisible="state != 'cutting'"/>
+                    <button name="action_to_finishing"
+                        string="→ Finishing"
+                        type="object" class="oe_highlight"
+                        invisible="state != 'sewing'"/>
+                    <button name="action_to_packing"
+                        string="→ Packing"
+                        type="object" class="oe_highlight"
+                        invisible="state != 'finishing'"/>
+                    <button name="action_to_shipment"
+                        string="→ Shipment"
+                        type="object" class="oe_highlight"
+                        invisible="state != 'packing'"/>
+                    <field name="state" widget="statusbar"
+                        statusbar_visible="order_confirm,material_receive,cutting,sewing,finishing,packing,shipment"/>
+                </header>
+
+                <sheet>
+                    <group string="Order Info">
+                        <group>
+                            <field name="order_id" options="{'no_create': True}"/>
+                            <field name="buyer_id"/>
+                            <field name="style_no"/>
+                        </group>
+                        <group>
+                            <field name="order_qty"/>
+                            <field name="shipment_date"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Order Confirm">
+                            <group><group>
+                                <field name="order_confirm_date"/>
+                            </group></group>
+                        </page>
+
+                        <page string="Material Receive"
+                            invisible="state == 'order_confirm'">
+                            <group><group>
+                                <field name="material_receive_date"/>
+                                <field name="material_receive_qty"/>
+                            </group></group>
+                        </page>
+
+                        <page string="Cutting"
+                            invisible="state in ('order_confirm','material_receive')">
+                            <group><group>
+                                <field name="cutting_date"/>
+                                <field name="cutting_qty"/>
+                            </group></group>
+                        </page>
+
+                        <page string="Sewing"
+                            invisible="state in ('order_confirm','material_receive','cutting')">
+                            <group><group>
+                                <field name="sewing_date"/>
+                                <field name="sewing_qty"/>
+                            </group></group>
+                        </page>
+
+                        <page string="Finishing"
+                            invisible="state in ('order_confirm','material_receive','cutting','sewing')">
+                            <group><group>
+                                <field name="finishing_date"/>
+                                <field name="finishing_qty"/>
+                            </group></group>
+                        </page>
+
+                        <page string="Packing"
+                            invisible="state in ('order_confirm','material_receive','cutting','sewing','finishing')">
+                            <group><group>
+                                <field name="packing_date"/>
+                                <field name="packing_qty"/>
+                            </group></group>
+                        </page>
+
+                        <page string="Shipment"
+                            invisible="state != 'shipment'">
+                            <group><group>
+                                <field name="shipment_actual_date"/>
+                                <field name="shipment_qty"/>
+                            </group></group>
+                        </page>
+
+                        <page string="Notes">
+                            <field name="note"
+                                placeholder="Add any production notes here..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_merchandiser_production_search" model="ir.ui.view">
+        <field name="name">merchandiser.production.search</field>
+        <field name="model">merchandiser.production</field>
+        <field name="arch" type="xml">
+            <search string="Search Production">
+                <field name="order_id"/>
+                <field name="buyer_id"/>
+                <field name="style_no"/>
+                <separator/>
+                <filter name="order_confirm" string="Order Confirm"
+                    domain="[('state','=','order_confirm')]"/>
+                <filter name="material_receive" string="Material Receive"
+                    domain="[('state','=','material_receive')]"/>
+                <filter name="cutting" string="Cutting"
+                    domain="[('state','=','cutting')]"/>
+                <filter name="sewing" string="Sewing"
+                    domain="[('state','=','sewing')]"/>
+                <filter name="finishing" string="Finishing"
+                    domain="[('state','=','finishing')]"/>
+                <filter name="packing" string="Packing"
+                    domain="[('state','=','packing')]"/>
+                <filter name="shipment" string="Shipment"
+                    domain="[('state','=','shipment')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_buyer" string="Buyer"
+                        context="{'group_by': 'buyer_id'}"/>
+                    <filter name="group_state" string="Stage"
+                        context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_merchandiser_production" model="ir.actions.act_window">
+        <field name="name">Production</field>
+        <field name="res_model">merchandiser.production</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_merchandiser_production_search"/>
+    </record>
+
+    <!-- Menu -->
+    <menuitem id="menu_merchandiser_production" name="Production"
+        parent="menu_merchandiser_root"
+        action="action_merchandiser_production" sequence="4"/>
+
+</odoo>

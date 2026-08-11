@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <record id="view_pf_profile_form" model="ir.ui.view">
+            <field name="name">pf.profile.form</field>
+            <field name="model">pf.profile</field>
+            <field name="arch" type="xml">
+                <form string="PF Profile" create="false" edit="false" delete="false">
+                    <sheet>
+                        <div class="oe_button_box" name="button_box" groups="base.group_user">
+                            <button name="act_current_employee_pf" string="PF Details" type="object"
+                                    class="oe_stat_button" icon="fa-calendar">
+                            </button>
+                            <button name="act_current_employee_loan" string="Loan Details" type="object"
+                                    class="oe_stat_button" icon="fa-calendar">
+                            </button>
+
+                        </div>
+
+                        <div id="o_profile_container">
+
+                            <group string="Basic Information">
+                                <group>
+                                    <field name="employee_id" options='{"no_create_edit": True, "no_create": True}'/>
+                                    <field name="pf_board_id"
+                                           options='{"no_create_edit": True, "no_create": True, "no_open": True}'/>
+                                    <field name="employee_name"/>
+                                    <field name="job_id"
+                                           options='{"no_create_edit": True, "no_create": True, "no_open": True}'/>
+                                    <field name="join_date"/>
+                                    <field name="left_date"/>
+                                    <field name="membership_date"/>
+                                    <field name="membership_approve_date"/>
+                                    <field name="tax_identification"/>
+                                    <field name="is_interest_free"/>
+                                    <field name="closed_date" readonly="1"/>
+                                </group>
+                                <group>
+                                    <div>
+                                        <field name="image" widget='image' class="oe_avatar"/>
+                                    </div>
+                                </group>
+                            </group>
+
+                            <group string="Service Period">
+                                <field name="service_period"/>
+                                <field name="membership_period"/>
+                            </group>
+
+                            <group>
+                                <group string="PF Balance">
+                                    <field name="employee_current_balance" readonly="1"/>
+                                    <field name="company_current_balance" readonly="1"/>
+                                    <field name="balance_current" readonly="1" style="font-weight:bold;"/>
+                                </group>
+                                <group>
+                                </group>
+                            </group>
+                            <notebook>
+
+                            </notebook>
+                        </div>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                        <field name="activity_ids" widget="mail_activity"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_pf_profile_tree" model="ir.ui.view">
+            <field name="name">pf.profile.form</field>
+            <field name="model">pf.profile</field>
+            <field name="arch" type="xml">
+                <tree string="PF Profile List" create="false" edit="false" delete="false">
+                    <field name="employee_id"/>
+                    <field name="employee_name"/>
+                    <field name="job_id"/>
+                    <field name="pf_board_id"/>
+                    <field name="is_interest_free"/>
+                    <field name="is_active"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_pf_profile_search" model="ir.ui.view">
+            <field name="name">pf.profile.search</field>
+            <field name="model">pf.profile</field>
+            <field name="arch" type="xml">
+                <search string="PF Profile search">
+                    <field name="employee_id" string="Employee"
+                           filter_domain="['|',('employee_id.name', 'ilike', self),('employee_id.id_card_no', 'ilike', self)]"/>
+
+                </search>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="pf_profile_action">
+            <field name="name">PF Profile</field>
+            <field name="res_model">pf.profile</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem id="menu_bs_pf_profile" name="Profile"
+                  parent="base.menu_hr_employee_pf_root"
+                  action="pf_profile_action"
+                  groups="base.group_user" sequence="5"/>
+    </data>
+</odoo>

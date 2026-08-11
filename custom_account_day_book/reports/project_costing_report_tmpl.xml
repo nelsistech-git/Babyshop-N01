@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+<!--        <report id="project_costing_report_tmpl"-->
+<!--                model="project.costing.report.wizard"-->
+<!--			    string="Project Costing Report"-->
+<!--                name="custom_account_day_book.project_costing_report_pdf"-->
+<!--			    file="custom_account_day_book.project_costing_report_pdf"-->
+<!--                report_type="qweb-pdf"/>-->
+
+        <record id="project_costing_report_tmpl" model="ir.actions.report">
+            <field name="name">Budget Details Report</field>
+            <field name="model">project.costing.report.wizard</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">custom_account_day_book.project_costing_report_pdf</field>
+            <field name="report_file">custom_account_day_book.project_costing_report_pdf</field>
+        </record>
+
+        <template id="project_costing_report_pdf">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <style type="text/css">
+                            table, tr, th, td {
+                                border: 1px solid #000; !important;
+                            }
+                        </style>
+
+                        <div class="oe_structure"/>
+
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <h3 class="text-center head_font_color"><strong>Project Costing Report (<t t-esc="report_type"/>)</strong></h3><br/>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <div><strong>Start Date:</strong> <t t-esc="form['start_date']" t-options='{"widget": "date"}'/></div>
+                                <div><strong>End Date:</strong> <t t-esc="form['end_date']" t-options='{"widget": "date"}'/></div>
+
+                            </div>
+                            <div class="col-6 text-right">
+                                <div><strong>Source Location:</strong> <t t-esc="src_loc_name"/></div>
+                                <div><strong>Project Location:</strong> <t t-esc="dest_loc_name"/></div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <table class="table table-condensed">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center align-middle bg_color font_color"><strong>Sl. No.</strong></th>
+                                        <th class="text-left align-middle bg_color font_color"><strong>Cost Head</strong></th>
+                                        <th class="text-left align-middle bg_color font_color"><strong>Product Name</strong></th>
+                                        <th class="text-left align-middle bg_color font_color"><strong>UoM</strong></th>
+                                        <th class="text-right align-middle bg_color font_color"><strong>Date</strong></th>
+                                        <!--<th class="text-left align-middle bg_color font_color text-nowrap"><strong>Source Location</strong></th>
+                                        <th class="text-left align-middle bg_color font_color text-nowrap"><strong>Project Location</strong></th>-->
+                                        <th class="text-right align-middle bg_color font_color"><strong>Qty.</strong></th>
+
+                                        <th class="text-right align-middle bg_color font_color"><strong>Total Cost</strong></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-set="sl_no" t-value="1"/>
+                                    <t t-set="t_quantity" t-value="0"/>
+                                    <t t-set="t_cost_price" t-value="0"/>
+                                    <t t-set="total_cost_price" t-value="0"/>
+                                    <t t-foreach="csr" t-as="o">
+                                        <tr>
+                                            <td class="text-center align-middle">
+                                                <t t-esc="sl_no"/>
+                                            </td>
+                                            <td class="text-left align-middle">
+                                                <t t-esc="o['cost_head']"/>
+                                            </td>
+                                            <td class="text-left align-middle">
+                                                <t t-esc="o['product']"/>
+                                            </td>
+                                            <td class="text-left align-middle">
+                                                <t t-esc="o['uom']"/>
+                                            </td>
+                                            <td class="text-left align-middle">
+                                                <t t-esc="o['date']"/>
+                                            </td>
+                                            <!--<td class="text-left align-middle">
+                                                <t t-esc="o['dest_location']"/>
+                                            </td>-->
+                                            <td class="text-right align-middle">
+                                                <t t-esc="'{0:,.3f}'.format(o['qty'])"/>
+                                                <t t-set="t_quantity" t-value="t_quantity + o['qty']"/>
+                                            </td>
+                                            <!--<td class="text-right align-middle">
+                                                <t t-esc="'{0:,.2f}'.format(o['cost_price'])"/>
+                                                <t t-set="t_cost_price" t-value="t_cost_price + o['cost_price']"/>
+                                            </td>-->
+                                            <td class="text-right align-middle">
+                                                <t t-esc="'{0:,.2f}'.format(o['total_cost'])"/>
+                                                <t t-set="total_cost_price" t-value="total_cost_price + o['total_cost']"/>
+                                            </td>
+                                            <t t-set="sl_no" t-value="sl_no + 1"/>
+                                        </tr>
+                                    </t>
+                                    <tr>
+                                        <t>
+                                            <td class="text-right align-middle" colspan="5"><strong>Total</strong></td>
+                                        </t>
+                                        <td class="text-right align-middle">
+                                            <strong><t t-esc="'{0:,.2f}'.format(t_quantity)"/></strong>
+                                        </td>
+                                        <!--<td class="text-right align-middle">
+                                            <strong><t t-esc="'{0:,.2f}'.format(t_cost_price)"/></strong>
+                                        </td>-->
+                                        <td class="text-right align-middle">
+                                            <strong><t t-esc="'{0:,.2f}'.format(total_cost_price)"/></strong>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

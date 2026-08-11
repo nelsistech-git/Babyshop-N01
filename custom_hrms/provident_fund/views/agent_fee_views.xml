@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_agent_fee_form" model="ir.ui.view">
+        <field name="name">view.agent.fee.form</field>
+        <field name="model">agent.fee</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_confirm" id="action_confirm" class="btn-primary"
+                            type="object" string="Confirm" invisible="state != 'draft'"/>
+
+                    <button name="action_draft" id="action_draft" class="btn-secondary"
+                            type="object" string="Set to Draft" invisible="state not in ['confirm','cancel']"/>
+
+                    <button name="action_done" id="action_done" class="btn-primary"
+                            type="object" confirm="Are you sure you want to Done?" string="Approve"
+                            invisible="state != 'confirm'"/>
+
+                    <button name="action_cancel" confirm="Are you sure you want to Cancel?" type="object"
+                            string="Cancel" invisible="state != 'draft'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirm,approve"/>
+                </header>
+                <sheet>
+
+                    <group>
+                        <group>
+                            <field name="agent_id" required="1" readonly="state != 'draft'"
+                                   options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="from_date" required="1" readonly="state != 'draft'"/>
+                            <field name="to_date" required="1" readonly="state != 'draft'"/>
+                        </group>
+                        <group>
+                            <field name="date" required="1" readonly="state != 'draft'"/>
+                            <field name="agent_details" readonly="state != 'draft'"/>
+                        </group>
+                    </group>
+
+                    <h3 style="color:#7C7BAD">Fees Line</h3>
+                    <field readonly="state != 'draft'" name="line_ids">
+                        <tree editable="bottom" string="Fees Line">
+                            <field name="commission_type_id" required="1"
+                                   options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="type_account_id"
+                                   options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="balance" required="1" sum="balance"/>
+                            <field name="remarks"/>
+                        </tree>
+                    </field>
+                    <group>
+                        <group>
+                            <field name="total_commission_amount" style="font-weight:bold" readonly="1" force_save="1"/>
+                            <separator/>
+                            <field name="avg_investment_in_share" readonly="state != 'draft'" required="1"/>
+                            <field name="return_share_percentage" readonly="state != 'draft'" required="1"/>
+                            <field name="return_share_amount" readonly="1" force_save="1"/>
+                            <field name="credit_by_managing_agent" readonly="1" force_save="1"/>
+                            <separator/>
+                            <field name="managing_agent_fee_percentage" readonly="state != 'draft'" required="1"/>
+                            <field name="managing_agent_fee_total_amount" readonly="1" force_save="1"/>
+                        </group>
+                        <group>
+                            <field name="debit_aac_id" readonly="state != 'draft'"
+                                   options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"
+                                   required="1"/>
+                            <field name="credit_acc_id" readonly="state != 'draft'"
+                                   options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"
+                                   required="1"/>
+                            <field name="acc_move_id" readonly="1" force_save="1"
+                                   options="{'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                        </group>
+                    </group>
+
+
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+
+    <record id="view_agent_fee_tree" model="ir.ui.view">
+        <field name="name">agent.fee.tree</field>
+        <field name="model">agent.fee</field>
+        <field name="arch" type="xml">
+            <tree string="Agent Fee List">
+                <field name="date"/>
+                <field name="total_commission_amount" sum="total_commission_amount"/>
+                <field name="avg_investment_in_share" sum="total_commission_amount"/>
+                <field name="return_share_percentage" sum="total_commission_amount"/>
+                <field name="return_share_amount" sum="total_commission_amount"/>
+                <field name="credit_by_managing_agent" sum="total_commission_amount"/>
+                <field name="managing_agent_fee_percentage" sum="total_commission_amount"/>
+                <field name="managing_agent_fee_total_amount" sum="total_commission_amount"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+
+    <record id="view_agent_fee_filter" model="ir.ui.view">
+        <field name="name">agent.fee.filter</field>
+        <field name="model">agent.fee</field>
+        <field name="arch" type="xml">
+            <search string="Search List">
+                <field name="debit_aac_id" filter_domain="[('sm_account_id', 'ilike', self)]"/>
+                <field name="credit_acc_id" filter_domain="[('sm_bo_account_id', 'ilike', self)]"/>
+                <field name="state" filter_domain="[('state', 'ilike', self)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="agent_fee_action" model="ir.actions.act_window">
+        <field name="name">Agent Fees</field>
+        <field name="res_model">agent.fee</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a New Agent Fee
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="root_menu_agent_fee" name="Agent Commission" parent="base.menu_hr_employee_pf_root"
+              sequence="16"/>
+    <menuitem id="sub_menu_agent_fee" name="Agent Fee" parent="root_menu_agent_fee" action="agent_fee_action"
+              sequence="1"/>
+
+</odoo>

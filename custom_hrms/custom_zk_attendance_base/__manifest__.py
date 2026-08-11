@@ -1,0 +1,25 @@
+{
+    'name': "Custom ZK Attendance Base",
+    'version': '17.0.0.0.1',
+    'category': 'Technical Settings',
+    'summary': """Custom ZK Attendance Base for Odoo v17""",
+    'description': """Custom ZK Attendance Base for Odoo v17""",
+    'author': 'Nelsis Tech Limited',
+    'company': 'Nelsis Tech Limited',
+    'maintainer': 'Nelsis Tech Limited',
+    'website': 'https://nelsistech.com/',
+    'depends': ['web', 'base_setup'],
+    'data': [
+        'data/base_data.xml',
+        # 'views/assets.xml',
+    ],
+    'pre_init_hook': 'pre_init_hook',
+    'post_init_hook': 'post_init_hook',
+    'uninstall_hook': 'uninstall_hook',
+    'post_load': 'post_load',
+    'installable': True,
+    'application': True,
+    'auto_install': False,
+    'license': 'LGPL-3',
+
+}

@@ -1,0 +1,193 @@
+
+/** @odoo-module **/
+
+import { _lt } from "@web/core/l10n/translation";
+import { registry } from "@web/core/registry";
+import { Component, onWillStart } from "@odoo/owl";
+import { onPatched } from "@odoo/owl";
+import { loadJS } from "@web/core/assets"
+
+console.log("GraphWidget.js loaded.");
+
+export class GraphWidget extends Component {
+    // setup(){
+    //     onPatched(() => {
+    //         this.initializeChart();
+    //     });
+    //     this.chartRef = useRef("chart")
+    //     onWillStart(async ()=>{
+    //         await loadJS("https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.min.js")
+    //         console.log("GraphWidget.js loaded.");
+    //     })
+
+    //     onMounted(()=>this.renderChart())
+    //     console.log("GraphWidget.js loaded.");
+    // }
+    
+    // constructor() {
+    //     super(...arguments);
+    //     // this.chart = null;  // to hold the chart instance
+    //     // Use the value from the company_statistics field
+    //     console.log("GraphWidget.js loaded.");
+    //     this.data = this.props.record.data.company_statistics;
+    //     this.graph_type = this.props.graph_type || 'line';  // default to 'line'
+    //     this.xlabel = this.props.xlabel;
+    //     this.ylabel = this.props.ylabel;
+
+    //     console.log("THIS DATA", this.data);
+    //     console.log("Typeof(THIS DATA)", typeof(this.data));
+
+    //     let str = this.data
+    //     let parsedArray = JSON.parse(str);
+
+    //     console.log("THIS DATA", parsedArray);
+    //     console.log("Typeof(THIS DATA)", typeof(parsedArray));
+
+    //     this.initializeChart();
+    // }
+
+    // willStart() {
+    //     console.log("GraphWidget will start.");
+    //     return super.willStart();
+    // }
+
+    // setup() {
+    //     onPatched(() => {
+    //         this.initializeChart();
+    //     });
+    // }
+
+    // initializeChart() {
+    //     console.log("Rendering graph...");
+    
+    //     // Delay the execution of the code inside the setTimeout by 0 milliseconds.
+    //     // This effectively pushes the code to the end of the current call stack, allowing the DOM to update first.
+        
+    //     console.log(this);
+    //     setTimeout(() => {
+    //         console.log("Delayed query:", document.querySelector('.ssp_graph'));
+        
+
+    //         // Get the canvas context
+    //         const canvasElement = document.querySelector('.ssp_graph');  // Get the actual DOM element
+    //         console.log("Canvas Element:", canvasElement);
+
+    //         if (!canvasElement) {
+    //             console.error("Canvas element not found!");
+    //             return;
+    //         }
+    //         const context = canvasElement.getContext('2d');
+        
+    //         // Get the configuration for the chart
+    //         const config = this.getLineChartConfig();
+    //         console.log("Chart Configuration:", config);
+        
+    //         // Check if the chart is already initialized
+    //         var chart = new Chart(context, config);
+        
+    //         if (chart) {
+    //             console.log("Chart initialized successfully.");
+    //         } else {
+    //             console.error("Failed to initialize the chart.");
+    //         }
+    //     }, 2000); 
+        
+    // }
+    
+    
+    
+
+    // getLineChartConfig() {
+
+    //     let parsedArray = JSON.parse(this.data);
+
+
+    //     if (!Array.isArray(parsedArray) || parsedArray.length === 0) {
+    //         console.error("parsedArray is not an array or is empty:", parsedArray);
+    //         return null;
+    //     }
+        
+    //     const labels = parsedArray[0].values.map(pt => pt.x);
+        
+    //     const datasets = parsedArray.map(dataset => ({
+    //         data: dataset.values.map(pt => pt.y),
+    //         label: dataset.key,
+    //         borderColor: dataset.color,
+    //         borderWidth: 2,
+    //         fill: dataset.area ? 'start' : false,
+    //     }));
+        
+    //     return {
+    //         type: 'line',
+    //         data: {
+    //             labels: labels,
+    //             datasets: datasets
+    //         },
+    //         options: {
+    //             legend: { display: true },
+    //             scales: {
+    //                 yAxes: [{
+    //                     display: true,
+    //                     scaleLabel: {
+    //                         display: true,
+    //                         labelString: "Value in BDT",
+    //                         fontSize: 14
+    //                     },
+    //                     ticks: {
+    //                         beginAtZero: true,
+    //                     },
+    //                 }],
+    //                 xAxes: [{
+    //                     display: true,
+    //                     scaleLabel: {
+    //                         display: true,
+    //                         labelString: "Last Three Month (Day)",
+    //                         fontSize: 14
+    //                     }
+    //                 }]
+    //             },
+    //             responsive: true,
+    //             maintainAspectRatio: false,
+    //             elements: {
+    //                 line: {
+    //                     tension: 0.000001,
+    //                     backgroundColor: 'transparent',
+    //                 }
+    //             },
+    //             tooltips: {
+    //                 intersect: false,
+    //                 position: 'nearest',
+    //                 caretSize: 0,
+    //             },
+    //         },
+    //     };
+    // }
+    
+    
+}
+
+GraphWidget.template = "operation_overview.GraphWidget";
+GraphWidget.displayName = _lt("Graph Widget");
+GraphWidget.supportedTypes = ["float", "integer", "monetary"];
+
+GraphWidget.props = {
+        record: { type: Object, required: true },
+        graph_type: { type: String, optional: true, default: 'line' },
+        xlabel: { type: String, optional: true },
+        ylabel: { type: String, optional: true },
+    
+        // Additional props based on the error messages
+        update: { type: Function, optional: true },
+        value: { type: String, optional: true },
+        decorations: { type: Object, optional: true }, 
+        readonly: { type: Boolean, optional: true },
+        id: { type: String, optional: true },   
+        name: { type: String, optional: true },
+        type: { type: String, optional: true },
+        setDirty: { type: Function, optional: true },
+    };
+
+GraphWidget.isEmpty = () => false;
+
+registry.category("fields").add("graph_widget", GraphWidget);
+

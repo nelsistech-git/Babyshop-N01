@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ===== COURIER PARTNER VIEWS ===== -->
+    <record id="view_courier_partner_list" model="ir.ui.view">
+        <field name="name">courier.partner.list</field>
+        <field name="model">courier.partner</field>
+        <field name="arch" type="xml">
+            <tree string="Courier Partners">
+                <field name="name"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_courier_partner_form" model="ir.ui.view">
+        <field name="name">courier.partner.form</field>
+        <field name="model">courier.partner</field>
+        <field name="arch" type="xml">
+            <form string="Courier Partner">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="active"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_courier_partner" model="ir.actions.act_window">
+        <field name="name">Courier Partners</field>
+        <field name="res_model">courier.partner</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem
+            id="menu_courier_partner"
+            name="Courier Partners"
+            parent="sale.product_menu_catalog"
+            action="action_courier_partner"
+            sequence="20"/>
+
+    <!-- ===== RES PARTNER FORM ===== -->
+    <record id="view_partner_form_custom" model="ir.ui.view">
+        <field name="name">res.partner.form.custom</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='phone']" position="after">
+                <group>
+                    <field name="customer_type" string="Customer Type"/>
+                    <field name="customer_location" string="Customer Location"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ===== SALE ORDER FORM VIEW ===== -->
+    <record id="view_sale_order_form_custom" model="ir.ui.view">
+        <field name="name">sale.order.form.custom</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+
+            <!-- Odoo built-in state bar -->
+            <xpath expr="//field[@name='state']" position="attributes">
+                <attribute name="statusbar_visible">sale,cancel</attribute>
+            </xpath>
+
+            <!-- Custom header fields after partner_id -->
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="partner_address" readonly="1" string="Address"/>
+                <field name="customer_type" readonly="1"/>
+                <field name="customer_location" readonly="1"/>
+                <field name="sales_type"/>
+                <field name="courier_id"/>
+                <field name="courier_condition" invisible="not courier_id"/>
+                <field name="courier_slip_no" invisible="not courier_id"/>
+                <field name="discount"/>
+            </xpath>
+
+            <!-- SL handle before product -->
+            <xpath expr="//field[@name='order_line']//field[@name='product_id']" position="before">
+                <field name="sequence" widget="handle" string="SL"/>
+            </xpath>
+
+            <!-- Details, Type, Color in order lines -->
+            <xpath expr="//field[@name='order_line']/tree//field[@name='product_uom_qty']" position="before">
+                <field name="line_details" string="Details" optional="show"/>
+                <field name="type" string="Type" optional="show"/>
+                <field name="color" string="Color" optional="show"/>
+            </xpath>
+
+        </field>
+    </record>
+
+    <!-- ===== SALE ORDER LIST VIEW ===== -->
+    <record id="view_sale_order_list_custom" model="ir.ui.view">
+        <field name="name">sale.order.list.custom</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_quotation_tree_with_onboarding"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="customer_type" optional="show"/>
+                <field name="customer_location" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ===== INVOICE CUSTOM FIELDS + BANK DETAILS ===== -->
+    <record id="view_account_move_form_custom" model="ir.ui.view">
+        <field name="name">account.move.form.custom</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+
+            <!-- Tab/Notebook-->
+            <xpath expr="//notebook" position="inside">
+                <page string="Invoice Charges" name="invoice_charges">
+                    <group>
+                        <group string="Extra Charges">
+                            <field name="labor_charge"/>
+                            <field name="delivery_charge"/>
+                            <field name="lab_test_charge"/>
+                        </group>
+                        <group string="Discounts">
+                            <field name="discount_vat"/>
+                            <field name="discount_lab_test"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Payment">
+                            <field name="advance_paid"/>
+                        </group>
+                        <group string="Computed Totals">
+                            <field name="sub_total" readonly="1"/>
+                            <field name="total_before_discount" readonly="1"/>
+                            <field name="total_after_discount" readonly="1"/>
+                            <field name="total_due_amount" readonly="1"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+
+            <xpath expr="//field[@name='narration']" position="after">
+                <field name="terms_conditions" placeholder="Enter terms and conditions..."/>
+            </xpath>
+
+            <!-- Bank Details ) -->
+            <xpath expr="//field[@name='terms_conditions']" position="after">
+                <separator string="Bank Details"/>
+                <group>
+                    <field name="bank_account_name"/>
+                    <field name="bank_name"/>
+                    <field name="bank_account_no"/>
+                    <field name="bank_branch"/>
+                    <field name="bank_routing_no"/>
+                </group>
+            </xpath>
+
+        </field>
+    </record>
+
+</odoo>

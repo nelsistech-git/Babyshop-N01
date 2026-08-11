@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Batch Attendance Form -->
+    <record id="batch_attendance_sheet_form" model="ir.ui.view">
+        <field name="name">batch.attendance.sheet.form</field>
+        <field name="model">batch.attendance.sheet</field>
+        <field name="arch" type="xml">
+            <form string="Batch Attendance Sheet">
+                <header>
+                    <button name="%(action_batch_attendance_sheet_wizard)d" type="action" string="Generate"
+                            class="oe_highlight" invisible="state == 'done' or att_sheet_count > 0"/>
+                    <button name="action_validate" type="object" string="Validate" class="oe_highlight"
+                            invisible="att_sheet_count &lt;= 0 or state == 'done'"/>
+                    <button name="action_payslip_done" type="object" string="Payslip Done" class="oe_highlight"
+                            invisible="att_sheet_count &lt;= 0 or state == 'draft' or is_payslip_done"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,done"/>
+                    <field name="att_sheet_count" invisible="1"/>
+                    <field name="is_payslip_done" invisible="1"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_att_sheets" class="oe_stat_button" icon="fa-book" type="object"
+                                help="Generated Sheets" invisible="att_sheet_count == 0">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_value"><field name="att_sheet_count"/></span>
+                                <span class="o_stat_text">Sheets</span>
+                            </div>
+                        </button>
+                        <button name="action_open_payslips" class="oe_stat_button" icon="fa-book" type="object"
+                                help="Generated Payslips" invisible="state != 'done'">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_value"><field name="att_sheet_count"/></span>
+                                <span class="o_stat_text">Payslips</span>
+                            </div>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1" required="1" force_save="1" invisible="not name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <label for="date_from" string="Period"/>
+                            <div class="o_row">
+                                <field name="date_from" readonly="state == 'done' or att_sheet_count > 0"
+                                       class="oe_inline"/> - <field name="date_to"
+                                                                    readonly="state == 'done' or att_sheet_count > 0"
+                                                                    class="oe_inline"/>
+                            </div>
+                            <field name="user_work_location_id" readonly="state == 'done' or att_sheet_count > 0"
+                                   options="{'no_open': True, 'no_create': 1, 'no_create_edit': 1, 'no_quick_create': True}"/>
+                            <field name="department_id" readonly="state == 'done' or att_sheet_count > 0"
+                                   options="{'no_open': True, 'no_create': 1, 'no_create_edit': 1, 'no_quick_create': True}"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Attendance Sheet">
+                            <field name="att_sheet_ids" readonly="state != 'draft'">
+                                <tree create="false">
+                                    <field name="name"/>
+                                    <field name="user_work_location_id"/>
+                                    <field name="department_id"/>
+                                    <field name="company_id"/>
+                                    <field name="date_from"/>
+                                    <field name="date_to"/>
+                                    <field name="state"/>
+                                    <field name="payslip_id"/>
+                                    <field name="payslip_state"/>
+                                    <field name="state" invisible="1"/>
+                                </tree>
+                                <form>
+                                    <group>
+                                        <group>
+                                            <field name="name" readonly="1"/>
+                                            <field name="user_work_location_id" readonly="1"
+                                                   options="{'no_open': True, 'no_create': 1, 'no_create_edit': 1, 'no_quick_create': True}"/>
+                                            <field name="department_id" readonly="1"
+                                                   options="{'no_open': True, 'no_create': 1, 'no_create_edit': 1, 'no_quick_create': True}"/>
+                                        </group>
+                                        <group>
+                                            <field name="company_id" readonly="1"
+                                                   options="{'no_open': True, 'no_create': 1, 'no_create_edit': 1, 'no_quick_create': True}"/>
+                                            <field name="date_from" readonly="1"/>
+                                            <field name="date_to" readonly="1"/>
+                                            <field name="payslip_id" readonly="1"
+                                                   options="{'no_open': True, 'no_create': 1, 'no_create_edit': 1, 'no_quick_create': True}"/>
+                                        </group>
+                                        <field name="state" invisible="1"/>
+                                    </group>
+                                </form>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <!-- Chatter -->
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Batch Attendance Tree -->
+    <record id="batch_attendance_sheet_tree" model="ir.ui.view">
+        <field name="name">batch.attendance.sheet.tree</field>
+        <field name="model">batch.attendance.sheet</field>
+        <field name="arch" type="xml">
+            <tree string="Batch Attendance Sheet">
+                <field name="date_from" readonly="1"/>
+                <field name="date_to" readonly="1"/>
+                <field name="name" readonly="1"/>
+                <field name="user_work_location_id" readonly="1"/>
+                <field name="department_id" readonly="1"/>
+                <field name="state" readonly="1"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Batch Attendance Filter -->
+    <record id="batch_attendance_sheet_search" model="ir.ui.view">
+        <field name="name">batch.attendance.sheet.search</field>
+        <field name="model">batch.attendance.sheet</field>
+        <field name="arch" type="xml">
+            <search string="Search Payslip Batches">
+                <field name="name" string="Batch Attendance Sheet"/>
+                <field name="user_work_location_id" string="Work/Job Location"/>
+                <field name="department_id" string="Department"/>
+                <filter string="Draft" name="draft_filter" domain="[('state', '=', 'draft')]"
+                        help="Draft Batch Attendance Sheet"/>
+                <filter string="Done" name="done_filter" domain="[('state', '=', 'done')]"
+                        help="Done Batch Attendance Sheet"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Batch Attendance Action -->
+    <record id="action_batch_attendance_sheet" model="ir.actions.act_window">
+        <field name="name">Batch Attendance Sheets</field>
+        <field name="res_model">batch.attendance.sheet</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="batch_attendance_sheet_search"/>
+    </record>
+
+    <!-- Batch Attendance Menu -->
+    <menuitem
+            id="menu_batch_attendance_sheet"
+            action="action_batch_attendance_sheet"
+            name="Batch Attendance Sheets"
+            sequence="80"
+            parent="custom_hr_attendance_sheet.attendance_sheet_menu"/>
+</odoo>

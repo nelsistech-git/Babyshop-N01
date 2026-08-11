@@ -1,0 +1,437 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <data>
+
+
+        <record id="final_pf_settlement_sheet_tmpl" model="ir.actions.report">
+            <field name="name">PF Final Settlement Sheet</field>
+            <field name="model">employee.pf.settlement</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">hr_final_settlement.final_pf_settlement_sheet_view</field>
+            <field name="report_file">hr_final_settlement.final_pf_settlement_sheet_view</field>
+            <field name="print_report_name">(object.name)</field>
+        </record>
+
+
+        <template id="final_pf_settlement_sheet_view">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-call="web.external_layout">
+                        <div class="page">
+                            <style type="text/css">
+                                table, th, tr, td {
+                                    background: white !important;
+                                    border: 1px solid black;
+                                    padding: 5px !important;
+                                }
+                            </style>
+                            <div class="oe_structure"/>
+                            <div>
+                                <h3 class="text-center head_font_color">
+                                    <strong>
+                                        <span t-field="o.company_id"/>
+                                    </strong>
+                                </h3>
+                            </div>
+                            <div class="row">
+                                <div class="col-6">
+                                    <p style="color: #000; font-size: 15px;"><strong>Ref:</strong> <t
+                                            t-esc="o.name"/></p>
+                                </div>
+                                <div class="col-6 text-right">
+                                    <p style="color: #000; font-size: 15px;"><strong>Date:</strong>  <t
+                                            t-esc="o.date_requested" t-options='{"widget": "date"}'/></p>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="text-center head_font_color">
+                                    <strong>
+                                        PF FINAL SETTLEMENT SHEET
+                                    </strong>
+                                </h3>
+                            </div>
+                            <br/>
+                            <table style="border-collapse: collapse;width: 100%; margin-bottom: 2em;"
+                                   class="table-condensed">
+
+                                <tbody class="consumed_tbody">
+                                    <t t-set="sl_no" t-value="1"/>
+                                    <tr>
+                                        <td class="text-center align-middle" style="width: 5%;">
+                                            <span t-esc="'1'"/>
+                                        </td>
+                                        <td class="text-left align-middle" colspan="2">
+                                            <strong>Employee Name:</strong>
+                                        </td>
+                                        <td class="text-left align-middle" colspan="3">
+                                            <span t-field="o.employee_id.name"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-center align-middle" style="width: 5%;">
+                                            <span t-esc="'2'"/>
+                                        </td>
+                                        <td class="text-left align-middle" colspan="2">
+                                            <strong>Designation:</strong>
+                                        </td>
+                                        <td class="text-left align-middle" colspan="3">
+                                            <span t-field="o.job_position"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-center align-middle" style="width: 5%;">
+                                            <span t-esc="'3'"/>
+                                        </td>
+                                        <td class="text-left align-middle" colspan="2">
+                                            <strong>Employee ID:</strong>
+                                        </td>
+                                        <td class="text-left align-middle" colspan="3">
+                                            <span t-field="o.old_empid"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-center align-middle" style="width: 5%;">
+                                            <span t-esc="'4'"/>
+                                        </td>
+                                        <td class="text-left align-middle" colspan="2">
+                                            <strong>Name of the Unit:</strong>
+                                        </td>
+                                        <td class="text-left align-middle" colspan="3">
+                                            <span t-field="o.user_work_location_id"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-center align-middle" style="width: 5%;">
+                                            <span t-esc="'5'"/>
+                                        </td>
+                                        <td class="text-left align-middle" colspan="2">
+                                            <strong>Department/ Section:</strong>
+                                        </td>
+                                        <td class="text-left align-middle" colspan="3">
+                                            <span t-field="o.department_id"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-center align-middle" style="width: 5%;">
+                                            <span t-esc="'6'"/>
+                                        </td>
+                                        <td class="text-left align-middle" colspan="2">
+                                            <strong>Date of Joining:</strong>
+                                        </td>
+                                        <td class="text-left align-middle">
+                                            <span t-field="o.initial_employment_date"/>
+                                        </td>
+                                        <td class="text-left align-middle">
+                                            <strong>Date of Separation:</strong>
+                                        </td>
+                                        <td class="text-left align-middle">
+                                            <span t-field="o.date_of_separation"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-center align-middle" style="width: 5%;">
+                                            <span t-esc="'7'"/>
+                                        </td>
+                                        <td class="text-left align-middle" colspan="2">
+                                            <strong>Length of Service:</strong>
+                                        </td>
+                                        <td class="text-left align-middle" colspan="3">
+                                            <span t-field="o.length_of_service"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-center align-middle" style="width: 5%;">
+                                            <span t-esc="'8'"/>
+                                        </td>
+                                        <td class="text-left align-middle" colspan="2">
+                                            <strong>Separation Type:</strong>
+                                        </td>
+                                        <td class="text-left align-middle">
+                                            <span t-field="o.resignation_type_id"/>
+                                        </td>
+                                        <td class="text-left align-middle">
+                                            <strong>Notice Period(Given):</strong>
+                                        </td>
+                                        <td class="text-left align-middle">
+                                            <span t-field="o.notice_period"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-center align-middle" style="width: 5%;">
+                                            <span t-esc="'9'"/>
+                                        </td>
+                                        <td class="text-left align-middle" colspan="2">
+                                            <strong>TPF Membership Date:</strong>
+                                        </td>
+                                        <td class="text-left align-middle" colspan="3">
+                                            <span t-esc="tpf_membership"/>
+                                        </td>
+                                    </tr>
+                                    <t t-set="sl_no" t-value="10"/>
+                                    <t t-set="year" t-value=""/>
+                                    <t t-set="year_total" t-value="0"/>
+                                    <t t-set="grand_total" t-value="0"/>
+
+                                    <t t-foreach="csr" t-as="line">
+                                        <t t-foreach="line" t-as="line2">
+                                            <t t-foreach="line[str(line2)]" t-as="line3">
+                                                <tr>
+                                                    <t t-if="line3['pf_amount'] != 0">
+                                                        <td class="text-center align-middle"
+                                                            t-if="year != line3['year']"
+                                                            t-att-rowspan="len(line[str(line2)])">
+                                                            <span t-esc="' '"/>
+                                                        </td>
+                                                        <td class="text-center align-middle"
+                                                            t-if="year != line3['year']"
+                                                            t-att-rowspan="len(line[str(line2)])" colspan="2">
+                                                            <span t-esc="line3['year']"/>
+                                                        </td>
+                                                        <td class="text-center align-middle">
+                                                            <span t-esc="dict(pf_obj.fields_get(allfields=['month'])['month']['selection'])[line3['month']]"
+                                                                  readonly="1"/>
+                                                        </td>
+                                                        <td class="text-left align-middle">
+                                                            TK.
+                                                        </td>
+                                                        <td class="text-right align-middle">
+                                                            <span t-if="line3['pf_amount'] != 0"
+                                                                  t-esc="'{0:,.2f}'.format(line3['pf_amount'])"/>
+                                                            <!--                                                                <span t-else="" t-esc="'-'"/>-->
+                                                            <t t-set="year_total"
+                                                               t-value="year_total + line3['pf_amount']"/>
+                                                            <t t-set="grand_total"
+                                                               t-value="grand_total + line3['pf_amount']"/>
+                                                        </td>
+
+                                                    </t>
+
+                                                </tr>
+                                                <t t-set="year" t-value="line3['year']"/>
+                                            </t>
+                                            <tr>
+                                                <td class="text-center align-middle" colspan="5">
+                                                    <strong>Amount of Employee's Contribution </strong>
+                                                </td>
+                                                <td class="text-right align-middle">
+                                                    <span t-esc="'{0:,.2f}'.format(year_total)"/>
+                                                </td>
+                                            </tr>
+
+                                            <t t-set="year_total" t-value="0"/>
+                                        </t>
+                                    </t>
+                                    <tr>
+                                        <td class="text-center align-middle" colspan="5">
+                                            <strong>Total Employee Contribution Till Date</strong>
+                                        </td>
+                                        <td class="text-right align-middle">
+                                            <span t-esc="'{0:,.2f}'.format(grand_total)"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="7">
+
+                                        </td>
+                                    </tr>
+
+                                    <t t-set="deposite" t-value="0"/>
+                                    <tr>
+                                        <td class="text-center align-middle">
+                                            <span t-esc="'10'"/>
+                                        </td>
+                                        <td class="text-left align-middle" colspan="2">
+                                            <strong>Ten Contribution(as per maturity)(CP)</strong>
+                                            <!--                                                <strong>Employee Contribution/Part (EP) Year "o.date_of_separation":</strong>-->
+                                        </td>
+                                        <td>
+                                            <strong>30% of employees Deposited Amount</strong>
+                                        </td>
+                                        <td>
+                                            <strong>Tk.</strong>
+                                        </td>
+                                        <td class="text-right align-right">
+                                            <t t-set="deposite" t-value="(grand_total * 30)/100"/>
+                                            <span t-esc="'{0:,.2f}'.format(deposite)"/>
+                                            <!--                                                            <strong><span t-field="o.date_of_separation"/></strong>-->
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-center align-middle">
+                                            <span t-esc="'11'"/>
+                                        </td>
+                                        <td class="text-left align-middle" colspan="2">
+                                            <strong>Profit on Total Amount (PP)</strong>
+                                            <!--                                                <strong>Employee Contribution/Part (EP) Year "o.date_of_separation":</strong>-->
+                                        </td>
+                                        <td class="text-right align-right">
+                                            <strong>0%</strong>
+                                        </td>
+                                        <td>
+                                            <strong>Tk.</strong>
+                                        </td>
+                                        <td class="text-right align-right">
+                                            -
+                                            <!--                                                            <strong><span t-field="o.date_of_separation"/></strong>-->
+                                        </td>
+                                    </tr>
+                                    <t t-set="maturity" t-value="0"/>
+                                    <tr>
+                                        <td class="text-right align-right" colspan="4">
+                                            <strong>Total Payable as of Maturity </strong>
+                                        </td>
+                                        <td>
+                                            <strong>Tk.</strong>
+                                        </td>
+                                        <td class="text-right align-right">
+                                            <t t-set="maturity" t-value="grand_total + deposite"/>
+                                            <span t-esc="'{0:,.2f}'.format(maturity)"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-center align-middle" colspan="7">
+                                            <strong>Entitlement</strong>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-center align-middle" t-att-rowspan="7">
+                                            <span t-esc="12"/>
+                                        </td>
+                                        <td class="text-center align-middle" t-att-rowspan="7" colspan="2">
+                                            Less
+                                        </td>
+                                        <tr class="text-left align-left">
+                                            <td>
+                                                (a) Early settlement (TPF Rules-14/KA/I)CP
+                                            </td>
+                                            <td>
+                                                <strong>Tk.</strong>
+                                            </td>
+                                            <td class="text-right align-right">
+                                                <span t-esc="'{0:,.2f}'.format(deposite)"/>
+                                            </td>
+                                        </tr>
+                                        <tr class="text-left align-left">
+                                            <td>
+                                                (b) Early settlement (TPF Rules-14/KA/I)PP
+                                            </td>
+                                            <td>
+                                                <strong>Tk.</strong>
+                                            </td>
+                                            <td class="text-right align-right">
+                                                <strong>-</strong>
+                                            </td>
+                                        </tr>
+                                        <tr class="text-left align-left">
+                                            <td>
+                                                (c) Other Dues
+                                            </td>
+                                            <td>
+                                                <strong>Tk.</strong>
+                                            </td>
+                                            <td class="text-right align-right">
+                                                <strong>-</strong>
+                                            </td>
+                                        </tr>
+                                        <tr class="text-left align-left">
+                                            <td>
+                                            </td>
+                                            <td>
+                                                <strong>Tk.</strong>
+                                            </td>
+                                            <td class="text-right align-right">
+                                                <strong>-</strong>
+                                            </td>
+                                        </tr>
+                                        <tr class="text-left align-left">
+                                            <td>
+                                            </td>
+                                            <td>
+                                                <strong>Tk.</strong>
+                                            </td>
+                                            <td class="text-right align-right">
+                                                <strong>-</strong>
+                                            </td>
+                                        </tr>
+                                        <tr class="text-left align-left">
+                                            <td>
+                                            </td>
+                                            <td>
+                                                <strong>Tk.</strong>
+                                            </td>
+                                            <td class="text-right align-right">
+                                                <strong>-</strong>
+                                            </td>
+                                        </tr>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-right align-right" colspan="4">
+                                            <strong>Deducted Total </strong>
+                                        </td>
+                                        <td>
+                                            <strong>Tk.</strong>
+                                        </td>
+                                        <td class="text-right align-right">
+                                            <span t-esc="'{0:,.2f}'.format(deposite)"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-right align-right" colspan="4">
+                                            <strong>PAYABLE FINAL SETTLEMENT TAKA </strong>
+                                        </td>
+                                        <td>
+                                            <strong>Tk.</strong>
+                                        </td>
+                                        <td class="text-right align-right">
+                                            <span t-esc="'{0:,.2f}'.format(grand_total)"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-center align-middle" colspan="7">
+
+                                            <p class="m-0"><strong>Amount In Words: <span
+                                                    t-esc="o._compute_amount_in_word(grand_total)"/></strong></p>
+                                        </td>
+                                    </tr>
+
+                                </tbody>
+                            </table>
+                            <br/>
+                            <br/>
+                            <div class="row" style="color: #374151 ;">
+                                <div class="col-3 text-center">
+                                    <div>
+                                        <p style="text-align:center;text-decoration: overline;"><strong>Prepared
+                                            By</strong></p>
+                                    </div>
+                                    <div>
+                                        <span t-esc="create_uid"/>
+                                    </div>
+                                </div>
+                                <div class="col-3 text-center">
+                                    <div>
+                                        <p style="text-align:center;text-decoration: overline;"><strong>Checked
+                                            By</strong></p>
+                                    </div>
+                                </div>
+                                <div class="col-3 text-center">
+                                    <div>
+                                        <p style="text-align:center;text-decoration: overline;"><strong>
+                                            Accounts</strong></p>
+                                    </div>
+                                </div>
+                                <div class="col-3 text-center">
+                                    <div>
+                                        <p style="text-align:center;text-decoration: overline;"><strong>
+                                            Management</strong></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

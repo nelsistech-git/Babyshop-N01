@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <data>
+
+        <record model="ir.actions.report" id="employee_overtime_report_id_tmpl">
+            <field name="name">Employee Overtime Report</field>
+            <field name="model">employee.overtime.report.wizard</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">custom_hr_report.employee_overtime_report_template</field>
+            <field name="report_file">custom_hr_report.employee_overtime_report_template</field>
+            <field name="paperformat_id" ref="custom_common_settings.paperformat_custom_a4_bd"/>
+        </record>
+
+        <template id="employee_overtime_report_template">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <style type="text/css">
+                            table, th, tr, td{
+                            background: white !important;
+                            border: 1px solid black;
+                            }
+                        </style>
+                        <div class="oe_structure"/>
+                        <h3 class="text-center head_font_color">
+                            <strong>
+                                <span t-esc="form['company_id'][1]"/>
+                            </strong>
+                        </h3>
+                        <div>
+                            <h3 class="text-center head_font_color">
+                                <strong>
+                                    Employee Overtime Report
+                                    <br/>
+                                </strong>
+                            </h3>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <div style="color: #000; font-size: 15px;"><strong>From Date:</strong> <t t-esc="form['start_date']" t-options='{"widget": "date"}'/></div>
+                                <div style="color: #000; font-size: 15px;"><strong>To Date:</strong> <t t-esc="form['end_date']" t-options='{"widget": "date"}'/></div>
+                            </div>
+                            <div class="col-6">
+                                <div class="text-right" style="color: #000; font-size: 15px;"><strong>Work Location:</strong> <t t-esc="work_loc_name"/></div>
+                                <div class="text-right" style="color: #000; font-size: 15px;"><strong>Department:</strong> <t t-esc="dept_name"/></div>
+                                <div class="text-right" style="color: #000; font-size: 15px;"><strong>Employee:</strong> <t t-esc="employee_name"/>
+                                    <t t-if="buisness_unit">
+                                        <br/>
+                                        <strong>Office/business Unit:</strong>  <t t-esc="buisness_unit"/>
+                                    </t>
+                                    <t t-if="tag_names_list">
+                                        <br/>
+                                        <strong>Tags:</strong>  <t t-esc="tag_names_list"/>
+                                    </t>
+                                
+                                </div>
+                                <div class="text-right" t-if="form['employee_id']" style="color: #000; font-size: 15px;"><strong>Employee ID:</strong> <t t-esc="employee_id_card"/></div>
+                            </div>
+                        </div>
+                        <table style="border-collapse: collapse;width: 100%; margin-bottom: 2em;"
+                               class="table table-condensed">
+                            <thead>
+                                <tr>
+                                    <th class="text-center align-middle bg_color font_color">Sl.</th>
+                                    <th class="text-center align-middle bg_color font_color">Date</th>
+                                    <t t-if="not form['employee_id']">
+                                        <th class="text-left align-middle bg_color font_color">Name</th>
+                                    </t>
+                                    <th class="text-center align-middle bg_color font_color">Check In</th>
+                                    <th class="text-center align-middle bg_color font_color">Check Out</th>
+                                    <th class="text-center align-middle bg_color font_color">Overtime Hours</th>
+                                </tr>
+                            </thead>
+                            <tbody class="consumed_tbody">
+                                <t t-set="sl_no" t-value="1"/>
+                                <t t-foreach="csr" t-as="line">
+                                    <tr>
+                                        <td class="text-center align-middle">
+                                            <span t-esc="sl_no"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <span t-esc="line['attendance_date']" t-options='{"widget": "date"}'/>
+                                        </td>
+                                        <t t-if="not form['employee_id']">
+                                            <td class="text-left align-middle">
+                                                <span t-esc="line['employee_name']"/>
+                                            </td>
+                                        </t>
+                                        <td class="text-center align-middle">
+                                            <span t-esc="line['check_in_time']" t-options="{'widget': 'float_time'}"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <span t-esc="line['check_out_time']" t-options="{'widget': 'float_time'}"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <span t-esc="line['overtime_hours_time']" t-options="{'widget': 'float_time'}"/>
+                                        </td>
+                                    </tr>
+                                    <t t-set="sl_no" t-value="sl_no + 1"/>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

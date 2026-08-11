@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <data>
+        <menuitem id="hr_attendance.menu_hr_attendance_reporting"
+                  name="Reporting"
+                  sequence="25"
+                  parent="hr_attendance.menu_hr_attendance_root"
+                  groups="hr.group_hr_user"
+        />
+        <menuitem id="hr_attendance.menu_hr_attendance_report" name="Attendance Graph"
+                  parent="hr_attendance.menu_hr_attendance_reporting" sequence="30"
+                  groups="hr_attendance.group_hr_attendance_officer" action="hr_attendance.hr_attendance_reporting"/>
+
+
+        <menuitem id="menu_attendance_report_root_attendance_sub"
+                  name="Attendance"
+                  sequence="1"
+                  parent="hr_attendance.menu_hr_attendance_reporting"
+                  groups="hr.group_hr_user"
+        />
+
+        <menuitem id="menu_daily_attendance_statistic_report_att"
+                  name="Daily Attendance Statistic Report"
+                  sequence="1"
+                  action="custom_hr_attendance_sheet.action_daily_attendance_statistic_report_wizard"
+                  parent="custom_hr_attendance_sheet.menu_attendance_report_root_attendance_sub"
+                  groups="hr.group_hr_user,custom_common_settings.group_branch_manager"
+        />
+
+        <menuitem
+                id="menu_attendance_sheet_checkin_checkout"
+                name="Attendance Sheet Check In / Check Out"
+                sequence="2"
+                action="custom_hr_attendance_sheet.action_attendance_sheet_checkin_checkout_wizard"
+                parent="custom_hr_attendance_sheet.menu_attendance_report_root_attendance_sub"
+                groups="hr.group_hr_user"
+        />
+
+        <menuitem
+                id="hr_holidays.hr_holidays_public_time_off_menu_configuration"
+                action="hr_holidays.open_view_public_holiday"
+                name="Public Holidays Base"
+                parent="hr_holidays.menu_hr_holidays_configuration"
+                groups="hr_holidays.group_hr_holidays_manager"
+                sequence="3"/>
+        <record model="ir.ui.menu" id="hr_holidays.hr_holidays_public_time_off_menu_configuration">
+            <field name="groups_id" eval="[(6,0,[ref('base.group_system')])]"/>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_wppf_statement_wizard_form" model="ir.ui.view">
+        <field name="name">wppf.statement.wizard.form</field>
+        <field name="model">wppf.statement.wizard</field>
+        <field name="arch" type="xml">
+            <form string="WPPF Statement">
+                <sheet>
+                    <group>
+                        <group>
+
+                            <field name="fiscalyear_id"
+                                   options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                            <field name="employee_id"
+                                   options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                        </group>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_print_pdf" type="object" string="Print (PDF)" class="oe_highlight"/>
+                    <button special="cancel" string="Cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="action_wppf_statement_wizard" model="ir.actions.act_window">
+        <field name="name">WPPF Statement</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">wppf.statement.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_wppf_statement_wizard_form"/>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_hr_employee_wppf_sub_reports"
+              name="Reporting"
+              sequence="90"
+              parent="menu_hr_employee_wppf_root"/>
+
+    <menuitem id="menu_wppf_statement_wizard"
+              name="WPPF Statement"
+              sequence="1"
+              action="action_wppf_statement_wizard"
+              parent="menu_hr_employee_wppf_sub_reports"
+              groups="hr.group_hr_manager"
+    />
+
+</odoo>

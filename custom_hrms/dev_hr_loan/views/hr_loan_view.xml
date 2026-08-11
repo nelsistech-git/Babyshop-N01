@@ -1,0 +1,620 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_employee_loan_form" model="ir.ui.view">
+		<field name="name">view.employee.loan.form</field>
+		<field name="model">employee.loan</field>
+		<field name="arch" type="xml">
+			<form string="Employee Loan">
+				<header>
+                    <button name="compute_installment" invisible="state not in ('draft','request')" string="Compute Installment"
+                            class="btn-primary" type="object" groups="base.group_user"/>
+
+                    <button name="action_send_request" invisible="state not in ('draft')" string="Submit Request"
+                            class="btn-primary" type="object" groups="base.group_user"/>
+
+                    <field name="is_dm" invisible="1"/>
+                    <button name="dep_manager_approval_loan" string="Dept Head Approve" class="btn-primary"
+                            type="object" invisible="is_dm == False or state !='request'" />
+                    
+                    <button name='%(dev_hr_loan.action_reject_loan_reason)d' string="Reject Request"
+                            type="action" invisible="state not in ('request','dep_approval','hr_approval','acc_approval')" />
+
+                    <button name="cancel_loan" invisible="state not in ('request')" string="Cancel" type="object"
+                            groups="base.group_user"/>
+
+                    <button name="hr_manager_approval_loan" invisible="state not in ('dep_approval')" string="HR Approve" class="btn-primary"
+                            type="object" groups="hr.group_hr_manager,custom_common_settings.group_hr_controller"/>
+
+                    <button name="acc_manager_approval_loan" invisible="state not in ('hr_approval')" string="Accounts Approve" class="btn-primary"
+                            type="object" groups="account.group_account_manager"/>
+
+                    <button name="trusty_manager_approval_loan" invisible="state not in ('acc_approval')" string="Trusty Approve" class="btn-primary"
+                            type="object" groups="dev_hr_loan.group_loan_trusty_manager"/>
+
+                    <button name="paid_loan" invisible="state not in ('trusty_approval')" string="Payment Disburse" class="btn-primary" type="object"
+                            groups="account.group_account_manager"/>
+
+                    <button name="set_to_draft" invisible="state not in ('cancel', 'reject')" string="Set to Draft" type="object"
+                            groups="base.group_user"/>
+
+
+                    <button name="action_done_loan" invisible="state not in ('paid')" string="Done" class="btn-primary" type="object"
+                            groups="hr.group_hr_manager" />
+
+                    <button name='send_loan_detail' invisible="state not in ('done')" string='Send Mail' type="object" groups="hr.group_hr_user"/>
+
+                    <button name="%(emp_loan_early_settle_remission_wizard_action)d" string="Early Settlement/Remission" type="action" invisible="state != 'done'" groups="hr.group_hr_manager"/>
+
+                    <button name="%(action_loan_reschedule_wizard)d" string="Loan Reschedule" type="action" invisible="state != 'done'" groups="hr.group_hr_manager"/>
+                    <button name='action_chk_paid_remaining' string='Refresh All Remaining' type="object" groups="dev_hr_loan.group_loan_refresher" /> <!--attrs="{'invisible':[('state','in',['close','reject','cancel'])]}"-->
+
+                    <button name='action_loan_application_print' string='Print Application' type="object" /> <!--attrs="{'invisible':[('state','in',['close','reject','cancel'])]}"-->
+
+					<field name="state" widget="statusbar" statusbar_visible="draft,request,dep_approval,hr_approval,acc_approval,trusty_approval,paid,done,close"/>
+				</header>
+				<sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <b><button name="view_journal_entry" type="object"  class="oe_stat_button" icon="fa-external-link" string="Journal Entry" groups="hr.group_hr_manager" invisible="state not in ('done','paid')" /></b>
+                         <button type="object"
+                            name="action_view_loan_installment"
+                            class="oe_stat_button"
+                            icon="fa-list"
+                            invisible="installment_count == 0" >
+                             <field name="installment_count" string="Installment" widget="statinfo" />
+                         </button>
+                        
+                    </div>
+                    
+                	<label for="name" class="oe_edit_only"/>
+                	<h1><field name="name" readonly="1"/></h1>
+
+                    <label for="loan_type_id" />
+                    <field name="loan_type_id" readonly="state != 'draft'" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                    <field name="type_id_type" invisible="1"/>
+
+                    <group >
+                        <group string="Employee Information">
+                            <field name="employee_id" readonly="state != 'draft'" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="company_id" readonly="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="partner_id" readonly="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" />
+                            <field name="user_work_location_id" readonly="1" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="department_id" readonly="1" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="job_id" readonly="1" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="joining_date"/>
+                            <field name="date_of_confirmation"/>
+                            <field name="loan_url" invisible="1"/>
+                            <field name="user_id" readonly="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="hr_manager_id" invisible="1"/>
+                            <field name="move_id" invisible="1" />
+                            <field name="manager_id" readonly="state != 'draft'" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+
+                        </group>
+                        <group string="Account Status">
+                                <field name="current_balance" readonly="1" force_save="1"/>
+                                <field name="eligible_amount" readonly="1" force_save="1"/>
+                                <field name="eligible_pf" string="Eligible (PF)" readonly="1" force_save="1" invisible="type_id_type !='pf_loan'"/>
+                                <field name="eligible_cpf" string="Eligible (CPF)" readonly="1" force_save="1" invisible="type_id_type !='pf_loan'" />
+
+                                <field name="current_loan" readonly="1" force_save="1"/>
+                                <field name="applicable_amount" readonly="1" force_save="1" style="font-weight:bold;"/>
+                                <field name="notes" readonly="state not in ('draft','request')" required="1"/>
+
+                        </group>
+                    </group>
+
+                    <group string="Loan Information">
+                        <group>
+                            <field name="is_apply_interest" invisible="1"/>
+
+                            <field name="start_date_requested" readonly="state != 'draft'" required="state == 'draft'"/>
+                            <field name="start_date" readonly="state not in ('draft','request','dep_approval','hr_approval')" required="state not in ('draft','request','dep_approval','hr_approval')"/>
+
+                            <field name="requested_amount" readonly="state != 'draft'" required="1" style="font-weight:bold;"/>
+                            <field name="approved_amount" force_save="1" readonly="state not in ('request','dep_approval','hr_approval')" style="font-weight:bold;" required="1"/>
+                            <field name="loan_amount" readonly="state != 'draft'" force_save="1" style="font-weight:bold;"/>
+                            <field name="loan_amount_pf" readonly="1" force_save="1" invisible="type_id_type != 'pf_loan'"/>
+                            <field name="loan_amount_cpf" readonly="1" force_save="1" invisible="type_id_type != 'pf_loan'"/>
+
+                            <field name="distributed_by" readonly="state not in ('draft','request')" required="1"/>
+                            <field name="term" required="1" readonly="state not in ('draft','request') or distributed_by == 'inst'" force_save="1"/>
+                            <field name="installment_amount" required="1" readonly="state not in ('draft','request') or distributed_by == 'term'" force_save="1"/>
+                            <field name="installment_amount_previous" readonly="1" force_save="1"/>
+
+                            <field name="interest_amount" invisible="is_apply_interest != True"/>
+                            <field name="extra_in_amount" invisible="is_apply_interest != True"/>
+                            <field name="payment_method" readonly="state != 'draft'"/>
+                            <field name="is_revised" readonly="1"/>
+                            <field name="process_fee_amount" readonly="state in ('paid','done','close')" required="state == 'trusty_approval'"/>
+                            <field name="loan_disbursement_amount" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="date" readonly="state != 'draft'" required="state == 'draft'"/> <!--readonly="1" -->
+                            <field name="approve_date" readonly="1"/>
+                            <field name="disburse_date" readonly="state != 'trusty_approval'" required="state == 'trusty_approval'"/>  <!--readonly="1" force_save="1"-->
+                            <field name="end_date"/>
+                            <field name="paid_count" readonly="1" force_save="1"/>
+                            <field name="paid_amount" style="font-weight:bold;" decoration-success="(paid_amount &gt; 0)"/>
+                            <field name="remaining_count" readonly="1" force_save="1"/>
+                            <field name="remaing_amount" style="font-weight:bold;" decoration-danger="(remaing_amount &gt; 0)"/>
+                            <field name="remaining_pf" string="Remaining (PF)" readonly="1" force_save="1" invisible="type_id_type != 'pf_loan'"/>
+                            <field name="remaining_cpf" string="Remaining (CPF)" readonly="1" force_save="1" invisible="type_id_type != 'pf_loan'"/>
+
+                            <field name="interest_rate" invisible="is_apply_interest != True" readonly="state != 'draft'"/>
+                            <field name="interest_type" invisible="is_apply_interest != True" readonly="state != 'draft'"/>
+
+                            <field name="is_apply_top_up" readonly="1" force_save="1"/>
+                            <field name="journal_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" readonly="1" force_save="1"/>
+                            <field name="debit_loan_account" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" readonly="1" force_save="1"/>
+                            <field name="debit_process_fee_account" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" readonly="1" force_save="1"/>
+                            <field name="debit_interest_account" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" readonly="1" force_save="1"/>
+
+                            <field name="credit_loan_account" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" 
+                            readonly="state in ('paid','done','close')" required="state == 'trusty_approval'"/>
+                            <field name="disbursement_notes" readonly="state not in ('hr_approval','trusty_approval')" invisible="state in  ('draft','request','dep_approval')"/>
+
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Installment">
+                            <br/>
+                            <field name="installment_lines" readonly="1" >
+                                <tree string="Installment" decoration-success="is_paid == True"  decoration-muted="is_skip == True">
+                                    <field name="name"/>
+                                    <field name="date"/>
+                                    <field name="amount" invisible="1"/>
+                                    <field name="interest" invisible="1"/>
+                                    <field name="installment_amt" sum="installment_amt"/>
+                                    <field name="ins_interest" sum="ins_interest"/>
+                                    <field name="total_installment" sum="total_installment"/>
+                                    <field name="is_early_settlement" invisible="0"/>
+                                    <field name="is_remission" invisible="0"/>
+                                    <field name="is_paid" /><!-- invisible="1" -->
+                                    <field name="paid_date" /><!-- invisible="1" -->
+                                    <field name="is_skip" /><!-- invisible="1" -->
+                                    <button type="object" name="action_view_payslip" string="Payslip" class="btn-primary"
+                                    	invisible="is_paid == False" groups="hr_payroll.group_hr_payroll_manager"/>
+                                    <button name="view_journal_entry" type="object"  class="btn-primary" string="Journal" groups="hr.group_hr_manager" invisible="is_paid == False"/>
+                                </tree>
+                            </field>
+                        </page>
+
+                         <page string="Document">
+                             <field name="loan_document_line_ids" mode="kanban" context="{'default_loan_id': active_id,'default_employee_id':employee_id }">
+                                 <kanban>
+                                     <field name="name"/>
+                                     <field name="document"/>
+                                     <field name="employee_id"/>
+                                     <field name="date"/>
+                                     <templates>
+                                         <t t-name="kanban-box">
+                                             <div t-attf-class="oe_kanban_card oe_kanban_global_click">
+                                                 <div class="oe_kanban_details">
+                                                     <strong><h3><field name="sequ_name"/></h3></strong>
+                                                     <ul>
+                                                         <li><span style="color: #800000">Name : </span><field name="name"/></li>
+                                                         <li><span style="color: #800000">Date: </span><field name="date"/></li>
+                                                     </ul>
+                                                 </div>
+                                             </div>
+                                         </t>
+                                     </templates>
+                                 </kanban>
+                            </field>
+                        </page>
+
+                        <page string='Reject Reason' invisible="state in ('draft','request')">
+                            <group>
+                            <field name="reject_reason" readonly="1"/>
+                            <br/>
+                                <field name="reject_reason_hr" readonly="1"/>
+                            <br/>
+                                <field name="reject_reason_trusty" readonly="1"/>
+                            <br/>
+                            <field name="reject_reason_acc" readonly="1"/>
+                            </group>
+                        </page>
+                    </notebook>
+				</sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+			</form>
+		</field>
+	</record>
+
+    <record id="view_employee_loan_tree" model="ir.ui.view">
+        <field name="name">view.employee.loan.tree</field>
+        <field name="model">employee.loan</field>
+        <field name="arch" type="xml">
+            <tree string="Employee Loan">
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="user_work_location_id"/>
+                <field name="department_id"/>
+                <field name="job_id"/>
+                <field name="loan_type_id" />
+                <field name="start_date_requested"/>
+                <field name="start_date"/>
+                <field name="approve_date"/>
+                <field name="requested_amount"/>
+                <field name="approved_amount"/>
+                <field name="installment_count"/>
+                <field name="loan_amount"/>
+                <field name="paid_count"/>
+                <field name="paid_amount"/>
+                <field name="remaining_count"/>
+                <field name="remaing_amount"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_employee_loan_filter" model="ir.ui.view">
+        <field name="name">employee.loan.select</field>
+        <field name="model">employee.loan</field>
+        <field name="arch" type="xml">
+            <search string="Search Employee Loan">
+                <field name="id_card_no" filter_domain="[('id_card_no', '=', self)]"/>
+            	<field name="employee_id" operator="child_of"/>
+            	<field name="user_work_location_id"/>
+            	<field name="department_id"/>
+            	<field name="job_id"/>
+                <field name="user_id"/>
+                <field name="name" string="Loan" filter_domain="[('name','ilike',self)]"/>
+                <filter name='draft' string="Draft" domain="[('state','=','draft')]" help="Draft Loan"/>
+                <filter name='done' string="Done" domain="[('state','=','done')]" help="Done Loan"/>
+                <filter name='paid' string="Paid" domain="[('state','=','paid')]" help="Paid Loan"/>
+                <filter name='hr_approval' string="HR Approval" domain="[('state','=','hr_approval')]"/>
+                <filter name='trusty_approval' string="Trusty Approval" domain="[('state','=','trusty_approval')]"/>
+                <field name="loan_type_id"/>
+<!--                <field name="employee_id"/>-->
+                <group expand="0" string="Group By">
+                    <filter string="Employees" name="employee_id" context="{'group_by':'employee_id'}"/>
+                    <filter string="Manager" name="manager_id" context="{'group_by':'manager_id'}"/>
+                    <filter string="Loan type" name="type" context="{'group_by':'loan_type_id'}"/>
+                    <filter string="States" name="state" context="{'group_by':'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+     <record id="action_view_all_loan" model="ir.actions.act_window">
+            <field name="name">View Loan</field>
+            <field name="res_model">employee.loan</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain"></field>
+            <field name="context">{
+                    'search_default_loan_type_id': [active_id],
+                    'default_loan_type_id': active_id,
+            }</field>
+            <field name="search_view_id" ref="view_employee_loan_filter"/>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click here to create a new Loan.
+              </p>
+            </field>
+        </record>
+
+    <record id="action_loan_create" model="ir.actions.act_window">
+            <field name="name">Loan Create</field>
+            <field name="res_model">employee.loan</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_mode">form</field>
+            <field name="domain"></field>
+            <field name="context">{
+                    'search_default_loan_type_id': [active_id],
+                    'default_loan_type_id': active_id,
+                    'contact_display': 'partner_address',
+            }
+            </field>
+            <field name="search_view_id" ref="view_employee_loan_form"/>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click here to create a new Loan.
+              </p>
+            </field>
+        </record>
+    <record id="action_hr_approval" model="ir.actions.act_window">
+            <field name="name">Done Loan</field>
+            <field name="res_model">employee.loan</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain"></field>
+            <field name="context">{
+                    'search_default_loan_type_id': [active_id],
+                    'default_loan_type_id': active_id,
+                    'contact_display': 'partner_address',
+                    'search_default_hr_approval': 1,
+            }
+            </field>
+            <field name="search_view_id" ref="view_employee_loan_filter"/>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click here to create a new Loan.
+              </p>
+            </field>
+        </record>
+
+    <record id="action_loan_paid" model="ir.actions.act_window">
+            <field name="name">Done Loan</field>
+            <field name="res_model">employee.loan</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain"></field>
+            <field name="context">{
+                    'search_default_loan_type_id': [active_id],
+                    'default_loan_type_id': active_id,
+                    'contact_display': 'partner_address',
+                    'search_default_paid': 1,
+            }
+            </field>
+            <field name="search_view_id" ref="view_employee_loan_filter"/>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click here to create a new Loan.
+              </p>
+            </field>
+        </record>
+    
+    <record id="action_loan_tree_done" model="ir.actions.act_window">
+            <field name="name">Done Loan</field>
+            <field name="res_model">employee.loan</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain"></field>
+            <field name="context">{
+                    'search_default_loan_type_id': [active_id],
+                    'default_loan_type_id': active_id,
+                    'contact_display': 'partner_address',
+                    'search_default_done': 1,
+            }
+            </field>
+            <field name="search_view_id" ref="view_employee_loan_filter"/>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click here to create a new Loan.
+              </p>
+            </field>
+        </record>
+
+    <record id="action_loan_tree_draft" model="ir.actions.act_window">
+            <field name="name">Draft Loan</field>
+            <field name="res_model">employee.loan</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain"></field>
+            <field name="context">{
+                    'search_default_loan_type_id': [active_id],
+                    'default_loan_type_id': active_id,
+                    'contact_display': 'partner_address',
+                    'search_default_draft': 1,
+            }
+            </field>
+            <field name="search_view_id" ref="view_employee_loan_filter"/>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click here to create a new Loan.
+              </p>
+            </field>
+        </record>
+        
+    <record id="get_hr_loan_type" model="ir.actions.act_window">
+            <field name="name">Employee Loan</field>
+            <field name="res_model">employee.loan</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain"></field>
+            <field name="context">{
+                    'search_default_loan_type_id': [active_id],
+                    'default_loan_type_id': active_id,
+                    'contact_display': 'partner_address',
+            }
+            </field>
+            <field name="search_view_id" ref="view_employee_loan_filter"/>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click here to create a new Loan.
+              </p>
+            </field>
+        </record>
+
+
+    <record model="ir.actions.act_window" id="action_employee_loan">
+        <field name="name">Employee Loan</field>
+        <field name="res_model">employee.loan</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_my_loans':1}</field>
+        <field name="help" type="html">
+          <p class="oe_view_nocontent_create">
+            	Click to define a new loan.
+          </p>
+        </field>
+    </record>
+
+
+
+   <!-- request-->
+    <record id="view_employee_loan_form_request" model="ir.ui.view">
+		<field name="name">view.employee.loan.request.form</field>
+		<field name="model">employee.loan</field>
+		<field name="arch" type="xml">
+			<form string="Employee Loan Request">
+				<header>
+                    <button name="compute_installment" invisible="state not in ('draft','request','dep_approval','hr_approval','acc_approval')" string="Compute Installment"
+                            class="btn-primary" type="object" groups="base.group_user"/>
+
+                    <button name="action_send_request" invisible="state not in ('draft')" string="Submit Request"
+                            class="btn-primary" type="object" groups="base.group_user"/>
+
+                    <field name="is_dm" invisible="1"/>
+
+                    <button name="set_to_draft" invisible="state not in ('cancel','reject')" string="Set to Draft" type="object"
+                            groups="base.group_user"/>
+                    <button name='action_loan_application_print' string='Print Application' type="object" /> <!--attrs="{'invisible':[('state','in',['close','reject','cancel'])]}"-->
+
+					<field name="state" widget="statusbar" statusbar_visible="draft,request,dep_approval,hr_approval,acc_approval,trusty_approval,paid,done"/>
+				</header>
+				<sheet>
+
+                	<label for="name" class="oe_edit_only"/>
+                	<h1><field name="name" readonly="1"/></h1>
+
+                    <label for="loan_type_id" />
+                    <field name="loan_type_id" readonly="state != 'draft'" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                    <field name="type_id_type" invisible="1"/>
+
+                    <group >
+                        <group string="Employee Information">
+                            <field name="employee_id" readonly="1" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="company_id" readonly="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="partner_id" readonly="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="user_work_location_id" readonly="1" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="department_id" readonly="1" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="job_id" readonly="1" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="joining_date"/>
+                            <field name="date_of_confirmation"/>
+                            <field name="loan_url" invisible="1"/>
+                            <field name="user_id" readonly="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="hr_manager_id" invisible="1"/>
+                            <field name="move_id" invisible="1" />
+                            <field name="manager_id" readonly="state != 'draft'" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+
+                        </group>
+                        <group string="Account Status">
+                                <field name="current_balance" readonly="1" force_save="1"/>
+                                <field name="eligible_amount" readonly="1" force_save="1"/>
+                                <field name="eligible_pf" string="Eligible (PF)" readonly="1" force_save="1" invisible="type_id_type != 'pf_loan'" />
+                                <field name="eligible_cpf" string="Eligible (CPF)" readonly="1" force_save="1" invisible="type_id_type != 'pf_loan'" />
+
+                                <field name="current_loan" readonly="1" force_save="1"/>
+                                <field name="applicable_amount" readonly="1" force_save="1" style="font-weight:bold;"/>
+
+                                <field name="notes" readonly="state not in ('draft','request')" required="1"/>
+                        </group>
+                    </group>
+
+                    <group string="Loan Information">
+                        <group>
+                            <field name="is_apply_interest" invisible="1"/>
+
+                            <field name="start_date_requested" readonly="state != 'draft'" required="state == 'draft'" />
+
+                            <field name="requested_amount" readonly="state != 'draft'" required="1" style="font-weight:bold;"/>
+                            <field name="approved_amount" readonly="1" force_save="1" style="font-weight:bold;"/>
+                            <field name="loan_amount" readonly="state != 'draft'" force_save="1" style="font-weight:bold;" invisible="1"/>
+                            <field name="loan_amount_pf" readonly="1" force_save="1" invisible="type_id_type != 'pf_loan'" />
+                            <field name="loan_amount_cpf" readonly="1" force_save="1" invisible="type_id_type != 'pf_loan'" />
+
+                            <field name="distributed_by" readonly="state != 'draft'" required="1"/>
+                            <field name="term" required="1" readonly="state != 'draft' or distributed_by == 'inst'" force_save="1"/>
+                            <field name="installment_amount" required="1" readonly="state != 'draft' or distributed_by == 'term'" force_save="1"/>
+                            <field name="installment_amount_previous" readonly="1" force_save="1"/>
+
+                            <field name="interest_amount" invisible="is_apply_interest != True"/>
+                            <field name="extra_in_amount" invisible="is_apply_interest != True"/>
+                            <field name="payment_method" readonly="state != 'draft'"/>
+                            <field name="is_revised" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="date" readonly="1"/>
+                            <field name="approve_date" readonly="1"/>
+                            <field name="end_date"/>
+                            <field name="paid_amount" style="font-weight:bold;" decoration-success="(paid_amount &gt; 0)"/>
+                            <field name="remaing_amount" style="font-weight:bold;" decoration-danger="(remaing_amount &gt; 0)"/>
+                            <field name="remaining_pf" string="Remaining (PF)" readonly="1" force_save="1" invisible="type_id_type != 'pf_loan'" />
+                            <field name="remaining_cpf" string="Remaining (CPF)" readonly="1" force_save="1" invisible="type_id_type != 'pf_loan'" />
+
+                            <field name="interest_rate" invisible="is_apply_interest != True" readonly="state != 'draft'"/>
+                            <field name="interest_type" invisible="is_apply_interest != True" readonly="state != 'draft'"/>
+
+                            <field name="is_apply_top_up" readonly="1" force_save="1"/>
+
+
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Installment">
+                            <br/>
+                            <field name="installment_lines" readonly="1" >
+                                <tree string="Installment" decoration-success="is_paid == True"  decoration-muted="is_skip == True">
+                                    <field name="name"/>
+                                    <field name="date"/>
+                                    <field name="amount" invisible="1"/>
+                                    <field name="interest" invisible="1"/>
+                                    <field name="installment_amt" sum="installment_amt"/>
+                                    <field name="ins_interest" sum="ins_interest"/>
+                                    <field name="total_installment" sum="total_installment"/>
+
+                                    <field name="is_paid" /><!-- invisible="1" -->
+                                    <field name="is_skip" /><!-- invisible="1" -->
+                                </tree>
+                                <form string="Installment">
+                                    <group>
+                                    <field name="name"/>
+                                    <field name="date"/>
+                                    <field name="amount" invisible="1"/>
+                                    <field name="interest" invisible="1"/>
+                                    <field name="installment_amt" />
+                                    <field name="ins_interest" />
+                                    <field name="total_installment" />
+                                    <field name="is_paid" />
+                                    <field name="is_skip" />
+                                    </group>
+                                </form>
+                            </field>
+                        </page>
+
+
+                        <page string='Reject Reason' invisible="state != 'reject'">
+                            <br/>
+                            <field name="reject_reason" readonly="1"/>
+                        </page>
+                    </notebook>
+				</sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+			</form>
+		</field>
+	</record>
+
+    <record model="ir.actions.act_window" id="action_employee_loan_request">
+        <field name="name">Employee Loan Requests</field>
+        <field name="res_model">employee.loan</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('user_id', '=', uid)]</field>
+        <field name="context">{'search_default_my_loans':1}</field>
+        <field name="help" type="html">
+          <p class="oe_view_nocontent_create">
+            	Click to define a new loan.
+          </p>
+        </field>
+    </record>
+    <record id="action_employee_loan_request_tree" model="ir.actions.act_window.view">
+        <field eval="1" name="sequence"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="view_employee_loan_tree"/>
+        <field name="act_window_id" ref="action_employee_loan_request"/>
+    </record>
+    <record id="action_employee_loan_request_from" model="ir.actions.act_window.view">
+        <field eval="2" name="sequence"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_employee_loan_form_request"/>
+        <field name="act_window_id" ref="action_employee_loan_request"/>
+    </record>
+    <!--end request-->
+
+    <menuitem name="Employee Loan" id="menu_employee_loan" parent="menu_main_employee_loan_sub" groups="hr.group_hr_user,group_loan_requester" action="action_employee_loan"/>
+    <menuitem id="hr_loan_expenses" name="Employee Loan" parent="hr_payroll.menu_root_hr_related_expenses" action="dev_hr_loan.action_employee_loan" groups="account.group_account_manager" sequence="1"/>
+
+    <!--Under PF menu-->
+    <menuitem name="Loan Requests" id="menu_employee_loan_pf_request" parent="menu_hr_loan_pf_sub" groups="hr.group_hr_user,group_loan_requester" action="action_employee_loan_request" sequence="1"/>
+    <menuitem name="Employee Loan All" id="menu_employee_loan_pf" parent="menu_hr_loan_pf_sub" groups="hr.group_hr_user" action="action_employee_loan" sequence="2"/>
+
+</odoo>

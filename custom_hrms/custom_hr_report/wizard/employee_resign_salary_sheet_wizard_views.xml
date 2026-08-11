@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <data>
+        <record id="view_employee_resign_salary_sheet_wizard_form" model="ir.ui.view">
+            <field name="name">employee.resign.salary.sheet.wizard.form</field>
+            <field name="model">employee.resign.salary.sheet.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Employee Resign Salary Sheet">
+                    <group>
+                        <group>
+                            <field name="year" required="1"/>
+                            <field name="month"/>
+                        </group>
+                        <group>
+                            <field name="company_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="user_work_location_id" placeholder="All" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="department_id" placeholder="All" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="state"/>
+                            <field name="sbu_unit_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="category_ids" widget="many2many_tags" options="{'color_field': 'color', 'no_open': True, 'no_create': 1, 'no_create_edit': 1, 'no_quick_create': True}" />
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="employee_resign_salary_sheet_pdf" string="Download (PDF)" type="object" class="btn-primary"/>
+                        <button name="employee_resign_salary_sheet_excel" string="Download (Excel)" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="employee_resign_salary_sheet_wizard_action" model="ir.actions.act_window">
+            <field name="name">Employee Resign Salary Sheet</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">employee.resign.salary.sheet.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_employee_resign_salary_sheet_wizard_form"/>
+            <field name="target">new</field>
+        </record>
+
+        <!--<menuitem name="Employee Resign Salary Sheet" id="menu_employee_resign_salary_sheet" sequence="35" parent="custom_hr_report.menu_salary_report_root" action="employee_resign_salary_sheet_wizard_action" groups="hr.group_hr_user" />-->
+
+        <menuitem name="Employee Resign Salary Sheet" id="menu_employee_resign_salary_sheet_payroll" sequence="14" parent="hr_payroll.menu_report_payroll_salary" action="employee_resign_salary_sheet_wizard_action" groups="hr.group_hr_user" />
+
+    </data>
+</odoo>

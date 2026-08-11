@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+     <record id="view_rostering_shift_settings_form" model="ir.ui.view">
+         <field name="name">view.rostering.shift.settings.form</field>
+         <field name="model">rostering.shift.settings</field>
+         <field name="arch" type="xml">
+           <form>
+               <sheet>
+                   <group>
+                       <group>
+                           <field name="name" required="1" />
+                           <field name="start_time" widget="float_time" required="1"/>
+                           <field name="end_time" widget="float_time" required="1"/>
+                            <field name="remarks"/>
+                       </group>
+                   </group>
+               </sheet>
+               <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers" />
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+           </form>
+       </field>
+   </record>
+
+
+   <record id="view_rostering_shift_settings_tree" model="ir.ui.view">
+       <field name="name">rostering.shift.settings.tree</field>
+       <field name="model">rostering.shift.settings</field>
+       <field name="arch" type="xml">
+           <tree string="Agent Fee List">
+               <field name="name" />
+               <field name="start_time" />
+               <field name="end_time" />
+           </tree>
+       </field>
+   </record>
+
+   <record id="view_rostering_shift_settings_filter" model="ir.ui.view">
+       <field name="name">rostering.shift.settings.filter</field>
+       <field name="model">rostering.shift.settings</field>
+       <field name="arch" type="xml">
+           <search string="Search List">
+<!--               <field name="name" filter_domain="[('name', 'ilike', self)]"/>-->
+               <field name="start_time" filter_domain="[('start_time', 'ilike', self)]"/>
+               <field name="end_time" filter_domain="[('end_time', 'ilike', self)]"/>
+          </search>
+       </field>
+   </record>
+    
+   <record id="rostering_shift_settings_action" model="ir.actions.act_window">
+       <field name="name">Rostering Shift Settings</field>
+       <field name="res_model">rostering.shift.settings</field>
+       <field name="view_mode">tree,form</field>
+       <field name="help" type="html">
+           <p class="o_view_nocontent_smiling_face">
+               Create a New Rostering Shift
+           </p>
+       </field>
+   </record>
+
+<!--    <menuitem  id="root_menu_rostering_shift" name="Rostering Shift" parent="hr_attendance.menu_hr_attendance_root"  sequence="43"/>-->
+<!--    <menuitem  id="sub_menu_rostering_shift_settings" name="Shift Settings" parent="root_menu_rostering_shift" action="rostering_shift_settings_action" sequence="3"/>-->
+
+</odoo>

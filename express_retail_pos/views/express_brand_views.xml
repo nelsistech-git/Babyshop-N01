@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_express_pos_brand_tree" model="ir.ui.view">
+        <field name="name">express.pos.brand.tree</field>
+        <field name="model">express.pos.brand</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="code"/>
+            </tree>
+        </field>
+    </record>
+    <record id="view_express_pos_brand_form" model="ir.ui.view">
+        <field name="name">express.pos.brand.form</field>
+        <field name="model">express.pos.brand</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <field name="logo" widget="image" class="oe_avatar"/>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="e.g. Baby Shop"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <field name="code"/>
+                        <field name="sequence_id"/>
+                        <field name="product_category_ids" widget="many2many_tags"/>
+                    </group>
+                    <notebook>
+                        <page string="Showrooms / Branches">
+                            <field name="branch_ids">
+                                <tree editable="bottom">
+                                    <field name="name"/>
+                                    <field name="code"/>
+                                    <field name="manager_id"/>
+                                    <field name="warehouse_id"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Notes">
+                            <field name="note"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="action_express_pos_brand" model="ir.actions.act_window">
+        <field name="name">Brands</field>
+        <field name="res_model">express.pos.brand</field>
+        <field name="view_mode">list,form</field>
+        <field name="help">Configure each retail brand (e.g. Baby Shop, SNS) with its own categories, showrooms and
+            numbering.
+        </field>
+    </record>
+    <record id="view_express_pos_branch_tree" model="ir.ui.view">
+        <field name="name">express.pos.branch.tree</field>
+        <field name="model">express.pos.branch</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="brand_id"/>
+                <field name="manager_id"/>
+                <field name="warehouse_id"/>
+                <field name="receipt_format" optional="show"/>
+                <field name="color" widget="color_picker" optional="hide"/>
+            </tree>
+        </field>
+    </record>
+    <record id="view_express_pos_branch_form" model="ir.ui.view">
+        <field name="name">express.pos.branch.form</field>
+        <field name="model">express.pos.branch</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="e.g. Dhanmondi 27"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="brand_id"/>
+                            <field name="code"/>
+                            <field name="manager_id"/>
+                            <field name="warehouse_id"/>
+                        </group>
+                        <group>
+                            <field name="default_journal_id"/>
+                            <field name="color" widget="color_picker"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <group string="Receipt / Billing">
+                        <field name="phone" placeholder="e.g. +971562474453"/>
+                        <field name="receipt_format" placeholder="Use company default"/>
+                    </group>
+                    <notebook>
+                        <page string="Cashiers / Staff">
+                            <p class="text-muted">Only these users (plus the Branch Manager above) can open the Checkout
+                                Console for this branch and will see its sales figures - this is what the Express POS
+                                branch-scoping security rules key off.
+                            </p>
+                            <field name="user_ids" widget="many2many_tags"/>
+                        </page>
+                        <page string="Address / Notes">
+                            <field name="address"
+                                   placeholder="Showroom address, e.g.: Shop no-4, Block-D, Level-1 Bashundhara City"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="action_express_pos_branch" model="ir.actions.act_window">
+        <field name="name">Showrooms / Branches</field>
+        <field name="res_model">express.pos.branch</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help">Each branch defines its own staff, manager, warehouse and payment journal. Cashiers only see
+            and sell for the branch(es) they are assigned to here.
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <data>
+        <record id="view_inventory_minimum_stock_report_wizard_form" model="ir.ui.view">
+            <field name="name">inventory.minimum.stock.report.wizard.form</field>
+            <field name="model">inventory.minimum.stock.report.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Inventory Minimum Stock Report">
+                    <group>
+<!--                        <group>-->
+<!--                            <field name="start_date"/>-->
+<!--                            <field name="end_date" required="1"/>-->
+<!--                        </group>-->
+<!--                        <group>-->
+                        <group>
+                            <field name="location_id" placeholder="All" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="product_id" placeholder="All" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                        </group>
+                        <group></group>
+<!--                        </group>-->
+                    </group>
+                    <footer>
+                        <button name="inventory_minimum_stock_report_pdf" string="Download (PDF)" type="object" class="btn-primary"/>
+                        <button name="inventory_minimum_stock_report_excel" string="Download (Excel)" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_inventory_minimum_stock_report_wizard" model="ir.actions.act_window">
+            <field name="name">Inventory Minimum Stock Report</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">inventory.minimum.stock.report.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_inventory_minimum_stock_report_wizard_form"/>
+            <field name="target">new</field>
+        </record>
+
+        <menuitem id="menu_inventory_minimum_stock_report_wizard"
+              name="Inventory Minimum Stock Report"
+              sequence="1"
+              action="action_inventory_minimum_stock_report_wizard"
+              parent="stock.menu_warehouse_report"
+        />
+    </data>
+</odoo>

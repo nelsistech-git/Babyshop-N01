@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Budget Particular Form View -->
+        <record id="view_budget_particular_head_form" model="ir.ui.view">
+            <field name="name">budget.particular.head.form</field>
+            <field name="model">budget.particular.head</field>
+            <field name="arch" type="xml">
+                <form string="Budget Particular">
+                     <header>
+                         <button name="action_confirm" id="action_confirm" class="btn-primary" type="object" string="Confirm"
+                                invisible="state in ['confirm','approve','cancel']"/>
+                         <button name="action_approve" id="action_approve" class="btn-primary" type="object" string="Approve"
+                                invisible="state in ['draft','approve','cancel']"/>
+                         <button name="action_draft" id="action_draft" type="object" string="Set to Draft"
+                                invisible="state == 'draft'"/>
+                         <button name="action_cancel" id="action_cancel" type="object" string="Cancel"
+                                invisible="state in ['confirm', 'approve', 'cancel']"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,confirm,approve"/>
+                    </header>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name" required="1" readonly="state == 'approve'"/>
+                                <field name="fiscal_year" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" required="1"  readonly="state == 'approve'"/>
+                            </group>
+                            <group></group>
+                        </group>
+                        <button name="action_budget_head_add_wizard" id="action_add_budget_head_wizard" type="object" class="btn-primary" string="Add Budget Head"
+                                invisible="state in ['confirm', 'approve']"/>
+                        <group string="Budget">
+                            <field name="budget_particular_line_ids"  readonly="state != 'draft'">
+                                <tree string="Budget Particular Line" editable="bottom" delete="1">
+                                    <field name="sub_parent_id" required="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                    <field name="budget_parti_child_id" required="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                    <field name="account_id" required="1" readonly="1" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                    <field name="budget_amount" required="1"/>
+                                </tree>
+                                <form>
+                                    <field name="sub_parent_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                    <field name="budget_parti_child_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                    <field name="account_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                    <field name="budget_amount"/>
+                                </form>
+                            </field>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Budget Particular Tree View -->
+        <record id="view_budget_particular_head_tree" model="ir.ui.view">
+            <field name="name">budget.particular.head.tree</field>
+            <field name="model">budget.particular.head</field>
+            <field name="arch" type="xml">
+                <tree string="Budget Particular">
+                    <field name="name" readonly="1"/>
+                    <field name="fiscal_year" readonly="1"/>
+                    <field name="state" readonly="1"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Budget Particular Action -->
+        <record id="action_budget_particular_head" model="ir.actions.act_window">
+            <field name="type">ir.actions.act_window</field>
+            <field name="name">Budget Particular</field>
+            <field name="res_model">budget.particular.head</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Create Budget Particular!
+                </p>
+            </field>
+        </record>
+
+        <menuitem id="menu_budget_particular_head" name="Budget Particular" parent="custom_account_day_book.menu_budget_particular_root" action="action_budget_particular_head" sequence="1"/>
+    </data>
+</odoo>

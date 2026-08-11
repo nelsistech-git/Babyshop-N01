@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+	<data>
+
+<!--       <report id="day_book_report_ids"-->
+<!--            model="day.book.print.wizards"-->
+<!--            string="Print Day Book"-->
+<!--            name="custom_account_day_book.day_book_report_template_ids"-->
+<!--            file="custom_account_day_book.day_book_report_template_ids"-->
+<!--            report_type="qweb-pdf" />-->
+
+        <record id="day_book_report_ids" model="ir.actions.report">
+            <field name="name">Print Office Management Cost</field>
+            <field name="model">day.book.print.wizards</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">custom_account_day_book.day_book_report_template_ids</field>
+            <field name="report_file">custom_account_day_book.day_book_report_template_ids</field>
+        </record>
+
+		<template id="day_book_report_template_ids">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <div class="page">
+                    <style type="text/css">
+                        th {
+                            background: #90ee90;
+                        }
+
+                        tr:nth-child(even) {
+                            background-color: #dddddd;
+                        }
+
+                        h2 {
+                            color: teal;
+                            text-align: center !important;
+                        }
+
+                        .total-row {
+                            background-color: #ffffff !important;
+                            text-align: center !important;
+                            border: 1px solid #000;
+                        !important
+                        }
+
+                    </style>
+
+                    <div class="oe_structure"/>
+
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <h2 class="head_font_color">Account Office Management Cost PDF Report</h2><br/>
+                        </div>
+                    </div>
+                    <br/>
+                    <div class="row">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th rowspan="2" class="align-left bg_color font_color"><strong>Date</strong></th>
+                                    <th rowspan="2" class="align-left bg_color font_color"><strong>Name</strong></th>
+                                    <th rowspan="2" class="align-left bg_color font_color"><strong>Account Name</strong></th>
+                                    <th style="text-align: left" rowspan="2" class="bg_color font_color" ><strong>Amount</strong></th>
+                                    <th style="text-align: left" rowspan="2" class="bg_color font_color" ><strong>Partner</strong></th>
+                                    <th style="text-align: left" rowspan="2" class="bg_color font_color" ><strong>Reference</strong></th>
+                                    <th style="text-align: left" rowspan="2" class="bg_color font_color" ><strong>Journal</strong></th>
+                                    <th style="text-align: left" rowspan="2" class="bg_color font_color" ><strong>Create By</strong></th>
+                                    <th style="text-align: left" rowspan="2" class="bg_color font_color" ><strong>Last Updated By</strong></th>
+                                    <th style="text-align: left" rowspan="2" class="bg_color font_color" ><strong>Status</strong></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="csr" t-as="o">
+                                    <tr style="border: 1px solid #000;">
+                                        <td class="text-left" >
+                                           <t t-esc="o['date']"/>
+                                        </td>
+                                         <td class="text-left" >
+                                           <t t-esc="o['name']"/>
+                                        </td>
+                                         <td class="text-left" >
+                                           <t t-esc="o['account_name']"/>
+                                        </td>
+                                         <td class="text-left" >
+                                           <t t-esc="o['amount_total_signed']"/>
+                                        </td>
+                                         <td class="text-left" >
+                                           <t t-esc="o['partner_id']"/>
+                                        </td>
+                                         <td class="text-left" >
+                                           <t t-esc="o['ref']"/>
+                                        </td>
+                                         <td class="text-left" >
+                                           <t t-esc="o['journal_id']"/>
+                                        </td>
+                                         <td class="text-left" >
+                                           <t t-esc="o['create_uid']"/>
+                                        </td>
+                                         <td class="text-left" >
+                                           <t t-esc="o['write_uid']"/>
+                                        </td>
+                                         <td class="text-left" >
+                                           <t t-esc="o['state']"/>
+                                        </td>
+
+                                    </tr>
+                                </t>
+
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </t>
+        </t>
+    </template>
+	</data>
+</odoo>

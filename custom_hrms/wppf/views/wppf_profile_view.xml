@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <record id="view_wppf_profile_form" model="ir.ui.view">
+            <field name="name">wppf.profile.form</field>
+            <field name="model">wppf.profile</field>
+            <field name="arch" type="xml">
+                <form string="WPPF Profile" create="false" edit="true" delete="false">
+                    <sheet>
+                        <div class="oe_button_box" name="button_box" groups="base.group_user">
+                            <button name="act_current_employee_wppf" string="WPPF Details" type="object"
+                                    class="oe_stat_button" icon="fa-calendar">
+
+                            </button>
+                        </div>
+
+
+                        <div id="o_profile_container">
+
+                            <group string="Basic Information">
+                                <group>
+                                    <field name="is_active" invisible="1"/>
+                                    <field name="employee_id" options='{"no_create_edit": True, "no_create": True}'
+                                           readonly="1"/>
+                                    <field name="pf_board_id"
+                                           options='{"no_create_edit": True, "no_create": True, "no_open": True}'
+                                           required="1" readonly="not is_active"/>
+                                    <field name="employee_name"/>
+                                    <field name="job_id"
+                                           options='{"no_create_edit": True, "no_create": True, "no_open": True}'/>
+                                    <field name="join_date"/>
+                                    <field name="left_date" readonly="1"/>
+                                    <field name="membership_date" readonly="1"/>
+                                    <field name="membership_approve_date" readonly="1"/>
+                                    <field name="tax_identification"/>
+                                    <field name="closed_date" readonly="1"/>
+
+                                </group>
+                                <group>
+                                    <div>
+                                        <field name="image" widget='image' class="oe_avatar"/>
+                                    </div>
+                                </group>
+                            </group>
+
+                            <group string="Service Period">
+                                <field name="service_period"/>
+                                <field name="membership_period"/>
+                            </group>
+
+                            <group>
+                                <group string="WPPF Balance">
+                                    <field name="employee_current_balance" readonly="1"/>
+                                    <field name="company_current_balance" readonly="1"/>
+                                    <field name="balance_current" readonly="1" style="font-weight:bold;"/>
+                                </group>
+                            </group>
+
+                        </div>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                        <field name="activity_ids" widget="mail_activity"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_wppf_profile_tree" model="ir.ui.view">
+            <field name="name">wppf.profile.form</field>
+            <field name="model">wppf.profile</field>
+            <field name="arch" type="xml">
+                <tree string="PF Profile List" create="false" edit="false" delete="false">
+                    <field name="employee_id"/>
+                    <field name="employee_name"/>
+                    <field name="job_id"/>
+                    <field name="pf_board_id"/>
+                    <field name="is_active"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="wppf_profile_action">
+            <field name="name">WPPF Profile</field>
+            <field name="res_model">wppf.profile</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem id="menu_bs_wppf_profile" name="Profile"
+                  parent="menu_hr_employee_wppf_root"
+                  action="wppf_profile_action"
+                  groups="base.group_user" sequence="5"/>
+    </data>
+</odoo>

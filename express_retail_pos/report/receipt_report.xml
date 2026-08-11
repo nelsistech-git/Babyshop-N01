@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--  Default action: auto-picks Bangladesh or Dubai/UAE layout per order,
+             based on the branch's Receipt Format (falls back to the company default).  -->
+    <record id="action_report_express_pos_receipt" model="ir.actions.report">
+        <field name="name">Express POS Thermal Receipt</field>
+        <field name="model">sale.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">express_retail_pos.report_express_pos_receipt_document</field>
+        <field name="report_file">express_retail_pos.report_express_pos_receipt_document</field>
+        <field name="print_report_name">'Receipt - %s' % (object.name)</field>
+        <field name="paperformat_id" ref="paperformat_express_pos_receipt"/>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!--  Manual override: always print in the Bangladesh (non-VAT) cash-memo layout,
+             regardless of the branch/company configuration. Handy for testing or when a
+             single company sells in both formats.  -->
+    <record id="action_report_express_pos_receipt_bd" model="ir.actions.report">
+        <field name="name">Print Receipt - Bangladesh Format</field>
+        <field name="model">sale.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">express_retail_pos.report_express_pos_receipt_document</field>
+        <field name="report_file">express_retail_pos.report_express_pos_receipt_document</field>
+        <field name="print_report_name">'Receipt BD - %s' % (object.name)</field>
+        <field name="paperformat_id" ref="paperformat_express_pos_receipt"/>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!--  Manual override: always print in the Dubai/UAE VAT Tax Invoice layout.  -->
+    <record id="action_report_express_pos_receipt_dubai" model="ir.actions.report">
+        <field name="name">Print Receipt - Dubai/UAE VAT Format</field>
+        <field name="model">sale.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">express_retail_pos.report_express_pos_receipt_document</field>
+        <field name="report_file">express_retail_pos.report_express_pos_receipt_document</field>
+        <field name="print_report_name">'Receipt Dubai - %s' % (object.name)</field>
+        <field name="paperformat_id" ref="paperformat_express_pos_receipt"/>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="binding_type">report</field>
+    </record>
+</odoo>

@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Month wise Account Summary Report List Tree View -->
+        <record id="view_month_wise_account_summary_report_list_tree" model="ir.ui.view">
+            <field name="name">month.wise.account.summary.report.list.tree</field>
+            <field name="model">month.wise.account.summary.report.list</field>
+            <field name="arch" type="xml">
+                <tree string="Month wise Account Summary Report List" create="false" edit="false" delete="false">
+                    <field name="account_type_id"/>
+                    <field name="account_id"/>
+                    <field name="rate_jan" invisible="not context.get('is_multi_currency', False)"/>
+                    <field name="opening_jan"/>
+                    <field name="during_jan"/>
+                    <field name="closing_jan"/>
+                    <field name="closing_jan_usd" invisible="not context.get('is_multi_currency', False)"/>
+                    <field name="rate_feb" invisible="not context.get('is_multi_currency', False)"/>
+                    <field name="opening_feb"/>
+                    <field name="during_feb"/>
+                    <field name="closing_feb"/>
+                    <field name="closing_feb_usd" invisible="not context.get('is_multi_currency', False)"/>
+                    <field name="rate_mar" invisible="not context.get('is_multi_currency', False)"/>
+                    <field name="opening_mar"/>
+                    <field name="during_mar"/>
+                    <field name="closing_mar"/>
+                    <field name="closing_mar_usd" invisible="not context.get('is_multi_currency', False)"/>
+                    <field name="rate_apr" invisible="not context.get('is_multi_currency', False)"/>
+                    <field name="opening_apr"/>
+                    <field name="during_apr"/>
+                    <field name="closing_apr"/>
+                    <field name="closing_apr_usd" invisible="not context.get('is_multi_currency', False)"/>
+                    <field name="rate_may" invisible="not context.get('is_multi_currency', False)"/>
+                    <field name="opening_may"/>
+                    <field name="during_may"/>
+                    <field name="closing_may"/>
+                    <field name="closing_may_usd" invisible="not context.get('is_multi_currency', False)"/>
+                    <field name="rate_jun" invisible="not context.get('is_multi_currency', False)"/>
+                    <field name="opening_jun"/>
+                    <field name="during_jun"/>
+                    <field name="closing_jun"/>
+                    <field name="closing_jun_usd" invisible="not context.get('is_multi_currency', False)"/>
+                    <field name="rate_jul" invisible="not context.get('is_multi_currency', False)"/>
+                    <field name="opening_jul"/>
+                    <field name="during_jul"/>
+                    <field name="closing_jul"/>
+                    <field name="closing_jul_usd" invisible="not context.get('is_multi_currency', False)"/>
+                    <field name="rate_aug" invisible="not context.get('is_multi_currency', False)"/>
+                    <field name="opening_aug"/>
+                    <field name="during_aug"/>
+                    <field name="closing_aug"/>
+                    <field name="closing_aug_usd" invisible="not context.get('is_multi_currency', False)"/>
+                    <field name="rate_sep" invisible="not context.get('is_multi_currency', False)"/>
+                    <field name="opening_sep"/>
+                    <field name="during_sep"/>
+                    <field name="closing_sep"/>
+                    <field name="closing_sep_usd" invisible="not context.get('is_multi_currency', False)"/>
+                    <field name="rate_oct" invisible="not context.get('is_multi_currency', False)"/>
+                    <field name="opening_oct"/>
+                    <field name="during_oct"/>
+                    <field name="closing_oct"/>
+                    <field name="closing_oct_usd" invisible="not context.get('is_multi_currency', False)"/>
+                    <field name="rate_nov" invisible="not context.get('is_multi_currency', False)"/>
+                    <field name="opening_nov"/>
+                    <field name="during_nov"/>
+                    <field name="closing_nov"/>
+                    <field name="closing_nov_usd" invisible="not context.get('is_multi_currency', False)"/>
+                    <field name="rate_dec" invisible="not context.get('is_multi_currency', False)"/>
+                    <field name="opening_dec"/>
+                    <field name="during_dec"/>
+                    <field name="closing_dec"/>
+                    <field name="closing_dec_usd" invisible="not context.get('is_multi_currency', False)"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Month wise Account Summary Report List Search View -->
+        <record id="view_month_wise_account_summary_report_list_search" model="ir.ui.view">
+            <field name="name">month.wise.account.summary.report.list.search</field>
+            <field name="model">month.wise.account.summary.report.list</field>
+            <field name="arch" type="xml">
+                <search string="Search">
+                    <field name="account_id"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Account Type" name="group_by_account_type_id" context="{'group_by': 'account_type_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- Month wise Account Summary Report List Window Action -->
+        <record id="action_month_wise_account_summary_report_list" model="ir.actions.act_window">
+            <field name="type">ir.actions.act_window</field>
+            <field name="name">Month wise Account Summary Report List</field>
+            <field name="res_model">month.wise.account.summary.report.list</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{}</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    View Month wise Account Summary Report List
+                </p>
+            </field>
+        </record>
+
+        <!--  Month wise Account Summary Report List Server Action -->
+        <record id="month_wise_account_summary_report_list_srv_action" model="ir.actions.server">
+            <field name="name">Month wise Account Summary Report List Server Action</field>
+            <field name="type">ir.actions.server</field>
+            <field name="model_id" ref="model_month_wise_account_summary_report_list"/>
+            <field name="state">code</field>
+            <field name="code">
+rate = 1.00
+is_multi_currency = False
+year = None
+is_list_view = False
+if env.context.get('rate'):
+                rate = env.context.get('rate')
+if env.context.get('year'):
+                y = int(env.context.get('year'))
+if env.context.get('is_multi_currency'):
+                is_multi_currency = True
+if env.context.get('other_currency_id'):
+                other_currency_id = env.context.get('other_currency_id')
+if env.context.get('currency_id'):
+                currency_id = env.context.get('currency_id')
+action = model.action_month_wise_account_summary_report_list(y, currency_id, other_currency_id, is_multi_currency, rate)
+            </field>
+        </record>
+    </data>
+</odoo>

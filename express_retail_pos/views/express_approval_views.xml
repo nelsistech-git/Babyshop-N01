@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_express_approval_request_tree" model="ir.ui.view">
+        <field name="name">express.approval.request.tree</field>
+        <field name="model">express.approval.request</field>
+        <field name="arch" type="xml">
+            <tree decoration-warning="state in ('draft','manager_approved','gm_approved')"
+                  decoration-success="state == 'approved'" decoration-danger="state == 'rejected'">
+                <field name="name"/>
+                <field name="record_description"/>
+                <field name="action_type"/>
+                <field name="requested_by"/>
+                <field name="request_date"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_express_approval_request_form" model="ir.ui.view">
+        <field name="name">express.approval.request.form</field>
+        <field name="model">express.approval.request</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_manager_approve" type="object" string="Manager Approve"
+                            invisible="state != 'draft'" class="btn-primary"
+                            groups="express_retail_pos.group_express_pos_branch_manager"/>
+                    <button name="action_gm_approve" type="object" string="GM Approve"
+                            invisible="state != 'manager_approved'" class="btn-primary"
+                            groups="express_retail_pos.group_express_pos_gm"/>
+                    <button name="action_md_approve" type="object" string="MD Final Approve"
+                            invisible="state != 'gm_approved'" class="btn-primary"
+                            groups="express_retail_pos.group_express_pos_md"/>
+                    <button name="action_reject" type="object" string="Reject"
+                            invisible="state in ('approved','rejected')"
+                            groups="express_retail_pos.group_express_pos_branch_manager"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,manager_approved,gm_approved,approved"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="record_description"/>
+                            <field name="action_type"/>
+                            <field name="requires_md_direct"/>
+                            <field name="requested_by"/>
+                            <field name="request_date"/>
+                        </group>
+                        <group>
+                            <field name="manager_id"/>
+                            <field name="gm_id"/>
+                            <field name="md_id"/>
+                            <field name="request_ip"/>
+                        </group>
+                    </group>
+                    <group string="Reason">
+                        <field name="reason" nolabel="1"/>
+                    </group>
+                    <group string="Change Detail">
+                        <field name="old_values" readonly="1"/>
+                        <field name="new_values" readonly="1"/>
+                    </group>
+                    <notebook>
+                        <page string="Audit Trail">
+                            <field name="log_ids" readonly="1">
+                                <tree>
+                                    <field name="date"/>
+                                    <field name="level"/>
+                                    <field name="action"/>
+                                    <field name="user_id"/>
+                                    <field name="comment"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_express_approval_request" model="ir.actions.act_window">
+        <field name="name">Approval Requests</field>
+        <field name="res_model">express.approval.request</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="action_express_approval_request_pending" model="ir.actions.act_window">
+        <field name="name">My Pending Approvals</field>
+        <field name="res_model">express.approval.request</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('state', '!=', 'approved'), ('state', '!=', 'rejected')]</field>
+    </record>
+</odoo>

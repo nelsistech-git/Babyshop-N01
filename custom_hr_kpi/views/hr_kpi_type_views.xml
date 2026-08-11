@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- KPI Type: Tree View -->
+    <record id="view_hr_kpi_type_tree" model="ir.ui.view">
+        <field name="name">hr.kpi.type.tree</field>
+        <field name="model">hr.kpi.type</field>
+        <field name="arch" type="xml">
+            <tree string="KPI Types">
+                <field name="sequence"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- KPI Type: Form View -->
+    <record id="view_hr_kpi_type_form" model="ir.ui.view">
+        <field name="name">hr.kpi.type.form</field>
+        <field name="model">hr.kpi.type</field>
+        <field name="arch" type="xml">
+            <form string="KPI Type">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="code"/>
+                        <field name="description"/>
+                    </group>
+                    <group>
+                        <field name="sequence"/>
+                        <field name="active"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- KPI Name (type.line): Tree View -->
+    <record id="view_hr_kpi_type_line_tree" model="ir.ui.view">
+        <field name="name">hr.kpi.type.line.tree</field>
+        <field name="model">hr.kpi.type.line</field>
+        <field name="arch" type="xml">
+            <tree string="KPI Names">
+                <field name="name"/>
+                <field name="kpi_type_id"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- KPI Name (type.line): Form View -->
+    <record id="view_hr_kpi_type_line_form" model="ir.ui.view">
+        <field name="name">hr.kpi.type.line.form</field>
+        <field name="model">hr.kpi.type.line</field>
+        <field name="arch" type="xml">
+            <form string="KPI Name">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="kpi_type_id"/>
+                        <field name="description"/>
+                    </group>
+                    <group>
+                        <field name="active"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Actions -->
+    <record id="action_hr_kpi_type" model="ir.actions.act_window">
+        <field name="name">KPI Types</field>
+        <field name="res_model">hr.kpi.type</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_hr_kpi_type_tree"/>
+    </record>
+
+    <record id="action_hr_kpi_type_line" model="ir.actions.act_window">
+        <field name="name">KPI Names</field>
+        <field name="res_model">hr.kpi.type.line</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_hr_kpi_type_line_tree"/>
+    </record>
+
+    <!-- Menu structure -->
+    <menuitem id="menu_hr_kpi_root" parent="hr.menu_human_resources_configuration" name="HR KPI" sequence="50"/>
+
+    <menuitem id="menu_hr_kpi_types" name="KPI Types" parent="menu_hr_kpi_root" action="action_hr_kpi_type" sequence="10"/>
+    <menuitem id="menu_hr_kpi_names" name="KPI Names" parent="menu_hr_kpi_root" action="action_hr_kpi_type_line" sequence="20"/>
+
+</odoo>

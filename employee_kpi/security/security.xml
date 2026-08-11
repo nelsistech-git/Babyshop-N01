@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="module_category_employee_kpi" model="ir.module.category">
+            <field name="name">Employee KPI</field>
+            <field name="sequence">10</field>
+        </record>
+
+        <record id="group_kpi_user" model="res.groups">
+            <field name="name">KPI User</field>
+            <field name="category_id" ref="module_category_employee_kpi"/>
+            <field name="comment">Can create and submit Daily KPI entries.</field>
+        </record>
+
+        <record id="group_kpi_manager" model="res.groups">
+            <field name="name">KPI Manager</field>
+            <field name="category_id" ref="module_category_employee_kpi"/>
+            <field name="implied_ids" eval="[(4, ref('group_kpi_user'))]"/>
+            <field name="comment">Can approve/reject KPIs and manage Monthly, Yearly summaries and KPI Configuration.</field>
+        </record>
+    </data>
+</odoo>

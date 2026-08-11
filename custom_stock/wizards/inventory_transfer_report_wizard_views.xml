@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <data>
+        <record id="view_inventory_transfer_report_wizard_form" model="ir.ui.view">
+            <field name="name">inventory.transfer.report.wizard.form</field>
+            <field name="model">inventory.transfer.report.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Inventory Transfer Report">
+                    <group>
+                        <group>
+                            <field name="start_date" required="1"/>
+                            <field name="end_date" required="1"/>
+                        </group>
+                        <group>
+                            <field name="src_location_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="dest_location_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="category_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="product_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="transfer_number"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="inventory_transfer_report_pdf" string="Download (PDF)" type="object" class="btn-primary"/>
+                        <button name="inventory_transfer_report_excel" string="Download (Excel)" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_inventory_transfer_report" model="ir.actions.act_window">
+            <field name="name">Inventory Transfer Report</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">inventory.transfer.report.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_inventory_transfer_report_wizard_form"/>
+            <field name="target">new</field>
+        </record>
+
+        <menuitem id="menu_inventory_transfer_report_wizard"
+              name="Inventory Transfer Report"
+              sequence="150"
+              action="action_inventory_transfer_report"
+              parent="stock.menu_warehouse_report"
+        />
+    </data>
+</odoo>

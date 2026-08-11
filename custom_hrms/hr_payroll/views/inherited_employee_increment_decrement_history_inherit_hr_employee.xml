@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <record id="view_inherited_employee_increment_decrement_history_inherit_hr_employee_form" model="ir.ui.view">
+            <field name="name">inherited.employee.increment.decrement.history.inherit.hr.employee</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_form"/>
+            <field name="arch" type="xml">
+                 <xpath expr="//group[@name='OfficialBankInfo']" position="after" groups="hr.group_hr_user">
+
+                    <separator string="Increment/Decrement History"></separator>
+                     <!--<group string="Increment/Decrement History" name="increment_decrement_history">-->
+                        <field name="increment_decrement_ids" context="{'default_employee_id': active_id}" >
+                            <tree string="Increment/Decrement History" default_order='effective_date desc' create="0">
+                                <field name="type" readonly="1"/>
+                                <field name="gross_salary" readonly="1"/>
+                                <field name="amount" readonly="1"/>
+                                <field name="new_gross_salary" readonly="1"/>
+                                <field name="effective_date" readonly="1"/>
+                                <field name="is_salary_review" readonly="1"/>
+                            </tree>
+                            <form string="Increment/Decrement History">
+                                <group>
+                                    <group>
+                                        <field name="type" readonly="1"/>
+                                        <field name="gross_salary" readonly="1"/>
+                                        <field name="amount" readonly="1"/>
+                                        <field name="new_gross_salary" readonly="1"/>
+                                        <field name="effective_date" readonly="1"/>
+                                        <field name="is_salary_review" readonly="1"/>
+                                    </group>
+                                </group>
+                            </form>
+                        </field>
+                    <!--</group>-->
+                 </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,142 @@
+/* Modern SCSS Variables and Mixins */
+$primary-color: #2563eb;
+$secondary-color: #7c3aed;
+$success-color: #059669;
+$warning-color: #d97706;
+$danger-color: #dc2626;
+$info-color: #0891b2;
+
+$card-border-radius: 16px;
+$panel-border-radius: 16px;
+$icon-size: 65px;
+$transition-speed: 0.3s;
+
+// Gradient mixins
+@mixin gradient-bg($color1, $color2) {
+  background: linear-gradient(135deg, $color1 0%, $color2 100%);
+}
+
+@mixin card-shadow($level: 1) {
+  @if $level == 1 {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  } @else if $level == 2 {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  } @else {
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+  }
+}
+
+// Modern Dashboard Container
+.ssp_review_dashboard_class {
+  .o_kanban_renderer.o_kanban_ungrouped .o_kanban_record {
+    width: 100% !important;
+    margin: 0;
+    padding: 0;
+  }
+
+  .o_kanban_record {
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+}
+
+// Enhanced animations
+@keyframes slideInFromLeft {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInFromRight {
+  0% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes zoomIn {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+// Staggered animations for cards
+.modern-card:nth-child(1) { animation-delay: 0.1s; }
+.modern-card:nth-child(2) { animation-delay: 0.2s; }
+.modern-card:nth-child(3) { animation-delay: 0.3s; }
+.modern-card:nth-child(4) { animation-delay: 0.4s; }
+
+.modern-panel:nth-child(1) { animation: slideInFromLeft 0.6s ease forwards; }
+.modern-panel:nth-child(2) { animation: slideInFromRight 0.6s ease forwards; }
+
+// Enhanced typography
+.panel-title, .chart-title {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  letter-spacing: 0.5px;
+}
+
+// Glass morphism effect
+.glass-effect {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+// Dark mode support (optional)
+@media (prefers-color-scheme: dark) {
+  .modern-panel {
+    background: rgba(31, 41, 55, 0.9);
+    color: white;
+    
+    .panel-title {
+      color: white;
+      background: linear-gradient(135deg, rgba(55, 65, 81, 0.8) 0%, rgba(75, 85, 99, 0.8) 100%);
+    }
+  }
+}
+
+// Print styles
+@media print {
+  .modern-card, .modern-panel {
+    box-shadow: none;
+    border: 1px solid #ccc;
+    break-inside: avoid;
+  }
+  
+  .modern-card::before {
+    display: none;
+  }
+}
+
+// Accessibility improvements
+.modern-card:focus,
+.modern-panel:focus {
+  outline: 2px solid $primary-color;
+  outline-offset: 2px;
+}
+
+// High contrast mode
+@media (prefers-contrast: high) {
+  .modern-card {
+    border: 2px solid black;
+  }
+  
+  .modern-panel {
+    border: 2px solid black;
+  }
+}

@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hr_public_holiday_view_form" model="ir.ui.view">
+        <field name="name">hr.public.holiday.view.form</field>
+        <field name="model">hr.public.holiday</field>
+        <field name="arch" type="xml">
+            <form string="Public Holidays">
+                <header>
+                    <button name="action_active" id="action_confirm" class="btn-primary" type="object" string="Active"
+                            groups="hr.group_hr_manager" invisible="state == 'active'"/>
+                    <button name="action_inactive" id="action_approve" class="btn-primary" type="object"
+                            string="Inactive" groups="hr.group_hr_manager" invisible="state == 'inactive'"/>
+                    <button name="action_refresh_emp" id="action_refresh_emp" class="btn-primary" type="object"
+                            string="Refresh Employee" groups="hr.group_hr_manager" invisible="state == 'inactive'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="inactive,active"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1>
+                            <field name="name" placeholder="Holiday Reason"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <label for="date_from" string="Period"/>
+                        <div>
+                            <field name="date_from" class="oe_inline"/>
+                            -
+                            <field name="date_to" class="oe_inline"/>
+                        </div>
+                    </group>
+                    <group>
+                        <label for="type_select" string="Apply On"/>
+                        <field name="type_select" widget="radio" nolabel="1"/>
+                        <field name="set_dept" string="All Departments"
+                               invisible="type_select in ['emp','tag','workloc']"/>
+                        <field name="set_dept" string="All Work Locations"
+                               invisible="type_select in ['emp','tag','dep']"/>
+                        <field name="set_dept" string="All Tags" invisible="type_select in ['emp','workloc','dep']"/>
+
+                        <field name="dep_ids" widget="many2many_tags" invisible="type_select != 'dep'"
+                               options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                        <field name="workloc_ids" widget="many2many_tags" invisible="type_select != 'workloc'"
+                               options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                        <field name="cat_ids" widget="many2many_tags" invisible="type_select != 'tag'"
+                               options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                        <field name="emp_ids" widget="many2many_tags" invisible="type_select != 'emp'"
+                               options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+
+                    </group>
+                    <label for="note"/>
+                    <field name="note" placeholder="Notes"/>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="hr_public_holiday_view_tree" model="ir.ui.view">
+        <field name="name">hr.public.holiday.view.tree</field>
+        <field name="model">hr.public.holiday</field>
+        <field name="arch" type="xml">
+            <tree string="Public Holidays" decoration-muted="state=='inactive'">
+                <field name="name"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_hr_public_holiday" model="ir.actions.act_window">
+        <field name="name">Public Holidays</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">hr.public.holiday</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new public holiday
+            </p>
+        </field>
+    </record>
+
+    <menuitem
+            id="menu_hr_public_holiday"
+            name="Public Holidays"
+            parent="hr_holidays.menu_hr_holidays_root"
+            sequence="4"
+            groups="hr_holidays.group_hr_holidays_manager,hr_holidays.group_hr_holidays_user"/>
+
+    <menuitem id="menu_action_public_holiday" name="Public Holidays"
+              parent="menu_hr_public_holiday"
+              action="action_hr_public_holiday"
+              sequence="1"/>
+
+    <!-- HR Public Holidays Details Tree View -->
+    <record id="view_hr_public_holiday_details_tree" model="ir.ui.view">
+        <field name="name">hr.public.holiday.details.tree</field>
+        <field name="model">hr.public.holiday.details</field>
+        <field name="arch" type="xml">
+            <tree create="0" edit="0" delete="0" editable="bottom">
+                <field name="holiday_id"/>
+                <field name="holiday_date"/>
+                <field name="holiday_no"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- HR Public Holidays Details Search View -->
+    <record id="view_hr_public_holiday_details_search" model="ir.ui.view">
+        <field name="name">hr.public.holiday.details.search</field>
+        <field name="model">hr.public.holiday.details</field>
+        <field name="arch" type="xml">
+            <search string="HR Public Holiday Details Search">
+                <field name="holiday_id"/>
+                <field name="holiday_date"/>
+                <field name="holiday_no"/>
+                <group expand="0" string="Group By" colspan="4">
+                    <filter string="Date" name="group_by_holiday_date" context="{'group_by':'holiday_date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- HR Public Holidays Details Action -->
+    <record id="action_hr_public_holiday_details" model="ir.actions.act_window">
+        <field name="name">Public Holiday Details</field>
+        <field name="res_model">hr.public.holiday.details</field>
+        <field name="view_mode">tree</field>
+        <field name="search_view_id" ref="view_hr_public_holiday_details_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create an HR Public Holiday Details!
+            </p>
+        </field>
+    </record>
+
+    <!-- HR Holidays Detail Menu -->
+    <menuitem id="menu_hr_public_holiday_details" name="Public Holidays Detail" parent="menu_hr_public_holiday"
+              action="action_hr_public_holiday_details" groups="base.group_system" sequence="2"/>
+</odoo>

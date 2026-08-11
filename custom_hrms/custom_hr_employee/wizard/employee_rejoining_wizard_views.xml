@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_employee_rejoining_wizard_form" model="ir.ui.view">
+            <field name="name">employee.rejoining.wizard.form</field>
+            <field name="model">employee.rejoining.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Employee Rejoining">
+                    <group>
+                        <group>
+                            <field name="employee_id" required="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="employee_type_id" required="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="initial_employment_date" required="1"/>
+                        </group>
+                        <group>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="action_employee_rejoining" string="Rejoin" type="object" class="btn-primary"
+                                confirm="Are you sure you want to rejoin this employee?"/>
+                        <button string="Cancel" special="cancel" class="oe_link" />
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_employee_rejoining_wizard" model="ir.actions.act_window">
+            <field name="name">Employee Rejoining</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">employee.rejoining.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_employee_rejoining_wizard_form"/>
+            <field name="target">new</field>
+        </record>
+
+        <menuitem id="menu_employee_rejoining_wizard" name="Employee Rejoining" parent="custom_hr_employee.menu_hr_employee_operations" action="action_employee_rejoining_wizard" sequence="400"/>
+    </data>
+</odoo>

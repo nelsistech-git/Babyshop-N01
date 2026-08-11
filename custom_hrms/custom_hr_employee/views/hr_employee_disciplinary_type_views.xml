@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <!--Form View-->
+        <record id="employee_disciplinary_type_form_view" model="ir.ui.view">
+            <field name="name">employee.disciplinary.type.form.view</field>
+            <field name="model">hr.employee.disciplinary.type</field>
+            <field name="arch" type="xml">
+                <form string="Disciplinary Type">
+                    <sheet>
+                        <group name="main">
+                            <group>
+                                <field name="name"/>
+                                <field name="allow_date_range"/>
+                                <field name="allow_payslip"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="employee_disciplinary_type_tree_view" model="ir.ui.view">
+            <field name="name">employee.disciplinary.type.tree.view</field>
+            <field name="model">hr.employee.disciplinary.type</field>
+            <field name="arch" type="xml">
+                <tree string="Disciplinary Type">
+                    <field name="name"/>
+                    <field name="allow_date_range"/>
+                    <field name="allow_payslip"/>
+                </tree>
+            </field>
+        </record>
+
+        <!--Action View-->
+        <record id="employee_disciplinary_type_list_action" model="ir.actions.act_window">
+            <field name="name">Disciplinary Type</field>
+            <field name="res_model">hr.employee.disciplinary.type</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">Create the first Disciplinary Type</p>
+            </field>
+        </record>
+
+        <!--Add Menu Item-->
+        <menuitem id="menu_hr_disciplinary_type" name="Disciplinary Type"
+                  parent="custom_hr_employee.menu_hr_employee_settings_root"
+                  sequence="45" action="employee_disciplinary_type_list_action"
+                  groups="hr.group_hr_manager,hr.group_hr_user"/>
+
+    </data>
+</odoo>

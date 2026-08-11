@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <report id="barcode_wise_detail_supplier_report_tmpl"
+                model="barcode.wise.current.stock.report.wizard"
+			    string="Barcode wise Detail Supplier Report"
+                name="custom_stock.barcode_wise_detail_supplier_report_pdf"
+			    file="custom_stock.barcode_wise_detail_supplier_report_pdf"
+                report_type="qweb-pdf"
+                print_report_name="Barcode wise Detail Supplier Report"/>
+
+        <template id="barcode_wise_detail_supplier_report_pdf">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <style type="text/css">
+<!--                            th{
+                                background: #90ee90;
+                            }-->
+                            tr:nth-child(even) {
+                                background-color: #dddddd;
+                            }
+                        </style>
+
+                        <div class="oe_structure"/>
+
+                        <t t-if="form['report_type']=='01'">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <h2 style="text-align:center !important;" class="text-center head_font_color">Barcode wise Detail Supplier Report</h2><br/>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6">
+                                    <p style="color: #000; font-size: 15px;">Category: <t t-esc="categ_name"/></p>
+                                </div>
+                                <div class="col-6">
+                                    <p class="text-right" style="color: #000; font-size: 15px;">Location: <t t-esc="loc_name"/></p>
+                                </div>
+                            </div>
+                            <br/>
+                            <div class="row">
+                                <table class="table table-condensed">
+                                    <thead>
+                                        <tr>
+                                            <th rowspan="2" class="text-center lign-middle bg_color font_color"><strong>Sl. No.</strong></th>
+                                            <th t-if="loc_name=='All Locations'" rowspan="2" class="text-left align-middle bg_color font_color">
+                                                <strong>Location</strong>
+                                            </th>
+                                            <th rowspan="2" class="text-left align-middle bg_color font_color"><strong>Category Name</strong></th>
+                                            <th rowspan="2" class="text-center align-middle bg_color font_color"><strong>Barcode</strong></th>
+                                            <th rowspan="2" class="text-left align-middle bg_color font_color"><strong>Product Name</strong></th>
+                                            <th rowspan="2" class="text-left align-middle bg_color font_color"><strong>Attribute Name</strong></th>
+                                            <th rowspan="2" class="text-left align-middle bg_color font_color"><strong>UoM</strong></th>
+                                            <th rowspan="2" class="text-right align-middle bg_color font_color"><strong>Qty.</strong></th>
+                                            <th rowspan="2" class="text-right align-middle bg_color font_color"><strong>Cost</strong></th>
+                                            <th rowspan="2" class="text-right align-middle bg_color font_color"><strong>Other Cost</strong></th>
+                                            <th rowspan="2" class="text-right align-middle bg_color font_color"><strong>Total Cost</strong></th>
+                                            <th rowspan="2" class="text-right align-middle bg_color font_color"><strong>Sale Price</strong></th>
+                                            <th rowspan="2" class="text-right align-middle bg_color font_color"><strong>Total Sale Price</strong></th>
+                                            <th rowspan="2" class="text-right align-middle bg_color font_color"><strong>Vendor</strong></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-set="sl_no" t-value="1"/>
+                                        <t t-set="t_quantity" t-value="0"/>
+                                        <t t-set="t_cost" t-value="0"/>
+                                        <t t-set="t_cost_rate" t-value="0"/>
+                                        <t t-set="t_net_value" t-value="0"/>
+                                        <t t-set="t_sales_price" t-value="0"/>
+                                        <t t-set="total_sales_price" t-value="0"/>
+                                        <t t-foreach="csr" t-as="o">
+                                            <tr style="border: 1px solid #000;">
+                                                <td class="text-center align-middle">
+                                                    <t t-esc="sl_no"/>
+                                                </td>
+                                                <td t-if="loc_name=='All Locations'" class="text-left align-middle">
+                                                    <t t-esc="o['location_name']"/>
+                                                </td>
+                                                <td class="text-left align-middle">
+                                                    <t t-esc="o['categ_name']"/>
+                                                </td>
+                                                <td class="text-center align-middle">
+                                                    <t t-esc="o['barcode']"/>
+                                                </td>
+                                                <td class="text-left align-middle">
+                                                    <t t-esc="o['product_tmpl_name']"/>
+                                                </td>
+                                                <td class="text-left align-middle">
+                                                    <t t-esc="o['product_name']"/>
+                                                </td>
+                                                <td class="text-left align-middle">
+                                                    <t t-esc="o['uom_name']"/>
+                                                </td>
+                                                <td class="text-right align-middle">
+                                                    <t t-esc="'{0:,.3f}'.format(o['quantity'])"/>
+                                                    <t t-set="t_quantity" t-value="t_quantity + o['quantity']"/>
+                                                </td>
+                                                <td class="text-right align-middle">
+                                                    <t t-esc="'{0:,.2f}'.format(o['cost'])"/>
+                                                    <t t-set="t_cost" t-value="t_cost + o['cost']"/>
+                                                </td>
+                                                <td class="text-right align-middle">
+                                                    <t t-esc="'{0:,.2f}'.format(o['total_cost_rate'])"/>
+                                                    <t t-set="t_cost_rate" t-value="t_cost_rate + o['total_cost_rate']"/>
+                                                </td>
+                                                <td class="text-right align-middle">
+                                                    <t t-esc="'{0:,.2f}'.format(o['net_value'])"/>
+                                                    <t t-set="t_net_value" t-value="t_net_value + o['net_value']"/>
+                                                </td>
+                                                <td class="text-right align-middle">
+                                                    <t t-esc="'{0:,.2f}'.format(o['sales_price'])"/>
+                                                    <t t-set="t_sales_price" t-value="t_sales_price + o['sales_price']"/>
+                                                </td>
+                                                <td class="text-right align-middle">
+                                                    <t t-esc="'{0:,.2f}'.format(o['quantity'] * o['sales_price'])"/>
+                                                    <t t-set="total_sales_price" t-value="total_sales_price + (o['quantity'] * o['sales_price'])"/>
+                                                </td>
+                                                <td class="text-left align-middle">
+                                                    <t t-esc="o['supplier_name']"/>
+                                                </td>
+                                                <t t-set="sl_no" t-value="sl_no + 1"/>
+                                            </tr>
+                                        </t>
+                                        <tr style="border: 1px solid black;">
+                                            <t t-if="loc_name=='All Locations'">
+                                                <td class="text-right align-middle" colspan="7"><strong>TOTAL</strong></td>
+                                            </t>
+                                            <t t-else="">
+                                                <td class="text-right align-middle" colspan="6"><strong>TOTAL</strong></td>
+                                            </t>
+                                            <td class="text-right align-middle">
+                                                <strong><t t-esc="'{0:,.2f}'.format(t_quantity)"/></strong>
+                                            </td>
+                                            <td class="text-right align-middle">
+                                                <strong><t t-esc="'{0:,.2f}'.format(t_cost)"/></strong>
+                                            </td>
+                                            <td class="text-right align-middle">
+                                                <strong><t t-esc="'{0:,.2f}'.format(t_cost_rate)"/></strong>
+                                            </td>
+                                            <td class="text-right align-middle">
+                                                <strong><t t-esc="'{0:,.2f}'.format(t_net_value)"/></strong>
+                                            </td>
+                                            <td class="text-right align-middle">
+                                                <strong><t t-esc="'{0:,.2f}'.format(t_sales_price)"/></strong>
+                                            </td>
+                                            <td class="text-right align-middle">
+                                                <strong><t t-esc="'{0:,.2f}'.format(total_sales_price)"/></strong>
+                                            </td>
+                                            <td class="text-left align-middle"/>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </t>
+                        <t t-else="">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <h2 style="text-align:center !important;" class="text-center head_font_color">Barcode wise Detail Supplier Report</h2><br/>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <p style="color: #000; font-size: 15px;">Category: <t t-esc="categ_name"/></p>
+                                </div>
+                            </div>
+                            <br/>
+                            <div class="row">
+                                <table class="table table-condensed">
+                                    <thead>
+                                        <tr>
+                                            <th rowspan="2" class="text-center align-middle bg_color font_color"><strong>Sl. No.</strong></th>
+                                            <th rowspan="2" class="text-left align-middle bg_color font_color"><strong>Category Name</strong></th>
+                                            <th rowspan="2" class="text-center align-middle bg_color font_color"><strong>Barcode</strong></th>
+                                            <th rowspan="2" class="text-left align-middle bg_color font_color"><strong>Product Name</strong></th>
+                                            <th rowspan="2" class="text-left align-middle bg_color font_color"><strong>Attribute Name</strong></th>
+                                            <th rowspan="2" class="align-middle text-left bg_color font_color"><strong>UoM</strong></th>
+                                            <th rowspan="2" class="text-right align-middle bg_color font_color"><strong>Qty.</strong></th>
+                                            <th rowspan="2" class="text-right align-middle bg_color font_color"><strong>Cost</strong></th>
+                                            <th rowspan="2" class="text-right align-middle bg_color font_color"><strong>Other Cost</strong></th>
+                                            <th rowspan="2" class="text-right align-middle bg_color font_color"><strong>Total Cost</strong></th>
+                                            <th rowspan="2" class="text-right align-middle bg_color font_color"><strong>Sale Price</strong></th>
+                                            <th rowspan="2" class="text-right align-middle bg_color font_color"><strong>Total Sale Price</strong></th>
+                                            <th rowspan="2" class="text-right align-middle bg_color font_color"><strong>Vendor</strong></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-set="sl_no" t-value="1"/>
+                                        <t t-set="t_quantity" t-value="0"/>
+                                        <t t-set="t_cost" t-value="0"/>
+                                        <t t-set="t_cost_rate" t-value="0"/>
+                                        <t t-set="t_net_value" t-value="0"/>
+                                        <t t-set="t_sales_price" t-value="0"/>
+                                        <t t-set="total_sales_price" t-value="0"/>
+                                        <t t-foreach="csr" t-as="o">
+                                            <tr style="border: 1px solid #000;">
+                                                <td class="text-center align-middle">
+                                                    <t t-esc="sl_no"/>
+                                                </td>
+                                                <td class="text-left align-middle">
+                                                    <t t-esc="o['categ_name']"/>
+                                                </td>
+                                                 <td class="text-center align-middle">
+                                                    <t t-esc="o['barcode']"/>
+                                                </td>
+                                                <td class="text-left align-middle">
+                                                    <t t-esc="o['product_tmpl_name']"/>
+                                                </td>
+                                                <td class="text-left align-middle">
+                                                    <t t-esc="o['product_name']"/>
+                                                </td>
+                                                <td class="text-left align-middle">
+                                                    <t t-esc="o['uom_name']"/>
+                                                </td>
+                                                <td class="text-right align-middle">
+                                                    <t t-esc="'{0:,.3f}'.format(o['quantity'])"/>
+                                                    <t t-set="t_quantity" t-value="t_quantity + o['quantity']"/>
+                                                </td>
+                                                <td class="text-right align-middle">
+                                                    <t t-esc="'{0:,.2f}'.format(o['cost'])"/>
+                                                    <t t-set="t_cost" t-value="t_cost + o['cost']"/>
+                                                </td>
+                                                <td class="text-right align-middle">
+                                                    <t t-esc="'{0:,.2f}'.format(o['total_cost_rate'])"/>
+                                                    <t t-set="t_cost_rate" t-value="t_cost_rate + o['total_cost_rate']"/>
+                                                </td>
+                                                <td class="text-right align-middle">
+                                                    <t t-esc="'{0:,.2f}'.format(o['net_value'])"/>
+                                                    <t t-set="t_net_value" t-value="t_net_value + o['net_value']"/>
+                                                </td>
+                                                <td class="text-right align-middle">
+                                                    <t t-esc="'{0:,.2f}'.format(o['sales_price'])"/>
+                                                    <t t-set="t_sales_price" t-value="t_sales_price + o['sales_price']"/>
+                                                </td>
+                                                <td class="text-right align-middle">
+                                                    <t t-esc="'{0:,.2f}'.format(o['quantity'] * o['sales_price'])"/>
+                                                    <t t-set="total_sales_price" t-value="total_sales_price + (o['quantity'] * o['sales_price'])"/>
+                                                </td>
+                                                <td class="text-left align-middle">
+                                                    <t t-esc="o['supplier_name']"/>
+                                                </td>
+                                                <t t-set="sl_no" t-value="sl_no + 1"/>
+                                            </tr>
+                                        </t>
+                                        <tr style="border: 1px solid black;">
+                                            <td class="text-right align-middle" colspan="6">
+                                                <strong>TOTAL</strong>
+                                            </td>
+                                            <td class="text-right align-middle">
+                                                <strong><t t-esc="'{0:,.2f}'.format(t_quantity)"/></strong>
+                                            </td>
+                                            <td class="text-right align-middle">
+                                                <strong><t t-esc="'{0:,.2f}'.format(t_cost)"/></strong>
+                                            </td>
+                                            <td class="text-right align-middle">
+                                                <strong><t t-esc="'{0:,.2f}'.format(t_cost_rate)"/></strong>
+                                            </td>
+                                            <td class="text-right align-middle">
+                                                <strong><t t-esc="'{0:,.2f}'.format(t_net_value)"/></strong>
+                                            </td>
+                                            <td class="text-right align-middle">
+                                                <strong><t t-esc="'{0:,.2f}'.format(t_sales_price)"/></strong>
+                                            </td>
+                                            <td class="text-right align-middle">
+                                                <strong><t t-esc="'{0:,.2f}'.format(total_sales_price)"/></strong>
+                                            </td>
+                                            <td class="text-left align-middle"/>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </t>
+                    </div>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

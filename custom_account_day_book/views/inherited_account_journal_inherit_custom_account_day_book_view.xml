@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <data>
+        <record id="view_account_journal_form_inherit_daybook" model="ir.ui.view">
+            <field name="name">account.journal.form.inherit.daybook</field>
+            <field name="model">account.journal</field>
+            <field name="inherit_id" ref="account.view_account_journal_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='type']" position="after">
+                    <field name="report_format" />
+                    <field name="is_daybook_display" />
+                    <field name="is_payment_display" />
+                    <field name="is_deposit_journal" />
+                    <field name="is_payment_journal" />
+                    <field name="is_stock_market_display" />
+                    <field name="is_pf_display" />
+                    <field name="is_wppf_display" />
+                    <field name="is_online_payment" />
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_account_journal_tree_inherit_daybook" model="ir.ui.view">
+            <field name="name">account.journal.tree.inherit.daybook</field>
+            <field name="model">account.journal</field>
+            <field name="inherit_id" ref="account.view_account_journal_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='type']" position="after">
+                    <field name="report_format" />
+                    <field name="is_daybook_display" />
+                    <field name="is_payment_display" />
+                    <field name="is_payment_journal" />
+                    <field name="is_stock_market_display" />
+                    <field name="is_pf_display" />
+                    <field name="is_wppf_display" />
+                    <field name="is_online_payment" />
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_account_journal_search_inherit_daybook" model="ir.ui.view">
+            <field name="name">account.journal.search.inherit.daybook</field>
+            <field name="model">account.journal</field>
+            <field name="inherit_id" ref="account.view_account_journal_search"/>
+            <field name="arch" type="xml">
+                <xpath expr="//filter[@name='miscellaneous']" position="after">
+                    <filter name="day_book_filter" string="Office Management Cost" domain="[('is_daybook_display', '=', True)]"/>
+                    <filter name="payment_filter" string="Payment" domain="[('is_payment_display', '=', True)]"/>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>

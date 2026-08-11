@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <record id="view_pf_committee_form" model="ir.ui.view">
+        <field name="name">pf.committee.form</field>
+        <field name="model">pf.committee</field>
+        <field name="arch" type="xml">
+            <form string="PF Committee">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="type" readonly="1" force_save="1"/>
+                            <field name="name"/>
+                            <field name="pf_board_id" domain="[('type','=',type)]"
+                                   options='{"no_open": True, "no_create_edit": True, "no_create": True}'/>
+                        </group>
+                        <group>
+                            <field name="date_committee"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Committee Members">
+                            <field name="committee_line">
+                                <tree string="Members" editable="bottom">
+                                    <field name="employee_id" options='{"no_create_edit": True, "no_create": True}'/>
+                                    <field name="job_id" force_save="1"/>
+                                    <field name="pf_job_id"/>
+                                    <field name="is_active" widget="boolean_toggle"/>
+                                    <field name="active_from"/>
+                                    <field name="active_to"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_pf_committee_tree" model="ir.ui.view">
+        <field name="name">pf.committee.tree</field>
+        <field name="model">pf.committee</field>
+        <field name="arch" type="xml">
+            <tree string="PF Committee">
+                <field name="name"/>
+                <field name="date_committee"/>
+            </tree>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_pf_committee">
+        <field name="name">PF Committee</field>
+        <field name="res_model">pf.committee</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('type', '=', 'pf')]</field>
+        <field name="context">{'default_type': 'pf'}</field>
+    </record>
+
+    <menuitem id="menu_pf_committee"
+              name="Committee"
+              action="action_pf_committee"
+              parent="provident_fund.menu_hr_employee_pf_sub_board_committee"
+              groups="provident_fund.group_provident_fund_officer"
+              sequence="3"
+    />
+
+
+</odoo>

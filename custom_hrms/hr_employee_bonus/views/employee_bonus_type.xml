@@ -1,0 +1,98 @@
+<odoo>
+	<!-- Views -->
+	<record id="view_employee_bonus_type_form" model="ir.ui.view">
+		<field name="name">Employee Bonus Type Form</field>
+		<field name="model">hr.employee.bonus.type</field>
+		<field name="arch" type="xml">
+			<form>
+				<sheet>
+					<div class="oe_button_box" name="button_box">
+						<button name="toggle_active" type="object"
+							groups="hr.group_hr_user" class="oe_stat_button"
+							icon="fa-archive">
+							<field name="active" widget="boolean_toggle"
+								options="{&quot;terminology&quot;: &quot;archive&quot;}" />
+						</button>
+					</div>
+					<group>
+						<group>
+							<field name="name" placeholder="Bonus Type Name" />
+							<field name="calculation_type" />
+							<field name="percentage_from_settings" invisible="calculation_type == 'fixed'"/>
+							<field name="settings_type" invisible="not percentage_from_settings" required="percentage_from_settings"/>
+
+						</group>
+						<group>
+							<field name="allowed_employee_type_ids" widget="many2many_tags" required="1" options="{'no_open':True,'no_create_edit':1}"/>
+							<field name="based_on_type" invisible="calculation_type == 'fixed' or percentage_from_settings" required="calculation_type == 'percentage' and not percentage_from_settings"/>
+							<field name="payroll_code" />
+						</group>
+					</group>
+					<div style="color: gray;" invisible="not percentage_from_settings">Employee Bonus Settings required for percentage*</div>
+					<!--Settings-->
+					<group name="bonus_settings" colspan="2" invisible="not percentage_from_settings">
+						<field name="bonus_setting_ids" context="{'default_head_id': active_id}" >
+							<tree string="Bonus Settings" editable="bottom">
+								<field name="head_id" required="1" options="{'no_open':True,'no_create_edit':1}"/>
+								<field name="settings_type"/>
+								<field name="days_from" required="settings_type in ['serv_len','serv_len_emp_type']" readonly="settings_type == 'emp_type'"/>
+								<field name="days_to" required="settings_type in ['serv_len','serv_len_emp_type']" readonly="settings_type == 'emp_type'"/>
+								<field name="employee_type_id" required="settings_type in ['emp_type','serv_len_emp_type']" readonly="settings_type == 'serv_len'" options="{'no_open':True,'no_create_edit':1}" />
+
+								<field name="reference"/>
+								<field name="based_on_type"/>
+								<field name="amount_percentage"/>
+							</tree>
+							<form string="Bonus Settings">
+								<group name="bonus_settings_frm">
+									<field name="head_id" required="1" options="{'no_open':True,'no_create_edit':1}"/>
+									<field name="settings_type"/>
+									<field name="days_from" required="settings_type in ['serv_len','serv_len_emp_type']" readonly="settings_type == 'emp_type'"/>
+									<field name="days_to" required="settings_type in ['serv_len','serv_len_emp_type']" readonly="settings_type == 'emp_type'"/>
+									<field name="employee_type_id" required="settings_type in ['emp_type','serv_len_emp_type']" readonly="settings_type == 'serv_len'" options="{'no_open':True,'no_create_edit':1}" />
+
+									<field name="reference"/>
+									<field name="based_on_type"/>
+									<field name="amount_percentage"/>
+								</group>
+							</form>
+						</field>
+					</group>
+				</sheet>
+				<div class="oe_chatter">
+					<field name="message_follower_ids" widget="mail_followers"
+						groups="base.group_user" />
+					<field name="message_ids" widget="mail_thread" />
+				</div>
+			</form>
+		</field>
+	</record>
+
+	<record id="view_employee_bonus_type_tree" model="ir.ui.view">
+		<field name="name">Employee Bonus Type Tree</field>
+		<field name="model">hr.employee.bonus.type</field>
+		<field name="arch" type="xml">
+			<tree>
+				<field name="name"/>
+				<field name="calculation_type"/>
+				<field name="payroll_code" />
+				<field name="percentage_from_settings"/>
+				<field name="settings_type" />
+				<field name="allowed_employee_type_ids" widget="many2many_tags"/>
+				<field name="based_on_type"/>
+				<field name="active"/>
+			</tree>
+		</field>
+	</record>
+	
+	<!-- Menuitems and Actions -->
+	<record id="action_employee_bonus_type" model="ir.actions.act_window">
+		<field name="name">Employee Bonus Types</field>
+		<field name="res_model">hr.employee.bonus.type</field>
+		<field name="view_mode">tree,form</field>
+	</record>
+	<menuitem id="menu_employee_bonus_type" name="Employee Bonus Types"
+		action="action_employee_bonus_type"
+		parent="hr_payroll.menu_hr_salary_configuration" sequence="91" groups="hr.group_hr_manager,hr_payroll.group_hr_payroll_manager"/>
+</odoo>
+

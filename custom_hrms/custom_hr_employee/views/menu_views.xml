@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <!-- Menu Item -->
+        <record model="ir.ui.menu" id="hr.menu_hr_root">
+            <field name='name'>HR- Employees</field>
+            <!--<field name="groups_id" eval="[(6,0,[ref('hr.group_hr_user')]), (4,ref('group_employee_list_viewer'))]"/>-->
+            <field name="groups_id" eval="[(6,0,[ref('custom_common_settings.group_hr_employee_root_menu')])]"/>
+            <field name="sequence" eval="2"/>
+        </record>
+
+        <record model="ir.ui.menu" id="hr_recruitment.menu_hr_recruitment_root">
+            <field name='name'>HR- Recruitment</field>
+            <field name="groups_id" eval="[(6,0,[ref('custom_common_settings.group_hr_recruitment_root_menu')])]"/>
+            <field name="sequence" eval="1"/>
+        </record>
+
+        <menuitem id="hr.menu_hr_employee" name="Directory"
+                  action="hr.hr_employee_public_action" parent="hr.menu_hr_root"
+                  groups="hr.group_hr_manager,hr.group_hr_user"
+                  sequence="4"/>
+
+        <menuitem id="menu_hr_employee_settings_root"
+                  name="HR Settings" parent="hr.menu_hr_root" sequence="98"
+                  groups="hr.group_hr_manager"/>
+
+        <menuitem id="menu_hr_employee_operations" name="Operations"
+                  parent="hr.menu_hr_root" sequence="10" groups="hr.group_hr_manager"/>
+        <!-- custom_hr_employee_requisition.custom_hr_group_recruiter, -->
+        <menuitem id="hr_contract.hr_menu_contract" name="Contracts"
+                  action="hr_contract.action_hr_contract" parent="hr.menu_hr_root"
+                  sequence="4" groups="base.group_system"/>
+
+        <menuitem action="hr.hr_department_tree_action"
+                  id="hr.menu_hr_department_tree"
+                  parent="hr.menu_human_resources_configuration" sequence="1"
+                  groups="hr.group_hr_manager"/>
+
+        <!--Menu for Designation -->
+        <record id="hr.action_hr_job" model="ir.actions.act_window">
+            <field name="name">Designations(Job Positions)</field>
+        </record>
+        <!--parent="hr.menu_human_resources_configuration" -->
+        <menuitem id="menu_designation_config" name="Designations"
+                  parent="menu_hr_employee_settings_root" sequence="5"
+                  action="hr.action_hr_job" groups="hr.group_hr_manager"/>
+
+        <!--Rename Employee Tags menu -->
+        <!--parent="hr.menu_human_resources_configuration" -->
+        <menuitem id="hr.menu_view_employee_category_form"
+                  name="Employee Tag" action="hr.open_view_categ_form"
+                  parent="menu_hr_employee_settings_root" groups="hr.group_hr_manager"
+                  sequence="15"/>
+
+        <!--Job grade settings root menu -->
+        <!-- parent="hr.menu_human_resources_configuration" -->
+
+        <menuitem id="menu_hr_job_grade_root"
+                  name="Job Grade Settings" parent="menu_hr_employee_settings_root"
+                  sequence="99" groups="base.group_no_one"/>
+
+        <menuitem id="menu_hr_employee_details"
+                  name="Employee Details" parent="hr.menu_hr_employee_payroll"
+                  sequence="100" groups="hr.group_hr_manager"/>
+
+        <!-- menu access or hide -->
+        <!-- <record model="ir.ui.menu" id="hr.menu_hr_department_tree"> <field
+            name="action" eval="False" /> </record> -->
+
+        <menuitem id="menu_hr_department_tree"
+                  action="hr.hr_department_tree_action"
+                  parent="menu_hr_employee_settings_root" sequence="1"
+                  groups="hr.group_hr_user"/>
+
+        <menuitem id="hr_resume_line_type_menu" name="Resumé Types"
+                  action="hr_skills.hr_resume_type_action"
+                  parent="menu_hr_employee_settings_root"
+                  sequence="47" groups="base.group_no_one,base.group_erp_manager"/>
+
+        <menuitem id="hr_skill_type_menu" name="Skills"
+                  action="hr_skills.hr_skill_type_action"
+                  parent="menu_hr_employee_settings_root" sequence="48"
+                  groups="base.group_no_one,base.group_erp_manager"/>
+
+
+        <record model="ir.ui.menu" id="hr_timesheet.timesheet_menu_root">
+            <field name="sequence" eval="135"/>
+            <field name="groups_id" eval="[(6,0,[ref('custom_common_settings.group_timesheets_root_menu')])]"/>
+        </record>
+
+        <!--<record model="ir.ui.menu" id="hr_expense.menu_hr_expense_root">
+            <field name="sequence" eval="140" />
+            &lt;!&ndash;<field name="groups_id" eval="[(6,0,[ref('hr.group_hr_user')])]"/>&ndash;&gt;
+            <field name="groups_id" eval="[(6,0,[ref('custom_common_settings.group_expense_root_menu')])]"/>
+        </record>-->
+
+        <record model="ir.ui.menu" id="hr.hr_menu_hr_reports">
+            <field name="groups_id"
+                   eval="[(6,0,[ref('hr.group_hr_user'), ref('custom_common_settings.group_branch_manager')])]"/>
+        </record>
+
+        <menuitem id="menu_hr_region_planning" name="Region Planning"
+                  parent="custom_hr_employee.menu_hr_employee_settings_root"
+                  groups="base.group_erp_manager"
+                  sequence="99"/>
+        <menuitem id="division_menu_hr" name="Divisions" parent="custom_hr_employee.menu_hr_region_planning"
+              action="custom_common_settings.division_list_action" sequence="5"/>
+        <menuitem id="district_menu_hr" name="Districts" parent="custom_hr_employee.menu_hr_region_planning"
+                  action="custom_common_settings.district_list_action" sequence="10"/>
+        <menuitem id="thana_menu_hr" name="Upazila/Thana" parent="custom_hr_employee.menu_hr_region_planning"
+                  action="custom_common_settings.thana_list_action" sequence="15"/>
+        <menuitem id="postcode_menu_hr" name="Post Code" parent="custom_hr_employee.menu_hr_region_planning"
+                  action="custom_common_settings.postcode_list_action" sequence="16"/>
+
+    </data>
+</odoo>

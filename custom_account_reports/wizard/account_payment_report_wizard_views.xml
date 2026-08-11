@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <!-- Form View -->
+        <record id="view_account_payment_receive_report_wizard_form" model="ir.ui.view">
+            <field name="name">account.payment.receive.report.wizard.form</field>
+            <field name="model">account.payment.receive.report.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Payment/Receive Report">
+                    <group>
+                        <group>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                            <field name="state"/>
+                        </group>
+                        <group>
+                            <field name="partner_id" string="Partner"/>
+                            <field name="journal_id" string="Journal (Bank/Cash)"/>
+                            <field name="payment_type" string="Type"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button string="Download PDF" type="object" name="action_generate_pdf" class="btn-primary"/>
+                        <button string="Download Excel" type="object" name="action_generate_excel" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <!-- Action -->
+        <record id="action_account_payment_receive_report_wizard" model="ir.actions.act_window">
+            <field name="name">Payment/Receive Report</field>
+            <field name="res_model">account.payment.receive.report.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_account_payment_receive_report_wizard_form"/>
+            <field name="target">new</field>
+        </record>
+
+        <!-- Menu -->
+        <menuitem
+            id="menu_account_payment_receive_report_wizard"
+            name="Payment/Receive Report"
+            parent="account.menu_finance_reports"
+            action="action_account_payment_receive_report_wizard"
+            sequence="100"/>
+
+    </data>
+</odoo>

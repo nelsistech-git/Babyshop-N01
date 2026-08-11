@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="cheque_book_bank_view_form" model="ir.ui.view">
+        <field name="name">cheque.book.bank.form</field>
+        <field name="model">cheque.book.bank</field>
+        <field name="arch" type="xml">
+            <form string="Bank Information Form">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name" required="1"/>
+                            <field name="swift_code" required="1"/>
+                            <field name="routing" invisible="1" />
+                            <field name="remarks" />
+                            <field name="active" />
+                        </group>
+                    </group>
+
+                    <group string="FDR Accounts">
+                        <group>
+                            <field name="journal_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="debit_acc" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="credit_acc" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                        </group>
+                        <group>
+                            <field name="excise_dr" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="interest_income_cr" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="tax_dr" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="other_charge_acc" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                        </group>
+                    </group>
+
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- bank accounts Form View -->
+	<record id="cheque_book_bank_view_tree" model="ir.ui.view">
+         <field name="name">cheque.book.bank.tree</field>
+         <field name="model">cheque.book.bank</field>
+         <field name="arch" type="xml">
+             <tree string="Bank Information List">
+             	<field name="name" required="1"/>
+                 <field name="swift_code"/>
+<!--                 <field name="routing"/>-->
+             </tree>
+         </field>
+     </record>
+
+    <!-- Cheque book bank search View -->
+    <record id="cheque_book_bank_view_search" model="ir.ui.view">
+         <field name="name">cheque.book.bank.search</field>
+         <field name="model">cheque.book.bank</field>
+        <field name="arch" type="xml">
+            <search string="Search Cheque Book Bank">
+                <field name="name"/>
+           </search>
+        </field>
+    </record>
+
+    <!-- bank Form window action -->
+	<record id="cheque_book_bank_action" model="ir.actions.act_window">
+        <field name="name">Bank Information</field>
+        <field name="res_model">cheque.book.bank</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Please Create Cheque Book Bank
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="bank_cheque_book_menu" name="Bank" action="cheque_book_bank_action" sequence="9"
+                  parent="account.menu_finance_configuration"/>
+
+</odoo>

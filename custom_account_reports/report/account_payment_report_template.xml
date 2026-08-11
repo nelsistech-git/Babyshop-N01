@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="paperformat_account_payment_receive_report" model="report.paperformat">
+        <field name="name">Payment/Receive Report Paper Format</field>
+        <field name="format">A4</field>
+        <field name="orientation">Landscape</field>
+        <field name="margin_top">40</field>
+        <field name="margin_bottom">18</field>
+        <field name="margin_left">10</field>
+        <field name="margin_right">10</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">36</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <record id="action_account_payment_receive_report_pdf" model="ir.actions.report">
+        <field name="name">Payment/Receive Report PDF</field>
+        <field name="model">account.payment.receive.report.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">custom_account_reports.report_payment_receive_pdf_template</field>
+        <field name="report_file">custom_account_reports.report_payment_receive_pdf_template</field>
+        <field name="binding_model_id" ref="custom_account_reports.model_account_payment_receive_report_wizard"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="custom_account_reports.paperformat_account_payment_receive_report"/>
+    </record>
+
+    <template id="report_payment_receive_pdf_template">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <t t-foreach="docs" t-as="doc">
+
+                    <t t-set="report_data" t-value="doc.get_report_data()"/>
+                    <div class="page">
+
+                        <t t-if="report_data.get('no_data')">
+                            <div style="text-align:center; padding:20px; font-style:italic; color:#666; font-weight:bold;">
+                                <t t-esc="'No data available for the selected criteria.'"/>
+                            </div>
+                        </t>
+
+                        <!-- ===== RECEIVE SECTION ===== -->
+                        <t t-if="report_data['receive']">
+                            <h2 style="font-weight:bold; font-size:16pt; text-align:center; color:#714B67;">
+                                Receive Report
+                            </h2>
+                            <p style="font-style:italic; color:#000000; font-weight:bold; text-align:center;">
+                                <span>Date: </span>
+                                <t t-esc="report_data['today'].strftime('%d/%m/%Y')"/>
+                                <span> | From: </span>
+                                <t t-esc="report_data['date_from'].strftime('%d/%m/%Y') if report_data['date_from'] else ''"/>
+                                <span> | To: </span>
+                                <t t-esc="report_data['date_to'].strftime('%d/%m/%Y') if report_data['date_to'] else ''"/>
+                                <span> | Partner: </span>
+                                <t t-esc="report_data['partner_name']"/>
+                                <span> | Journal: </span>
+                                <t t-esc="report_data['journal_name']"/>
+                                <span> | Status: </span>
+                                <t t-esc="report_data['state']"/>
+                            </p>
+                            <table class="table" style="width:100%; border-collapse:collapse;">
+                                <thead>
+                                    <tr style="background-color:#714B67; color:#FFFFFF; text-align:center;">
+                                        <th style="width:30%; padding:10px 8px; border-bottom:2px solid #5a3a52;">Partner</th>
+                                        <th style="width:20%; padding:10px 8px; border-bottom:2px solid #5a3a52;">Reference</th>
+                                        <th style="width:15%; padding:10px 8px; border-bottom:2px solid #5a3a52;">Date</th>
+                                        <th style="width:20%; padding:10px 8px; border-bottom:2px solid #5a3a52;">Journal</th>
+                                        <th style="width:15%; text-align:right; padding:10px 8px; border-bottom:2px solid #5a3a52;">Amount (Dr)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="report_data['receive']" t-as="line">
+                                        <tr t-attf-style="background-color: #{'#F9F9F9' if line_odd else '#FFFFFF'}; color:#000000;">
+                                            <td style="padding:9px 8px; border-bottom:1px solid #E0E0E0;"><t t-esc="line['partner']"/></td>
+                                            <td style="padding:9px 8px; border-bottom:1px solid #E0E0E0;"><t t-esc="line['name']"/></td>
+                                            <td style="text-align:center; padding:9px 8px; border-bottom:1px solid #E0E0E0;"><t t-esc="line['date'].strftime('%d/%m/%Y')"/></td>
+                                            <td style="padding:9px 8px; border-bottom:1px solid #E0E0E0;"><t t-esc="line['journal']"/></td>
+                                            <td style="text-align:right; padding:9px 8px; border-bottom:1px solid #E0E0E0;"><t t-esc="'{0:,.2f}'.format(line['amount'])"/></td>
+                                        </tr>
+                                    </t>
+                                    <tr style="background-color:#017E84; color:#FFFFFF; font-weight:bold;">
+                                        <td style="padding:9px 8px;">Receive Total</td>
+                                        <td style="background-color:#9FD8DA; padding:9px 8px;"></td>
+                                        <td style="background-color:#9FD8DA; padding:9px 8px;"></td>
+                                        <td style="background-color:#9FD8DA; padding:9px 8px;"></td>
+                                        <td style="text-align:right; padding:9px 8px;"><t t-esc="'{0:,.2f}'.format(report_data['receive_total'])"/></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <br/>
+                        </t>
+
+                        <!-- ===== PAYMENT SECTION ===== -->
+                        <t t-if="report_data['payment']">
+                            <h2 style="font-weight:bold; font-size:16pt; text-align:center; color:#714B67;">
+                                Payment Report
+                            </h2>
+                            <p style="font-style:italic; color:#000000; font-weight:bold; text-align:center;">
+                                <span>Date: </span>
+                                <t t-esc="report_data['today'].strftime('%d/%m/%Y')"/>
+                                <span> | From: </span>
+                                <t t-esc="report_data['date_from'].strftime('%d/%m/%Y') if report_data['date_from'] else ''"/>
+                                <span> | To: </span>
+                                <t t-esc="report_data['date_to'].strftime('%d/%m/%Y') if report_data['date_to'] else ''"/>
+                                <span> | Partner: </span>
+                                <t t-esc="report_data['partner_name']"/>
+                                <span> | Journal: </span>
+                                <t t-esc="report_data['journal_name']"/>
+                                <span> | Status: </span>
+                                <t t-esc="report_data['state']"/>
+                            </p>
+                            <table class="table" style="width:100%; border-collapse:collapse;">
+                                <thead>
+                                    <tr style="background-color:#714B67; color:#FFFFFF; text-align:center;">
+                                        <th style="width:30%; padding:10px 8px; border-bottom:2px solid #5a3a52;">Partner</th>
+                                        <th style="width:20%; padding:10px 8px; border-bottom:2px solid #5a3a52;">Reference</th>
+                                        <th style="width:15%; padding:10px 8px; border-bottom:2px solid #5a3a52;">Date</th>
+                                        <th style="width:20%; padding:10px 8px; border-bottom:2px solid #5a3a52;">Journal</th>
+                                        <th style="width:15%; text-align:right; padding:10px 8px; border-bottom:2px solid #5a3a52;">Amount (Cr)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="report_data['payment']" t-as="line">
+                                        <tr t-attf-style="background-color: #{'#F9F9F9' if line_odd else '#FFFFFF'}; color:#000000;">
+                                            <td style="padding:9px 8px; border-bottom:1px solid #E0E0E0;"><t t-esc="line['partner']"/></td>
+                                            <td style="padding:9px 8px; border-bottom:1px solid #E0E0E0;"><t t-esc="line['name']"/></td>
+                                            <td style="text-align:center; padding:9px 8px; border-bottom:1px solid #E0E0E0;"><t t-esc="line['date'].strftime('%d/%m/%Y')"/></td>
+                                            <td style="padding:9px 8px; border-bottom:1px solid #E0E0E0;"><t t-esc="line['journal']"/></td>
+                                            <td style="text-align:right; padding:9px 8px; border-bottom:1px solid #E0E0E0;"><t t-esc="'{0:,.2f}'.format(line['amount'])"/></td>
+                                        </tr>
+                                    </t>
+                                    <tr style="background-color:#017E84; color:#FFFFFF; font-weight:bold;">
+                                        <td style="padding:9px 8px;">Payment Total</td>
+                                        <td style="background-color:#9FD8DA; padding:9px 8px;"></td>
+                                        <td style="background-color:#9FD8DA; padding:9px 8px;"></td>
+                                        <td style="background-color:#9FD8DA; padding:9px 8px;"></td>
+                                        <td style="text-align:right; padding:9px 8px;"><t t-esc="'{0:,.2f}'.format(report_data['payment_total'])"/></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <br/>
+                        </t>
+
+                        <!-- ===== BALANCE ===== -->
+                        <t t-if="not report_data.get('no_data')">
+                            <table style="width:100%; border-collapse:collapse; margin-top:10px;">
+                                <tr style="background-color:#017E84; color:#FFFFFF; font-weight:bold;">
+                                    <td style="padding:10px 8px; width:85%;">Total Balance</td>
+                                    <td style="text-align:right; padding:10px 8px; width:15%;">
+                                        <t t-esc="'{0:,.2f}'.format(report_data['receive_total'] - report_data['payment_total'])"/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </t>
+
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

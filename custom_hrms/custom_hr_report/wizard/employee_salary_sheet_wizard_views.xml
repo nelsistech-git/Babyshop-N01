@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <data>
+        <record id="view_employee_salary_sheet_wizard_form" model="ir.ui.view">
+            <field name="name">employee.salary.sheet.wizard.form</field>
+            <field name="model">employee.salary.sheet.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Employee Salary Sheet Report">
+                    <group>
+                        <group>
+                            <field name="year" required="1"/>
+                            <field name="month"/>
+                            <field name="state"/>
+                            <field name="include_zero_less_payable"/>
+                        </group>
+                        <group>
+                            <field name="company_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="location_id" placeholder="All" options="{'no_create_edit': True, 'no_open': True, 'no_create':True}" />
+                            <field name="department_id" placeholder="All" options="{'no_create_edit': True, 'no_open': True, 'no_create':True}" />
+                            <field name="employee_id" placeholder="All" options="{'no_create_edit': True, 'no_open': True, 'no_create':True}" />
+                            <field name="sbu_unit_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="category_ids" widget="many2many_tags" options="{'color_field': 'color', 'no_open': True, 'no_create': 1, 'no_create_edit': 1, 'no_quick_create': True}" />
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="employee_salary_sheet_report_pdf" string="Download (PDF)" type="object" class="btn-primary"/>
+                        <button name="employee_salary_sheet_report_excel" string="Download (Excel)" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="employee_salary_sheet_wizard_action" model="ir.actions.act_window">
+            <field name="name">Employee Salary Sheet</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">employee.salary.sheet.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_employee_salary_sheet_wizard_form"/>
+            <field name="target">new</field>
+        </record>
+
+        <!--<menuitem name="Employee Salary Report" id="salary_report" sequence="5" parent="custom_hr_report.menu_salary_report_root" action="employee_salary_sheet_wizard_action" groups="hr.group_hr_user" />-->
+        <!--payroll-->
+        <menuitem name="Employee Salary Report" id="salary_report_payroll" sequence="2" parent="hr_payroll.menu_report_payroll_salary" action="employee_salary_sheet_wizard_action" groups="hr.group_hr_user" />
+
+
+    </data>
+</odoo>

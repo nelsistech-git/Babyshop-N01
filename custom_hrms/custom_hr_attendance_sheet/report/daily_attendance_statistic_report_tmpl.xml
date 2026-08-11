@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+	<data>
+        <record id="paperformat_daily_attendance_statistic_report" model="report.paperformat">
+            <field name="name">Daily Attendance Statistic Report Paperformat</field>
+            <field name="default" eval="True"/>
+            <field name="format">Legal</field>
+            <field name="orientation">Landscape</field>
+            <field name="margin_top">30</field>
+            <field name="margin_bottom">20</field>
+            <field name="margin_left">1</field>
+            <field name="margin_right">2</field>
+            <field name="header_line" eval="False"/>
+            <field name="header_spacing">25</field>
+            <field name="dpi">110</field>
+        </record>
+<!-- 20, 16 -->
+        <record id="daily_attendance_statistic_report_view_tmpl" model="ir.actions.report">
+            <field name="name">Daily Attendance Statistic Report</field>
+            <field name="model">daily.attendance.statistic.report.wizard</field>
+            <field name="report_type">qweb-html</field>
+            <field name="report_name">custom_hr_attendance_sheet.daily_attendance_statistic_report_view</field>
+            <field name="report_file">custom_hr_attendance_sheet.daily_attendance_statistic_report_view</field>
+            <field name="paperformat_id" ref="custom_hr_attendance_sheet.paperformat_daily_attendance_statistic_report"/>
+        </record>
+
+
+        <record id="daily_attendance_statistic_report_tmpl" model="ir.actions.report">
+            <field name="name">Daily Attendance Statistic Report</field>
+            <field name="model">daily.attendance.statistic.report.wizard</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">custom_hr_attendance_sheet.daily_attendance_statistic_report_view</field>
+            <field name="report_file">custom_hr_attendance_sheet.daily_attendance_statistic_report_view</field>
+            <field name="paperformat_id"
+                   ref="custom_hr_attendance_sheet.paperformat_daily_attendance_statistic_report"/>
+        </record>
+
+		<template id="daily_attendance_statistic_report_view">
+            <t t-call="web.html_container">
+                <t t-call="custom_hr_attendance_sheet.custom_external_layout">
+                    <div class="page">
+                        <style type="text/css">
+                            th, tr, td{
+                                background: white !important;
+                                border: 1px solid black !important;
+                            }
+                        </style>
+                        <t t-set="data" t-value="request.env['daily.attendance.statistic.report.wizard'].sudo().search([('id', '=', ftr_id)], limit=1).daily_attendance_statistic_report_sql_att()"/>
+
+                        <t t-set="model" t-value="data['model']"/>
+                        <t t-set="form" t-value="data['form']"/>
+                        <t t-set="csr" t-value="data['csr']"/>
+                        <t t-set="month" t-value="data['month']"/>
+                        <t t-set="year" t-value="data['year']"/>
+                        <t t-set="work_location_name" t-value="data['work_location_name']"/>
+                        <t t-set="report_type" t-value="data['report_type']"/>
+                        <t t-set="dept_name" t-value="data['dept_name']"/>
+                        <t t-set="leave_type_names" t-value="data['leave_type_names']"/>
+                        <t t-set="day_list" t-value="data['day_list']"/>
+                        <t t-set="week_days" t-value="data['week_days']"/>
+                        <t t-set="tag_names_list" t-value="data['tag_names_list']"/>
+                        <t t-set="buisness_unit" t-value="data['buisness_unit']"/>
+
+                        <div class="oe_structure"/>
+                        <div>
+                            <h3 class="text-center head_font_color">
+                                <strong>
+                                    <span t-esc="form['company_id'][1]"/>
+                                    <br/>
+                                    Daily Attendance Statistic Report (<span t-esc="month"/> - <span t-esc="year"/>)
+                                </strong>
+                            </h3>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <div style="color: #000; font-size: 15px;"><strong>Work/Job Location:</strong> <t t-esc="work_location_name"/></div>
+                                <div style="color: #000; font-size: 15px;"><strong>Report Type:</strong> <t t-esc="report_type"/></div>
+                            </div>
+                            <div class="col-6 text-right">
+                                <div style="color: #000; font-size: 15px;"><strong>Department Name:</strong>
+                                    <t t-esc="dept_name"/>
+                                    <br/>
+                                    <strong>Office/business Unit:</strong>  <t t-esc="buisness_unit"/>
+                                    <br/>
+                                    <strong>Tags:</strong>  <t t-esc="tag_names_list"/>
+                                </div>
+                            </div>
+                        </div>
+                        <br/>
+                        <t t-set="p_present_day" t-value="0"/>
+                        <table style="border-collapse: collapse;width: 100%; margin-bottom: 2em;" class="table table-condensed">
+                            <thead>
+                                <tr>
+                                    <th rowspan="2" class="text-center align-middle bg_color font_color">Sl. No.</th>
+                                    <th rowspan="2" class="text-center align-middle bg_color font_color">Emp. ID</th>
+                                    <th rowspan="2" class="text-left align-middle bg_color font_color">Emp. Name</th>
+                                    <th rowspan="2" class="text-center align-middle bg_color font_color">Device ID</th>
+                                    <th rowspan="2" class="text-left align-middle bg_color font_color">Work/Job Location</th>
+                                    <t t-foreach="len(day_list)" t-as="l">
+                                        <th class="text-center align-middle bg_color font_color">
+                                            <span t-esc="day_list[l]"/>
+                                        </th>
+                                    </t>
+                                    <th rowspan="2" class="text-center align-middle bg_color font_color">Work. Days</th>
+                                    <th rowspan="2" class="text-center align-middle bg_color font_color">Present Days</th>
+                                    <th rowspan="2" class="text-center align-middle bg_color font_color">Abs. Days</th>
+                                    <th rowspan="2" class="text-center align-middle bg_color font_color">Late Days</th>
+                                    <th rowspan="2" class="text-center align-middle bg_color font_color">Early Days</th>
+                                    <th rowspan="2" class="text-center align-middle bg_color font_color">Unpaid Leave</th>
+                                    <th rowspan="2" class="text-center align-middle bg_color font_color">Paid Leave</th>
+                                    <th rowspan="2" class="text-center align-middle bg_color font_color">OT Days (W/PH)</th>
+                                </tr>
+                                <tr>
+                                    <t t-foreach="len(week_days)" t-as="l">
+                                        <th class="text-center align-middle bg_color font_color">
+                                            <span t-esc="week_days[l]"/>
+                                        </th>
+                                    </t>
+                                </tr>
+                            </thead>
+                            <tbody class="consumed_tbody">
+                                <t t-set="sl_no" t-value="1"/>
+                                <t t-foreach="csr" t-as="line">
+                                    <t t-if="line['work_days'] == 0 and line['present_days'] == 0 and line['absent_days'] == 0 and line['late_days'] == 0 and line['early_out'] == 0 and line['leave_days'] == 0">
+                                    </t>
+                                    <t t-else="">
+                                        <t t-set="att_dict" t-value="line['att_day_list'][0]"/>
+                                        <tr>
+                                            <td class="text-center align-middle">
+                                                <span t-esc="sl_no"/>
+                                            </td>
+                                            <td class="text-center align-middle">
+                                                <span t-esc="line['old_emp_id']"/>
+                                            </td>
+                                            <td class="text-left align-middle">
+                                                <span t-esc="line['emp_name']"/>
+                                            </td>
+                                            <td class="text-center align-middle">
+                                                <span t-esc="line['device_id']"/>
+                                            </td>
+                                            <td class="text-left align-middle">
+                                                <span t-esc="line['loc_name']"/>
+                                            </td>
+                                            <t t-foreach="att_dict" t-as="line2">
+                                                <td class="text-center align-middle">
+                                                    <span t-esc="att_dict[str(line2)]"/>
+                                                </td>
+                                            </t>
+                                            <td class="text-center align-middle">
+                                                <span t-esc="line['work_days']"/>
+                                            </td>
+
+                                            <td class="text-center align-middle">
+
+                                                
+                                                <t t-set="p_present_day" t-value="int(line['present_days'])"/>
+                                                <span t-esc="p_present_day"/>
+
+                                            </td>
+                                            <td class="text-center align-middle">
+                                                <span t-esc="line['absent_days']"/>
+                                            </td>
+                                            <td class="text-center align-middle">
+                                                <span t-esc="line['late_days']"/>
+                                            </td>
+                                            <td class="text-center align-middle">
+                                                <span t-esc="line['early_out']"/>
+                                            </td>
+                                            <td class="text-center align-middle">
+                                                <span t-esc="line['unpaid_leave_days']"/>
+                                            </td>
+                                            <td class="text-center align-middle">
+                                                <span t-esc="line['leave_days']"/>
+                                            </td>
+                                            <td class="text-center align-middle">
+                                                <span t-esc="line['no_of_days_wph_ot']"/>
+                                            </td>
+                                        </tr>
+                                        <t t-set="sl_no" t-value="sl_no + 1"/>
+                                    </t>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+		</template>
+
+        <template id="custom_external_layout">
+            <t t-if="not o" t-set="o" t-value="doc"/>
+
+            <t t-if="not company">
+                
+                <t t-if="company_id">
+                    <t t-set="company" t-value="company_id"/>
+                </t>
+                <t t-elif="o and 'company_id' in o and o.company_id.sudo()">
+                    <t t-set="company" t-value="o.company_id.sudo()"/>
+                </t>
+                <t t-else="else">
+                    <t t-set="company" t-value="res_company"/>
+                </t>
+            </t>
+
+            <t t-call="{{company.external_report_layout_id.key}}">
+                <t t-raw="0" />
+                <t t-call="custom_hr_attendance_sheet.custom_footer_daily_attendance_statistics" />
+            </t>
+        </template>
+
+        <template id="custom_footer_daily_attendance_statistics">
+
+            <div t-attf-class="footer">
+                <div class="row" style="color: #374151; padding-bottom: 10px;">
+                    <div class="col-12 text-left">
+                        <div>
+                            <p style="text-align:left;text-decoration: overline; padding-bottom: 5px;"><strong>Present="P", Absent="A", Overtime="OT", Weekend="W", Public Holiday="PH", <t t-if="leave_type_names"><span t-esc="leave_type_names"/>,</t> Late &amp; Early Out="LE", Late="L", Early Out="E", One Time Punch="O", Late &amp; One Time Punch="LO"</strong></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center" style="border-top: 3px solid #374151;">
+
+                    <div t-field="company.report_footer"/>
+                    <div style="color: #374151 !important; margin-top: 0;" t-if="report_type == 'pdf'">
+                        Page: <span class="page"/> / <span class="topage"/>
+                    </div>
+                </div>
+            </div>
+		</template>
+	</data>
+</odoo>

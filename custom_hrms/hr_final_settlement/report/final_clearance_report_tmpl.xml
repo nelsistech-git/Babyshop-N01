@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+	<data>
+
+        <record id="final_clearance_report_tmpl" model="ir.actions.report">
+            <field name="name">Final Clearance Reportr</field>
+            <field name="model">employee.contract.clearance</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">hr_final_settlement.final_clearance_report_view</field>
+            <field name="report_file">hr_final_settlement.final_clearance_report_view</field>
+            <field name="print_report_name">(object.name)</field>
+        </record>
+
+
+		<template id="final_clearance_report_view">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-call="web.external_layout">
+                        <div class="page">
+                            <style type="text/css">
+                                table, th, tr, td{
+                                    background: white !important;
+                                    border: 1px solid black;
+                                }
+                            </style>
+                            <div class="oe_structure"/>
+                            <div>
+                                <h3 class="text-center head_font_color">
+                                    <strong>
+                                        <span t-field="o.company_id"/>
+                                        <br/>FINAL CLEARANCE REPORT
+                                    </strong>
+                                </h3>
+                            </div>
+                            <br/>
+                            <table style="border-collapse: collapse;width: 100%; margin-bottom: 2em;" class="table table-condensed">
+                                <tbody class="consumed_tbody">
+                                        <tr>
+                                            <td class="text-left align-middle" colspan="2">
+                                                <strong>Employee Name:</strong> <span t-field="o.employee_id.name"/>
+                                            </td>
+                                            <td class="text-left align-middle">
+                                                <strong>Designation: </strong> <span t-field="o.job_position"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left align-middle">
+                                                <strong>ID No:</strong> <span t-field="o.old_empid"/>
+                                            </td>
+                                            <td class="text-left align-middle" colspan="3">
+                                               <strong>Department/Division:</strong> <span t-field="o.department_id"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left align-middle">
+                                                <strong>Salary:</strong> <span t-field="o.gross_salary"/>
+                                            </td>
+                                            <td class="text-left align-middle">
+                                                <strong>Entry on Duty (EOD): </strong> <span t-field="o.initial_employment_date"/>
+                                            </td>
+                                            <td class="text-left align-middle">
+                                                <strong>Last Day of Work (CoB):</strong> <span t-field="o.last_day_of_work"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left align-middle" colspan="3">
+                                                <strong>Reason for Separation:</strong> <span t-field="o.separation_type_id"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left align-middle" colspan="2">
+                                                <strong>Notice Period(Given):-</strong> <span t-if="o.notice_period == 'yes'" t-field="o.notice_period_days"/> <span t-else="" t-esc="'0'"/> Days <input type="checkbox" t-att-checked="o.notice_period == 'no'"/> N/A
+                                            </td>
+                                            <td class="text-left align-middle">
+                                                <strong>Notice Served:</strong> <input type="checkbox" t-att-checked="o.notice_served == 'yes'"/> Yes <input type="checkbox" t-att-checked="o.notice_served == 'no'"/> No
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left align-middle">
+                                                <strong>Date of Notice:-</strong> <span t-field="o.date_of_notice"/>
+                                            </td>
+                                            <td class="text-left align-middle"  colspan="2">
+                                                <strong>Job location:</strong> <span t-field="o.user_work_location_id"/>
+                                            </td>
+                                        </tr>
+                                </tbody>
+                            </table>
+                            <table style="border-collapse: collapse;width: 100%; margin-bottom: 2em;" class="table table-condensed">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center align-middle bg_color font_color">Dept/Division wise Handover/Clearance</th>
+                                        <th class="text-center align-middle bg_color font_color">yes</th>
+                                        <th class="text-center align-middle bg_color font_color">No</th>
+                                        <th class="text-center align-middle bg_color font_color">N/A</th>
+                                        <th class="text-center align-middle bg_color font_color">Dept/Div Head's Signature</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="consumed_tbody">
+                                    <t t-set="sl_no" t-value="1"/>
+                                    <tr>
+                                        <td class="text-left align-middle">
+                                            <strong>Section A: Concerned Department/Division:</strong>
+                                        </td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr t-foreach="o.section_a_lines" t-as="a">
+                                        <td class="text-left align-middle">
+                                            <span t-esc="sl_no"/>. <span t-field="a.final_settlement_settings_id"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <input type="checkbox" t-att-checked="a.observation_type == 'yes'"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <input type="checkbox" t-att-checked="a.observation_type == 'no'"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <input type="checkbox" t-att-checked="a.observation_type == 'na'"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <span t-field="a.note"/>
+                                        </td>
+                                        <t t-set="sl_no" t-value="sl_no + 1"/>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4" class="text-left align-middle">
+                                            Remarks, (if any): <span t-field="o.a_remarks"/>
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                    <t t-set="sl_no" t-value="1"/>
+                                    <tr>
+                                        <td class="text-left align-middle">
+                                            <strong>Section B: Accounts Department:</strong>
+                                        </td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr t-foreach="o.section_b_lines" t-as="b">
+                                        <td class="text-left align-middle">
+                                            <span t-esc="sl_no"/>. <span t-field="b.final_settlement_settings_id"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <input type="checkbox" t-att-checked="b.observation_type == 'yes'"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <input type="checkbox" t-att-checked="b.observation_type == 'no'"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <input type="checkbox" t-att-checked="b.observation_type == 'na'"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <span t-field="b.note"/>
+                                        </td>
+                                        <t t-set="sl_no" t-value="sl_no + 1"/>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4" class="text-left align-middle">
+                                            Remarks, (if any): <span t-field="o.b_remarks"/>
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                    <t t-set="sl_no" t-value="1"/>
+                                    <tr>
+                                        <td class="text-left align-middle">
+                                            <strong>Section C: Admin Department:</strong>
+                                        </td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr t-foreach="o.section_c_lines" t-as="c">
+                                        <td class="text-left align-middle">
+                                            <span t-esc="sl_no"/>. <span t-field="c.final_settlement_settings_id"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <input type="checkbox" t-att-checked="c.observation_type == 'yes'"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <input type="checkbox" t-att-checked="c.observation_type == 'no'"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <input type="checkbox" t-att-checked="c.observation_type == 'na'"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <span t-field="c.note"/>
+                                        </td>
+                                        <t t-set="sl_no" t-value="sl_no + 1"/>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4" class="text-left align-middle">
+                                            Remarks, (if any): <span t-field="o.c_remarks"/>
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                    <t t-set="sl_no" t-value="1"/>
+                                    <tr>
+                                        <td class="text-left align-middle">
+                                            <strong>Section D: IT Department:</strong>
+                                        </td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr t-foreach="o.section_d_lines" t-as="d">
+                                        <td class="text-left align-middle">
+                                            <span t-esc="sl_no"/>. <span t-field="d.final_settlement_settings_id"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <input type="checkbox" t-att-checked="d.observation_type == 'yes'"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <input type="checkbox" t-att-checked="d.observation_type == 'no'"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <input type="checkbox" t-att-checked="d.observation_type == 'na'"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <span t-field="d.note"/>
+                                        </td>
+                                        <t t-set="sl_no" t-value="sl_no + 1"/>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4" class="text-left align-middle">
+                                            Remarks, (if any): <span t-field="o.d_remarks"/>
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                    <t t-set="sl_no" t-value="1"/>
+                                    <tr>
+                                        <td class="text-left align-middle">
+                                            <strong>Section E: HR Department:</strong>
+                                        </td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr t-foreach="o.section_e_lines" t-as="e">
+                                        <td class="text-left align-middle">
+                                            <span t-esc="sl_no"/>. <span t-field="e.final_settlement_settings_id"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <input type="checkbox" t-att-checked="e.observation_type == 'yes'"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <input type="checkbox" t-att-checked="e.observation_type == 'no'"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <input type="checkbox" t-att-checked="e.observation_type == 'na'"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <span t-field="e.note"/>
+                                        </td>
+                                        <t t-set="sl_no" t-value="sl_no + 1"/>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4" class="text-left align-middle">
+                                            Remarks, (if any): <span t-field="o.e_remarks"/>
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <table style="border-collapse: collapse;width: 100%; margin-bottom: 2em;" class="table table-condensed">
+                                <tbody class="consumed_tbody">
+                                        <tr>
+                                            <td class="text-left align-middle" colspan="3">
+                                            <strong>Section F: To be completed by Outgoing Employee:</strong>
+                                        </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left align-middle" colspan="3">
+                                                <strong>Name of the Outgoing Employee:</strong> <span t-field="o.outgoing_emp_id.name"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left align-middle" colspan="3">
+                                                <strong>Mailing Address: </strong> <span t-field="o.mailing_address"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left align-middle">
+                                                <strong>Contact Phone:</strong> <span t-field="o.emp_id_phone"/>
+                                            </td>
+                                            <td class="text-left align-middle">
+                                               <strong>Mobile:</strong> <span t-field="o.emp_id_mobile"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left align-middle" colspan="2">
+                                               <strong>E-mail:</strong> <span t-field="o.emp_id_email"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left align-middle">
+                                                <strong>National ID #:</strong> <span t-field="o.emp_id_nid"/>
+                                            </td>
+                                            <td class="text-left align-middle">
+                                                <strong>Passport #: </strong> <span t-field="o.emp_id_passport"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="3" class="text-left align-middle">
+                                                Remarks, (if any): <span t-field="o.remarks"/>
+                                                <br/>
+                                                <br/>
+                                                <br/>
+                                                <br/>
+                                                <strong>Signature:</strong>............................................................ <strong>Date:</strong>............................................................
+                                            </td>
+                                        </tr>
+                                </tbody>
+                            </table>
+                            <p style="page-break-after: always;"/>
+                            <div>
+                                <h3 class="text-center">
+                                    <strong>
+                                        <span t-field="o.company_id"/>
+                                        <br/>DECLARATION<br/>
+                                    </strong>
+                                </h3>
+                            </div>
+                            <br/>
+                            <span t-field="o.note"/>
+                            <br/>
+                            <strong>Signed:</strong>.........................................................................<br/>
+                            <br/>
+                            <strong>Name:</strong>.......................................................................................<br/>
+                            <strong>Address:</strong>.............................................................................................................<br/>
+                            <strong>Date:</strong>.........................................................................................
+                        </div>
+                    </t>
+                </t>
+            </t>
+		</template>
+	</data>
+</odoo>

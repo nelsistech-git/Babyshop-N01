@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="inherited_view_change_standard_price_inherit_custom_stock_form" model="ir.ui.view">
+            <field name="name">inherited.view.change.standard.price.inherit.custom.stock.form</field>
+            <field name="model">stock.change.standard.price</field>
+            <field name="inherit_id" ref="stock_account.view_change_standard_price"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='new_price']" position="before">
+                    <field name="currency_id" required="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                    <field name="currency" invisible="1"/>
+                    <field name="rate" required="1" attrs="{'invisible':['|', ('currency','=', False), ('currency','=', 'BDT')]}"/>
+                    <field name="foreign_cost_price" attrs="{'invisible':[('currency','=', 'BDT')], 'required':[('currency','!=', 'BDT')]}"/>
+                </xpath>
+                <xpath expr="//field[@name='new_price']" position="attributes">
+                    <attribute name="attrs">{'readonly':[('currency','!=', 'BDT')]}</attribute>
+                    <attribute name="force_save">1</attribute>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

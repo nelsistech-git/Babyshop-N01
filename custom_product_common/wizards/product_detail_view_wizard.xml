@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_product_upload_wizard_form" model="ir.ui.view">
+        <field name="name">view.product.detail.wizard.form</field>
+        <field name="model">product.detail.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Product Upload">
+                <group>
+                    <group>
+                        <field required="1" name="product_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" style="font-weight:bold;"/>
+                        <field name="product_group"/>
+                        <field name="product_brand" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                        <field name="vendor_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                        <field name="style_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                        <field name="color_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                        <field name="product_item_group_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                        <field name="product_item_group_type_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                        <field name="country_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                        <field name="categ_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                        <field name="parent_categ_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                    </group>
+                    <group>
+                        <field name="default_code"/>
+                        <field name="barcode" />
+                        <field name="list_price" style="font-weight:bold;"/>
+                        <!--<field name="standard_price"/>-->
+                        <field name="uom_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                        <field name="uom_po_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                        <field name="qty_available" style="font-weight:bold;"/>
+                        <field name="minimum_stock_qty" style="font-weight:bold;"/>
+                        <field name="category_code"/>
+                        <!--<field name="default_qty"/>-->
+                        <field name="tracking"/>
+                        <field name="type"/>
+                        <field name="is_old_product"/>
+                    </group>
+                </group>
+                <footer>
+                    <button string="Close" special="cancel" class="oe_link" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Product detail_view Wizard Action -->
+    <record id="action_product_detail_view_wizard" model="ir.actions.act_window">
+        <field name="name">Product Detail View</field>
+        <field name="res_model">product.detail.wizard</field>
+        <field name="view_mode">form</field>
+<!--        <field name="view_id" ref="custom_product_common.view_product_upload_wizard_form"/>-->
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_product_detail_view_wizard"
+              name="Product Detail View"
+              sequence="200"
+              action="action_product_detail_view_wizard"
+              parent="stock.menu_stock_warehouse_mgmt"/>
+</odoo>

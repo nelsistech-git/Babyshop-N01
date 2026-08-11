@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- courier Mapping Form View -->
+	<record id="courier_mapping_view_form" model="ir.ui.view">
+        <field name="name">courier.mapping.form</field>
+        <field name="model">courier.mapping</field>
+        <field name="arch" type="xml">
+            <form  string="Courier Service">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="vendor_id" options="{'no_open': True,'no_create': True}"/>
+                        </group>
+                        <group>
+                            <field name="create_date" readonly="1"/>
+                        </group>
+                    </group>
+
+
+                    <field name="courier_ids" >
+                        <tree editable="bottom">
+                            <field name="product_id" options="{'no_create': True,'no_open': True}" required="1"/>
+                            <field name="amount" required="1"/>
+                        </tree>
+                        <form>
+                            <group>
+                                <field name="product_id" options="{'no_create': True,'no_open': True}"/>
+                                <field name="amount"/>
+                            </group>
+                        </form>
+                    </field>
+
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Courier Mapping Tree View -->
+	<record id="courier_mapping_view_tree" model="ir.ui.view">
+         <field name="name">courier.mapping.tree</field>
+         <field name="model">courier.mapping</field>
+         <field name="arch" type="xml">
+             <tree  string="Courier Mapping List">
+                 <field name="vendor_id" options="{'no_open':True,'no_create':True}"/>
+             </tree>
+         </field>
+     </record>
+
+    <!-- Courier Mapping search View -->
+    <record id="courier_mapping_view_search" model="ir.ui.view">
+         <field name="name">courier.mapping.search</field>
+         <field name="model">courier.mapping</field>
+        <field name="arch" type="xml">
+            <search string="Search Courier Mapping">
+                <field name="vendor_id"/>
+           </search>
+        </field>
+    </record>
+
+    <!-- Courier Mapping action window -->
+	<record id="courier_mapping_action" model="ir.actions.act_window">
+        <field name="name">Courier Mapping</field>
+        <field name="res_model">courier.mapping</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Please Create Courier Mapping
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_courier_mapping" name="Courier Mapping" parent="sale.sale_order_menu" groups="sales_team.group_sale_salesman,sales_team.group_sale_salesman_all_leads"
+                  action="courier_mapping_action" sequence="6"/>
+
+</odoo>

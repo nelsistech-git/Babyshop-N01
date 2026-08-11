@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<odoo>
+    <data>
+        <!--Form View-->
+        <record id="probation_period_view_form" model="ir.ui.view">
+            <!-- <field name="name">hr.probation.period</field> -->
+            <field name="name">hr.probation.period.form</field>
+            <field name="model">hr.probation.period</field>
+            <!-- <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field> -->
+
+            <!--This is the new odoo 13 format, not needed now, will check later if necessary-->
+<!--            <field name="type">ir.ui.view</field>-->
+<!--            <field name="view_mode">form</field>-->
+            <field name="arch" type="xml">
+                <form string="Probation period">
+                    <sheet>
+                        <group>
+                            <group name="main" string="Probation length">
+                                <field name="name" invisible="0" string="Name"></field>
+                                <field name="unit" class="oe_inline"/>
+                                <field name="length" class="oe_inline"/>
+                                <field name="active" class="oe_inline"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!--Tree View-->
+        <record id="probation_period_view_tree" model="ir.ui.view">
+            <!-- <field name="name">hr.probation.period</field> -->
+            <field name="name">hr.probation.period.tree</field>
+            <field name="model">hr.probation.period</field>
+<!--            <field name="type">ir.ui.view</field>-->
+            <field name="arch" type="xml">
+                <tree string="Probation Period">
+                    <field name="sequence" widget="handle"/>
+                    <field name="name"  string="Name"/>
+                    <field name="active" />
+                </tree>
+            </field>
+        </record>
+
+        <!--Action View-->
+        <record id="probation_period_list_action" model="ir.actions.act_window">
+            <field name="name">Probation period</field>
+            <field name="res_model">hr.probation.period</field>
+            <!-- <field name="view_type">form</field> -->
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{'readonly_by_pass': ['name']}</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">Create the first course</p>
+            </field>
+        </record>
+
+        <!--Add Menu Item-->
+        <menuitem id="menu_probation_config" name="Probation Period" parent="menu_hr_employee_settings_root"
+        sequence="20" action="probation_period_list_action" groups="hr.group_hr_manager"/>
+
+    </data>
+</odoo>
+
+

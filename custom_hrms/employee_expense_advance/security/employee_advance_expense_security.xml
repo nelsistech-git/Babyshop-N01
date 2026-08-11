@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate='1'>
+        
+    <record id="advance_exp_employee_rule" model="ir.rule">
+        <field name="name">Advance Expense Employee</field>
+        <field name="model_id" ref="model_employee_advance_expense"/>
+        <field name="domain_force">[('user_id','=',user.id)]</field>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    
+    <record id="advance_exp_officer_rule" model="ir.rule">
+        <field name="name">Advance Expense Officer</field>
+        <field name="model_id" ref="model_employee_advance_expense"/>
+        <field name="domain_force">[(1,'=',1)]</field>
+        <field name="groups" eval="[(4, ref('hr_expense.group_hr_expense_user'))]"/>
+    </record>
+       
+    <record id="advance_exp_account_rule" model="ir.rule">
+        <field name="name">Advance Account Officer</field>
+        <field name="model_id" ref="model_employee_advance_expense"/>
+        <field name="domain_force">[(1,'=',1)]</field>
+        <field name="groups" eval="[(4, ref('account.group_account_user'))]"/>
+    </record>
+    
+    <!--Multi Company Record Rules -->
+        
+    <record model="ir.rule" id="advance_exp_custom_multicomp_rule">
+        <field name="name">Advance Expense Multi Company</field>
+        <field name="model_id" ref="model_employee_advance_expense"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">['|',('company_id','=',False),('company_id','in', company_ids)]</field>
+    </record>
+    
+    <record model="ir.rule" id="advance_exp_line_custom_multicomp_rule">
+        <field name="name">Advance Expense Line Multi Company</field>
+        <field name="model_id" ref="model_advance_expense_line"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">['|',('advance_line_id.company_id','=',False),('advance_line_id.company_id','in', company_ids)]</field>
+    </record>
+    
+    </data>
+</odoo>

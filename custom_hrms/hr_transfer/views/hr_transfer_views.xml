@@ -1,0 +1,372 @@
+<odoo>
+	<data>
+		<record id="hr_transfer_view_tree" model="ir.ui.view">
+			<field name="name">hr.transfer.view.tree</field>
+			<field name="model">hr.transfer</field>
+			<field name="arch" type="xml">
+				<tree delete="0" decoration-muted="state=='cancel'"
+					decoration-info="state=='draft'"
+					decoration-success="state=='transfer'" string="Employee Transfer">
+					<field name="name" string="Reference" />
+					<field name="employee_id" />
+					<field name="id_card_no" />
+					<field name="device_user_id" />
+					<field name="date_requested" />
+					<field name="date_exec" />
+					<field name="transfer_company" />
+					<field name="state" string="Status" />
+				</tree>
+			</field>
+		</record>
+
+		<record id="hr_transfer_view_form" model="ir.ui.view">
+			<field name="name">hr.transfer.view.form</field>
+			<field name="model">hr.transfer</field>
+			<field name="arch" type="xml">
+				<form string="">
+					<header>
+						<button name="action_confirm" type="object"
+							string="Confirm" invisible="state not in ['draft']"
+							class="oe_highlight" />
+						<button name="action_supervisor_existing" type="object"
+							string="Supervisor(Existing) Approved" invisible="state not in ['confirm']"
+							class="oe_highlight" />
+						<button name="action_hr_approved" type="object"
+							string="HR Approved" invisible="state not in ['supervisor_existing']"
+							class="oe_highlight" />
+						<button name="action_supervisor_new" type="object"
+							string="Supervisor(To) Approved" invisible="state not in ['hr_approved']"
+							class="oe_highlight" />
+						<button name="action_md_approved" type="object"
+							string="MD Approved" invisible="state not in ['supervisor_new']"
+							class="oe_highlight" />
+						<button name="action_accounting_approved" type="object"
+							string="Accounting Approved" invisible="state not in ['md_approved']"
+							class="oe_highlight" />
+						<button name="action_transfer" type="object"
+							string="Transferred" invisible="state not in ['accounting_approved']"
+							class="oe_highlight" />
+						<button name="action_cancel" type="object" string="Cancel" invisible="state not in ['draft','confirm']"
+							class="oe_highlight" />
+						<field name="state" widget="statusbar"
+							statusbar_visible="draft,confirm,supervisor_existing,hr_approved,supervisor_new,md_approved,accounting_approved,transfer" />
+					</header>
+					<sheet>
+						<div class="oe_title">
+							<h1>
+								<field name="name" readonly="1" />
+							</h1>
+						</div>
+						<group>
+							<group string="Transfer For" name="transfer_for">
+								<field name="employee_id" force_save="1"
+									options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" readonly="state != 'draft'" required="1" />
+								<field name="location_id" force_save="1" readonly="1"
+									options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" />
+								<field name="emp_private_address_id" readonly="1"
+									options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" />
+								<field name="id_card_no" readonly="1" force_save="1" />
+								<field name="device_user_id" readonly="1" force_save="1" />
+								<field name="identification_id" readonly="1"
+									force_save="1" />
+								<field name="door_card_no" readonly="1" force_save="1" />
+								<field name="work_email" readonly="1" force_save="1" />
+								<field name="contact_no" readonly="1" force_save="1" />
+								<field name="initial_employment_date" readonly="1" force_save="1" />
+							</group>
+							<group string="Transfer Info">
+								<field name="requester_id"
+									options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" />
+								<field name="date_requested" readonly="1"
+									options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" />
+								<field name="date_exec"
+									   readonly="state != 'draft'"
+									options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" />
+							</group>
+							<group string="Current Allocation"  name="current_allocation">
+								<field name="company_id" readonly="1" force_save="1"
+									options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" />
+								<field name="location_id" readonly="1" force_save="1"
+									options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" />
+								<field name="department_id" force_save="1" readonly="1"
+									options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" />
+								<field name="job_position" readonly="1" force_save="1"
+									options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" />
+								<field name="manager_id" readonly="1" force_save="1"
+									options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" />
+								<field name="from_emp_contract" readonly="1"
+									force_save="1"
+									options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" />
+								<field name="gross_salary" readonly="1" force_save='1'
+									options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" />
+								<field name="resource_calendar" readonly="1"
+									force_save='1'
+									options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" />
+							</group>
+							<group string="Revised Transfer">
+								<field name="transfer_company" required="1" force_save="1"
+									readonly="state != 'draft'" />
+								<field name="to_wh_location_id" force_save="1"
+									   invisible="transfer_company == '1'"
+									   required="transfer_company == '0'"
+									   readonly="state != 'draft'"
+									options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" />
+								<field name="to_department_id" force_save="1"
+									   invisible="transfer_company == '1'"
+									   required="transfer_company == '0'"
+									   readonly="state != 'draft'"
+									options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" />
+								<field name="to_position" force_save="1"
+									   invisible="transfer_company == '1'"
+									   required="transfer_company == '0'"
+									   readonly="state != 'draft'"
+									options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"
+									 />
+<!--								domain="[('department_id', '=', to_department_id)]"-->
+								<field name="to_manager_id" force_save="1"
+									   invisible="transfer_company == '1'"
+									   readonly="state != 'draft'"
+									options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" />
+								<field name="other_company_name" force_save="1"
+									domain="[('my_company', '=', False)]"
+									   invisible="transfer_company == '0'"
+									   required="transfer_company == '1'"
+									   readonly="state != 'draft'"
+									options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" />
+								<field name="to_resource_calendar" force_save="1"
+									   invisible="transfer_company == '1'"
+									   required="transfer_company == '0'"
+									   readonly="state != 'draft'"
+									options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" />
+								<field name="to_att_policy_id" force_save="1"
+									   invisible="transfer_company == '1'"
+									   required="transfer_company == '0'"
+									   readonly="state != 'draft'"
+									options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" />
+								
+								<!-- <field name="other_company_job_location" force_save="1" attrs="{'invisible': 
+									[('transfer_company', '=', '0')], 'readonly': [('state', '!=', 'draft')]}" 
+									options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': 
+									True}"/> <field name="other_company_department" force_save="1" attrs="{'invisible': 
+									[('transfer_company', '=', '0')], 'readonly': [('state', '!=', 'draft')]}" 
+									options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': 
+									True}"/> <field name="other_company_job_position" force_save="1" attrs="{'invisible': 
+									[('transfer_company', '=', '0')], 'readonly': [('state', '!=', 'draft')]}" 
+									options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': 
+									True}"/> -->
+
+								<field name="other_company_job_location_id" force_save="1"
+									domain="[('head_id', '=', other_company_name)]"
+									   invisible="transfer_company == '0'"
+									   required="transfer_company == '1'"
+									   readonly="state != 'draft'"
+									options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" />
+								<field name="other_company_department_id" force_save="1"
+									domain="[('head_id', '=', other_company_name)]"
+									   invisible="transfer_company == '0'"
+									   required="transfer_company == '1'"
+									   readonly="state != 'draft'"
+									options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" />
+								<field name="other_company_job_position_id" force_save="1"
+									domain="[('head_id', '=', other_company_name),('dept_id', '=', other_company_department_id)]"
+									   invisible="transfer_company == '0'"
+									   required="transfer_company == '1'"
+									   readonly="state != 'draft'"
+									options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" />
+								
+								<field name="other_company_work_schedule_id" force_save="1"
+									domain="[('head_id', '=', other_company_name)]"
+									   invisible="transfer_company == '0'"
+									   required="transfer_company == '1'"
+									   readonly="state != 'draft'"
+									options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" />
+								<field name="other_company_att_policy_id" force_save="1"
+									domain="[('head_id', '=', other_company_name)]"
+									   invisible="transfer_company == '0'"
+									   required="transfer_company == '1'"
+									   readonly="state != 'draft'"
+									options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" />
+									
+								<field name="other_company_manager" force_save="1"
+									   invisible="transfer_company == '0'"
+									   readonly="state != 'draft'"
+									options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" />
+								<field name="note" force_save="1" readonly="state != 'draft'" />
+							</group>
+							<!-- <group string="Accounting Summary"> -->
+							<!-- <field name="total_residual_loan" readonly="1" force_save="1" 
+								/> -->
+							<!-- <field name="residual_Salary" readonly="1" force_save="1" /> -->
+							<!-- <field name="advance_salary" readonly="1" force_save="1"/> -->
+							<!-- </group> -->
+						</group>
+						
+						<group
+								invisible="transfer_company == '0' or state not in ['md_approved','accounting_approved','transfer']">
+							<button name="set_balance" type="object"
+								string="Check Accounting and Leave Balance"
+									invisible="transfer_company == '0' or state in ['transfer']"
+								class="oe_highlight" style="width:300px;" />
+						</group>
+						<group string="Accounting Entry"
+							   invisible="transfer_company == '0' or state not in ['md_approved','accounting_approved','transfer']">
+
+							<!-- <button name="set_balance" type="object" string="Check Balance" 
+								width="10%" attrs="{'invisible': [('transfer_company', '=', '0')]}" class="oe_highlight"/> -->
+
+							<!-- <separator /> -->
+							<group>
+								<group string="Loan">
+									<field name="loan_balance" readonly="1" force_save="1" />
+									<field name="loan_dr_acc" force_save="1"
+										options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"
+										   readonly="state != 'md_approved'"/>
+									<field name="loan_cr_acc" force_save="1"
+										options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"
+									   readonly="state != 'md_approved'"/>
+								</group>
+								<group string="Loan Interest">
+									<field name="loan_interest_balance" readonly="1"
+										force_save="1" />
+									<field name="loan_interest_dr_acc" force_save="1"
+										options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"
+										readonly="state != 'md_approved'" />
+									<field name="loan_interest_cr_acc" force_save="1"
+										options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"
+										readonly="state != 'md_approved'" />
+								</group>
+								<group string="Salary Advance">
+									<field name="salary_adv_balance" readonly="1"
+										force_save="1" />
+									<field name="salary_adv_dr_acc" force_save="1"
+										options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"
+										readonly="state != 'md_approved'" />
+									<field name="salary_adv_cr_acc" force_save="1"
+										options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"
+										readonly="state != 'md_approved'" />
+								</group>
+								<group string="Salary Payable">
+									<field name="salary_payable_balance" readonly="1"
+										force_save="1" />
+									<field name="salary_payable_dr_acc" force_save="1"
+										options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"
+										readonly="state != 'md_approved'" />
+									<field name="salary_payable_cr_acc" force_save="1"
+										options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"
+										readonly="state != 'md_approved'" />
+								</group>
+							</group>
+
+							<group>
+								<group string="TDS">
+									<field name="tds_balance" readonly="1" force_save="1" />
+									<field name="tds_dr_acc" force_save="1"
+										options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"
+										readonly="state != 'md_approved'" />
+									<field name="tds_cr_acc" force_save="1"
+										options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"
+										readonly="state != 'md_approved'" />
+								</group>
+								<group string="PF">
+									<field name="pf_balance" readonly="1" force_save="1" />
+									<field name="pf_dr_acc" force_save="1"
+										options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"
+										readonly="state != 'md_approved'" />
+									<field name="pf_cr_acc" force_save="1"
+										options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"
+										readonly="state != 'md_approved'" />
+								</group>
+							</group>
+						</group>
+						<group string="Leave Balance"
+							   invisible="transfer_company == '0' or state not in ['md_approved','accounting_approved','transfer']">
+							<group>
+							  	<field name="leave_casual_balance" readonly="1" force_save="1" />
+							  	<field name="leave_sick_balance" readonly="1" force_save="1" />
+							  	<field name="leave_marriage_balance" readonly="1" force_save="1" />
+							</group>
+							<group>
+							</group>
+						</group>
+						<div class="oe_chatter">
+							<field name="message_follower_ids" widget="mail_followers"
+								groups="base.group_user" />
+							<field name="message_ids" widget="mail_thread" />
+						</div>
+					</sheet>
+				</form>
+			</field>
+		</record>
+
+		<record id="view_hr_transfer_filter" model="ir.ui.view">
+			<field name="name">view.transfer.filter</field>
+			<field name="model">hr.transfer</field>
+			<field name="arch" type="xml">
+				<search string="Search Employee Transfer">
+					<field name="employee_id" string="Employee Name"
+						filter_domain="[('employee_id', 'ilike', self)]" />
+					<field name="department_id" string="Department"
+						filter_domain="[('department_id', 'ilike', self)]" />
+					<field name="job_position" string="Designation"
+						filter_domain="[('job_position', 'ilike', self)]" />
+					<field name="location_id" string="Job Location"
+						filter_domain="[('location_id', 'ilike', self)]" />
+					<field name="identification_id" />
+					<field name="id_card_no" filter_domain="[('id_card_no', '=', self)]"/>
+					<field name="door_card_no" />
+					<field name="device_user_id" filter_domain="[('device_user_id', '=', self)]"/>
+
+					<field name="transfer_company" string="Transfer To(Company)"
+						filter_domain="[('transfer_company', 'ilike', self)]" />
+					<field name="state" string="Status"
+						filter_domain="[('state', 'ilike', self)]" />
+
+					<filter string="Draft" name="draft_filter"
+						domain="[('state', '=', 'draft')]" />
+					<filter string="Supervisor(Existing) Approved"
+						name="supervisor_existing_filter"
+						domain="[('state', '=', 'supervisor_existing')]" />
+					<filter string="HR Approved" name="hr_approved_filter"
+						domain="[('state', '=', 'hr_approved')]" />
+					<filter string="Supervisor(To) Approved"
+						name="supervisor_new_filter"
+						domain="[('state', '=', 'supervisor_new')]" />
+					<filter string="MD Approved" name="md_approved_filter"
+						domain="[('state', '=', 'md_approved')]" />
+					<filter string="Accounting Approved"
+						name="accounting_approved_filter"
+						domain="[('state', '=', 'accounting_approved')]" />
+					<filter string="Transferred" name="accounting_transfer"
+						domain="[('state', '=', 'transfer')]" />
+					<filter string="Cancelled" name="cancel_filter"
+						domain="[('state', '=', 'cancel')]" />
+					<separator />
+					<filter string="Same Company" name="same_company_filter"
+						domain="[('transfer_company', '=', 0)]" />
+					<filter string="Other Company" name="other_company_filter"
+						domain="[('transfer_company', '=', 1)]" />
+
+				</search>
+			</field>
+		</record>
+
+
+		<record id="employee_transfer_action"
+			model="ir.actions.act_window">
+			<field name="name">Employee Transfer</field>
+			<field name="res_model">hr.transfer</field>
+			<field name="view_mode">tree,form</field>
+			<field name="help" type="html">
+				<p class="o_view_nocontent_smiling_face">
+					Create a Employee Transfer of a Employee
+				</p>
+			</field>
+		</record>
+
+		<menuitem id="menu_employee_transfer_action"
+			name="Employee Transfer"
+			parent="custom_hr_employee.menu_hr_employee_operations"
+			action="hr_transfer.employee_transfer_action"
+			groups="hr.group_hr_manager" sequence="15" />
+	</data>
+</odoo>

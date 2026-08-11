@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+
+        <record model="ir.actions.report" id="employee_confirmation_report_tmpl">
+            <field name="name">Employee Confirmation Report</field>
+            <field name="model">employee.confirmation.report.wizard</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">custom_hr_report.employee_confirmation_report_view</field>
+            <field name="report_file">custom_hr_report.employee_confirmation_report_view</field>
+            <field name="paperformat_id" ref="custom_common_settings.paperformat_custom_a4_bd"/>
+        </record>
+
+        <template id="employee_confirmation_report_view">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <style type="text/css">
+                            table, th, tr, td{
+                                background: white !important;
+                                border: 1px solid black;
+                            }
+                        </style>
+                        <div class="oe_structure"/>
+                        <div>
+                            <h3 class="text-center head_font_color">
+                                <strong>
+                                    <span t-esc="form['company_id'][1]"/>
+                                    <br/>
+                                    Employee Confirmation Report
+                                </strong>
+                            </h3>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <div>
+                                    <strong>From Date:</strong> <t t-esc="form['from_date']" t-options='{"widget": "date"}'/>
+                                </div>
+                                <div>
+                                    <strong>To Date:</strong> <t t-esc="form['to_date']" t-options='{"widget": "date"}'/>
+                                </div>
+                            </div>
+                            <div class="col-6 text-right">
+                                <div>
+                                    <strong>Work/Job Location:</strong> <t t-esc="work_location_name"/>
+                                </div>
+                                <div>
+                                    <strong>Department Name:</strong>  <t t-esc="dept_name"/>
+                                        <t t-if="buisness_unit">
+                                            <br/>
+                                            <strong>Office/business Unit:</strong>  <t t-esc="buisness_unit"/>
+                                        </t>
+                                        <t t-if="tag_names_list">
+                                            <br/>
+                                            <strong>Tags:</strong>  <t t-esc="tag_names_list"/>
+                                        </t>
+                                </div>
+                            </div>
+                        </div>
+                        <br/>
+                        <table style="border-collapse: collapse;width: 100%; margin-bottom: 2em;" class="table table-condensed">
+                            <thead>
+                                <tr style="color: black !important;">
+                                    <th class="text-center align-middle bg_color font_color">Sl. No.</th>
+                                    <th class="text-center align-middle bg_color font_color">Employee Name</th>
+                                    <th class="text-center align-middle bg_color font_color">Employee ID</th>
+                                    <th class="text-center align-middle bg_color font_color">Joining Date</th>
+                                    <th class="text-center align-middle bg_color font_color">Work Location</th>
+                                    <th class="text-center align-middle bg_color font_color">Department</th>
+                                    <th class="text-center align-middle bg_color font_color">Designation</th>
+                                    <th class="text-center align-middle bg_color font_color">Confirmation Date</th>
+                                    <th class="text-center align-middle bg_color font_color">Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody class="consumed_tbody">
+                                <t t-set="sl_no" t-value="1"/>
+                                <t t-foreach="csr" t-as="line">
+                                    <tr>
+                                        <td class="text-center align-middle">
+                                            <t t-esc="sl_no"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <span t-esc="line['emp_name']"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <span t-esc="line['id_card_no']"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <span t-esc="line['joining_date']" t-options='{"widget": "date"}'/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <span t-esc="line['loc_name']"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <span t-esc="line['dept_name']"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <span t-esc="line['desig_name']"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <span t-esc="line['confirmation_date']"/>
+                                        </td>
+                                        <td class="text-center align-middle"/>
+                                    </tr>
+                                    <t t-set="sl_no" t-value="sl_no + 1"/>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+		</template>
+	</data>
+</odoo>

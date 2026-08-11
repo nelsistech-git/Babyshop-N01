@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="stock_view_picking_form_inherit_custom_stock" model="ir.ui.view">
+        <field name="name">stock.picking.form.inherit.custom.stock</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form/sheet/notebook/page/field[@name='move_ids_without_package']/tree/field[@name='product_uom_qty']" position="after">
+                <field name="available_stock" readonly="1" sum="Total" attrs="{'column_invisible': [('parent.immediate_transfer', '=', True)]}"/>
+            </xpath>
+
+<!--            <xpath expr="//form/sheet/notebook/page[3]/field[@name='move_ids_without_package']/tree/field[@name='quantity']" position="attributes">-->
+<!--                <attribute name="sum">Total</attribute>-->
+<!--            </xpath>-->
+
+<!--            <xpath expr="//form/sheet/notebook/page[3]/field[@name='move_ids_without_package']/tree/field[@name='quantity_done']" position="attributes">-->
+<!--                <attribute name="sum">Total</attribute>-->
+<!--            </xpath>-->
+
+            <xpath expr="//form/sheet/notebook/page/field[@name='move_ids_without_package']/tree/field[@name='product_uom']" position="after">
+                <field name="remarks" readonly="state == 'done'" force_save="1"/>
+            </xpath>
+
+            <xpath expr="//form/sheet/notebook/page/field[@name='move_ids_without_package']/tree/field[@name='product_id']" position="attributes">
+                <attribute name="options">{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}</attribute>
+            </xpath>
+
+            <xpath expr="//button[@name='action_picking_move_tree']" position="before">
+                <button class="oe_stat_button" name="action_account_move_journal" type="object"
+                    icon="fa-bars" string="Journal Entries" help="Journal Entries">
+                </button>
+            </xpath>
+<!--            <xpath expr="//field[@name='note']" position="attributes">-->
+<!--                <attribute name="attrs">{'readonly': [('state', 'in', ('done','cancel'))]}</attribute>-->
+<!--            </xpath>-->
+            <xpath expr="//field[@name='location_dest_id']" position="after">
+                <field name="challan_no" placeholder="Add a Challan Number" invisible="purchase_id == False"/>
+                <field name="challan_date" invisible="purchase_id == False"/>
+                <field name="purchase_id" invisible="1" />
+                <field name="return_reason" invisible="state in ('done','cancel')"/>
+<!--                <field name="immediate_transfer" invisible="1"/>-->
+            </xpath>
+
+<!--            <xpath expr="//form/sheet/notebook/page/field[@name='move_ids_without_package']/form/group/field[@name='quantity']" position="after">-->
+<!--                <field name="challan_qty" readonly="1" force_save="1" attrs="{'column_invisible': [('parent.immediate_transfer', '=', True)]}"/>-->
+<!--            </xpath>-->
+
+<!--            <xpath expr="//form/sheet/notebook/page/field[@name='move_ids_without_package']/form/group/field[@name='quantity']" position="attributes">-->
+<!--                <attribute name="sum">Total</attribute>-->
+<!--            </xpath>-->
+
+            <xpath expr="//form/sheet/notebook/page/field[@name='move_ids_without_package']/tree/field[@name='product_uom']" position="before">
+                <field name="challan_qty" readonly="1" force_save="1"/>
+                <field name="expiry_date"/>
+            </xpath>
+
+            <xpath expr="//form/sheet/notebook/page/field[@name='move_ids_without_package']/tree/field[@name='product_uom']" position="before">
+                <field name="expiry_date" />
+            </xpath>
+
+<!--            <xpath expr="//form/sheet/notebook/page/field[@name='move_ids_without_package']" position="attributes">-->
+<!--                <attribute name="attrs">{'readonly': [('is_locked', '=', True),('state', '=', 'assigned')]}</attribute>-->
+<!--            </xpath>-->
+<!--            <xpath expr="//form/sheet/notebook/page[2]/field[@name='move_line_ids_without_package']" position="attributes">-->
+<!--                <attribute name="attrs">{'readonly': [('is_locked', '=', True),('state', '=', 'assigned')]}</attribute>-->
+<!--            </xpath>-->
+
+<!--             <xpath expr="//form//header//button[@name='action_toggle_is_locked']" position="attributes">-->
+<!--                <attribute name="groups">custom_common_settings.group_inventory_controller</attribute>-->
+<!--            </xpath>-->
+
+            <xpath expr="//field[@name='origin']" position="after">
+                    <field name="is_transfer_release" readonly="1"/>
+                    <field name="is_validate_button_show" invisible="1"/>
+                    <field name="sequence_code" invisible="1"/>
+            </xpath>
+
+            <xpath expr="//button[@name='action_assign']" position="after">
+                <button class="btn-primary" name="action_transfer_release" type="object"
+                    string="Transfer Release" help="Transfer Release"
+                    invisible="is_transfer_release != False or state != 'assigned'">
+                </button>
+            </xpath>
+
+            <xpath expr="//button[@name='button_validate']" position="after">
+                <button class="btn-secondary" name="action_reset_to_draft" type="object"
+                    string="Reset to Draft" groups="base.group_erp_manager,custom_common_settings.group_inventory_controller"
+                    invisible="state in ('draft', 'cancel', 'done')"
+                >
+                </button>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="inherit_view_stock_move_line_detailed_operation_tree" model="ir.ui.view">
+        <field name="name">inherit.stock.move.line.operations.tree</field>
+        <field name="model">stock.move.line</field>
+        <field name="inherit_id" ref="stock.view_stock_move_line_detailed_operation_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree/field[@name='quantity']" position="after">
+                <field name="available_stock" readonly="1" sum="Total" column_invisible="'picking_id.sequence_code' == 'IN'"/>
+            </xpath>
+            <xpath expr="//tree/field[@name='quantity']" position="attributes">
+                <attribute name="sum">Total</attribute>
+            </xpath>
+            <xpath expr="//tree/field[@name='product_uom_id']" position="after">
+                <field name="remarks" readonly="state == 'done'" force_save="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Action Receipt Stock -->
+    <record id="action_receive_stock" model="ir.actions.act_window">
+        <field name="name">Receipts</field>
+        <field name="res_model">stock.picking</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_mode">tree,kanban,form,calendar</field>
+        <field name="context">{'contact_display': 'partner_address', 'default_company_id': allowed_company_ids[0], 'is_transfer_stock': False, 'is_validate_button_show': True}</field>
+        <field name="domain">[('picking_type_id', '=', 5)]</field>
+        <field name="search_view_id" ref="stock.view_picking_internal_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new transfer
+            </p><p>
+                Transfers allow you to move products from one location to another.
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_receive_stock" name="Receipts" action="custom_stock.action_receive_stock"
+				  parent="stock.menu_stock_warehouse_mgmt" sequence="5"/>
+
+    <record id="view_backorder_confirmation_inherit_custom_stock" model="ir.ui.view">
+        <field name="name">stock_backorder_confirmation_inherit</field>
+        <field name="model">stock.backorder.confirmation</field>
+        <field name="inherit_id" ref="stock.view_backorder_confirmation"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='process']" position="attributes">
+                <attribute name="context">{'button_name': '1'}</attribute>
+            </xpath>
+            <xpath expr="//button[@name='process_cancel_backorder']" position="attributes">
+                <attribute name="context">{'button_name': '1'}</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_po_receipts" model="ir.actions.server">
+        <field name="name">PO Receipt</field>
+        <field name="type">ir.actions.server</field>
+        <field name="model_id" ref="model_stock_picking"/>
+        <field name="state">code</field>
+        <field name="code">
+        action = model.get_po_receipts()
+        </field>
+   </record>
+
+    <menuitem id="menu_po_receipts_id"
+      name="PO - Receipts"
+      sequence="2"
+      action="action_po_receipts"
+      parent="stock.menu_stock_warehouse_mgmt" />
+
+</odoo>

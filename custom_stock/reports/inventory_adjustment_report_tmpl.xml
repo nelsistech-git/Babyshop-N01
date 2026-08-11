@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <report id="inventory_adjustment_report_html_id"
+                model="inventory.adjustment.report.wizard"
+			    string="Inventory Adjustment Report"
+                name="custom_stock.inventory_adjustment_report_view"
+			    file="custom_stock.inventory_adjustment_report_view"
+                report_type="qweb-html"/>
+
+        <report id="inventory_adjustment_report_id"
+                model="inventory.adjustment.report.wizard"
+			    string="Inventory Adjustment Report"
+                name="custom_stock.inventory_adjustment_report_view"
+			    file="custom_stock.inventory_adjustment_report_view"
+                report_type="qweb-pdf"/>
+
+        <template id="inventory_adjustment_report_view">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <style type="text/css">
+                            table, th, tr, td{
+                                background: white !important;
+                            }
+
+                            h2 {
+                                text-align:center !important;
+                            }
+
+                        </style>
+
+                        <div class="oe_structure"/>
+
+                        <div class="row">
+                            <div class="col-lg-12 head_font_color">
+                                <h2>Inventory Adjustment Report</h2>
+                                <br/>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-6">
+                                <p style="color: #000; font-size: 15px;">From Date:  <t t-esc="form['start_date']" t-options='{"widget": "date"}'/></p>
+                                <p style="color: #000; font-size: 15px;">Category:  <t t-esc="categ_name"/></p>
+                            </div>
+                            <div class="col-6">
+                                <p class="text-right" style="color: #000; font-size: 15px;">To Date: <t t-esc="form['end_date']" t-options='{"widget": "date"}'/></p>
+                                <p class="text-right" style="color: #000; font-size: 15px;">Location: <t t-esc="loc_name"/></p>
+                            </div>
+                        </div>
+                        <br/>
+
+                        <div class="row">
+                            <table class="table table-condensed">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center align-middle bg_color font_color"><strong>Sl. No.</strong></th>
+                                        <th t-if="loc_name=='All Locations'" class="align-middle text-left bg_color font_color">
+                                            <strong>Location</strong>
+                                        </th>
+                                        <th class="align-middle text-left bg_color font_color"><strong>Product</strong></th>
+                                        <t t-if="qty_type=='all' or qty_type=='in_qty'">
+                                            <th class="align-middle text-right bg_color font_color"><strong>In Qty</strong></th>
+                                        </t>
+                                        <t t-if="qty_type=='all' or qty_type=='out_qty'">
+                                            <th class="align-middle text-right bg_color font_color"><strong>Out Qty</strong></th>
+                                        </t>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-set="sl_no" t-value="1"/>
+                                    <t t-set="t_in_qty" t-value="0"/>
+                                    <t t-set="t_out_qty" t-value="0"/>
+                                    <t t-foreach="csr" t-as="o">
+                                        <t t-if="qty_type=='in_qty'">
+                                            <tr style="border: 1px solid #000;" t-if="o['in_qty'] != 0">
+                                                <td class="text-center align-middle">
+                                                    <t t-esc="sl_no"/>
+                                                </td>
+                                                <td t-if="loc_name=='All Locations'" class="text-left align-middle">
+                                                    <t t-esc="o['location_name']"/>
+                                                </td>
+                                                <td class="text-left align-middle">
+                                                    <t t-esc="o['product_name']"/>
+                                                </td>
+                                                <td class="text-right align-middle">
+                                                    <t t-esc="'{0:,.3f}'.format(o['in_qty'])"/>
+                                                    <t t-set="t_in_qty" t-value="t_in_qty + o['in_qty']"/>
+                                                </td>
+                                                <t t-set="sl_no" t-value="sl_no + 1"/>
+                                            </tr>
+                                        </t>
+                                        <t t-elif="qty_type=='out_qty'">
+                                            <tr style="border: 1px solid #000;" t-if="o['out_qty'] != 0">
+                                                <td class="text-center align-middle">
+                                                    <t t-esc="sl_no"/>
+                                                </td>
+                                                <td t-if="loc_name=='All Locations'" class="text-left align-middle">
+                                                    <t t-esc="o['location_name']"/>
+                                                </td>
+                                                <td class="text-left align-middle">
+                                                    <t t-esc="o['product_name']"/>
+                                                </td>
+                                                <td class="text-right align-middle">
+                                                    <t t-esc="'{0:,.3f}'.format((-1) * o['out_qty'])"/>
+                                                    <t t-set="t_out_qty" t-value="t_out_qty + ((-1) * o['out_qty'])"/>
+                                                </td>
+                                                <t t-set="sl_no" t-value="sl_no + 1"/>
+                                            </tr>
+                                        </t>
+                                        <t t-else="">
+                                            <tr style="border: 1px solid #000;" t-if="o['in_qty'] != 0 or o['out_qty'] != 0">
+                                                <td class="text-center align-middle">
+                                                    <t t-esc="sl_no"/>
+                                                </td>
+                                                <td t-if="loc_name=='All Locations'" class="text-left align-middle">
+                                                    <t t-esc="o['location_name']"/>
+                                                </td>
+                                                <td class="text-left align-middle">
+                                                    <t t-esc="o['product_name']"/>
+                                                </td>
+                                                <td class="text-right align-middle">
+                                                    <t t-esc="'{0:,.3f}'.format(o['in_qty'])"/>
+                                                    <t t-set="t_in_qty" t-value="t_in_qty + o['in_qty']"/>
+                                                </td>
+                                                <td class="text-right align-middle">
+                                                    <t t-esc="'{0:,.3f}'.format((-1) * o['out_qty'])"/>
+                                                    <t t-set="t_out_qty" t-value="t_out_qty + ((-1) * o['out_qty'])"/>
+                                                </td>
+                                                <t t-set="sl_no" t-value="sl_no + 1"/>
+                                            </tr>
+                                        </t>
+                                    </t>
+                                    <tr style="border: 1px solid black;">
+                                        <t t-if="loc_name=='All Locations'">
+                                            <td class="text-right align-middle" colspan="3"><strong>TOTAL</strong></td>
+                                        </t>
+                                        <t t-else="">
+                                            <td class="text-right align-middle" colspan="2"><strong>TOTAL</strong></td>
+                                        </t>
+                                        <td class="text-right align-middle" t-if="qty_type=='all' or qty_type=='in_qty'">
+                                            <strong><t t-esc="'{0:,.3f}'.format(t_in_qty)"/></strong>
+                                        </td>
+                                        <td class="text-right align-middle" t-if="qty_type=='all' or qty_type=='out_qty'">
+                                            <strong><t t-esc="'{0:,.3f}'.format(t_out_qty)"/></strong>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

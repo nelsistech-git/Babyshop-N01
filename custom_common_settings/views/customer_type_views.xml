@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data>
+        <!-- Customer Type -->
+
+        <record id="view_customer_type_filter" model="ir.ui.view">
+            <field name="name">customer.type.list.select</field>
+            <field name="model">customer.type</field>
+            <field name="priority" eval="15"/>
+            <field name="arch" type="xml">
+                <search string="Search Customer Type">
+                    <field name="name" string="Customer Type" filter_domain="[('name', 'ilike', self)]"/>
+                    <field name="description" string="Description" filter_domain="[('description', 'ilike', self)]"/>
+               </search>
+            </field>
+        </record>
+
+        <record id="view_customer_type_tree_view" model="ir.ui.view">
+            <field name="name">view.customer.type.list.tree</field>
+            <field name="model">customer.type</field>
+            <field name="arch" type="xml">
+                <tree string="Customer Type" delete="0">
+                    <field name="type" readonly="1"/>
+<!--                    <field name="name" readonly="1"/>-->
+                    <field name="description" readonly="1"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_customer_type_form" model="ir.ui.view">
+            <field name="name">view.customer.type.form</field>
+            <field name="model">customer.type</field>
+            <field name="arch" type="xml">
+                <form string="Customer Type" delete="0">
+                    <sheet>
+                        <group>
+                            <field name="type" required="1"/>
+<!--                            <field name="name" placeholder="Name"/>-->
+                        </group>
+                        <group>
+                            <field name="description" />
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="customer_type_action" model="ir.actions.act_window">
+            <field name="name">Customer Type</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_mode">tree,kanban,form,pivot,graph,activity</field>
+            <field name="res_model">customer.type</field>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="customer_type_tree_all">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_customer_type_tree_view"/>
+            <field name="act_window_id" ref="customer_type_action"/>
+        </record>
+
+    
+    </data>
+</odoo>

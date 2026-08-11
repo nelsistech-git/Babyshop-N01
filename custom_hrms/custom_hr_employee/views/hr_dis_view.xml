@@ -1,0 +1,143 @@
+<?xml version="1.0" ?>
+<odoo>
+    <record id="hr_punishments_view_form" model="ir.ui.view">
+        <field name="name">hr.punishments.view.form</field>
+        <field name="model">hr.punishments</field>
+        <field name="arch" type="xml">
+            <form string="">
+                <header>
+                    <button name="action_confirm" type="object" string="Confirm" class="oe_highlight" />
+                    <button name="action_approve" string="Approve" type="object" invisible="state != 'confirm'" class="oe_highlight"
+                            groups="hr.group_hr_manager,hr.group_hr_user"/>
+                    <button name="action_draft" string="Send to Draft" type="object" class="btn-primary"
+                            invisible="state not in ['confirm', 'cancel']"/>
+                    <button name="action_cancel" string="Cancel" type="object" invisible="state not in ['confirm', 'draft']"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirm,approve"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="seq_name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group string="Employee Information">
+                        <group>
+                            <field name="employee_id" string="Employee" required="1"
+                                   readonly="state != 'draft'"
+                                   options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="company_id" readonly='1' force_save="1"
+                                   options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="old_empid" readonly="1" force_save="1"/>
+                            <field name="user_work_location_id" readonly="1" force_save="1"
+                                   options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="department_id" readonly="1" force_save="1"
+                                   options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="initial_employment_date" readonly="1" force_save="1"/>
+                        </group>
+                        <group string="Contract Information">
+                            <field name="currency_id" invisible="1"/>
+                            <field name="contract_id" readonly="1" force_save="1"
+                                   options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="gross_salary" readonly="1" force_save="1"/>
+                            <field name="basic_salary" readonly="1" force_save="1"/>
+                        </group>
+                    </group>
+                    <group string="Punishment">
+                        <group>
+                            <field name="pDate" readonly="1"/>
+                            <field name="type_of" readonly="state != 'draft'" invisible="1"/>
+                            <field name="type_id" required="1" readonly="state != 'draft'"
+                                   options="{'no_create': True, 'no_open': True}"/>
+                            <field name="allow_date_range" invisible="1"/>
+                            <field name="allow_payslip" readonly="state != 'draft'"/>
+
+                            <field name="from_date"
+                                   readonly="state != 'draft'" invisible="allow_date_range == False"
+                                   required="allow_date_range == True"/>
+                            <field name="to_date"
+                                   readonly="state != 'draft'" invisible="allow_date_range == False"
+                                   required="allow_date_range == True"/>
+                            <field name="payslip_date"
+                                   readonly="state != 'draft'" invisible="allow_payslip == False"
+                                   required="allow_payslip == True"/>
+                            <field name="amount"
+                                   readonly="state != 'draft'" invisible="allow_payslip == False"
+                                   required="allow_payslip == True"/>
+
+                        </group>
+                        <group>
+                            <field name="no_of_calendar_days" readonly="1" force_save="1"/>
+                            <field name="disciplinary_days" readonly="1" force_save="1"/>
+                            <field name="per_day_salary" readonly="1" force_save="1"/>
+                            <field name="disciplinary_days_amt" readonly="1" force_save="1"/>
+                            <field name="note" required="1" string="Note"
+                                   readonly="state != 'draft'"/>
+                        </group>
+                    </group>
+
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="hr_punishments_view_tree" model="ir.ui.view">
+        <field name="name">hr.punishments.view.tree</field>
+        <field name="model">hr.punishments</field>
+        <field name="arch" type="xml">
+            <tree string="">
+                <field name="seq_name"/>
+                <field name="employee_id" string="Employee"/>
+                <field name="department_id"/>
+                <field name="user_work_location_id"/>
+                <field name="pDate"/>
+                <field name="type_id"/>
+                <field name="from_date"/>
+                <field name="to_date"/>
+                <field name="allow_payslip"/>
+                <field name="payslip_date"/>
+                <field name="amount"/>
+                <field name="note"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="hr_punishments_action_form" model="ir.actions.act_window">
+        <field name="name">Disciplinary Action</field>
+        <field name="res_model">hr.punishments</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_view_employee_punishments" name="Disciplinary Actions" action="hr_punishments_action_form"
+              parent="custom_hr_employee.menu_hr_employee_operations" sequence="9" groups="hr.group_hr_manager"/>
+
+
+    <record id="inherited_hr_emp_employee_view_form_discipline"
+            model="ir.ui.view">
+        <field name="name">disciplinary.action.tree</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='official_record']" position="inside">
+                <group name="hr_punishment" groups="hr.group_hr_manager,base.group_erp_manager" string="Disciplinary Actions">
+                    <field name="punishments" readonly="1">
+                        <tree string="Disciplinary Action Tree">
+                            <field name="seq_name"/>
+                            <field name="pDate"/>
+                            <field name="type_id"/>
+                        </tree>
+                    </field>
+                </group>
+                <!--<page name="hr_punishment" groups="hr.group_hr_manager,base.group_erp_manager" string="Disciplinary Actions">
+                    <field name="punishments" readonly="1">
+                        <tree string="Disciplinary Action Tree">
+                            <field name="seq_name"/>
+                            <field name="pDate"/>
+                            <field name="type_id"/>
+                        </tree>
+                    </field>
+                </page>-->
+
+            </xpath>
+        </field>
+    </record>
+</odoo>

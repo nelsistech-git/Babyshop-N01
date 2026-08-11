@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_day_book_print_wizard_form" model="ir.ui.view">
+        <field name='name'>day.book.print.wizard.form</field>
+        <field name='model'>day.book.print.wizards</field>
+        <field name='arch' type='xml'>
+            <form string='Automatic Merge Wizard'>
+                <sheet>
+                    <group col="1">
+                        <h3 class="mb-3">
+                            Are you sure you want to Print PDF?
+                        </h3>
+                    </group>
+                    <footer>
+                        <button name="action_print_pdf" string="Print PDF" class="oe_highlight" type="object"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <act_window id="day_book_print_action"
+        name="Print Office Management Cost PDF"
+        res_model="day.book.print.wizards"
+        binding_model="account.move"
+        binding_views="list"
+        view_mode="form"
+        target="new"
+    />
+
+    <record id="print_action" model="ir.actions.act_window">
+        <field name="name">Office Management Cost Print Action</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">day.book.print.wizards</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_day_book_print_wizard_form"/>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

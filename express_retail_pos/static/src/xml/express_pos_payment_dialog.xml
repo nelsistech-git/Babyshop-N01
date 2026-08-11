@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates xml:space="preserve">
+
+<t t-name="express_retail_pos.ExpressPosPaymentDialog" owl="1">
+    <Dialog title="'Payment'">
+        <div class="o_express_pos_payment_dialog">
+            <div class="o_epd_amount_due">
+                <div class="o_epd_amount_due_label">Amount Due</div>
+                <div class="o_epd_amount_due_value"><t t-esc="props.currencySymbol"/>
+                    <t t-esc="props.amountDue.toFixed(2)"/></div>
+            </div>
+
+            <div class="o_epd_tender_row">
+                <t t-foreach="props.journals" t-as="journal" t-key="journal.id">
+                    <div class="o_epd_tender_btn"
+                         t-attf-class="o_epd_tender_btn {{ (state.amounts[journal.id] || 0) > 0 ? 'o_epd_tender_active' : '' }}"
+                         t-on-click="() => this.selectTender(journal.id)">
+                        <t t-esc="journal.name"/>
+                    </div>
+                </t>
+            </div>
+
+            <div class="o_epd_journals_list">
+                <t t-foreach="props.journals" t-as="journal" t-key="journal.id">
+                    <div class="o_epd_journal_row">
+                        <span class="o_epd_journal_name"><t t-esc="journal.name"/></span>
+                        <input type="number" step="0.01"
+                               t-att-value="state.amounts[journal.id]"
+                               t-on-change="(ev) => this.onAmountChange(journal.id, ev)"/>
+                        <button class="o_epc_icon_btn" title="Fill remaining"
+                                t-on-click="() => this.fillRemaining(journal.id)">↵</button>
+                    </div>
+                </t>
+            </div>
+
+            <hr/>
+            <div class="mb-2">
+                <label>Gift Card Code (optional)</label>
+                <div class="d-flex" style="gap:6px;">
+                    <input type="text" class="form-control" t-model="state.giftCardCode" placeholder="GC-XXXXXXXXXX"/>
+                    <input type="number" step="0.01" class="form-control" style="max-width:120px;"
+                           t-model="state.giftCardAmount" placeholder="Amount"/>
+                </div>
+            </div>
+
+            <div class="o_epd_summary_row">
+                <span>Entered</span>
+                <span><t t-esc="props.currencySymbol"/>
+                    <t t-esc="totalEntered.toFixed(2)"/></span>
+            </div>
+            <div class="o_epd_summary_row" t-if="!state.allowDue">
+                <span>Remaining</span>
+                <span><t t-esc="props.currencySymbol"/>
+                    <t t-esc="Math.max(0, remaining).toFixed(2)"/></span>
+            </div>
+            <div class="o_epd_summary_row o_epd_change" t-if="change > 0">
+                <span>Change</span>
+                <span><t t-esc="props.currencySymbol"/>
+                    <t t-esc="change.toFixed(2)"/></span>
+            </div>
+
+            <div class="o_epd_due_toggle" t-if="!props.isWalkin">
+                <input type="checkbox" t-att-checked="state.allowDue" t-on-change="toggleDue" id="epd_allow_due"/>
+                <label for="epd_allow_due" style="margin:0;">
+                    Sell on Credit / Due — complete the sale even if payment is short; the
+                    remainder stays as an open balance on this customer's account.
+                </label>
+            </div>
+        </div>
+        <t t-set-slot="footer">
+            <button class="btn btn-primary" t-att-disabled="!canConfirm" t-on-click="onConfirmClick">
+                Confirm and Print (Enter)
+            </button>
+            <button class="btn btn-secondary" t-on-click="() => this.props.close()">Cancel</button>
+        </t>
+    </Dialog>
+</t>
+
+</templates>

@@ -1,0 +1,89 @@
+<odoo>
+    <data>
+        <record id="view_employee_iom_form" model="ir.ui.view">
+            <field name="name">employee.iom.view.form</field>
+            <field name="model">employee.iom</field>
+            <field name="arch" type="xml">
+                <form delete="0" duplicate="0" string="Employee IOM">
+                    <header>
+                        <button name="action_approve" type="object" string="Approve"
+                                invisible="state not in ['pending']" class="oe_highlight"/>
+                        <button name="action_cancel" type="object" string="Cancel" invisible="state not in ['approved']"
+                                confirm="Are you sure you want to Cancel?" class="oe_highlight"/>
+                        <field name="state" widget="statusbar" statusbar_visible="pending,approved,cancel"/>
+                    </header>
+                    <sheet>
+                        <group>
+                            <group string="Employee IOM">
+                                <field name="employee_id" options="{'no_open':True,'no_create':1,'no_create_edit':1}"
+                                       readonly="state in ['approved','cancel']"/>
+                                <field name="date" readonly="state in ['approved','cancel']"/>
+                                <field name="note" readonly="state in ['approved','cancel']"/>
+                                <field name="reason" readonly="state in ['approved','cancel']"/>
+                            </group>
+                            <group>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_employee_iom_tree" model="ir.ui.view">
+            <field name="name">employee.iom.view.tree</field>
+            <field name="model">employee.iom</field>
+            <field name="arch" type="xml">
+                <tree delete="0" string="Employee IOM" decoration-muted="state=='cancel'"
+                      decoration-success="state=='approved'" decoration-info="state=='pending'">
+                    <field name="employee_id"/>
+                    <field name="date"/>
+                    <field name="note"/>
+                    <field name="reason"/>
+                    <field name="first_approve_reject"/>
+                    <field name="first_approve_reject_id"/>
+                    <field name="second_approve_reject"/>
+                    <field name="second_approve_reject_id"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="search_employee_iom_form" model="ir.ui.view">
+            <field name="name">search.employee.iom</field>
+            <field name="model">employee.iom</field>
+            <field name="arch" type="xml">
+                <search string="Search Employee IOM">
+                    <field name="employee_id"/>
+                    <field name="date"/>
+                    <field name="first_approve_reject"/>
+                    <field name="first_approve_reject_id"/>
+                    <field name="second_approve_reject"/>
+                    <field name="second_approve_reject_id"/>
+                    <field name="state"/>
+                    <group expand="0" string="Group By...">
+                        <filter string="Employee" name="employee_id"
+                                context="{'group_by': 'employee_id'}"/>
+                    </group>
+                    <group expand="0" string="Group By...">
+                        <filter string="Date" name="date"
+                                context="{'group_by': 'date'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_employee_iom" model="ir.actions.act_window">
+            <field name="name">Employee IOM</field>
+            <field name="res_model">employee.iom</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create an Employee IOM of an Employee
+                </p>
+            </field>
+        </record>
+
+        <menuitem id="menu_employee_iom" name="Employee IOM" parent="custom_hr_employee.menu_hr_employee_operations"
+                  action="action_employee_iom" groups="hr.group_hr_manager" sequence="300"/>
+    </data>
+</odoo>

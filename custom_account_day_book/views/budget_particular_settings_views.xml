@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Budget Particular Settings Form View -->
+        <record id="view_budget_particular_settings_form" model="ir.ui.view">
+            <field name="name">budget.particular.settings.form</field>
+            <field name="model">budget.particular.settings</field>
+            <field name="arch" type="xml">
+                <form string="Budget Particular Settings">
+                    <sheet>
+                        <group>
+                            <group>
+                            	<field name="particular_type" required="1"/>
+                                <field name="name" required="1"/>
+                                <field name="code" required="1" readonly="1" force_save="1"/>                                
+                                <field name="parent_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" 
+                                required="particular_type in ['sub_parent','child']"/>
+                                <field name="account_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" 
+                                invisible="particular_type != 'child'" required="particular_type == 'child'"/>
+                                <field name="report_type" required="1"/>
+                                <field name="active"/>
+                            </group>
+                            <group></group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+		
+        <!-- Budget Particular Settings Tree View -->
+        <record id="view_budget_particular_settings_tree" model="ir.ui.view">
+            <field name="name">budget.particular.settings.tree</field>
+            <field name="model">budget.particular.settings</field>
+            <field name="arch" type="xml">
+                <tree string="Budget Particular Settings">
+                    <field name="name" readonly="1"/>
+                    <field name="code" readonly="1"/>
+                    <field name="particular_type" readonly="1"/>
+                    <field name="parent_id" readonly="1"/>
+                    <field name="account_id" readonly="1"/>
+                    <field name="report_type" readonly="1"/>
+                    <field name="active" readonly="1"/>
+                </tree>
+            </field>
+        </record>
+
+<!--        &lt;!&ndash; Reserve Stock List Search View &ndash;&gt;
+        <record id="view_reserve_stock_list_search" model="ir.ui.view">
+            <field name="name">budget.particular.settings.search</field>
+            <field name="model">budget.particular.settings</field>
+            <field name="arch" type="xml">
+                <search string="Search">
+                    <field name="location_id"/>
+                    <field name="product_id"/>
+                    <separator />
+                    <group expand="0" string="Group By">
+                        <filter string="Product" name="group_by_product_id" context="{'group_by': 'product_id'}"/>
+                        <filter string="Location" name="group_by_location_id" context="{'group_by': 'location_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>-->
+
+        <!-- Budget Particular Settings Action -->
+        <record id="action_budget_particular_settings" model="ir.actions.act_window">
+            <field name="type">ir.actions.act_window</field>
+            <field name="name">Budget Particular Settings</field>
+            <field name="res_model">budget.particular.settings</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Create Budget Particular Settings
+                </p>
+            </field>
+        </record>
+
+        <menuitem id="menu_budget_particular_root" name="Budget" parent="account.menu_finance" sequence="15"/>
+
+        <menuitem id="menu_budget_particular_settings" name="Budget Particular Settings" parent="custom_account_day_book.menu_budget_particular_root" action="action_budget_particular_settings" groups="account.group_account_manager" sequence="8"/>
+    </data>
+</odoo>

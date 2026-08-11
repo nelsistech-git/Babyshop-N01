@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--parent-->
+    <!--<menuitem
+        id="menu_hr_payroll_accounts_top"
+        name="PF Accounts"
+        parent="base.menu_hr_employee_pf_root"
+        sequence="13"
+    />-->
+    <!--sub Operation-->
+    <menuitem
+        id="menu_hr_payroll_accounts_operation"
+        name="Operation"
+        parent="hr_payroll.menu_hr_payroll_accounts_top"
+        sequence="1"
+    />
+    <!--sub Reporting-->
+    <menuitem
+        id="menu_hr_payroll_accounts_report"
+        name="Reporting"
+        parent="hr_payroll.menu_hr_payroll_accounts_top"
+        sequence="10"
+    />
+
+    <!--accounts action inherit-->
+    <record id="hr_payroll_action_account_form" model="ir.actions.act_window">
+		<field name="name">Chart of Accounts</field>
+		<field name="res_model">account.account</field>
+		<field name="view_mode">tree,kanban,form</field>
+		<field name="view_id" ref="account.view_account_list"/>
+        <field name="context">{'default_fs_dept': 'pf'}</field>
+        <field name="domain">[('fs_dept', '=', 'pf')]</field>
+		<field name="help" type="html">
+		  	<p class="o_view_nocontent_smiling_face">
+				Add a new account
+		  	</p>
+			<p>
+				An account is part of a ledger allowing your company
+				to register all kinds of debit and credit transactions.
+				Companies present their annual accounts in two main parts: the
+				balance sheet and the income statement (profit and loss
+				account). The annual accounts of a company are required by law
+				to disclose a certain amount of information.
+		  	</p>
+		</field>
+	</record>
+
+    <menuitem action="hr_payroll_action_account_form"
+              name="Chart of Accounts"
+              id="hr_payroll_account_form_id"
+              parent="hr_payroll.menu_hr_payroll_accounts_operation"
+              sequence="1"/>
+
+    <!-- Journal Entry action inherit -->
+    <record id="action_move_journal_hr_payroll"
+        model="ir.actions.act_window">
+        <field name="name">Office Management Cost</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">tree,kanban,form,calendar</field>
+        <field name="view_id" ref="account.view_move_tree" />
+        <field name="search_view_id" ref="account.view_account_move_filter" />
+        <field name="context">{'default_type': 'entry', 'search_default_misc_filter':1, 'view_no_maturity': True, 'default_fs_dept': 'pf'}</field>
+        <field name="domain">[('fs_dept', '=', 'pf')]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a journal entry
+            </p>
+            <p>
+                A journal entry consists of several journal items, each of
+                which is either a debit or a credit transaction.
+            </p>
+        </field>
+    </record>
+
+    <menuitem
+        id="menu_hr_payroll_accounts_day_book"
+        name="Office Management Cost"
+        action="action_move_journal_hr_payroll"
+        parent="hr_payroll.menu_hr_payroll_accounts_operation"
+        sequence="2"
+    />
+
+
+
+</odoo>

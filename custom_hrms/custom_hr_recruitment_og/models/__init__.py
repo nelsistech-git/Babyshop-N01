@@ -1,0 +1,1 @@
+from . import inherited_hr_recruitment_inherit_hr_recruitment

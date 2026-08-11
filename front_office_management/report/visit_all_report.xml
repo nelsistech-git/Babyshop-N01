@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- PDF Report Action — model is the wizard so _get_report_values can fetch filtered visits -->
+    <record id="action_report_all_visits" model="ir.actions.report">
+        <field name="name">Visitor Report</field>
+        <field name="model">fo.visit.report.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">front_office_management.report_all_visits_template</field>
+        <field name="report_file">front_office_management.report_all_visits_template</field>
+    </record>
+
+    <!-- QWeb PDF Template -->
+    <template id="report_all_visits_template">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <div class="page">
+                    <!-- Report Title -->
+                    <h2 class="text-center mb-2">Visitor Report</h2>
+
+                    <!-- Date range subtitle — date_from and date_to come from _get_report_values -->
+                    <p class="text-center mb-4" style="color:#555; font-size:13px;">
+                        <t t-if="date_from or date_to">
+                            Period:
+                            <strong><t t-esc="date_from or ''"/></strong>
+                            <t t-if="date_from and date_to"> to </t>
+                            <strong><t t-esc="date_to or ''"/></strong>
+                        </t>
+                        <t t-else="">All Records</t>
+                    </p>
+
+                    <!-- Visitor data table -->
+                    <table class="table table-bordered table-sm" style="font-size:12px;">
+                        <thead>
+                            <tr>
+                                <th class="text-center" style="background-color:#6c7e7f; color:white; -webkit-print-color-adjust:exact; print-color-adjust:exact;">Date</th>
+                                <th class="text-center" style="background-color:#6c7e7f; color:white; -webkit-print-color-adjust:exact; print-color-adjust:exact;">Visitor</th>
+                                <th class="text-center" style="background-color:#6c7e7f; color:white; -webkit-print-color-adjust:exact; print-color-adjust:exact;">Purpose of Visit</th>
+                                <th class="text-center" style="background-color:#6c7e7f; color:white; -webkit-print-color-adjust:exact; print-color-adjust:exact;">Contact No.</th>
+                                <th class="text-center" style="background-color:#6c7e7f; color:white; -webkit-print-color-adjust:exact; print-color-adjust:exact;">Meeting With</th>
+                                <th class="text-center" style="background-color:#6c7e7f; color:white; -webkit-print-color-adjust:exact; print-color-adjust:exact;">State</th>
+                                <th class="text-center" style="background-color:#6c7e7f; color:white; -webkit-print-color-adjust:exact; print-color-adjust:exact;">Duration</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- docs = fo.visit records returned by _get_report_values -->
+                            <t t-foreach="docs" t-as="doc">
+                                <tr>
+                                    <td class="text-center">
+                                        <t t-if="doc.check_in_date">
+                                            <t t-esc="doc.check_in_date.strftime('%d-%m-%Y')"/>
+                                        </t>
+                                        <t t-else="">-</t>
+                                    </td>
+                                    <td><t t-esc="doc.visitor_id.name or '-'"/></td>
+                                    <td><t t-esc="', '.join(doc.reason_ids.mapped('name')) or '-'"/></td>
+                                    <td class="text-center"><t t-esc="doc.phone or '-'"/></td>
+                                    <td><t t-esc="doc.employee_id.name or '-'"/></td>
+                                    <td class="text-center">
+                                        <t t-if="doc.state == 'draft'">Draft</t>
+                                        <t t-elif="doc.state == 'check_in'">Checked In</t>
+                                        <t t-elif="doc.state == 'check_out'">Checked Out</t>
+                                        <t t-elif="doc.state == 'cancel'">Cancelled</t>
+                                    </td>
+                                    <td class="text-center">
+                                        <!-- Calculate and display visit duration -->
+                                        <t t-if="doc.check_in_date and doc.check_out_date">
+                                            <t t-set="duration" t-value="doc.check_out_date - doc.check_in_date"/>
+                                            <t t-set="total_minutes" t-value="int(duration.total_seconds() // 60)"/>
+                                            <t t-set="hours" t-value="total_minutes // 60"/>
+                                            <t t-set="minutes" t-value="total_minutes % 60"/>
+                                            <t t-esc="str(hours) + 'h ' + str(minutes) + 'm'"/>
+                                        </t>
+                                        <t t-elif="doc.check_in_date and not doc.check_out_date">
+                                            In Progress
+                                        </t>
+                                        <t t-else="">-</t>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>

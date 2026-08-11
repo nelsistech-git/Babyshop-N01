@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_budget_particular_report_wizard_form" model="ir.ui.view">
+            <field name="name">budget.particular.report.wizard.form</field>
+            <field name="model">budget.particular.report.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Budget Particular Report">
+                    <group>
+                        <group>
+                            <field name="fiscal_year" required="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="report_type"/>
+                            <field name="budget_head_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                        </group>
+                        <group>
+                            <field name="type" widget="radio"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="budget_particular_report_pdf" string="Download (PDF)" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_budget_particular_report_wizard" model="ir.actions.act_window">
+            <field name="name">Budget Particular Report</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">budget.particular.report.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_budget_particular_report_wizard_form"/>
+            <field name="target">new</field>
+        </record>
+
+        <!-- Budget Particular Report Menu: Budget > Budget Particular Report -->
+        <menuitem id="menu_budget_particular_report_wizard"
+              name="Budget Particular Report"
+              sequence="2"
+              action="action_budget_particular_report_wizard"
+              parent="custom_account_day_book.menu_budget_particular_root"
+
+        />
+    </data>
+</odoo>

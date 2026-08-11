@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+
+        <record id="extra_office_time_2h_report_id" model="ir.actions.report">
+            <field name="name">Over Time Sheet Report</field>
+            <field name="model">employee.extra.office.time.report.wizard</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">custom_hr_report.extra_office_time_2h_report_qweb</field>
+            <field name="report_file">custom_hr_report.extra_office_time_2h_report_qweb</field>
+        </record>
+
+        <!--details report==========================-->
+        <template id="extra_office_time_2h_report_qweb">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <div class="page">
+                        <style type="text/css">
+                            table, th, tr, td{
+                                background: white !important;
+                                border: 1px solid black;
+                                margin:0px;
+                                padding:0px;
+                                font-size: 12px;
+                            }
+                            .th-td-style{
+                                font-size:12px;
+                                padding: 6px !important;
+                            }
+                        </style>
+                        <t t-set="data" t-value="request.env['employee.extra.office.time.report.wizard'].search([('id', '=', ftr_id)], limit=1).employee_overtime_report_sql(rpt_type)"/>
+
+                        <t t-set="model" t-value="data['model']"/>
+                        <t t-set="form" t-value="data['form']"/>
+                        <t t-set="csr" t-value="data['csr']"/>
+                        <t t-set="employee_id_card" t-value="data['employee_id_card']"/>
+                        <t t-set="employee_name" t-value="data['employee_name']"/>
+                        <t t-set="work_loc_name" t-value="data['work_loc_name']"/>
+                        <t t-set="dept_name" t-value="data['dept_name']"/>
+
+                        <div class="oe_structure"/>
+                        <h3 class="text-center head_font_color">
+                            <strong>
+                                <span t-esc="form['company_id'][1]"/>
+                            </strong>
+                        </h3>
+                        <div>
+                            <h3 class="text-center head_font_color">
+                                <strong>
+                                     Over Time Sheet
+                                    <br/>
+                                </strong>
+                            </h3>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <div style="color: #000; font-size: 15px;"><strong>From Date:</strong> <t t-esc="form['start_date']" t-options='{"widget": "date"}'/></div>
+                                <div style="color: #000; font-size: 15px;"><strong>To Date:</strong> <t t-esc="form['end_date']" t-options='{"widget": "date"}'/></div>
+                            </div>
+                            <div class="col-6">
+                                <div class="text-right" style="color: #000; font-size: 15px;"><strong>Work Location:</strong> <t t-esc="work_loc_name"/></div>
+                                <div class="text-right" style="color: #000; font-size: 15px;"><strong>Department:</strong> <t t-esc="dept_name"/></div>
+                                <div class="text-right" style="color: #000; font-size: 15px;"><strong>Employee:</strong> <t t-esc="employee_name"/></div>
+                                <div class="text-right" t-if="form['employee_id']" style="color: #000; font-size: 15px;"><strong>Employee ID:</strong> <t t-esc="employee_id_card"/></div>
+                            </div>
+                        </div>
+                        <table style="border-collapse: collapse;width: 100%; margin-bottom: 2em;"
+                               class="table table-condensed">
+                            <thead>
+                                <tr>
+                                    <th class="text-center align-middle bg_color font_color th-td-style">Sl.</th>
+                                    <th class="text-center align-middle bg_color font_color th-td-style">ID</th>
+                                    <th class="text-left align-middle bg_color font_color th-td-style">Name</th>
+                                    <th class="text-center align-middle bg_color font_color th-td-style">Designation</th>
+                                    <th class="text-center align-middle bg_color font_color th-td-style">Join Date</th>
+                                    <th class="text-center align-middle bg_color font_color th-td-style">Basic</th>
+                                    <th class="text-center align-middle bg_color font_color th-td-style">NOD</th>
+                                    <th class="text-right align-middle bg_color font_color th-td-style">OT Hour</th>
+                                    <th class="text-right align-middle bg_color font_color th-td-style">OT Amt</th>
+                                    <th class="text-center align-middle bg_color font_color th-td-style">Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody class="consumed_tbody">
+                                <t t-set="t_ot_hour" t-value="0"/>
+                                <t t-foreach="csr" t-as="a">
+                                <tr t-if="'item_list' in a">
+                                    <td style="font-weight:bold" colspan="10" class="text-left th-td-style" >
+                                        <t t-esc="a['complete_name']"/>
+                                    </td>
+                                </tr>
+                                 <t t-if="'item_list' in a">
+                                     <t t-set="d_ot_hour" t-value="0"/>
+                                     <t t-set="sl_no" t-value="1"/>
+                                     <t t-foreach="a['item_list']" t-as="line">
+                                        <tr>
+                                            <td class="text-center align-middle th-td-style">
+                                                <span t-esc="sl_no"/>
+                                            </td>
+                                            <td class="text-center align-middle th-td-style">
+                                                <span t-esc="line['id_card_no']" />
+                                            </td>
+                                            <td class="text-left align-middle th-td-style">
+                                                <span t-esc="line['employee_name']"/>
+                                            </td>
+                                            <td class="text-center align-middle th-td-style">
+                                                <span t-esc="line['designation']" />
+                                            </td>
+                                            <td class="text-center align-middle th-td-style">
+                                                <span t-esc="line['join_date']" t-options='{"widget": "date"}'/>
+                                            </td>
+                                            <td class="text-center align-middle th-td-style">
+                                                <span t-esc="line['basic']" />
+                                            </td>
+                                            <td class="text-center align-middle th-td-style">
+                                                <span t-esc="line['nod']" />
+                                            </td>
+                                            <td class="text-right align-middle th-td-style">
+                                                <span t-esc="line['ot_hour']" t-options="{'widget': 'float_time'}"/>
+                                                 <t t-set="d_ot_hour" t-value="d_ot_hour + line['ot_hour']"/>
+                                            </td>
+                                            <td class="text-right align-middle th-td-style">
+                                            </td>
+                                            <td class="text-center align-middle th-td-style">
+                                            </td>
+                                        </tr>
+                                        <t t-set="sl_no" t-value="sl_no + 1"/>
+                                    </t>
+                                       <t t-set="t_ot_hour" t-value="t_ot_hour + d_ot_hour"/>
+                                       <tr style="border: 1px solid black;background:#f5f4f4">
+                                          <td class="text-right th-td-style" colspan="7"><strong> Total</strong></td>
+                                          <td class="text-right th-td-style">
+                                             <strong><t t-esc="d_ot_hour" t-options="{'widget': 'float_time'}"/></strong>
+                                          </td>
+                                           <td></td>
+                                           <td></td>
+                                       </tr>
+                                 </t>
+                                </t>
+
+                                 <tr style="border: 1px solid black;background:#f5f4f4">
+                                     <td class="text-right th-td-style" colspan="7"><strong> Grand Total</strong></td>
+                                     <td class="text-right th-td-style">
+                                        <strong><t t-esc="t_ot_hour" t-options="{'widget': 'float_time'}"/></strong>
+
+                                     </td>
+                                    <td></td>
+                                    <td></td>
+                                 </tr>
+                            </tbody>
+                        </table>
+                    </div>
+            </t>
+        </t>
+    </template>
+    </data>
+</odoo>

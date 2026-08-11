@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+	<data>
+
+        <record id="paperformat_department_wise_employee_details_salary_sheet_report" model="report.paperformat">
+            <field name="name">Department wise Employee Salary Sheet Paperformat</field>
+            <field name="default" eval="True"/>
+            <field name="format">Legal</field>
+            <field name="orientation">Landscape</field>
+            <field name="margin_top">30</field>
+            <field name="margin_bottom">20</field>
+            <field name="margin_left">5</field>
+            <field name="margin_right">5</field>
+            <field name="header_line" eval="False"/>
+            <field name="header_spacing">25</field>
+            <field name="dpi">110</field>
+        </record>
+
+
+        <record model="ir.actions.report" id="department_wise_employee_details_salary_sheet_report_tmpl">
+            <field name="name">Department wise Employee Salary Summary Report</field>
+            <field name="model">department.wise.employee.salary.sheet.report.wizard</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">custom_hr_report.department_wise_employee_details_salary_sheet_report_view</field>
+            <field name="report_file">custom_hr_report.department_wise_employee_details_salary_sheet_report_view</field>
+            <field name="paperformat_id" ref="custom_hr_report.paperformat_department_wise_employee_details_salary_sheet_report"/>
+        </record>
+
+		<template id="department_wise_employee_details_salary_sheet_report_view">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <style type="text/css">
+                            table, th, tr, td{
+                                background: white !important;
+                                border: 1px solid black;
+                            }
+                        </style>
+                        <div class="oe_structure"/>
+                        <div class="row">
+                            <div class="col-12">
+                                <h3 class="text-center head_font_color">
+                                    <strong>
+                                        <span t-esc="form['company_id'][1]"/>
+                                    <br/>
+                                        Department wise Employee Salary Summary Report -
+                                        <span t-esc="month"/> <span t-esc="year"/>
+                                        <br/>
+                                    </strong>
+                                </h3>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 text-left">
+                                <p style="color: #000; font-size: 15px;"><strong>Status:</strong> <t t-esc="state_name"/>
+                                    <t t-if="buisness_unit">
+                                        <br/>
+                                        <strong>Office/business Unit:</strong>
+                                        <t t-esc="buisness_unit"/>
+                                    </t>
+                                </p>
+                            </div>
+                            <div class="col-6 text-left">
+                                <p style="color: #000; font-size: 15px;"><strong>Department:</strong> <t t-esc="dept_name"/>
+                                    <t t-if="tag_names_list">
+                                        <br/>
+                                        <strong>Tags:</strong>
+                                        <t t-esc="tag_names_list"/>
+                                    </t>
+                                </p>
+                            </div>
+                        </div>
+                        <br/>
+                        <table style="border-collapse: collapse;width: 100%; margin-bottom: 2em;" class="table table-condensed">
+                            <thead>
+                                <tr style="color: black !important;">
+                                    <th class="text-center align-middle bg_color font_color">Sl.</th>
+                                    <th class="text-left align-middle bg_color font_color">Department</th>
+                                    <th class="text-center align-middle bg_color font_color">Total Employee</th>
+                                    <th class="text-right align-middle bg_color font_color">Gross Salary</th>
+                                    <th class="text-right align-middle bg_color font_color">Absent Deduct</th>
+                                    <th class="text-right align-middle bg_color font_color">Payable Amount</th>
+                                    <th class="text-right align-middle bg_color font_color">Advance Amount</th>
+                                    <th class="text-right align-middle bg_color font_color">Loan Adjustment</th>
+                                    <th class="text-right align-middle bg_color font_color">Tax</th>
+                                    <th class="text-right align-middle bg_color font_color">Provident Fund</th>
+                                    <th class="text-center align-middle bg_color font_color">Stamp</th>
+                                    <th class="text-right align-middle bg_color font_color">Net Payable(Cash)</th>
+                                    <th class="text-right align-middle bg_color font_color">Net Payable(Bank)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="consumed_tbody">
+                                <t t-set="sl_no" t-value="1"/>
+                                <t t-set="t_emp" t-value="0"/>
+                                <t t-set="t_gross" t-value="0"/>
+                                <t t-set="t_abs_amt" t-value="0"/>
+                                <t t-set="t_payable_salary" t-value="0"/>
+                                <t t-set="t_advance_salary" t-value="0"/>
+                                <t t-set="t_loan_adj" t-value="0"/>
+                                <t t-set="t_pf" t-value="0"/>
+                                <t t-set="t_tds" t-value="0"/>
+                                <t t-set="t_stamp" t-value="0"/>
+                                <t t-set="t_cash_pay" t-value="0"/>
+                                <t t-set="t_bank_pay" t-value="0"/>
+                                <t t-foreach="csr" t-as="line">
+                                    <tr>
+                                        <td class="text-center align-middle">
+                                            <span t-esc="sl_no"/>
+                                        </td>
+                                        <td class="text-left align-middle">
+                                            <span t-esc="line['dept_name']"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <span t-esc="line['emp_count']"/>
+                                            <t t-set="t_emp" t-value="t_emp + line['emp_count']"/>
+                                        </td>
+                                        <td class="text-right align-middle">
+                                            <span t-esc="'{0:,.2f}'.format(line['gross_salary'])"/>
+                                            <t t-set="t_gross" t-value="t_gross + line['gross_salary']"/>
+                                        </td>
+                                        <td class="text-right align-middle">
+                                            <span t-esc="'{0:,.2f}'.format(line['abs_amt'])"/>
+                                            <t t-set="t_abs_amt" t-value="t_abs_amt + line['abs_amt']"/>
+                                        </td>
+                                        <td class="text-right align-middle">
+                                            <span t-esc="'{0:,.2f}'.format(line['payable_salary'])"/>
+                                            <t t-set="t_payable_salary" t-value="t_payable_salary + line['payable_salary']"/>
+                                        </td>
+                                        <td class="text-right align-middle">
+                                            <span t-esc="'{0:,.2f}'.format(line['advance_amount'])"/>
+                                            <t t-set="t_advance_salary" t-value="t_advance_salary + line['advance_amount']"/>
+                                        </td>
+                                        <td class="text-right align-middle">
+                                            <span t-esc="'{0:,.2f}'.format(line['loan_adj'])"/>
+                                            <t t-set="t_loan_adj" t-value="t_loan_adj + line['loan_adj']"/>
+                                        </td>
+                                        <td class="text-right align-middle">
+                                            <span t-esc="'{0:,.2f}'.format(line['tds'])"/>
+                                            <t t-set="t_tds" t-value="t_tds + line['tds']"/>
+                                        </td>
+                                        <td class="text-right align-middle">
+                                            <span t-esc="'{0:,.2f}'.format(line['pf'])"/>
+                                            <t t-set="t_pf" t-value="t_pf + line['pf']"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <span t-esc="'{0:,.2f}'.format(line['stamp'])"/>
+                                            <t t-set="t_stamp" t-value="t_stamp + line['stamp']"/>
+                                        </td>
+                                        <td class="text-right align-middle">
+                                            <span t-esc="'{0:,.2f}'.format(line['cash_pay'])"/>
+                                            <t t-set="t_cash_pay" t-value="t_cash_pay + line['cash_pay']"/>
+                                        </td>
+                                        <td class="text-right align-middle">
+                                            <span t-esc="'{0:,.2f}'.format(line['bank_pay'])"/>
+                                            <t t-set="t_bank_pay" t-value="t_bank_pay + line['bank_pay']"/>
+                                        </td>
+                                    </tr>
+                                    <t t-set="sl_no" t-value="sl_no + 1"/>
+                                </t>
+                                <tr style="border: 1px solid black;">
+                                    <td class="text-right" colspan="2"><strong>TOTAL</strong></td>
+                                    <td class="text-center">
+                                        <strong><t t-esc="(t_emp)"/></strong>
+                                    </td>
+                                    <td class="text-right">
+                                        <strong><t t-esc="'{0:,.2f}'.format(t_gross)"/></strong>
+                                    </td>
+                                    <td class="text-right">
+                                        <strong><t t-esc="'{0:,.2f}'.format(t_abs_amt)"/></strong>
+                                    </td>
+                                    <td class="text-right">
+                                        <strong><t t-esc="'{0:,.2f}'.format(t_payable_salary)"/></strong>
+                                    </td>
+                                    <td class="text-right">
+                                        <strong><t t-esc="'{0:,.2f}'.format(t_advance_salary)"/></strong>
+                                    </td>
+                                    <td class="text-right">
+                                        <strong><t t-esc="'{0:,.2f}'.format(t_loan_adj)"/></strong>
+                                    </td>
+                                    <td class="text-center">
+                                        <strong>
+                                            <t t-esc="'{0:,.2f}'.format(t_tds)"/>
+                                        </strong>
+                                    </td>
+                                    <td class="text-right">
+                                        <strong><t t-esc="'{0:,.2f}'.format(t_pf)"/></strong>
+                                    </td>
+                                    <td class="text-right">
+                                        <strong>
+                                            <t t-esc="'{0:,.2f}'.format(t_stamp)"/>
+                                        </strong>
+                                    </td>
+                                    <td class="text-right">
+                                        <strong>
+                                            <t t-esc="'{0:,.2f}'.format(t_cash_pay)"/>
+                                        </strong>
+                                    </td>
+                                    <td class="text-right">
+                                        <strong>
+                                            <t t-esc="'{0:,.2f}'.format(t_bank_pay)"/>
+                                        </strong>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+		</template>
+	</data>
+</odoo>

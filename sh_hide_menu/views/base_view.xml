@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="sh_hm_hide_menu_user_form" model="ir.ui.view">
+        <field name="name">sh.hm.hide.menu.user.form</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page name="sh_hm_hide_menu_page" string="Hide Menu">
+                    <field name="sh_hm_hide_menu_ids" options="{'no_create': True}">
+                        <tree editable="bottom">
+                            <field name="complete_name" string="Hide Menu" />
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
+            <xpath expr="//header" position="inside">
+                <button type="action" class="oe_highlight" name="%(sh_hide_menu.sh_hide_menu_template_wizard_view_action)d" string = "Create Hide Menu Template"></button>
+            </xpath>
+            <xpath expr="//div[hasclass('oe_title')]" position="after">
+                <group>
+                    <group>
+                        <field name="menu_template_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                    </group>
+                </group> 
+            </xpath>
+        </field>
+    </record>
+</odoo>

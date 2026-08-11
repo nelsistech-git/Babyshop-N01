@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+	<data>
+		<record id="manual_hr_attendance_view_form" model="ir.ui.view">
+			<field name="name">hr.manual.attendance.wizard.form</field>
+			<field name="model">hr.manual.attendance.wizard</field>
+			<field name="arch" type="xml">
+				<form string="Manual Attendance">
+					<p style="font-size:14px; font-color:red; font-weight:bold;text-decoration: underline wavy;">
+						* Please give manual attendance in 24 hour format.
+					</p>
+
+					<group>
+						<field name="device_id"	options="{'no_open':True,'no_create':1,'no_create_edit':1}" />
+						<field name="user_id" domain = "[('device_id','=',device_id)]" options="{'no_open':True,'no_create':1,'no_create_edit':1}" />
+						<field name="attendance_state_id" options="{'no_open':True,'no_create':1,'no_create_edit':1}"/>
+						<field name="checkin_out_time" string="Check-In/Out Time" />
+						<field name="reason" string="Reason" />
+					</group>
+<!--					<div class="oe_chatter">-->
+<!--                        <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>-->
+<!--                        <field name="activity_ids" widget="mail_activity"/>-->
+<!--                        <field name="message_ids" widget="mail_thread"/>-->
+<!--                    </div>-->
+					<!-- <group>
+					</group> -->
+					<footer>
+						<button name="action_submit_attendance" string="Submit" type="object"
+							class="btn-primary" />
+						<!-- or
+						
+						<button name="action_manual_checkin" string="Check In" type="object"
+							class="btn-primary" />
+						or
+						<button name="action_manual_checkout" string="Check Out" type="object"
+							class="btn-primary" /> -->
+						or
+						<button string="Cancel" class="btn-danger" special="cancel" />
+					</footer>
+				</form>
+			</field>
+		</record>
+
+		<record id="manual_hr_attendance_action" model="ir.actions.act_window">
+			<field name="name">Manual Attendance</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="res_model">hr.manual.attendance.wizard</field>
+			<field name="view_mode">form</field>
+			<field name="view_id" ref="manual_hr_attendance_view_form" />
+			<field name="target">new</field>
+		</record>
+		
+		<menuitem id="menu_hr_attendance_manual"
+		name="Manual Attendance (Device)" parent="menu_hr_attendance_manage_attendances_sub_manual"
+		sequence="3" groups="hr_attendance.group_hr_attendance_officer"
+		action="manual_hr_attendance_action" active="False"/>
+		
+
+		<record id="manual_hr_attendance_view_form_employee" model="ir.ui.view">
+			<field name="name">hr.manual.attendance.wizard.employee.form</field>
+			<field name="model">hr.manual.attendance.wizard.employee</field>
+			<field name="arch" type="xml">
+				<form string="Manual Attendance Employee">
+					<p style="font-size:14px; font-color:red; font-weight:bold;text-decoration: underline wavy;">
+						* Please give manual attendance in 24 hour format.
+					</p>
+					<group>
+						<field name="entry_type" required="1"/>
+						<field name="department_ids" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" invisible="entry_type != '1'" widget="many2many_tags"/>
+						<field name="employee_id" invisible="entry_type != '0'" required="entry_type == '0'" options="{'no_open':True,'no_create':1,'no_create_edit':1}"/> <!-- only for 0 -->
+						
+						<field name="employee_ids" widget="many2many_tags"
+                               invisible="entry_type != '1'" required="entry_type == '1'" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+						
+						<field name="type" widget="radio" options="{'horizontal': true}" style="font-size:20px;"/>
+
+						
+						<field name="check_dt_from" invisible="entry_type != '1'" required="entry_type == '1'"/>
+						<field name="check_dt_to" invisible="entry_type != '1'" required="entry_type == '1'"/>
+						
+						<field name="check_in_time_from" widget="float_time" invisible="type == 'out' or entry_type != '1'" required="entry_type == '1' and type != 'out'" />
+						<field name="check_in_time" invisible="type == 'out' or entry_type != '0'" required="entry_type == '0' and type != 'out'" /><!-- only for 0 -->
+						<field name="check_in_device_id" options="{'no_open':True,'no_create':1,'no_create_edit':1}" invisible="type == 'out'" />
+						
+						<field name="check_out_time_to" widget="float_time" invisible="type == 'in' or entry_type != '1'" required="entry_type == '1' and type != 'in'" />
+						<field name="check_out_time" invisible="type == 'in' or entry_type != '0'" required="entry_type == '0' and type != 'in'" /><!-- only for 0 -->
+						<field name="check_out_device_id" options="{'no_open':True,'no_create':1,'no_create_edit':1}" invisible="type == 'in'" />
+						
+						<field name="reason" string="Reason" />
+					</group>
+<!--					<div class="oe_chatter">-->
+<!--                        <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>-->
+<!--                        <field name="activity_ids" widget="mail_activity"/>-->
+<!--                        <field name="message_ids" widget="mail_thread"/>-->
+<!--                    </div>-->
+					<!-- <group>
+					</group> -->
+					<footer>
+						<button name="action_submit_attendance" string="Submit" type="object"
+							class="btn-primary" />
+						or
+						<button string="Cancel" class="btn-danger" special="cancel" />
+					</footer>
+<!--					<div class="oe_chatter">-->
+<!--                        <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>-->
+<!--                        <field name="activity_ids" widget="mail_activity"/>-->
+<!--                        <field name="message_ids" widget="mail_thread"/>-->
+<!--                    </div>-->
+				</form>
+			</field>
+		</record>
+		
+		<record id="manual_hr_attendance_action_employee" model="ir.actions.act_window">
+			<field name="name">Manual Attendance (Employee)</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="res_model">hr.manual.attendance.wizard.employee</field>
+			<field name="view_mode">form</field>
+			<field name="view_id" ref="manual_hr_attendance_view_form_employee" />
+			<field name="target">new</field>
+		</record>
+		
+		<menuitem id="menu_hr_attendance_manual_employee"
+		name="Manual Attendance (Employee)" parent="menu_hr_attendance_manage_attendances_sub_manual"
+		sequence="1" groups="hr_attendance.group_hr_attendance_officer"
+		action="manual_hr_attendance_action_employee" />
+	</data>
+</odoo>

@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<template id="report_daily_document">
+    <t t-call="web.html_container">
+        <t t-foreach="docs" t-as="o">
+            <t t-call="web.external_layout">
+                <div class="page" style="font-size:11px;">
+                    <h2 style="text-align:center;">Daily Sale &amp; Official Cost</h2>
+                    <h4 style="text-align:center;">
+                        Date: <t t-esc="o.report_date" t-options="{'widget': 'date'}"/>
+                    </h4>
+
+                    <div class="row mt16">
+                        <!-- Left column: Showroom Sale + Supplier Transaction -->
+                        <div class="col-6">
+                            <strong>Showroom Sale Of Head Office</strong>
+                            <table class="table table-sm table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Customer Name</th>
+                                        <th class="text-end">Paid/Advance</th>
+                                        <th class="text-end">Condition</th>
+                                        <th class="text-end">Due</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="o.showroom_sale_line_ids" t-as="l">
+                                        <td><span t-esc="l.partner_id.name"/></td>
+                                        <td class="text-end"><span t-esc="l.paid_advance" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                        <td class="text-end"><span t-esc="l.invoice_total" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                        <td class="text-end"><span t-esc="l.due_amount" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Total:</strong></td>
+                                        <td class="text-end"><strong t-esc="sum(o.showroom_sale_line_ids.mapped('paid_advance'))" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                        <td class="text-end"><strong t-esc="sum(o.showroom_sale_line_ids.mapped('invoice_total'))" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                        <td class="text-end"><strong t-esc="sum(o.showroom_sale_line_ids.mapped('due_amount'))" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <strong>Supplier Transaction</strong>
+                            <table class="table table-sm table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Type</th>
+                                        <th class="text-end">Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="o.supplier_line_ids" t-as="l">
+                                        <td><span t-esc="l.partner_id.name"/></td>
+                                        <td><span t-esc="l.payment_method"/></td>
+                                        <td class="text-end"><span t-esc="l.amount" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2"><strong>Total Paid =</strong></td>
+                                        <td class="text-end"><strong t-esc="o.total_supplier_paid + o.md_sir_cash_paid" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Right column: Official Cost + Mobile & Bank -->
+                        <div class="col-6">
+                            <strong>Official Cost</strong>
+                            <table class="table table-sm table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Cost Detail</th>
+                                        <th>Name</th>
+                                        <th class="text-end">TK</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="o.official_cost_line_ids" t-as="l">
+                                        <td><span t-esc="l.cost_detail"/></td>
+                                        <td><span t-esc="l.payee"/></td>
+                                        <td class="text-end"><span t-esc="l.amount" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2"><strong>Total =</strong></td>
+                                        <td class="text-end"><strong t-esc="o.total_official_cost" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <strong>Mobile And Bank Transaction</strong>
+                            <table class="table table-sm table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Customer Name</th>
+                                        <th>Bank/Journal</th>
+                                        <th>Channel</th>
+                                        <th class="text-end">Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="o.collection_line_ids" t-as="l">
+                                        <td><span t-esc="l.partner_id.name"/></td>
+                                        <td><span t-esc="l.journal_id.name"/></td>
+                                        <td><span t-esc="l.channel"/></td>
+                                        <td class="text-end"><span t-esc="l.amount" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="3"><strong>Total =</strong></td>
+                                        <td class="text-end"><strong t-esc="o.total_amount_tk" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="row mt32">
+                        <div class="col-8 offset-2">
+                            <table class="table table-sm table-bordered">
+                                <tr>
+                                    <td><strong>Net Office Cash Adjustment</strong></td>
+                                    <td class="text-end"><span t-esc="o.net_office_cash_adjustment" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Total Amount Tk.</strong></td>
+                                    <td class="text-end"><span t-esc="o.total_amount_tk" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>MD Sir Cash Paid</strong></td>
+                                    <td class="text-end"><span t-esc="o.md_sir_cash_paid" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Total Cost Tk.</strong> (Official Cost + Supplier Paid)</td>
+                                    <td class="text-end"><span t-esc="o.total_official_cost + o.total_supplier_paid" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                </tr>
+                                <tr style="background-color:#eeeeee;">
+                                    <td><strong>Current / Net Office Cash</strong></td>
+                                    <td class="text-end"><strong t-esc="o.current_office_cash" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </t>
+</template>
+</odoo>

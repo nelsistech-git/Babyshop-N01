@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Batch Attendance Form -->
+    <record id="batch_attendance_process_form" model="ir.ui.view">
+        <field name="name">batch.attendance.process.form</field>
+        <field name="model">batch.attendance.process</field>
+        <field name="arch" type="xml">
+            <form string="Batch Attendance Process">
+                <header>
+                    <button name="action_draft" type="object" invisible="state != 'confirm'" string="Send to Draft" />
+                    <button name="action_confirm" type="object" invisible="state != 'draft'" string="Confirm" class="oe_highlight"/>
+                    <button name="action_start_process" type="object" string="Start Process" class="oe_highlight" invisible="process_status == '1'" />
+                    <button name="action_stop_process" type="object" string="Stop Process" invisible="process_status == '0'"/>
+
+                    <button name="action_delete_invalid_data" type="object" string="Delete Invalid Attendance Data" help="Delete Invalid Data from Attendance Device Data" invisible="process_status == '1'"/>
+                    <button name="action_map_employee_process" type="object" string="Mapped Employee" help="Mapped Employee if unmapped" invisible="process_status == '1'"/>
+                    <button name="action_refresh" type="object" string="Refresh"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirm"/>
+                </header>process_status
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="group_id" readonly="state == 'confirm'" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="missing_dt" />
+                            <field name="missing_dt_end" />
+                            <field name="note" />
+                        </group>
+                        <group>
+                            <field name="device_count" readonly="1"/>
+                            <field name="process_dt" readonly="1"/>
+                            <field name="process_status" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Devices">
+                            <field name="att_device_ids" readonly="state == 'confirm'" >
+                                <tree editable="bottom">
+                                    <field name="device_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                    <field name="device_users_count" readonly="1" sum="total device_users_count"/>
+                                    <field name="mapped_employees_count" readonly="1" sum="total mapped_employees_count"/>
+                                    <field name="device_user_extra" readonly="1" sum="total device_user_extra"/>
+                                    <field name="last_attendance_download" readonly="1"/>
+                                    <field name="map_before_dl" readonly="1"/>
+                                    <field name="total_att_records" readonly="1" sum="total total_att_records"/>
+                                    <field name="state" readonly="1"/>
+                                    <field name="last_mapped" readonly="1"/>
+                                    <field name="line_status_map" readonly="1"/>
+                                    <field name="last_process" readonly="1"/>
+                                    <field name="line_status" readonly="1"/>
+                                </tree>
+                                <form>
+                                    <group>
+                                        <field name="device_id" readonly="1" />
+                                        <field name="device_users_count" readonly="1"/>
+                                        <field name="mapped_employees_count" readonly="1"/>
+                                        <field name="device_user_extra" readonly="1"/>
+                                        <field name="last_attendance_download" readonly="1"/>
+                                        <field name="map_before_dl" readonly="1"/>
+                                        <field name="total_att_records" readonly="1"/>
+                                        <field name="state" readonly="1"/>
+                                        <field name="last_mapped" readonly="1"/>
+                                        <field name="line_status_map" readonly="1"/>
+                                        <field name="last_process" readonly="1"/>
+                                        <field name="line_status" readonly="1"/>
+                                    </group>
+                                </form>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+
+            </form>
+        </field>
+    </record>
+
+    <!-- Batch Attendance Tree -->
+    <record id="batch_attendance_process_tree" model="ir.ui.view">
+        <field name="name">batch.attendance.process.tree</field>
+        <field name="model">batch.attendance.process</field>
+        <field name="arch" type="xml">
+            <tree string="Batch Attendance Sheet">
+                <field name="sequence" widget='handle'/>
+                <field name="group_id" />
+                <field name="device_count" sum="total device_count"/>
+                <field name="att_device_ids" widget="many2many_tags"/>
+                <field name="note" />
+                <field name="process_dt" />
+                <field name="process_status" />
+                <field name="state" />
+            </tree>
+        </field>
+    </record>
+
+    <!-- Batch Attendance Filter -->
+    <record id="batch_attendance_process_search" model="ir.ui.view">
+        <field name="name">batch.attendance.process.search</field>
+        <field name="model">batch.attendance.process</field>
+        <field name="arch" type="xml">
+            <search string="Search Batches">
+                <field name="group_id"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Batch Attendance Action -->
+    <record id="action_batch_attendance_process" model="ir.actions.act_window">
+        <field name="name">Batch Attendance Device Process</field>
+        <field name="res_model">batch.attendance.process</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="batch_attendance_process_search"/>
+    </record>
+
+    <!-- Batch Attendance Menu -->
+    <menuitem
+        id="menu_batch_attendance_process"
+        action="action_batch_attendance_process"
+        name="Batch Attendance Device Process"
+        sequence="7"
+        parent="custom_zk_attendance_device.menu_hr_attendance_manage_attendances"
+        groups="hr_attendance.group_hr_attendance_manager"/>
+
+
+    <record id="view_batch_attendance_process_group_form" model="ir.ui.view">
+            <field name="name">batch.attendance.process.group.form</field>
+            <field name="model">batch.attendance.process.group</field>
+            <field name="arch" type="xml">
+                <form string="Device Group Form">
+                    <sheet>
+                        <group>
+                        	<group>
+	                            <field name="name" />
+                                <field name="active" />
+                            </group>
+                            <group>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_batch_attendance_process_group_tree" model="ir.ui.view">
+            <field name="name">batch.attendance.process.group.tree</field>
+            <field name="model">batch.attendance.process.group</field>
+            <field name="arch" type="xml">
+                <tree string="Device Group Tree">
+                    <field name="name" />
+                    <field name="active" />
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_batch_attendance_process_group" model="ir.actions.act_window">
+            <field name="name">Batch Attendance Device Group</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">batch.attendance.process.group</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+              <p class="o_view_nocontent_smiling_face">
+                Create a Batch Attendance Device Group!
+              </p><p>
+                The Batch Attendance Device Group!
+              </p>
+            </field>
+        </record>
+
+        <menuitem id="menu_batch_attendance_process_group"
+                  name="Batch Attendance Device Group"
+                  action="action_batch_attendance_process_group"
+                  parent="custom_zk_attendance_device.menu_hr_attendance_manage_attendances"
+                  groups="hr_attendance.group_hr_attendance_manager"
+                  sequence="20"/>
+
+</odoo>

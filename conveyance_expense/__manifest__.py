@@ -1,0 +1,21 @@
+{
+    'name': 'Custom Conveyance Expense',
+    'version': '17.0.1.0.0',
+    'summary': 'Conveyance Sheet linked with HR Expense',
+    'description': 'Adds a Details button on Expense form to open a Conveyance Sheet with approval workflow.',
+    'author': 'Blue Dream Fabrics Ltd.',
+    'category': 'Human Resources/Expenses',
+    'depends': ['hr_expense', 'account'],
+    'data': [
+        'security/security_groups.xml',
+        'security/ir.model.access.csv',
+        'data/conveyance_sequence.xml',
+        'views/conveyance_sheet_views.xml',
+        'views/hr_expense_inherit_views.xml',
+        'report/conveyance_report.xml',
+        'report/conveyance_report_template.xml',
+    ],
+    'installable': True,
+    'application': True,
+    'license': 'LGPL-3',
+}

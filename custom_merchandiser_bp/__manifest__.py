@@ -1,0 +1,21 @@
+{
+    'name': 'Custom Merchandiser BP',
+    'version': '17.0.1.0.0',
+    'summary': 'Manage Buyer, Costing, Sample, Order and Production',
+    'description': 'A module to manage merchandiser tasks: buyer details, costing, sample, order and production tracking.',
+    'category': 'Operations',
+    'author': 'Nelsis Tech Limited',
+    'depends': ['base', 'product', 'stock', 'mail', 'purchase'],
+    'data': [
+        'security/res_groups.xml',
+        'security/ir.model.access.csv',
+        'data/ir_sequence.xml',
+        'views/merchandiser_view.xml',
+        'views/merchandiser_sample_view.xml',
+        'views/merchandiser_order_views.xml',
+        'views/merchandiser_production_views.xml',
+    ],
+    'installable': True,
+    'application': True,
+    'license': 'LGPL-3',
+}

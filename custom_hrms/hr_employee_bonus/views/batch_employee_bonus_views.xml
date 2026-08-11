@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Batch HR Employee Bonus Form -->
+    <record id="view_batch_hr_employee_bonus_form" model="ir.ui.view">
+        <field name="name">batch.hr.employee.bonus.form</field>
+        <field name="model">batch.hr.employee.bonus</field>
+        <field name="arch" type="xml">
+            <form string="Batch HR Employee Bonus">
+                <header>
+                    <button name="%(action_batch_employee_bonus_wizard)d" type="action" string="Generate Bonus" class="oe_highlight" invisible="state  != 'draft'"/>
+                    <button name="action_confirm" type="object" string="Confirm" class="oe_highlight" invisible="emp_bonus_count &lt;= 0 or state != 'draft'"/>
+                    <button name="%(action_batch_employee_bonus_payslip_wizard)d" string="Generate Payslip" type="action" class="btn-primary" invisible="state != 'confirmed'"/>
+                    <button name="%(action_batch_bonus_sheet_wizard)d" string="Batch Bonus Sheet Report" type="action" invisible="emp_bonus_count == 0"/>
+
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,done"/>
+                    <field name="emp_bonus_count" invisible="1"/>
+                    <field name="is_emp_bonus_done" invisible="1"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_emp_bonus_sheets" class="oe_stat_button" icon="fa-book" type="object" help="Generated Employee Bonus" invisible="emp_bonus_count == 0">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_value"><field name="emp_bonus_count"/></span>
+                                <span class="o_stat_text">Employee Bonus</span>
+                             </div>
+                        </button>
+                    </div>
+
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1" required="1" force_save="1" invisible="not name"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <!--<group>
+                            <div class="oe_title">
+                                <h1>
+                                    <field name="name" readonly="1" required="1" force_save="1" invisible="not name"/>
+                                </h1>
+                            </div>
+                        </group>-->
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="bonus_on_joining_date" invisible="1" />
+                            <field name="bonus_date" readonly="state != 'draft' or emp_bonus_count &gt; 0"/>
+                            <field name="user_work_location_id" readonly="state != 'draft'" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="department_id" readonly="state != 'draft'" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                        </group>
+                        <group>
+                            <field name="bonus_type_id" required="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" readonly="state != 'draft' or emp_bonus_count &gt; 0"/>
+                            <field name="calculation_type"  />
+                            <field name="percentage_from_settings" invisible="calculation_type != 'percentage'"/>
+                            <field name="settings_type" invisible="not percentage_from_settings"/>
+							<field name="allowed_employee_type_ids" widget="many2many_tags" options="{'no_open':True,'no_create_edit':1}"/>
+
+                            <field name="based_on_type" string="Based On" invisible="calculation_type == 'fixed' or percentage_from_settings"/>
+
+                            <field name="amount_percentage" string="Amount"
+								invisible="calculation_type == 'percentage' or percentage_from_settings" readonly="state != 'draft'" required="1"/>
+
+                            <field name="amount_percentage"
+								string="(%)"
+								invisible="calculation_type == 'fixed' or percentage_from_settings" readonly="state != 'draft'" required="1"/>
+
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Employee Bonus">
+                            <field name="emp_bonus_ids" readonly="state != 'draft'">
+                                <tree create="false">
+                                    <field name="employee_id"/>
+                                    <field name="id_card_no"/>
+                                    <field name="user_work_location_id"/>
+                                    <field name="department_id"/>
+                                    <field name="date"/>
+                                    <field name="gross_salary"/>
+                                    <field name="basic_salary"/>
+                                    <field name="bonus_type_id"/>
+                                    <field name="based_on_type"/>
+                                    <field name="amount_percentage"/>
+                                    <field name="bonus_amount" sum="Total Bonus"/>
+                                    <field name="state" />
+                                </tree>
+                                <form>
+                                    <group>
+                                        <field name="employee_id" readonly="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                        <field name="user_work_location_id" readonly="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                        <field name="department_id" readonly="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                        <field name="date" readonly="1"/>
+                                        <field name="bonus_type_id" readonly="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                        <field name="amount_percentage" readonly="1"/>
+                                        <field name="gross_salary" readonly="1"/>
+                                        <field name="reference" readonly="1"/>
+                                        <field name="bonus_amount" readonly="1"/>
+                                        <field name="state" invisible="1"/>
+                                    </group>
+                                </form>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Batch HR Employee Bonus Tree -->
+    <record id="view_batch_hr_employee_bonus_tree" model="ir.ui.view">
+        <field name="name">batch.hr.employee.bonus.tree</field>
+        <field name="model">batch.hr.employee.bonus</field>
+        <field name="arch" type="xml">
+            <tree string="Batch Employee Bonus">
+                <field name="bonus_date" />
+                <field name="name" />
+                <field name="user_work_location_id" />
+                <field name="department_id" />
+                <field name="bonus_type_id" />
+                <field name="state"/>
+                <!--<field name="is_emp_bonus_done" />-->
+                <field name="company_id" groups="base.group_multi_company"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Batch HR Employee Bonus Search -->
+    <record id="view_batch_hr_employee_bonus_search" model="ir.ui.view">
+        <field name="name">batch.hr.employee.bonus.search</field>
+        <field name="model">batch.hr.employee.bonus</field>
+        <field name="arch" type="xml">
+            <search string="Search Batch Employee Bonus">
+                <field name="name" string="Batch Attendance Sheet"/>
+                <field name="user_work_location_id" string="Work/Job Location"/>
+                <field name="department_id" string="Department"/>
+                <filter string="Draft" name="draft_filter" domain="[('state', '=', 'draft')]" help="Draft Batch Employee Bonus"/>
+                <filter string="Confirmed" name="confirmed_filter" domain="[('state', '=', 'confirmed')]" help="Confirmed Batch Employee Bonus"/>
+                <filter string="Done" name="done_filter" domain="[('state', '=', 'done')]" help="Done Batch Employee Bonus"/>
+                <group expand="0" string="Group By">
+                    <filter string="Bonus Type" name="bonus_type_id" context="{'group_by': 'bonus_type_id'}" />
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Batch HR Employee Bonus Action -->
+    <record id="action_batch_hr_employee_bonus" model="ir.actions.act_window">
+        <field name="name">Batch Employee Bonus</field>
+        <field name="res_model">batch.hr.employee.bonus</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_batch_hr_employee_bonus_search"/>
+    </record>
+
+    <!-- Batch HR Employee Bonus Menu -->
+    <!--<menuitem
+        id="menu_batch_hr_employee_bonus"
+        action="action_batch_hr_employee_bonus"
+        name="Batch Employee Bonus"
+        sequence="2"
+        parent="hr_employee_bonus.menu_employee_bonus"
+        groups="hr.group_hr_manager,hr_payroll.group_hr_payroll_manager"/>-->
+
+    <menuitem
+        id="menu_batch_hr_employee_bonus_payroll"
+        action="action_batch_hr_employee_bonus"
+        name="Batch Employee Bonus"
+        sequence="2"
+        parent="hr_employee_bonus.menu_employee_bonus_payroll"
+        groups="hr.group_hr_manager,hr_payroll.group_hr_payroll_manager"/>
+
+</odoo>

@@ -1,0 +1,592 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_payslip">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <style type="text/css">
+                            th {
+                                background: white !important;
+                            }
+                            .bg_white {
+                                background: white !important;
+                            }
+                        </style>
+    <!--                    <h2 class="text-center" t-field="o.name"/>-->
+                        <h2 t-if="o.struct_id.code == 'BASE'" class="text-center">
+                            Salary Slip - <span style="color: #374151 !important;"><t t-esc="datetime.datetime.strptime(str(o.date_to), '%Y-%m-%d').strftime('%B %Y')"/></span>
+                        </h2>
+                        <h2 t-else="" class="text-center">
+                            Bonus Slip - <span style="color: #374151 !important;"><t t-esc="datetime.datetime.strptime(str(o.date_to), '%Y-%m-%d').strftime('%B %Y')"/></span>
+                        </h2>
+
+                        <div class="row">
+                            <div class="col-6 text-left">
+                                <strong>Unit/Branch: <span t-field="o.employee_id.user_work_location_id"/></strong>
+                            </div>
+                            <div class="col-6 text-right">
+                                <strong>Print Date: <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d-%b-%Y %H:%M')"/></strong>
+                            </div>
+                        </div>
+
+<!--                        <table class="table table-sm table-bordered" style="border: 1px solid black !important;">-->
+                        <table class="table-condensed" width="100%" style="border: 1px solid black !important;">
+                            <tr>
+                                <td width="50%" style="border: 1px solid black !important;">
+                                    <div><strong>Name: </strong><span t-field="o.employee_id"/></div>
+                                    <div><strong>Designation: </strong><span t-field="o.employee_id.job_id"/></div>
+                                    <div><strong>Email: </strong><span t-field="o.employee_id.work_email"/></div>
+                                    <div><strong>Cell: </strong><span t-field="o.employee_id.mobile_phone"/></div>
+                                    <div><strong>ID: </strong><span t-field="o.employee_id.id_card_no"/></div>
+                                </td>
+                                <td class="bg_white" width="50%" style="border: 1px solid black !important;"><strong>Company Information</strong>
+                                    <div><span t-field="o.company_id.name"/></div>
+                                    <div><span t-field="o.company_id.street"/></div>
+                                    <div><span t-field="o.company_id.street2" t-if="o.company_id.street2"/></div>
+                                    <div>
+                                        <span t-field="o.company_id.city"/>
+                                        <span t-field="o.company_id.state_id"/>
+                                        <span t-field="o.company_id.zip"/>
+                                        <span t-field="o.company_id.country_id"/>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid black !important; width: 50%"><strong>Reference: </strong><span t-field="o.ref_note"/></td>
+                                <td class="bg_white" style="border: 1px solid black !important; width: 50%"><strong>Bank Account: </strong><span t-field="o.employee_id.bank_account_id"/></td>
+                            </tr>
+
+                            <tr>
+                                <td style="border: 1px solid black !important; width: 50%"><strong>Date From: </strong><span t-field="o.date_from"/></td>
+                                <td class="bg_white" style="border: 1px solid black !important; width: 50%"><strong>Date To: </strong><span t-field="o.date_to"/></td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid black !important; width: 50%"><strong>Computed On: </strong><span t-field="o.compute_date"/></td>
+                                <td class="bg_white" style="border: 1px solid black !important; width: 50%"><strong>Salary Slip Number: </strong><span t-field="o.number"/></td>
+                            </tr>
+                            <tr>
+<!--                                o.line_ids.filtered(lambda line: line.code == 'GROSS').total-->
+<!--                                (o.line_ids.filtered(lambda line: line.code == 'GROSS').total)-->
+                                <td style="border: 1px solid black !important; width: 50%"><strong>Gross Salary: </strong><span t-esc="o.employee_id.contract_id.gross_salary"
+                                          t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/></td>
+                                <td class="bg_white" style="border: 1px solid black !important; width: 50%"><strong>In Words: </strong><span class="m-0" t-esc="o.amount_in_words(float(o.employee_id.contract_id.gross_salary))"/></td>
+                            </tr>
+                        </table>
+
+                        <br/>
+
+                        <table class="table-condensed" width="100%">
+                            <thead>
+                                <tr>
+<!--                                    <th>Code</th>-->
+                                    <th>Details</th>
+                                    <th colspan="2">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-set="ctype" t-value=""/>
+                                <t t-set="total_amt_a" t-value="0"/>
+
+                                <t t-set="cat_type_a" t-value="o.line_ids.filtered(lambda x: x.cat_type=='a')"/>
+                                <t t-foreach="cat_type_a" t-as="line">
+                                    <t t-if="line.cat_type != ctype">
+                                        <tr>
+<!--                                            <td></td>-->
+                                            <td t-if="line.cat_type == 'a'" t-attf-style="background-color:{{data['color2']}}!important;"><strong>A. Gross Salary (Breakdown)</strong></td>
+                                            <td t-attf-style="background-color:{{data['color3']}}!important; width: 15%; border-right: none;"></td>
+                                            <td t-attf-style="background-color:{{data['color3']}}!important; width: 15%;"></td>
+                                        </tr>
+                                    </t>
+                                    <t t-set="ctype" t-value="line.cat_type"/>
+                                    <t t-if="line.cat_type == ctype">
+                                        <tr>
+<!--                                            <td></td>-->
+                                            <td t-attf-style="background-color:{{data['color2']}}!important;"><span t-field="line.name"/></td>
+                                            <td t-attf-style="background-color:{{data['color3']}}!important; width: 15%; border-right: none;"></td>
+                                            <td class="text-right" t-attf-style="background-color:{{data['color3']}}!important; width: 15%;">
+                                                <span t-esc="line.total"
+                                                      t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
+                                                <t t-set="total_amt_a" t-value="total_amt_a + line.total"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </t>
+                                <tr t-if="cat_type_a">
+<!--                                    <td style="border-bottom: 1px solid black !important;"></td>-->
+                                    <td style="border-bottom: 1px solid black !important;"></td>
+                                    <td class="text-left" style="border-bottom: 1px solid black !important; width: 15%; border-right: none;"><strong>Total:</strong></td>
+                                    <td class="text-right bg_white" style="border-bottom: 1px solid black !important; width: 15%;">
+                                        <strong><span t-esc="'{0:,.2f}'.format(total_amt_a)"/> BDT</strong>
+                                    </td>
+                                </tr>
+
+                                <t t-set="ctype" t-value=""/>
+                                <t t-set="total_amt_b" t-value="0"/>
+                                <t t-set="cat_type_b" t-value="o.line_ids.filtered(lambda x: x.cat_type=='b')"/>
+                                <t t-foreach="cat_type_b" t-as="line">
+                                    <t t-if="line.cat_type != ctype">
+                                        <tr>
+<!--                                            <td></td>-->
+                                            <td t-if="line.cat_type == 'b' and o.struct_id.code == 'BASE'" t-attf-style="background-color:{{data['color2']}}!important;"><strong>B. Additional Allowance</strong></td>
+                                            <td t-else="line.cat_type == 'b'" t-attf-style="background-color:{{data['color2']}}!important;"><strong>Additional Allowance</strong></td>
+                                            <td t-attf-style="background-color:{{data['color3']}}!important; width: 15%; border-right: none;"></td>
+                                            <td t-attf-style="background-color:{{data['color3']}}!important; width: 15%;"></td>
+                                        </tr>
+                                    </t>
+                                    <t t-set="ctype" t-value="line.cat_type"/>
+                                    <t t-if="line.cat_type == ctype and line.total != 0">
+                                        <tr>
+<!--                                            <td></td>-->
+                                            <td t-attf-style="background-color:{{data['color2']}}!important;"><span t-field="line.name"/></td>
+                                            <td t-attf-style="background-color:{{data['color3']}}!important; width: 15%; border-right: none;"></td>
+                                            <td class="text-right" t-attf-style="background-color:{{data['color3']}}!important; width: 15%;">
+                                                <span t-esc="line.total"
+                                                      t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
+                                                <t t-set="total_amt_b" t-value="total_amt_b + line.total"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </t>
+                                <tr t-if="cat_type_b">
+<!--                                    <td style="border-bottom: 1px solid black !important;"></td>-->
+                                    <td style="border-bottom: 1px solid black !important;"></td>
+                                    <td class="text-left" style="border-bottom: 1px solid black !important; width: 15%; border-right: none;"><strong>Total:</strong></td>
+                                    <td class="text-right bg_white" style="border-bottom: 1px solid black !important; width: 15%;">
+                                        <strong><span t-esc="'{0:,.2f}'.format(total_amt_b)"/> BDT</strong>
+                                    </td>
+                                </tr>
+
+
+                                <t t-set="ctype" t-value=""/>
+                                <t t-set="total_amt_c" t-value="0"/>
+                                <t t-set="cat_type_c" t-value="o.line_ids.filtered(lambda x: x.cat_type=='c')"/>
+                                <t t-foreach="cat_type_c" t-as="line">
+                                    <t t-if="line.cat_type != ctype">
+                                        <tr>
+<!--                                            <td></td>-->
+                                            <td t-if="line.cat_type == 'c'" t-attf-style="background-color:{{data['color2']}}!important;"><strong>C. Deduction</strong></td>
+                                            <td t-attf-style="background-color:{{data['color3']}}!important; width: 15%; border-right: none;"></td>
+                                            <td t-attf-style="background-color:{{data['color3']}}!important; width: 15%;"></td>
+                                        </tr>
+                                    </t>
+                                    <t t-set="ctype" t-value="line.cat_type"/>
+                                    <t t-if="line.cat_type == ctype and line.total != 0">
+                                        <tr>
+<!--                                            <td></td>-->
+                                            <td t-attf-style="background-color:{{data['color2']}}!important;"><span t-field="line.name"/></td>
+                                            <td t-attf-style="background-color:{{data['color3']}}!important; width: 15%; border-right: none;"></td>
+                                            <td class="text-right" t-attf-style="background-color:{{data['color3']}}!important; width: 15%;">
+                                                <span t-esc="((-1) * line.total)"
+                                                      t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
+                                                <t t-set="total_amt_c" t-value="total_amt_c + ((-1) * line.total)"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </t>
+                                <tr t-if="cat_type_c">
+<!--                                    <td style="border-bottom: 1px solid black !important;"></td>-->
+                                    <td style="border-bottom: 1px solid black !important;"></td>
+                                    <td class="text-left" style="border-bottom: 1px solid black !important; width: 15%; border-right: none;"><strong>Total:</strong></td>
+                                    <td class="text-right bg_white" style="border-bottom: 1px solid black !important; width: 15%;">
+                                        <strong><span t-esc="'{0:,.2f}'.format(total_amt_c)"/> BDT</strong>
+                                    </td>
+                                </tr>
+
+                                <t t-set="ctype" t-value=""/>
+                                <t t-set="total_amt_d" t-value="0"/>
+                                <t t-set="cat_type_d" t-value="o.line_ids.filtered(lambda x: x.cat_type=='d')"/>
+                                <t t-foreach="cat_type_d" t-as="line">
+                                    <t t-if="line.cat_type != ctype">
+                                        <tr>
+<!--                                            <td></td>-->
+                                            <td t-if="line.cat_type == 'd' and o.struct_id.code == 'BASE'" t-attf-style="background-color:{{data['color2']}}!important;"><strong>Net Payable Salary (A + B - C)</strong></td>
+                                            <td t-else="line.cat_type == 'd'" t-attf-style="background-color:{{data['color2']}}!important;"><strong>Net Payable</strong></td>
+
+                                            <t t-set="ctype" t-value="line.cat_type"/>
+
+                                            <t t-if="line.cat_type == ctype">
+                                                <td t-attf-style="background-color:{{data['color3']}}!important; width: 15%; border-right: none;"></td>
+                                                <td class="text-right" t-attf-style="background-color:{{data['color3']}}!important; width: 15%;">
+                                                   <strong>
+                                                       <span t-esc="line.total"
+                                                          t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
+                                                   </strong>
+                                                    <t t-set="total_amt_d" t-value="total_amt_d + line.total"/>
+                                                </td>
+                                            </t>
+                                        </tr>
+                                    </t>
+<!--                                    <t t-set="ctype" t-value="line.cat_type"/>
+                                    <t t-if="line.cat_type == ctype">
+                                        <tr>
+&lt;!&ndash;                                            <td></td>&ndash;&gt;
+    &lt;!&ndash;                                        <span t-field="line.code"/>&ndash;&gt;
+                                            <td><span t-field="line.name"/></td>
+                                            <td style="width: 15%; border-right: none;"></td>
+                                            <td class="text-right" style="width: 15%;">
+                                                <span t-esc="line.total"
+                                                      t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
+                                                <t t-set="total_amt_d" t-value="total_amt_d + line.total"/>
+                                            </td>
+                                        </tr>
+                                    </t>-->
+                                </t>
+<!--                                <tr t-if="cat_type_d">
+&lt;!&ndash;                                    <td></td>&ndash;&gt;
+                                    <td></td>
+                                    <td class="text-left" style="border-bottom: 1px solid black !important; width: 15%; border-right: none;"><strong>Total Amount:</strong></td>
+                                    <td class="text-right" style="border-bottom: 1px solid black !important; width: 15%;">
+                                        <strong><span t-esc="'{0:,.2f}'.format(total_amt_d)"/> Tk</strong>
+                                    </td>
+                                </tr>-->
+
+
+                            </tbody>
+                        </table>
+
+                        <h6>
+                            <strong>Amount in Words: </strong>
+                            <span class="m-0" t-esc="o.amount_in_words(float(total_amt_d))"/>
+                        </h6>
+                        <br/>
+                        <br/>
+                        <p class="text-right" style="text-decoration: overline;"><strong>AUTHORIZED SIGNATURE</strong></p>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!--payslip format-2-->
+    <template id="report_payslip_extra">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <style type="text/css">
+                            .bg_white {
+                                background: white !important;
+                            }
+                            .table_border {
+                                border-collapse: separate !important;
+                                border: none !important;
+                                border-spacing: 5px;
+                            }
+                        </style>
+                        <h2 t-if="o.struct_id.code == 'BASE'" class="text-center">
+                            Pay Slip - <span style="color: #374151 !important;"><t t-esc="datetime.datetime.strptime(str(o.date_to), '%Y-%m-%d').strftime('%B %Y')"/></span>
+                        </h2>
+                        <h2 t-else="" class="text-center">
+                            Bonus Slip - <span style="color: #374151 !important;"><t t-esc="datetime.datetime.strptime(str(o.date_to), '%Y-%m-%d').strftime('%B %Y')"/></span>
+                        </h2>
+                        <div class="row">
+                            <div class="col-6 text-left">
+                                <strong>Unit: <span t-field="o.employee_id.work_location_id.name"/></strong>
+                            </div>
+                            <div class="col-6 text-right">
+                                <strong>Print Date: <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d-%b-%Y %H:%M')"/></strong>
+                            </div>
+                        </div>
+
+
+                        <table width="100%" style="border: none;">
+                            <tr t-if="data['color1']!='#FFFFFF'">
+
+
+                                <td width="15%" class="text-left" t-attf-style="background-color:{{data['color1']}}!important; color: white; border: none;">
+                                </td>
+                                <td width="35%" class="text-left" t-attf-style="background-color:{{data['color1']}}!important; color: white; border: none;"><strong>Employee Information</strong></td>
+
+
+                                <td width="15%" class="text-left" t-attf-style="background-color:{{data['color1']}}!important; color: white; border: none;">
+                                </td>
+                                <td width="35%" class="text-left" t-attf-style="background-color:{{data['color1']}}!important;  color: white; border: none;"><strong>Company Information</strong></td>
+                            </tr>
+                            <tr t-else="">
+                                <td width="15%" class="text-left" t-attf-style="background-color:{{data['color1']}}!important; border: none;">
+                                </td>
+                                <td width="35%" class="text-left" t-attf-style="background-color:{{data['color1']}}!important; border: none;"><strong>Employee Information</strong></td>
+
+                                <td width="15%" class="text-left" t-attf-style="background-color:{{data['color1']}}!important; border: none;">
+                                </td>
+                                <td width="35%" class="text-left" t-attf-style="background-color:{{data['color1']}}!important; border: none;"><strong>Company Information</strong></td>
+                            </tr>
+                            <tr>
+                                <td width="15%" class="text-right" style="border: none; background: white;">
+                                    <strong>Name: </strong>
+                                </td>
+                                <td width="35%" class="text-left" style="border: none; background: white;">
+                                    <span><span t-field="o.employee_id.name"/></span>
+                                </td>
+                                <td width="15%" class="text-right" style="border: none; background: white;">
+                                </td>
+                                <td width="35%" class="text-left" style="border: none; background: white;">
+                                    <div><span t-field="o.company_id.name"/></div>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td width="15%" class="text-right" style="border: none; background: white;">
+                                    <strong>Designation: </strong>
+                                </td>
+                                <td width="35%" class="text-left" style="border: none; background: white;">
+                                    <span><span t-field="o.employee_id.job_id"/></span>
+                                </td>
+                                <td width="15%" class="text-right" style="border: none; background: white;">
+                                </td>
+                                <td width="35%" class="text-left" style="border: none; background: white;">
+                                    <div><span t-field="o.company_id.street"/></div>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td width="15%" class="text-right" style="border: none; background: white;">
+                                    <strong>Email: </strong>
+                                </td>
+                                <td width="35%" class="text-left" style="border: none; background: white;">
+                                    <span><span t-field="o.employee_id.work_email"/></span>
+                                </td>
+                                <td width="15%" class="text-right" style="border: none; background: white;">
+                                </td>
+                                <td width="35%" class="text-left" style="border: none; background: white;">
+                                    <div><span t-field="o.company_id.street2" t-if="o.company_id.street2"/></div>
+                                    <div>
+                                        <span t-field="o.company_id.city"/>
+                                        <span t-field="o.company_id.state_id"/>
+                                        <span t-field="o.company_id.zip"/>
+                                        <span t-field="o.company_id.country_id"/>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td width="15%" class="text-right" style="border: none; background: white;">
+                                    <strong>Cell: </strong>
+                                </td>
+                                <td width="35%" class="text-left" style="border: none; background: white;">
+                                    <span><span t-field="o.employee_id.mobile_phone"/></span>
+                                </td>
+                                <td width="15%" class="text-right" style="border: none; background: white;">
+                                </td>
+                                <td width="35%" class="text-left" style="border: none; background: white;">
+                                    <div>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td style="border-top: none; border-left: none; border-right: none; border-bottom: 1px solid black !important; background: white;" width="15%" class="text-right">
+                                    <strong>ID: </strong>
+                                </td>
+                                <td style="border-top: none; border-left: none; border-right: none; border-bottom: 1px solid black !important;  background: white;" width="35%" class="text-left">
+                                    <span><span t-field="o.employee_id.id_card_no"/></span>
+                                </td>
+                                <td style="border-top: none; border-left: none; border-right: none; border-bottom: 1px solid black !important;  background: white;" width="15%" class="text-right">
+                                </td>
+                                <td style="border-top: none; border-left: none; border-right: none; border-bottom: 1px solid black !important;  background: white;" width="35%" class="text-left">
+                                    <div></div>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td width="15%" class="text-right" style="border: none; background: white;">
+                                    <strong>Reference: </strong>
+                                </td>
+                                <td width="35%" class="text-left" style="border: none; background: white;">
+                                    <span><span t-field="o.ref_note"/></span>
+                                </td>
+                                <td width="15%" class="text-right" style="border: none; background: white;">
+                                    <strong>Bank Account: </strong>
+                                </td>
+                                <td width="35%" class="text-left" style="border: none; background: white;">
+                                    <div><span t-field="o.employee_id.bank_account_id"/></div>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td width="15%" class="text-right" style="border: none; background: white;">
+                                    <strong>Date From: </strong>
+                                </td>
+                                <td width="35%" class="text-left" style="border: none; background: white;">
+                                    <span><span t-field="o.date_to"/></span>
+                                </td>
+                                <td width="15%" class="text-right" style="border: none; background: white;">
+                                    <strong>Date To: </strong>
+                                </td>
+                                <td width="35%" class="text-left" style="border: none; background: white;">
+                                    <div><span t-field="o.date_to"/></div>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td width="15%" class="text-right" style="border: none; background: white;">
+                                    <strong>Computed On: </strong>
+                                </td>
+                                <td width="35%" class="text-left" style="border: none; background: white;">
+                                    <span><span t-field="o.compute_date"/></span>
+                                </td>
+                                <td width="15%" class="text-right" style="border: none; background: white;">
+                                    <strong>Salary Slip No.: </strong>
+                                </td>
+                                <td width="35%" class="text-left" style="border: none; background: white;">
+                                    <div><span t-field="o.number"/></div>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td style="border: none; background: white;" width="15%" class="text-right">
+                                    <strong>Gross Salary: </strong>
+                                </td>
+                                <td style="border: none;  background: white;" width="35%" class="text-left">
+                                    <span t-esc="o.employee_id.contract_id.gross_salary"
+                                          t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
+                                </td>
+                                <td style="border: none; background: white;" width="15%" class="text-right">
+                                    <strong>In Words: </strong>
+                                </td>
+                                <td style="border: none; background: white;" width="35%" class="text-left">
+                                    <div><span class="m-0" t-esc="o.amount_in_words(float(o.employee_id.contract_id.gross_salary))"/></div>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <table class="table table-sm table_border" width="100%">
+                            <thead>
+                                <tr t-if="data['color1']!='#FFFFFF'">
+                                    <th class="text-center align-middle table_border" width="55%" t-attf-style="color:{{data['color1']}}!important;">Details</th>
+                                    <th class="text-center align-middle table_border" colspan="2" width="45%" t-attf-style="color:{{data['color1']}}!important;">Amount</th>
+                                </tr>
+                                <tr t-else="">
+                                    <th class="text-center align-middle table_border" width="55%">Details</th>
+                                    <th class="text-center align-middle table_border" colspan="2" width="45%">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-set="ctype" t-value=""/>
+                                <t t-set="total_amt_a" t-value="0"/>
+                                <t t-set="cat_type_a" t-value="o.line_ids.filtered(lambda x: x.cat_type=='a')"/>
+                                <t t-foreach="cat_type_a" t-as="line">
+                                    <t t-if="line.cat_type != ctype">
+                                        <tr>
+                                            <td t-if="line.cat_type == 'a'" t-attf-style="background-color:{{data['color2']}}!important; padding-left: 30px;" class="table_border"><strong>A. Gross Salary (Breakdown)</strong></td>
+                                            <td t-attf-style="background-color:{{data['color3']}}!important; width: 15%;" colspan="2" class="table_border"></td>
+                                        </tr>
+                                    </t>
+                                    <t t-set="ctype" t-value="line.cat_type"/>
+                                    <t t-if="line.cat_type == ctype">
+                                        <tr>
+                                            <td t-attf-style="background-color:{{data['color2']}}!important; padding-left: 220px;" class="table_border"><span t-field="line.name"/></td>
+                                            <td class="text-right table_border" t-attf-style="background-color:{{data['color3']}}!important; width: 15%; padding-right: 50px;" colspan="2">
+                                                <span t-esc="line.total"
+                                                      t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
+                                                <t t-set="total_amt_a" t-value="total_amt_a + line.total"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </t>
+                                <tr t-if="cat_type_a">
+                                    <td class="table_border"></td>
+                                    <td class="text-right bg_white table_border" style="width: 15%; padding-right: 50px;" colspan="2">
+                                        <strong><span t-esc="total_amt_a" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/></strong>
+                                    </td>
+                                </tr>
+
+                                <t t-set="ctype" t-value=""/>
+                                <t t-set="total_amt_b" t-value="0"/>
+                                <t t-set="cat_type_b" t-value="o.line_ids.filtered(lambda x: x.cat_type=='b')"/>
+                                <t t-foreach="cat_type_b" t-as="line">
+                                    <t t-if="line.cat_type != ctype">
+                                        <tr>
+                                            <td t-if="line.cat_type == 'b' and o.struct_id.code == 'BASE'" t-attf-style="background-color:{{data['color2']}}!important; padding-left: 30px;" class="table_border"><strong>B. Additional Allowance</strong></td>
+                                            <td t-else="line.cat_type == 'b'" t-attf-style="background-color:{{data['color2']}}!important; padding-left: 30px;" class="table_border"><strong>Additional Allowance</strong></td>
+                                            <td t-attf-style="background-color:{{data['color3']}}!important; width: 15%;" colspan="2" class="table_border"></td>
+                                        </tr>
+                                    </t>
+                                    <t t-set="ctype" t-value="line.cat_type"/>
+                                    <t t-if="line.cat_type == ctype and line.total != 0">
+                                        <tr>
+                                            <td class="table_border" t-attf-style="background-color:{{data['color2']}}!important; padding-left: 220px;"><span t-field="line.name"/></td>
+                                            <td class="text-right table_border" t-attf-style="background-color:{{data['color3']}}!important; width: 15%; padding-right: 50px;" colspan="2">
+                                                <span t-esc="line.total"
+                                                      t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
+                                                <t t-set="total_amt_b" t-value="total_amt_b + line.total"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </t>
+                                <tr t-if="cat_type_b">
+                                    <td class="table_border"></td>
+                                    <td class="text-right bg_white table_border" style="width: 15%; padding-right: 50px;" colspan="2">
+                                        <strong><span t-esc="total_amt_b" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/></strong>
+                                    </td>
+                                </tr>
+
+
+                                <t t-set="ctype" t-value=""/>
+                                <t t-set="total_amt_c" t-value="0"/>
+                                <t t-set="cat_type_c" t-value="o.line_ids.filtered(lambda x: x.cat_type=='c')"/>
+                                <t t-foreach="cat_type_c" t-as="line">
+                                    <t t-if="line.cat_type != ctype">
+                                        <tr>
+                                            <td class="table_border" t-if="line.cat_type == 'c'" t-attf-style="background-color:{{data['color2']}}!important; padding-left: 30px;"><strong>C. Deduction</strong></td>
+                                            <td class="table_border" t-attf-style="background-color:{{data['color3']}}!important; width: 15%;" colspan="2"></td>
+                                        </tr>
+                                    </t>
+                                    <t t-set="ctype" t-value="line.cat_type"/>
+                                    <t t-if="line.cat_type == ctype and line.total != 0">
+                                        <tr>
+                                            <td class="table_border" t-attf-style="background-color:{{data['color2']}}!important; padding-left: 220px;"><span t-field="line.name"/></td>
+                                            <td class="text-right table_border" t-attf-style="background-color:{{data['color3']}}!important; width: 15%; padding-right: 50px;" colspan="2">
+                                                <span t-esc="((-1) * line.total)"
+                                                      t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
+                                                <t t-set="total_amt_c" t-value="total_amt_c + ((-1) * line.total)"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </t>
+                                <tr t-if="cat_type_c">
+                                    <td class="table_border"></td>
+                                    <td class="text-right bg_white table_border" style="width: 15%; padding-right: 50px;" colspan="2">
+                                        <strong><span t-esc="total_amt_c" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/></strong>
+                                    </td>
+                                </tr>
+
+                                <t t-set="ctype" t-value=""/>
+                                <t t-set="total_amt_d" t-value="0"/>
+                                <t t-set="cat_type_d" t-value="o.line_ids.filtered(lambda x: x.cat_type=='d')"/>
+                                <t t-foreach="cat_type_d" t-as="line">
+                                    <t t-if="line.cat_type != ctype">
+                                        <tr>
+                                            <td class="table_border" t-if="line.cat_type == 'd' and o.struct_id.code == 'BASE'" t-attf-style="background-color:{{data['color2']}}!important; padding-left: 30px;"><strong>Net Payable Salary (A + B - C)</strong></td>
+                                            <td class="table_border" t-else="line.cat_type == 'd'" t-attf-style="background-color:{{data['color2']}}!important; padding-left: 30px;"><strong>Net Payable</strong></td>
+                                            <t t-set="ctype" t-value="line.cat_type"/>
+                                            <t t-if="line.cat_type == ctype">
+                                                <td class="text-right table_border" t-attf-style="background-color:{{data['color3']}}!important; width: 15%;padding-right: 50px;" colspan="2">
+                                                   <strong>
+                                                       <span t-esc="line.total"
+                                                          t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
+                                                   </strong>
+                                                    <t t-set="total_amt_d" t-value="total_amt_d + line.total"/>
+                                                </td>
+                                            </t>
+                                        </tr>
+                                    </t>
+                                </t>
+
+                            </tbody>
+                        </table>
+                        <h6>
+                            <strong>Amount in Words: </strong>
+                            <span class="m-0" t-esc="o.amount_in_words(float(total_amt_d))"/>
+                        </h6>
+                        <br/>
+                        <p class="text-right" style="text-decoration: overline;"><strong>AUTHORIZED SIGNATURE</strong></p>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+
+</odoo>

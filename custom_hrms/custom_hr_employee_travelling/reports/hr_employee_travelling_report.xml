@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+		<record id="hr_employee_travelling_report" model="ir.actions.report">
+			<field name="name">Print Employee Travelling Program</field>
+			<field name="model">hr_employee_travelling</field>
+			<field name="report_type">qweb-pdf</field>
+			<field name="report_name">custom_hr_employee_travelling.hr_employee_travelling_details_view</field>
+			<field name="report_file">custom_hr_employee_travelling.hr_employee_travelling_details_view</field>
+		</record>
+		<record id="hr_employee_travelling_report_paperformat" model="report.paperformat">
+			<field name="name">Travelling Program</field>
+			<field name="default" eval="True"/>
+			<field name="format">A4</field>
+			<field name="page_height">0</field>
+			<field name="page_width">0</field>
+			<field name="orientation">Portrait</field>
+			<field name="margin_top">3</field>
+			<field name="margin_bottom">3</field>
+			<field name="margin_left">3</field>
+			<field name="margin_right">3</field>
+			<field name="header_line" eval="False"/>
+			<field name="header_spacing">3</field>
+			<field name="dpi">90</field>
+		</record>
+
+		<template id="hr_employee_travelling_details_view">
+            <t t-call="web.html_container">
+                <t t-if="o and 'company_id' in o">
+                    <t t-set="company" t-value="o.company_id"></t>
+                </t>
+                <t t-if="not o or not 'company_id' in o">
+                    <t t-set="company" t-value="res_company"></t>
+                    <t t-foreach="docs" t-as="employee">
+                    	<t t-if="employee.company_id"><t t-set="company" t-value="employee.company_id"></t></t>
+                    </t>
+                </t>
+
+	            <t t-set="total_transport_cost" t-value="0.00"/>
+	            <t t-set="total_lodge" t-value="0.00"/>
+	            <t t-set="total_daily_allow" t-value="0.00"/>
+	            <t t-set="total_refreshment" t-value="0.00"/>
+	            <t t-set="total_other_cost" t-value="0.00"/>
+	            <t t-set="total_amount" t-value="0.00"/>
+
+	            <t t-call="custom_hr_employee_travelling.report_hr_employee_travelling_details_header" />
+				<t t-call="web.internal_layout">
+					<div class="page" style="margin-top:0px; font-size: 12px;">
+						<t t-foreach="docs" t-as="employee">
+							<div class="text-center" style="width: 100%; margin-bottom: 1rem; font-size: 1.5rem;">
+								<b>Traveling Program</b>
+							</div>
+							<div class="row">
+								<div class="col-8">
+									<table class="table table-bordered">
+										<tr>
+											<td class="text-left">Name</td>
+											<td class="text-left"><span t-esc="employee.employee_id.name"/></td>
+										</tr>
+										<tr>
+											<td class="text-left">Designation</td>
+											<td class="text-left"><span t-esc="employee.designation_id.name"/></td>
+										</tr>
+										<tr>
+											<td class="text-left">Department</td>
+											<td class="text-left"><span t-esc="employee.department_id.name"/></td>
+										</tr>
+										<tr>
+											<td class="text-left">Concern</td>
+											<td class="text-left"><span t-esc="company.name"/></td>
+										</tr>
+										<tr>
+											<td class="text-left">Date</td>
+											<td class="text-left"><span t-esc="employee.date"/></td>
+										</tr>
+									</table>
+								</div>
+								<div class="col-4">
+									<table class="table table-bordered">
+										<tr>
+											<td class="text-center" colspan="2"><b>Traveling Budget Approval</b></td>
+										</tr>
+										<tr>
+											<td class="text-left">Transport Cost</td>
+											<td class="text-left">100</td>
+										</tr>
+										<tr>
+											<td class="text-left">Refreshment</td>
+											<td class="text-left">100</td>
+										</tr>
+										<tr>
+											<td class="text-left">Lodge/Daily Allowance</td>
+											<td class="text-left">1000</td>
+										</tr>
+										<tr>
+											<td class="text-left"><b>Total</b></td>
+											<td class="text-left">1200</td>
+										</tr>
+									</table>
+								</div>
+							</div>
+							<!--Travelling Lines-->
+							<div style="margin-top: 1rem; margin-bottom: 1rem;">
+								<table class="table table-bordered">
+									<thead>
+										<th>Date</th>
+										<th>Time</th>
+										<th>From</th>
+										<th>To</th>
+										<th>Purpose of Visit</th>
+									</thead>
+									<t t-if="employee.employee_travelling_line_ids">
+										<t t-foreach="employee.employee_travelling_line_ids" t-as="travel_lines">
+											<tr>
+												<td class="text-left"><span t-esc="travel_lines.travel_date"/></td>
+												<td class="text-left"><span t-esc="travel_lines.travel_time" t-options='{"widget": "float_time"}'/></td>
+												<td class="text-left"><span t-esc="travel_lines.location_from"/></td>
+												<td class="text-left"><span t-esc="travel_lines.location_to"/></td>
+												<td class="text-left"><span t-esc="travel_lines.purpose_of_visit"/></td>
+											</tr>
+										</t>
+									</t>
+									<t t-else="">
+										<tr>
+											<td class="text-left">-</td>
+											<td class="text-left">-</td>
+											<td class="text-left">-</td>
+											<td class="text-left">-</td>
+											<td class="text-left">-</td>
+										</tr>
+									</t>
+								</table>
+							</div>
+
+							<!--Travel Program Signing-->
+							<div>
+								<table class="table">
+									<tr style="height: 6rem;">
+										<td class="text-left align-bottom" style="width: 50%%;">
+											<span style="border-top: 1px solid black;">Traveler</span>
+										</td>
+										<td class="text-right align-bottom" style="width: 50%%;">
+											<span style="border-top: 1px solid black;">Department Head</span>
+										</td>
+									</tr>
+								</table>
+							</div>
+							<!--Travelling Expenses-->
+							<div style="margin-top: 1rem; margin-bottom: 1rem;">
+								<table class="table table-bordered">
+									<thead class="text-center">
+										<tr>
+											<th rowspan="2">Date</th>
+											<th colspan="2">Place</th>
+											<th colspan="2">Traveling</th>
+											<th colspan="4">Entertainment</th>
+											<th rowspan="2">Amount</th>
+										</tr>
+										<tr>
+											<th>From</th>
+											<th>To</th>
+											<th>Transport Mode</th>
+											<th>Cost</th>
+											<th>Lodge</th>
+											<th>Daily Allowance</th>
+											<th>Refreshment</th>
+											<th>Other</th>
+										</tr>
+									</thead>
+									<tbody>
+										<t t-if="employee.employee_travelling_line_ids">
+											<t t-foreach="employee.employee_travelling_line_ids" t-as="travel_lines">
+												<t t-if="travel_lines.travelling_expense_ids">
+													<t t-foreach="travel_lines.travelling_expense_ids" t-as="expense_line">
+														<tr style="font-size: 11px;">
+															<td class="text-left"><span t-esc="expense_line.travel_expense_date"/></td>
+															<td class="text-left"><span t-esc="expense_line.location_from"/></td>
+															<td class="text-left"><span t-esc="expense_line.location_to"/></td>
+															<td class="text-left"><span t-esc="expense_line.transport_mode"/></td>
+															<td class="text-left">
+																<t t-set="total_transport_cost"
+																   t-value="total_transport_cost + expense_line.transport_cost"/>
+																<span t-esc="'{:.2f}'.format(expense_line.transport_cost)"/>
+															</td>
+															<td class="text-left">
+																<t t-set="total_lodge"
+																   t-value="total_lodge + expense_line.lodge"/>
+																<span t-esc="'{:.2f}'.format(expense_line.lodge)"/>
+															</td>
+															<td class="text-left">
+																<t t-set="total_daily_allow"
+																   t-value="total_daily_allow + expense_line.daily_allowance"/>
+																<span t-esc="'{:.2f}'.format(expense_line.daily_allowance)"/>
+															</td>
+															<td class="text-left">
+																<t t-set="total_refreshment"
+																   t-value="total_refreshment + expense_line.refreshment"/>
+																<span t-esc="'{:.2f}'.format(expense_line.refreshment)"/>
+															</td>
+															<td class="text-left">
+																<t t-set="total_other_cost"
+																   t-value="total_other_cost + expense_line.other_entertainment"/>
+																<span t-esc="'{:.2f}'.format(expense_line.other_entertainment)"/>
+															</td>
+															<td class="text-left">
+																<t t-set="total_amount" t-value="total_amount + expense_line.total"/>
+																<span t-esc="'{:.2f}'.format(expense_line.total)"/>
+															</td>
+														</tr>
+													</t>
+												</t>
+											</t>
+										</t>
+										<t t-else="">
+											<tr>
+												<td class="text-left">-</td>
+												<td class="text-left">-</td>
+												<td class="text-left">-</td>
+												<td class="text-left">-</td>
+												<td class="text-left">-</td>
+												<td class="text-left">-</td>
+												<td class="text-left">-</td>
+												<td class="text-left">-</td>
+												<td class="text-left">-</td>
+												<td class="text-left">-</td>
+											</tr>
+										</t>
+										<tr>
+											<td colspan="4"><b>Total</b></td>
+											<td><b><span t-esc="'{:.2f}'.format(total_transport_cost)"/></b></td>
+											<td><b><span t-esc="'{:.2f}'.format(total_lodge)"/></b></td>
+											<td><b><span t-esc="'{:.2f}'.format(total_daily_allow)"/></b></td>
+											<td><b><span t-esc="'{:.2f}'.format(total_refreshment)"/></b></td>
+											<td><b><span t-esc="'{:.2f}'.format(total_other_cost)"/></b></td>
+											<td><b><span t-esc="'{:.2f}'.format(total_amount)"/></b></td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+							<!--Travel Expense Signing-->
+							<div>
+								<table class="table">
+									<tr style="height: 6rem;">
+										<td class="text-left align-bottom" style="width: 16.6%%;">
+											<span style="border-top: 1px solid black;">Receiver</span>
+										</td>
+										<td class="text-center align-bottom" style="width: 16.6%%;">
+											<span style="border-top: 1px solid black;">Department Head</span>
+										</td>
+										<td class="text-center align-bottom" style="width: 16.6%%;">
+											<span style="border-top: 1px solid black;">HR &amp; Admin</span>
+										</td>
+										<td class="text-center align-bottom" style="width: 16.6%%;">
+											<span style="border-top: 1px solid black;">Accounts Dept.</span>
+										</td>
+										<td class="text-center align-bottom" style="width: 16.6%%;">
+											<span style="border-top: 1px solid black;">(Acknowledged By)</span>
+										</td>
+										<td class="text-right align-bottom" style="width: 16.6%%;">
+											<span style="border-top: 1px solid black;">Unit Head</span>
+										</td>
+									</tr>
+								</table>
+<!--								<div class="col-2" style="border-top: 1px solid black;">-->
+<!--									<span>Receiver</span>-->
+<!--								</div>-->
+<!--								<div class="col-2" style="border-top: 1px solid black;">-->
+<!--									<span>Department Head</span>-->
+<!--								</div>-->
+<!--								<div class="col-2" style="border-top: 1px solid black;">-->
+<!--									<span>HR &amp; Admin</span>-->
+<!--								</div>-->
+<!--								<div class="col-2" style="border-top: 1px solid black;">-->
+<!--									<span>Accounts Dept.</span>-->
+<!--								</div>-->
+<!--								<div class="col-2" style="border-top: 1px solid black;">-->
+<!--									<span>(Acknowledged By)</span>-->
+<!--								</div>-->
+<!--								<div class="col-2" style="border-top: 1px solid black;">-->
+<!--									<span>Unit Head</span>-->
+<!--								</div>-->
+							</div>
+						</t>
+					</div>
+				</t>
+	            <t t-call="custom_hr_employee_travelling.report_hr_employee_travelling_details_footer" />
+            </t>
+		</template>
+
+		<template id="custom_hr_employee_travelling.report_hr_employee_travelling_details_header">
+			<div class="header">
+				<div class="row">
+					<div class="col-2 mr-4 text-left">
+						<img t-if="company.logo" t-att-src="image_data_uri(company.logo)"
+                                 style="max-height:150px;max-width:110px" alt="Company Logo"/>
+<!--						<img t-if="company.logo" t-att-src="'data:image/png;base64,%s' % company.logo"-->
+<!--							style="max-height:90px;max-width:110px" />-->
+					</div>
+
+					<div class="col-10 text-left">
+                        <strong>
+                            <div t-field="company.name" style="font-size:25px;"/>
+                        </strong>
+                        <span t-field="company.street"/>
+                        <span t-field="company.street2"/>
+                        <span t-field="company.city"/>
+                        <span t-field="company.zip"/>
+                        <br/>
+                        Phone:
+                        <span t-field="company.phone"/>
+                        <br/>
+<!--                        Fax:-->
+<!--                        <span t-field="company.fax"/>-->
+<!--                        <br/>-->
+                        Web:
+                        <span t-field="company.website"/>
+                    </div>
+				</div>
+			</div>
+		</template>
+
+        <template id="custom_hr_employee_travelling.report_hr_employee_travelling_details_footer">
+			<div class="footer">
+
+				<div class="row" style="border-top:solid 1px #000;">
+					<div class="col-4">
+						<span
+							t-esc="context_timestamp(datetime.datetime.now()).strftime('%a, %d %b %Y %H:%M:%S')" />
+					</div>
+					<div class="col-4">
+						Printed By:
+						<span t-esc="user.name"></span>
+					</div>
+					<div t-if="report_type == 'pdf'" class="col-4 text-right">
+                    Page:
+                    <span class="page"/>
+                    of
+                    <span class="topage"/>
+                </div>
+				</div>
+			</div>
+		</template>
+	</data>
+</odoo>

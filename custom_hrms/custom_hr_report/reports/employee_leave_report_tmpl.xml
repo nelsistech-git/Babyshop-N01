@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <data>
+
+        <record model="ir.actions.report" id="employee_leave_report_tmpl">
+            <field name="name">Leave Report</field>
+            <field name="model">employee.leave.report.wizard</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">custom_hr_report.employee_leave_report_view</field>
+            <field name="report_file">custom_hr_report.employee_leave_report_view</field>
+            <field name="paperformat_id" ref="custom_common_settings.paperformat_custom_a4_bd"/>
+        </record>
+
+        <template id="employee_leave_report_view">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <style type="text/css">
+                            table, th, tr, td{
+                                background: white !important;
+                                border: 1px solid black;
+                            }
+                        </style>
+                        <div class="oe_structure"/>
+                        <div>
+                            <h3 class="text-center head_font_color">
+                                <strong>
+                                    <span>
+                                        <span t-esc="form['company_id'][1]"/>
+                                        <br/>
+                                        Leave Report (Date Wise)
+                                    </span>
+                                    <br/>
+                                </strong>
+                            </h3>
+                            <div class="row">
+                                <div class="col-6 text-left">
+                                    <div style="color: #000; font-size: 15px;">
+                                        <strong>From Date:</strong>
+                                        <t t-esc="form['start_date']" t-options='{"widget": "date"}'/>
+                                    </div>
+                                    <div style="color: #000; font-size: 15px;">
+                                        <strong>To Date:</strong>
+                                        <t t-esc="form['end_date']" t-options='{"widget": "date"}'/>
+                                    </div>
+                                    <div style="color: #000; font-size: 15px;">
+                                        <strong>Work/Job Location:</strong>
+                                        <t t-esc="work_loc_name"/>
+                                    </div>
+                                    <div style="color: #000; font-size: 15px;">
+                                        <t t-if="buisness_unit">
+                                            <strong>Office/business Unit:</strong>
+                                            <t t-esc="buisness_unit"/>
+                                        </t>
+                                    </div>
+
+                                </div>
+                                <div class="col-6 text-right">
+                                    <div style="color: #000; font-size: 15px;">
+                                        <strong>Time Off Type:</strong>
+                                        <t t-esc="leave_type_name"/>
+                                    </div>
+                                    <div style="color: #000; font-size: 15px;">
+                                        <strong>Department:</strong>
+                                        <t t-esc="dept_name"/>
+                                    </div>
+                                    <div style="color: #000; font-size: 15px;">
+                                        <strong>Status:</strong>
+                                        <t t-esc="status_name"/>
+                                    </div>
+                                    <div style="color: #000; font-size: 15px;">
+                                        <t t-if="tag_names_list">
+                                            <strong>Tags:</strong>
+                                            <t t-esc="tag_names_list"/>
+                                        </t>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <table class="table table-condensed" style="border-collapse: collapse;width: 100%; margin-bottom: 5px;">
+                            <thead>
+                                <tr style="color: black !important;">
+                                    <th class="text-center align-middle text-nowrap bg_color font_color">Sl.</th>
+                                    <th class="text-center align-middle text-nowrap bg_color font_color">Employee</th>
+                                    <th class="text-center align-middle text-nowrap bg_color font_color">Designation</th>
+                                    <th class="text-center align-middle text-nowrap bg_color font_color">Employee ID</th>
+                                    <th class="text-center align-middle text-nowrap bg_color font_color">Start Date</th>
+                                    <th class="text-center align-middle text-nowrap bg_color font_color">End Date</th>
+                                    <th class="text-center align-middle bg_color font_color">Duration (Days)</th>
+                                    <th class="text-center align-middle text-nowrap bg_color font_color">Status</th>
+                                    <th class="text-center align-middle text-nowrap bg_color font_color">Time Off Type</th>
+                                </tr>
+                            </thead>
+                            <tbody class="consumed_tbody">
+                                <t t-set="sl_no" t-value="1"/>
+                                <t t-foreach="csr" t-as="line">
+                                    <tr>
+                                        <td class="text-center align-middle">
+                                            <t t-esc="sl_no"/>
+                                        </td>
+                                        <td class="text-center align-middle body_col_bg_color">
+                                            <span t-esc="line['emp_name']"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <span t-esc="line['designation']"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <span t-esc="line['id_no']"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <span t-esc="line['start_date']" t-options='{"widget": "date"}'/>
+                                        </td>
+                                        <td class="text-center align-middle text-nowrap">
+                                            <span t-esc="line['end_date']" t-options='{"widget": "date"}'/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <span t-esc="line['duration']"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <span t-esc="line['status']"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <span t-esc="line['leave_type']"/>
+                                        </td>
+                                    </tr>
+                                    <t t-set="sl_no" t-value="sl_no + 1"/>
+                                </t>
+                            </tbody>
+                        </table>
+                        <t t-set="sl_no" t-value="1"/>
+                    </div>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

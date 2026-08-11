@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <!-- Account Particular Line Details Form View -->
+        <record id="view_acc_particular_line_form" model="ir.ui.view">
+            <field name="name">view.acc.particular.line.form</field>
+            <field name="model">acc.particular.line</field>
+            <field name="arch" type="xml">
+                <form string="Account Particular Line">
+                    <group>
+                        <field name="acc_particular_line_details_ids">
+                            <tree string="Account Particular Line Details" editable="bottom" create="1" delete="1" limit="150">
+                                <field name="account_id" readonly="0" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="amt_type" readonly="0" required="1"/>
+                                <field name="sign" readonly="0" required="1"/>
+                                <field name="last_map_time" readonly="1"/>
+                            </tree>
+                        </field>
+
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <!-- Account Particular Tree View -->
+        <record id="view_acc_particular_tree" model="ir.ui.view">
+            <field name="name">view.acc.particular.tree</field>
+            <field name="model">acc.particular</field>
+            <field name="arch" type="xml">
+                <tree string="Account Particular">
+					<field name="fs_dept"/>
+					<field name="name"/>
+					<field name="type"/>
+					<field name="active"/>
+                    <field name="profit_loss_id" invisible="type  != 'BL'" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                    <field name="rpt_title_name" />
+				</tree>
+            </field>
+        </record>
+
+        <!-- Account Particular Form View -->
+        <record id="view_acc_particular_form" model="ir.ui.view">
+            <field name="name">view.acc.particular.form</field>
+            <field name="model">acc.particular</field>
+            <field name="arch" type="xml">
+                <form string="Account Particular">
+					<header>
+						<button name="action_map_accounts" string="Map Accounts" type="object"/>
+					</header>
+                    <sheet>
+                       <!--<div class="oe_button_box" name="button_box">
+                            <button name="action_map_accounts" class="oe_stat_button" type="object" string="Map Accounts"></button>
+                        </div>-->
+
+                        <group>
+                            <group>
+                                <field name="name" required="1"/>
+                            </group>
+                            <group>
+                                <field name="fs_dept" required="1"/>
+                            </group>
+                        </group>
+
+                        <group>
+                            <group>
+                                <field name="type" required="1"/>
+                                <field name="z_view_rule" required="1"/>
+                            </group>
+                            <group>
+                                <field name="active" required="1"/>
+                                <field name="usd_rate" required="0"/>
+                            </group>
+                        </group>
+                        <group>
+                            <field name="acc_particular_line_ids">
+                                <tree string="Account Particular Line" editable="bottom" default_order='code asc'>
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="code" required="1"/>
+                                    <field name="notes"/>
+                                    <field name="include_op_balance"/>
+                                    <field name="value_type" required="1"/>
+                                    <field name="fixed_amt" readonly="value_type =='dynamic'"/>
+                                    <field name="fixed_cmp_amt" readonly="value_type == 'dynamic'"/>
+                                    <button name="action_acc_particular_line" type="object" icon="fa-list" string="Details" invisible="value_type == 'fixed'"/>
+                                </tree>
+                            </field>
+                            <field name="profit_loss_id" invisible="type  != 'BL'" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="rpt_title_name" />
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Account Particular Search View -->
+        <record id="view_acc_particular_search" model="ir.ui.view">
+            <field name="name">view.acc.particular.search</field>
+            <field name="model">acc.particular</field>
+            <field name="arch" type="xml">
+                <search string="Search Account Particular Configuration">
+                    <field name="name" string="Format Name" filter_domain="[('name','ilike',self)]"/>
+                    <field name="acc_particular_line_ids" string="Account Particular Accounts" filter_domain="[('acc_particular_line_ids.acc_particular_line_details_ids.account_id','ilike',self)]"/>
+                    <filter string="Active" name="active_filter" domain="[('active', '=', True)]" help="Active Account Particular Configuration Formats"/>
+                    <filter string="Inactive" name="inactive_filter" domain="[('active', '=', False)]" help="Inactive Account Particular Configuration Formats"/>
+                </search>
+            </field>
+        </record>
+
+        <!-- Action for Account Particular -->
+        <record id="action_acc_particular" model="ir.actions.act_window">
+            <field name="name">Financial Report Configuration</field>
+            <field name="res_model">acc.particular</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_acc_particular_tree"/>
+            <field name="target">current</field>
+        </record>
+
+        <menuitem id="menu_acc_particular" sequence="50" action="action_acc_particular"
+                  name="Financial Report Config." parent="account.account_account_menu" groups="account.group_account_manager"/>
+    </data>
+</odoo>

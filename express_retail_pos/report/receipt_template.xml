@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--  ================================================================
+             Shared base styling for the 80mm thermal receipt. Both country
+             layouts below reuse these classes so a single CSS block keeps
+             them visually consistent (same font, same rule/line weights).
+             ================================================================  -->
+    <template id="express_pos_receipt_assets">
+        <style>.express-pos-receipt { font-family: 'Courier New', Consolas, monospace; color: #000; width: 100%;
+            page-break-after: always; } .express-pos-receipt:last-child { page-break-after: avoid; }
+            .express-pos-receipt .epr-center { text-align: center; } .express-pos-receipt .epr-right { text-align:
+            right; } .express-pos-receipt .epr-bold { font-weight: bold; } .express-pos-receipt .epr-shop-name {
+            font-size: 15px; font-weight: bold; } .express-pos-receipt .epr-branch-name { font-size: 12px; font-weight:
+            bold; } .express-pos-receipt .epr-small { font-size: 10px; } .express-pos-receipt .epr-body { font-size:
+            11px; } .express-pos-receipt .epr-dup { text-align: center; font-weight: bold; font-size: 12px; border: 1px
+            dashed #000; padding: 3px; margin-bottom: 5px; } .express-pos-receipt hr { border: none; border-top: 1px
+            dashed #000; margin: 4px 0; } .express-pos-receipt table { width: 100%; border-collapse: collapse; }
+            .express-pos-receipt .epr-items th { text-align: left; font-size: 10px; font-weight: bold; border-bottom:
+            1px solid #000; padding-bottom: 2px; } .express-pos-receipt .epr-items th.epr-right { text-align: right; }
+            .express-pos-receipt .epr-items td { font-size: 10.5px; padding: 1px 0; vertical-align: top; }
+            .express-pos-receipt .epr-totals td { font-size: 11px; padding: 1px 0; } .express-pos-receipt .epr-totals
+            td.epr-label { text-align: left; } .express-pos-receipt .epr-totals td.epr-value { text-align: right; }
+            .express-pos-receipt .epr-totals tr.epr-grand td { font-weight: bold; font-size: 12px; }
+            .express-pos-receipt .epr-footer-note { text-align: center; font-size: 10px; margin-top: 4px; }
+            .express-pos-receipt .epr-powered { text-align: center; font-size: 9px; margin-top: 6px; color: #000; }
+        </style>
+    </template>
+    <!--  ================================================================
+             DISPATCHER: one report entry point for every printed order.
+             Picks the Bangladesh or Dubai/UAE layout per-order based on the
+             branch's Receipt Format (falls back to the company default), or
+             an explicit override passed in via context (used by the two
+             manual "Print Receipt - <Format>" actions).
+             ================================================================  -->
+    <template id="report_express_pos_receipt_document">
+        <t t-call="web.html_container">
+            <t t-call="express_retail_pos.express_pos_receipt_assets"/>
+            <t t-foreach="docs" t-as="o">
+                <t t-set="express_receipt_format" t-value="o._get_express_receipt_format()"/>
+                <t t-if="express_receipt_format == 'dubai'">
+                    <t t-call="express_retail_pos.report_express_pos_receipt_dubai_document"/>
+                </t>
+                <t t-else="">
+                    <t t-call="express_retail_pos.report_express_pos_receipt_bd_document"/>
+                </t>
+            </t>
+        </t>
+    </template>
+    <!--  ================================================================
+             BANGLADESH LAYOUT
+             Non-VAT retail cash-memo style, matching the "Baby Shop LTD"
+             reference receipt: Style / Product Name / Qty / Price columns,
+             Total Price / Total Qty / Total Discount / Total Vat / Payable
+             Taka / Receive Taka / Exchange Taka / Mode of Payment footer.
+             ================================================================  -->
+    <template id="report_express_pos_receipt_bd_document">
+        <div class="express-pos-receipt page">
+            <div t-if="is_duplicate" class="epr-dup">**** DUPLICATE COPY ****</div>
+            <div class="epr-center epr-shop-name" t-esc="o.company_id.name"/>
+            <div class="epr-center epr-branch-name" t-if="o.express_pos_branch_id"
+                 t-esc="o.express_pos_branch_id.name"/>
+            <div class="epr-center epr-small" t-if="o.express_pos_branch_id.address" style="white-space: pre-line;"
+                 t-esc="o.express_pos_branch_id.address"/>
+            <div class="epr-center epr-small" t-if="o.express_pos_branch_id.phone or o.company_id.phone">
+                Phone:
+                <t t-esc="o.express_pos_branch_id.phone or o.company_id.phone"/>
+            </div>
+            <hr/>
+            <table class="epr-body">
+                <tr>
+                    <td>
+                        Invoice No:
+                        <span t-esc="o.name"/>
+                    </td>
+                    <td class="epr-right">
+                        Date:
+                        <span t-esc="o.date_order" t-options="{'widget': 'date', 'format': 'dd-MM-yyyy'}"/>
+                    </td>
+                </tr>
+                <tr t-if="o.company_id.vat">
+                    <td colspan="2">
+                        Vat Reg No:
+                        <span t-esc="o.company_id.vat"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        Seller:
+                        <span t-esc="o.user_id.name or '-'"/>
+                    </td>
+                </tr>
+                <tr t-if="o.partner_id and not o.partner_id.name == 'Walk-in Customer'">
+                    <td colspan="2">
+                        Customer:
+                        <span t-esc="o.partner_id.name"/>
+                    </td>
+                </tr>
+            </table>
+            <hr/>
+            <table class="epr-items">
+                <thead>
+                    <tr>
+                        <th style="width:18%;">Style</th>
+                        <th style="width:47%;">Product Name</th>
+                        <th class="epr-right" style="width:12%;">Qty</th>
+                        <th class="epr-right" style="width:23%;">Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-foreach="o.order_line" t-as="line">
+                        <tr t-if="not line.display_type">
+                            <td t-esc="line.product_id.style_number or line.product_id.default_code or ''"/>
+                            <td t-esc="line.product_id.name"/>
+                            <td class="epr-right" t-esc="'%.0f' % line.product_uom_qty"/>
+                            <td class="epr-right" t-esc="'%.2f' % line.price_subtotal"/>
+                        </tr>
+                    </t>
+                </tbody>
+            </table>
+            <hr/>
+            <table class="epr-totals">
+                <tr>
+                    <td class="epr-label">Total Price :</td>
+                    <td class="epr-value">
+                        <span t-esc="'%.2f' % o.express_receipt_gross_amount"/>
+                        /-
+                    </td>
+                </tr>
+                <tr>
+                    <td class="epr-label">Total Qty :</td>
+                    <td class="epr-value">
+                        <span t-esc="'%.0f' % sum(o.order_line.filtered(lambda l: not l.display_type).mapped('product_uom_qty'))"/>
+                        Item
+                    </td>
+                </tr>
+                <tr>
+                    <td class="epr-label">Total Discount :</td>
+                    <td class="epr-value">
+                        <span t-esc="'%.2f' % o.express_receipt_discount_amount"/>
+                        /-
+                    </td>
+                </tr>
+                <tr t-if="o.amount_tax">
+                    <td class="epr-label">Total Vat :</td>
+                    <td class="epr-value">
+                        <span t-esc="'%.2f' % o.amount_tax"/>
+                        /-
+                    </td>
+                </tr>
+                <tr class="epr-grand">
+                    <td class="epr-label">Payable Taka :</td>
+                    <td class="epr-value">
+                        <span t-esc="'%.2f' % o.amount_total"/>
+                        /-
+                    </td>
+                </tr>
+                <tr>
+                    <td class="epr-label">Receive Taka :</td>
+                    <td class="epr-value">
+                        <span t-esc="'%.2f' % o.express_receipt_amount_paid"/>
+                        /-
+                    </td>
+                </tr>
+                <tr>
+                    <td class="epr-label">Exchange Taka :</td>
+                    <td class="epr-value">
+                        <span t-esc="'%.2f' % o.express_receipt_amount_change"/>
+                        /-
+                    </td>
+                </tr>
+                <tr>
+                    <td class="epr-label">Mode of Payment :</td>
+                    <td class="epr-value" t-esc="o.express_receipt_payment_methods"/>
+                </tr>
+            </table>
+            <hr/>
+            <div class="epr-footer-note">Can be exchange within 7 days. No refund</div>
+            <div class="epr-powered">Powered By: Nelsis Tech</div>
+        </div>
+    </template>
+    <!--  ================================================================
+             DUBAI / UAE LAYOUT
+             VAT Tax Invoice style, matching the "SNS / Sahil N Sabil Trading
+             L.L.C." reference receipt: TAX Invoice header, TRN, Style /
+             Product Name / Qty / Price / Dis% / Price columns, Total Net
+             Price / Total Qty / Total Discount / Total VAT% / Total incl.
+             VAT AED / Receive AED / Exchange AED / Mode of Payment footer.
+             ================================================================  -->
+    <template id="report_express_pos_receipt_dubai_document">
+        <div class="express-pos-receipt page">
+            <div t-if="is_duplicate" class="epr-dup">**** DUPLICATE COPY ****</div>
+            <div class="epr-center epr-bold" style="font-size:13px;">TAX Invoice</div>
+            <div class="epr-center epr-shop-name" t-esc="o.company_id.name"/>
+            <div class="epr-center epr-branch-name" t-if="o.express_pos_branch_id"
+                 t-esc="o.express_pos_branch_id.name"/>
+            <div class="epr-center epr-small" t-if="o.express_pos_branch_id.address" style="white-space: pre-line;"
+                 t-esc="o.express_pos_branch_id.address"/>
+            <div class="epr-center epr-small" t-if="o.express_pos_branch_id.phone or o.company_id.phone">
+                Phone:
+                <span t-esc="o.express_pos_branch_id.phone or o.company_id.phone"/>
+            </div>
+            <hr/>
+            <table class="epr-body">
+                <tr>
+                    <td>
+                        Invoice No:
+                        <span t-esc="o.name"/>
+                    </td>
+                    <td class="epr-right">
+                        Date:
+                        <span t-esc="o.date_order" t-options="{'widget': 'date', 'format': 'dd-MM-yyyy'}"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Seller ID:
+                        <span t-esc="o.user_id.id or '-'"/>
+                    </td>
+                    <td class="epr-right">Vat Reg</td>
+                </tr>
+                <tr t-if="o.company_id.vat">
+                    <td/>
+                    <td class="epr-right">
+                        TRN No:
+                        <span t-esc="o.company_id.vat"/>
+                    </td>
+                </tr>
+                <tr t-if="o.partner_id and not o.partner_id.name == 'Walk-in Customer'">
+                    <td colspan="2">
+                        Customer:
+                        <span t-esc="o.partner_id.name"/>
+                    </td>
+                </tr>
+            </table>
+            <hr/>
+            <table class="epr-items">
+                <thead>
+                    <tr>
+                        <th style="width:15%;">Style</th>
+                        <th style="width:35%;">Product Name</th>
+                        <th class="epr-right" style="width:10%;">Qty</th>
+                        <th class="epr-right" style="width:15%;">Price</th>
+                        <th class="epr-right" style="width:10%;">Dis%</th>
+                        <th class="epr-right" style="width:15%;">Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-foreach="o.order_line" t-as="line">
+                        <tr t-if="not line.display_type">
+                            <td t-esc="line.product_id.style_number or line.product_id.default_code or ''"/>
+                            <td t-esc="line.product_id.name"/>
+                            <td class="epr-right" t-esc="'%.0f' % line.product_uom_qty"/>
+                            <td class="epr-right" t-esc="'%.2f' % line.price_unit"/>
+                            <td class="epr-right" t-esc="'%.0f%%' % (line.discount or 0.0)"/>
+                            <td class="epr-right" t-esc="'%.2f' % line.price_subtotal"/>
+                        </tr>
+                    </t>
+                </tbody>
+            </table>
+            <hr/>
+            <table class="epr-totals">
+                <tr>
+                    <td class="epr-label">Total Net Price :</td>
+                    <td class="epr-value">
+                        <span t-esc="'%.2f' % o.amount_untaxed"/>
+                        /-
+                    </td>
+                </tr>
+                <tr>
+                    <td class="epr-label">Total Qty :</td>
+                    <td class="epr-value">
+                        <span t-esc="'%.0f' % sum(o.order_line.filtered(lambda l: not l.display_type).mapped('product_uom_qty'))"/>
+                        Item
+                    </td>
+                </tr>
+                <tr>
+                    <td class="epr-label">Total Discount :</td>
+                    <td class="epr-value">
+                        <span t-esc="'%.2f' % o.express_receipt_discount_amount"/>
+                        /-
+                    </td>
+                </tr>
+                <tr>
+                    <td class="epr-label">
+                        Total
+                        <span t-esc="'%.0f' % o.express_receipt_tax_rate"/>
+                        % Vat :
+                    </td>
+                    <td class="epr-value">
+                        <span t-esc="'%.2f' % o.amount_tax"/>
+                        /-
+                    </td>
+                </tr>
+                <tr class="epr-grand">
+                    <td class="epr-label">
+                        Total including VAT
+                        <span t-esc="o.currency_id.name"/>
+                        :
+                    </td>
+                    <td class="epr-value">
+                        <span t-esc="'%.2f' % o.amount_total"/>
+                        /-
+                    </td>
+                </tr>
+                <tr>
+                    <td class="epr-label">
+                        Receive
+                        <span t-esc="o.currency_id.name"/>
+                        :
+                    </td>
+                    <td class="epr-value">
+                        <span t-esc="'%.2f' % o.express_receipt_amount_paid"/>
+                        /-
+                    </td>
+                </tr>
+                <tr>
+                    <td class="epr-label">
+                        Exchange
+                        <span t-esc="o.currency_id.name"/>
+                        :
+                    </td>
+                    <td class="epr-value">
+                        <span t-esc="'%.2f' % o.express_receipt_amount_change"/>
+                        /-
+                    </td>
+                </tr>
+                <tr>
+                    <td class="epr-label">Mode of Payment :</td>
+                    <td class="epr-value" t-esc="o.express_receipt_payment_methods"/>
+                </tr>
+            </table>
+            <hr/>
+            <div class="epr-footer-note">Can be exchange within 7 days. No refund</div>
+            <div class="epr-powered">Powered By: Nelsis Tech</div>
+        </div>
+    </template>
+</odoo>

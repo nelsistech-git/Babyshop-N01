@@ -1,0 +1,646 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <data>
+        <!-- Journal Entries MenuItem Replaced to Day Book -->
+        <record model="ir.ui.menu"
+                id="account.menu_action_move_journal_line_form">
+            <field name='name'>Office Management Cost</field>
+        </record>
+
+        <!-- Added Created By and Last Updated By to Tree View -->
+        <record id="view_move_tree_day_book" model="ir.ui.view">
+            <field name="name">account.day.book</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_move_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='amount_total_signed']"
+                       position="replace"/>
+                <xpath expr="//field[@name='journal_id']" position="after">
+                    <field name="narration" string="Narration" optional="hide"/>
+                    <field name="dr_accounts_str" string="DR Accounts" optional="hide"/>
+                    <field name="cr_accounts_str" string="CR Accounts" optional="hide"/>
+                    <field name="create_uid" optional="show"/>
+                    <field name="create_date" optional="show"/>
+                    <field name="write_uid" optional="show"/>
+                    <field name="write_date" optional="show"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_move_form_narration1" model="ir.ui.view">
+            <field name="name">account.view.move.form1</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_move_form"/>
+            <field name="priority">100</field>
+            <field name="arch" type="xml">
+
+                <xpath expr="//div[hasclass('o_col')]" position="replace">
+                    <field name="partner_id" widget="res_partner_many2one" nolabel="1"
+                           context="{
+                                            'res_partner_search_mode': (context.get('default_move_type', 'entry') in ('out_invoice', 'out_refund', 'out_receipt') and 'customer') or (context.get('default_move_type', 'entry') in ('in_invoice', 'in_refund', 'in_receipt') and 'supplier') or False,
+                                            'show_address': 1, 'default_is_company': True, 'show_vat': True}"
+                           domain="[('company_id', 'in', (False, company_id))]"
+                           options='{"no_quick_create": True}'
+                           invisible="move_type not in ('out_invoice', 'out_refund', 'in_invoice', 'in_refund', 'out_receipt', 'in_receipt')"
+                           readonly="state != 'draft'"/>
+                    <button name="action_update_fpos_values" type="object"
+                            string="Update Taxes and Accounts"
+                            help="Recompute all taxes and accounts based on this fiscal position"
+                            class="btn-link mb-1 px-0" icon="fa-refresh"
+                            confirm="This will update all taxes and accounts based on the currently selected fiscal position."
+                            invisible="not show_update_fpos or state in ['cancel', 'posted']"/>
+                </xpath>
+                <!-- Print -->
+                <xpath expr="//button[@name='action_reverse']"
+                       position="after">
+                    <button name="print_voucher" class="btn-primary"
+                            type="object" string="Print"/>
+                </xpath>
+
+                <xpath expr="//field[@name='partner_id']" position="after">
+
+                    <field name="location_id"
+                           options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"
+                           readonly="state in ('posted','cancel')"
+                           invisible="context.get('default_type') in ('in_invoice', 'in_refund','in_receipt')"
+                    />
+                    <field name="cost_center_id"
+                           options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"
+                           readonly="state in ('posted','cancel')"
+                           invisible="context.get('default_move_type') in ('in_invoice', 'in_refund','in_receipt')"
+                    />
+                    <field name="account_tag_ids"
+                           options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"
+                           readonly="state in ('posted','cancel')" widget="many2many_tags"
+                    />
+                </xpath>
+
+                <xpath expr="//field[@name='to_check']" position="after">
+                    <field name="fs_dept" force_save="1"
+                           invisible="context.get('default_move_type') not in ('in_receipt','entry')" required="1"
+                           readonly="state == 'posted'"/>
+                </xpath>
+
+                <!-- Label Replaced to Narration -->
+                <xpath
+                        expr="//form/sheet/notebook/page[2]/field/tree/field[@name='name']"
+                        position="replace"/>
+
+                <xpath expr="//form/sheet/notebook/page[2]/field/tree/field[@name='partner_id']" position="after">
+                    <field name="name" widget="section_and_note_text"
+                           string="Narration"/>
+                    <field name="location_id"
+                           options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"
+                           invisible="context.get('default_move_type') in ('in_invoice', 'in_refund','in_receipt')"
+                    />
+                    <field name="cost_center_id"
+                           options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"
+                           invisible="context.get('default_move_type') in ('in_invoice', 'in_refund','in_receipt')"
+                    />
+                </xpath>
+
+                <!-- Invisible Debit Field -->
+                <xpath
+                        expr="//form/sheet/notebook/page[2]/field/tree/field[@name='debit']"
+                        position="replace">
+                </xpath>
+
+                <!-- Invisible Credit Field -->
+                <xpath
+                        expr="//form/sheet/notebook/page[2]/field/tree/field[@name='credit']"
+                        position="replace">
+                </xpath>
+
+                <!-- Debit and Credit Placed after Account ID -->
+                <xpath
+                        expr="//form/sheet/notebook/page[2]/field/tree/field[@name='account_id']"
+                        position="after">
+                    <field name="debit" sum="Total Debit"
+                           invisible="display_type in ('line_section', 'line_note')"/>
+                    <field name="credit" sum="Total Credit"
+                           invisible="display_type in ('line_section', 'line_note')"/>
+                </xpath>
+
+                <!-- Invisible Narration{Remarks} Field -->
+                <xpath
+                        expr="//form/sheet/notebook/page[4]/field[@name='narration']"
+                        position="replace">
+                </xpath>
+
+                <!-- replace duplicate partner_id and date -->
+                <xpath expr="//div[hasclass('o_td_label')]" position="inside">
+                    <label for="partner_id" string="Partner"
+                           style="font-weight:bold;"
+                           invisible="move_type != 'entry'"/>
+                </xpath>
+
+                <xpath expr="//field[@name='partner_id']" position="after">
+                    <label for="partner_id" string="Partner" style="font-weight:bold;"
+                                       invisible="move_type not in ('entry')"/>
+                    <field name="partner_id" widget="res_partner_many2one" nolabel="1"
+                           context="{
+                                'res_partner_search_mode': (context.get('default_move_type', 'entry') in ('out_invoice', 'out_refund', 'out_receipt') and 'customer') or (context.get('default_move_type', 'entry') in ('in_invoice', 'in_refund', 'in_receipt') and 'supplier') or False,
+                                'show_address': 1, 'default_is_company': True, 'show_vat': True}"
+                           domain="[('company_id', 'in', (False, company_id))]"
+                           options='{"no_quick_create": True}'
+                           invisible="move_type not in ('entry')"
+                           readonly="state != 'draft'"/>
+                    <field name="partner_mobile" invisible="1"/>
+                    <field name="partner_email" readonly="1"/>
+                    <!--					<field name="partner_balance_amount" readonly="1" />-->
+
+                    <label for="partner_balance_amount" string="Balance"/>
+                    <div class="o_row o_row_readonly o_hr_holidays_dates" style="display:inline-flex">
+                        <field nolabel="0" readonly="1" force_save="1" name="bdt_currency_id" class="oe_inline"
+                               options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                        <field name="partner_balance_amount" class="oe_inline" readonly="1" force_save="1"/>
+                    </div>
+
+<!--                    <field name="partner_type" readonly="1"/>-->
+<!--                    <field name="is_employee" readonly="1"/>-->
+                </xpath>
+
+<!--                <xpath expr="//field[@name='invoice_date']" position="replace">-->
+<!--                    <field name="invoice_date" invisible="1"/>-->
+<!--                </xpath>-->
+
+                <xpath expr="//field[@name='invoice_user_id']" position="attributes">
+                    <attribute name="options">{'no_open': True, 'no_create': 1, 'no_create_edit': 1,
+                                               'no_quick_create': True}</attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='team_id']" position="attributes">
+                    <attribute name="options">{'no_open': True, 'no_create': 1, 'no_create_edit': 1,
+                                               'no_quick_create': True}</attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='currency_id']" position="after">
+                    <field name="invoice_user_id" optional="show"
+                           invisible="context.get('default_move_type') not in ('out_invoice', 'out_refund','out_receipt')"
+                           readonly="state == 'posted'" string="Salesperson"
+                           options="{'no_open':True, 'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                    <field name="team_id"
+                           invisible="context.get('default_move_type') not in ('out_invoice', 'out_refund','out_receipt')"
+                           optional="hide" readonly="state == 'posted'"
+                           options="{'no_open':True, 'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                </xpath>
+
+                <!-- Added Narration{Remarks} Field at Journal Items -->
+                <xpath
+                        expr="//form/sheet/notebook/page[2]/field[@name='line_ids']"
+                        position="after">
+                    <footer>
+                        <field name="narration" placeholder="Add Remarks (if any)"
+                               nolabel="1" height="50"/>
+                    </footer>
+                </xpath>
+
+                <!--				<xpath expr="//field[@name='journal_id']" position="replace">-->
+
+                <!-- <field name="journal_id" string="Day Book Journal"
+                    attrs="{'invisible': [('type', 'not in', ('entry'))]}"
+                    groups="account.group_account_user" options="{'no_open':1,'no_create':1,'no_create_edit':1}"
+                    domain="[('is_daybook_display', '=', True)]"/> -->
+
+                <!--					    <field name="journal_id"-->
+                <!--                                       invisible="context.get('default_journal_id') and context.get('type', 'entry') != 'entry'"-->
+                <!--                                       groups="account.group_account_user"-->
+                <!--                                       options="{'no_create': True}"-->
+                <!--                                       domain="[('type', '=?', invoice_filter_type_domain)]"-->
+                <!--                                       attrs="{'readonly': [('name', '!=', '/')]}"/>-->
+
+                <!--						<field name="journal_id"-->
+                <!--                                       invisible="context.get('move_type', 'entry') != 'entry'"-->
+                <!--                                       groups="account.group_account_user"-->
+                <!--                                       options="{'no_open':1,'no_create':1,'no_create_edit':1}"-->
+                <!--                                       domain="[('is_daybook_display', '=', True)]"-->
+                <!--                                       />-->
+                <!--					attrs="{'readonly': [('name', '!=', '/')]}"-->
+
+                <!--				</xpath>-->
+                <xpath expr="//field[@name='currency_id']" position="attributes">
+                    <attribute name="options">{'no_open': True, 'no_create': 1, 'no_create_edit': 1,
+                                               'no_quick_create': True}</attribute>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Filter by Today's Date -->
+        <record id="view_account_move_filter_inherit"
+                model="ir.ui.view">
+            <field name="name">account.move.select.inherit</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_account_move_filter"/>
+            <field name="arch" type="xml">
+                <xpath expr="//search/filter[@name='date']" position="before">
+                    <field name="create_uid" string="Created by"/>
+                    <field name="invoice_line_ids" string="Account"
+                           filter_domain="[('invoice_line_ids.account_id', 'ilike', self)]"/>
+                    <field name="ref" string="Reference"/>
+                    <field name="cost_center_id"/>
+                </xpath>
+                <xpath expr="//search/filter[@name='unposted']" position="before">
+                    <filter string="My Entries" name="my_entries"
+                            domain="[('create_uid', '=', uid)]"/>
+                    <separator/>
+                </xpath>
+                <xpath expr="//search/filter[@name='date']" position="before">
+                    <filter string="Today's Date" name="today_date"
+                            domain="[('date', '=', datetime.datetime.now().strftime('%Y-%m-%d'))]"/>
+                    <field name="fs_dept" string="FS Department" filter_domain="[('fs_dept', 'ilike', self)]"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Account Name View in Tree -->
+        <record id="view_move_account_name" model="ir.ui.view">
+            <field name="name">account.name</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_move_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//tree" position="attributes">
+                    <attribute name="limit">500</attribute>
+                </xpath>
+                <xpath expr="//field[@name='name']" position="before">
+                    <field name="location_id" readonly="1"/>
+                    <field name="cost_center_id" readonly="1"/>
+                </xpath>
+                <xpath expr="//field[@name='name']" position="after">
+                    <field name="account_name" optional="show" string="Account" readonly="1"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_move_tree_debit" model="ir.ui.view">
+            <field name="name">account.day.book</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="view_move_account_name"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='account_name']" position="after">
+                    <field name="amount_total_signed" sum="Total Amount"
+                           string="Debit"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Calendar View -->
+        <record model="ir.ui.view" id="calendar_view">
+            <field name="name">account.move.calendar</field>
+            <field name="model">account.move</field>
+            <field name="arch" type="xml">
+                <calendar string="Calendar" date_start="date"
+                          date_stop="date" color="date">
+                </calendar>
+            </field>
+        </record>
+
+        <!-- Default today's date and Journal Entries Replaced to Day Book -->
+        <record id="account.action_move_journal_line"
+                model="ir.actions.act_window">
+            <field name="name">Office Management Cost</field>
+            <field name="res_model">account.move</field>
+            <field name="view_mode">tree,kanban,form,calendar</field>
+            <field name="view_id" ref="account.view_move_tree"/>
+            <field name="search_view_id" ref="account.view_account_move_filter"/>
+            <field name="context">{'default_type': 'entry', 'search_default_today_date': 1, 'view_no_maturity': True,
+                                   'default_fs_dept': 'accounts'}</field>
+            <field name="domain">[('fs_dept', '=', 'accounts')]</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create a journal entry
+                </p>
+                <p>
+                    A journal entry consists of several journal items, each of
+                    which is either a debit or a credit transaction.
+                </p>
+            </field>
+        </record>
+
+        <!--accounts action inherit-->
+        <record id="account.action_account_form" model="ir.actions.act_window">
+            <field name="context">{'default_fs_dept': 'accounts'}</field>
+            <field name="domain">[('fs_dept', '=', 'accounts')]</field>
+        </record>
+
+        <!-- Account Wise Total Debit, Total Credit and Total Balance -->
+        <record id="view_account_form_inherit_day_book" model="ir.ui.view">
+            <field name="name">account.account.form.inherit.day.book</field>
+            <field name="model">account.account</field>
+            <field name="inherit_id" ref="dynamic_accounts_report.inherited_account_inherit_dynamic_rpt_form"/>
+            <field name="arch" type="xml">
+                <!--<xpath expr="//field[@name='tax_ids']" position="replace">
+                </xpath>-->
+                <xpath expr="//field[@name='deprecated']" position="replace">
+                </xpath>
+                <xpath expr="//field[@name='is_po_discount']" position="replace">
+                </xpath>
+
+                <xpath expr="//field[@name='parent_hierarchy']" position="after">
+                    <field name="total_debit" optional="show"
+                           string="Total Debit" invisible="user_type_id_type =='view'"/>
+                    <field name="total_credit" optional="show"
+                           string="Total Credit" invisible="user_type_id_type =='view'"/>
+                    <field name="total_balance" optional="show"
+                           string="Total Balance" invisible="user_type_id_type =='view'"/>
+                    <field name="acc_remarks"/>
+                </xpath>
+
+                <!--<xpath expr="//field[@name='group_id']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>-->
+
+                <xpath expr="//page[@name='accounting']" position="after">
+                        <field name="parent_child_type" invisible="1"/>
+<!--                    <notebook>-->
+                        <page string="Other Settings" name="other_settings"
+                              invisible="parent_child_type == 'parent'">
+                            <group>
+                                <group string="Other Settings">
+                                    <!--<field name="tax_ids" widget="many2many_tags"
+                                           domain="[('company_id','=',company_id)]"
+                                           invisible="internal_group == 'off_balance'"/>-->
+                                    <label for="reconcile"
+                                           invisible="account_type == 'liquidity' or internal_group == 'off_balance'"/>
+                                    <div invisible="account_type == 'liquidity' or internal_group == 'off_balance'">
+                                        <field name="reconcile"/>
+<!--                                        <button name="action_open_reconcile" class="oe_link" type="object"-->
+<!--                                                string=" -> Reconcile"-->
+<!--                                                attrs="{'invisible': [('reconcile', '=', False)]}"/>-->
+                                    </div>
+                                    <field name="deprecated" invisible="user_type_id_type == 'view'"/>
+                                    <field name="fs_dept" readonly="1" force_save="1" required="1"/>
+                                </group>
+                                <group string="Extra Settings">
+                                    <field name="is_emp_ledger"/>
+                                    <field name="is_cus_rec_ledger"/>
+                                    <field name="is_cus_adv_ledger"/>
+                                    <field name="is_vendor_pay_ledger"/>
+                                    <field name="is_vendor_adv_ledger"/>
+                                    <field name="is_default_cus_adv"/>
+                                    <field name="is_default_vendor_adv"/>
+                                    <field name="is_wip_acc"/>
+                                    <field name="is_production_acc"/>
+                                    <field name="production_extra_cost_category"/>
+                                    <field name="project_extra_cost_category"/>
+                                    <field name="is_foreign_gain_loss_acc"/>
+                                    <field name="is_online_payment"/>
+                                    <field name="is_po_discount" invisible="user_type_id_type == 'view'"/>
+                                </group>
+                            </group>
+
+                            </page>
+<!--                        </notebook>-->
+
+					<!--<group>
+						<group>
+							<field name="create_uid" string="Created by" readonly="1" options="{'no_open':1,'no_create':1,'no_create_edit':1}"/>
+							<field name="create_date" string="Created date" readonly="1" />
+						</group>
+						<group>
+							<field name="write_uid" string="Updated by" readonly="1" options="{'no_open':1,'no_create':1,'no_create_edit':1}"/>
+							<field name="write_date" string="Updated date" readonly="1" />
+						</group>
+					</group>-->
+
+				</xpath>
+
+			</field>
+		</record>
+
+
+        <!--&lt;!&ndash; Account Wise Total Debit, Total Credit and Total Balance &ndash;&gt;
+        <record id="view_account_form_inherit" model="ir.ui.view">
+            <field name="name">account.account.form.inherit</field>
+            <field name="model">account.account</field>
+            <field name="inherit_id" ref="account.view_account_form"/>
+            <field name="arch" type="xml">
+                &lt;!&ndash;<xpath
+                        expr="//field[@name='account_type']"
+                        position="before">
+                    <field name="parent_child_type" required="1"/>
+                    <field name="user_type_id_type" invisible="1"/>
+                    &lt;!&ndash;<field name="allow_user_type_id"  options="{'no_open':1,'no_create':1,'no_create_edit':1}" required="1"/>&ndash;&gt;
+                </xpath>&ndash;&gt;
+
+                &lt;!&ndash;				<xpath&ndash;&gt;
+                &lt;!&ndash;					expr="//form/sheet/group/group/field[@name='user_type_id']"&ndash;&gt;
+                &lt;!&ndash;					position="after">&ndash;&gt;
+                &lt;!&ndash;					<field name="total_debit" optional="show"&ndash;&gt;
+                &lt;!&ndash;						string="Total Debit" attrs="{'invisible': [('user_type_id_type','=','view')]}"/>&ndash;&gt;
+                &lt;!&ndash;					<field name="total_credit" optional="show"&ndash;&gt;
+                &lt;!&ndash;						string="Total Credit" attrs="{'invisible': [('user_type_id_type','=','view')]}"/>&ndash;&gt;
+                &lt;!&ndash;					<field name="total_balance" optional="show"&ndash;&gt;
+                &lt;!&ndash;						string="Total Balance" attrs="{'invisible': [('user_type_id_type','=','view')]}"/>&ndash;&gt;
+                &lt;!&ndash;				</xpath>&ndash;&gt;
+
+                <xpath expr="//field[@name='tax_ids']" position="replace">
+                </xpath>
+                <xpath expr="//field[@name='deprecated']" position="replace">
+                </xpath>
+
+&lt;!&ndash;                <xpath expr="//form/sheet/group/group/div" position="replace">&ndash;&gt;
+&lt;!&ndash;                </xpath>&ndash;&gt;
+
+&lt;!&ndash;                <label for="reconcile" position="replace">&ndash;&gt;
+&lt;!&ndash;                </label>&ndash;&gt;
+
+                <xpath expr="//form/sheet/notebook" position="before">
+                    <group>
+                        <field name="total_debit" optional="show"
+                               string="Total Debit" invisible="user_type_id_type =='view'"/>
+                        <field name="total_credit" optional="show"
+                               string="Total Credit" invisible="user_type_id_type =='view'"/>
+                        <field name="total_balance" optional="show"
+                               string="Total Balance" invisible="user_type_id_type =='view'"/>
+                        <field name="acc_remarks"/>
+                    </group>
+                </xpath>
+                <xpath expr="//field[@name='group_id']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+
+                <xpath expr="//notebook/page" position="after">
+                        <field name="parent_child_type" invisible="1"/>
+&lt;!&ndash;                    <notebook>&ndash;&gt;
+                        <page string="Other Settings" name="other_settings"
+                              invisible="parent_child_type == 'parent'">
+                            <group>
+                                <group string="Other Settings">
+                                    <field name="tax_ids" widget="many2many_tags"
+                                           domain="[('company_id','=',company_id)]"
+                                           invisible="internal_group == 'off_balance'"/>
+                                    <label for="reconcile"
+                                           invisible="account_type == 'liquidity' or internal_group == 'off_balance'"/>
+                                    <div invisible="account_type == 'liquidity' or internal_group == 'off_balance'">
+                                        <field name="reconcile"/>
+&lt;!&ndash;                                        <button name="action_open_reconcile" class="oe_link" type="object"&ndash;&gt;
+&lt;!&ndash;                                                string=" -> Reconcile"&ndash;&gt;
+&lt;!&ndash;                                                attrs="{'invisible': [('reconcile', '=', False)]}"/>&ndash;&gt;
+                                    </div>
+                                    <field name="deprecated" invisible="user_type_id_type == 'view'"/>
+                                    <field name="fs_dept" readonly="1" force_save="1" required="1"/>
+                                </group>
+                                <group string="Extra Settings">
+                                    <field name="is_emp_ledger"/>
+                                    <field name="is_cus_rec_ledger"/>
+                                    <field name="is_cus_adv_ledger"/>
+                                    <field name="is_vendor_pay_ledger"/>
+                                    <field name="is_vendor_adv_ledger"/>
+                                    <field name="is_default_cus_adv"/>
+                                    <field name="is_default_vendor_adv"/>
+                                    <field name="is_wip_acc"/>
+                                    <field name="is_production_acc"/>
+                                    <field name="production_extra_cost_category"/>
+                                    <field name="project_extra_cost_category"/>
+                                    <field name="is_foreign_gain_loss_acc"/>
+                                </group>
+                            </group>
+
+                                &lt;!&ndash;<group string="Other Settings" attrs="{'invisible': [('user_type_id_type','=','view')]}">
+									<group>
+										<field name="is_emp_ledger"/>
+										<field name="is_cus_rec_ledger"/>
+										<field name="is_cus_adv_ledger"/>
+										<field name="is_vendor_pay_ledger"/>
+										<field name="is_vendor_adv_ledger"/>
+										<field name="is_default_cus_adv"/>
+										<field name="is_default_vendor_adv"/>
+										&lt;!&ndash;<field name="create_uid" string="Created by" readonly="1"/>
+										<field name="write_uid" string="Updated by" readonly="1"/>&ndash;&gt;
+									</group>
+									<group>
+										<field name="is_wip_acc"/>
+										<field name="is_production_acc"/>
+										<field name="production_extra_cost_category"/>
+									</group>
+								</group>&ndash;&gt;
+                            </page>
+&lt;!&ndash;                        </notebook>&ndash;&gt;
+
+					&lt;!&ndash;<group>
+						<group>
+							<field name="create_uid" string="Created by" readonly="1" options="{'no_open':1,'no_create':1,'no_create_edit':1}"/>
+							<field name="create_date" string="Created date" readonly="1" />
+						</group>
+						<group>
+							<field name="write_uid" string="Updated by" readonly="1" options="{'no_open':1,'no_create':1,'no_create_edit':1}"/>
+							<field name="write_date" string="Updated date" readonly="1" />
+						</group>
+					</group>&ndash;&gt;
+
+				</xpath>
+
+				&lt;!&ndash;<xpath expr="//sheet" position="after">
+					<div class="oe_chatter">
+						<field name="message_follower_ids" widget="mail_followers"/>
+						<field name="activity_ids" widget="mail_activity"/>
+						<field name="message_ids" widget="mail_thread"/>
+					</div>
+				</xpath>&ndash;&gt;
+			</field>
+		</record>-->
+
+
+        <record id="view_account_list_inherit_custom_day_book" model="ir.ui.view">
+            <field name="name">view.account.list.inherit.custom.day.book</field>
+            <field name="model">account.account</field>
+            <field name="inherit_id" ref="account.view_account_list"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='account_type']" position="attributes">
+					<attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='currency_id']" position="attributes">
+					<attribute name="invisible">1</attribute>
+                </xpath>
+				<!--<xpath expr="//field[@name='name']" position="before">
+					<field name="tag_ids" widget="many2many_tags"  optional="hide"/>
+				</xpath>-->
+				<xpath expr="//field[@name='name']" position="after">
+					<field name="internal_group" optional="hide"/>
+					<field name="tag_ids" widget="many2many_tags"  optional="hide"/>
+					<field name="account_type" string="Type" optional="hide"/>
+					<field name="acc_remarks"  optional="hide"/>
+					<field name="total_debit" string="Total Debit" sum="Total Amount"/>
+					<field name="total_credit" string="Total Credit" sum="Total Amount"/>
+					<field name="total_balance" string="Total Balance" sum="Total Amount"/>
+                </xpath>
+            </field>
+        </record>
+
+		<!-- Total Debit, Credit & Balance in Account Move Journal Item Lines -->
+		<record id="view_account_form_inherit_credit_debit"
+			model="ir.ui.view">
+			<field name="name">account.account.form.inherit.credit.debit</field>
+			<field name="model">account.move</field>
+			<field name="inherit_id" ref="account.view_move_form" />
+			<field name="arch" type="xml">
+				<xpath expr="////form/sheet/notebook/page[2]/field/tree/field[@name='partner_id']" position="attributes">
+					<attribute name="options">{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}</attribute>
+					<attribute name="required">True</attribute>
+				</xpath>
+				<xpath expr="//field[@name='partner_id']" position="attributes">
+					<attribute name="options">{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}</attribute>
+				</xpath>
+				<xpath expr="//field[@name='partner_shipping_id']" position="attributes">
+					<attribute name="options">{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}</attribute>
+				</xpath>
+<!--				<xpath expr="//field[@name='partner_id']" position="attributes">-->
+<!--					<attribute name="required">True</attribute>-->
+<!--				</xpath>-->
+				<xpath
+					expr="////form/sheet/notebook/page[2]/field/tree/field[@name='account_id']"
+					position="attributes">
+					<attribute name="width">05</attribute>
+					<attribute name="options">{'no_open':True,'no_create':1,'no_create_edit':1,
+						'no_quick_create': True}</attribute>
+				</xpath>
+<!--				<xpath expr="//field[@name='tag_ids']"-->
+<!--					position="replace">-->
+<!--				</xpath>-->
+<!--				<xpath expr="//form/sheet/notebook/page[2]/field/tree/field[@name='analytic_tag_ids']"-->
+<!--					position="replace">-->
+<!--				</xpath>-->
+				<xpath
+					expr="//form/sheet/notebook/page[2]/field/tree/field[@name='name']"
+					position="after">
+					<field name="account_tag_ids" optional="hide"
+						string="Account Groups" widget="many2many_tags"/>
+					<field name="total_debit" optional="show"
+						string="Total Debit" />
+					<field name="total_credit" optional="show"
+						string="Total Credit" />
+					<field name="total_balance" optional="show"
+						string="Total Balance" />
+				</xpath>
+				<xpath
+					expr="//form/sheet/notebook/page[2]/field/tree"
+					position="attributes">
+					<attribute name="decoration-danger">total_balance &lt; 0</attribute>
+				</xpath>
+			</field>
+		</record>
+
+
+        <record id="view_account_search_inherit_custom_day_book" model="ir.ui.view">
+            <field name="name">view.account.search.inherit.custom.day.book</field>
+            <field name="model">account.account</field>
+            <field name="inherit_id" ref="account.view_account_search"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='account_type']" position="after">
+                    <field name="parent_child_type"/>
+                    <field name="tag_ids" string="Account Groups"/>
+                    <field name="acc_remarks"/>
+                    <field name="fs_dept"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record model="ir.ui.menu" id="account.menu_finance_entries">
+            <field name="sequence" eval="0"/>
+        </record>
+
+
+    </data>
+</odoo>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <data>
+        <record id="view_one_time_punch_summary_report_form" model="ir.ui.view">
+            <field name="name">one.time.punch.summary.report.wizard.form</field>
+            <field name="model">one.time.punch.summary.report.wizard</field>
+            <field name="arch" type="xml">
+                <form string="One Time Punch Summary Report">
+                    <group>
+                        <group>
+                            <field name="year" required="1"/>
+                            <field name="month"/>
+                        </group>
+                        <group>
+                            <field name="company_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="user_work_location_id" placeholder="All" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="department_id" placeholder="All" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="sbu_unit_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="category_ids" widget="many2many_tags" options="{'color_field': 'color', 'no_open': True, 'no_create': 1, 'no_create_edit': 1, 'no_quick_create': True}" />
+                        </group>
+                    </group>
+                    <group>
+                        <field widget="radio" name="type"/>
+                    </group>
+                    <footer>
+                        <button invisible="type == '02'" name="one_time_punch_summary_report_pdf" string="Download (PDF)" type="object" class="btn-primary"/>
+                        <button invisible="type == '02'" name="one_time_punch_summary_report_excel" string="Download (Excel)" type="object" class="btn-primary"/>
+
+                        <button invisible="type == '01'" name="one_time_punch_summary_report_pdf_detail" string="Download (PDF)" type="object" class="btn-primary"/>
+                        <button invisible="type == '01'" name="one_time_punch_summary_report_excel_detail" string="Download (Excel)" type="object" class="btn-primary"/>
+
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="one_time_punch_summary_report_action" model="ir.actions.act_window">
+            <field name="name">One Time Punch Summary Report</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">one.time.punch.summary.report.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_one_time_punch_summary_report_form"/>
+            <field name="target">new</field>
+        </record>
+
+        <!--<menuitem id="menu_one_time_punch_summary_report" name="One Time Punch Summary Report" sequence="15" action="one_time_punch_summary_report_action" parent="custom_hr_report.menu_attendance_report_root" groups="hr.group_hr_user" />-->
+        <menuitem id="menu_one_time_punch_summary_report_att" name="One Time Punch Summary Report" sequence="20" action="one_time_punch_summary_report_action" parent="custom_hr_attendance_sheet.menu_attendance_report_root_attendance_sub" groups="hr.group_hr_user" />
+
+    </data>
+</odoo>

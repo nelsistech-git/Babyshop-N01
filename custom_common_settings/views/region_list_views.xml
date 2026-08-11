@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_region_list_form" model="ir.ui.view">
+        <field name="name">region.list.form</field>
+        <field name="model">region.list</field>
+        <field name="arch" type="xml">
+            <form string="Region List"  copy="false">
+            	<header>
+                     <button name="action_download_data" id="action_download_data" type="object" string="Download (Hierarchy)"/>
+                     <button name="action_download_data_base" id="action_download_data_base" type="object" string="Download (Base)"/>
+                </header>
+                
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="type"/>
+                            <field name="parent_id" invisible="type == 'national'or  type == False" required="type != 'national'" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="name" />
+                            <field name="code" readonly="1" force_save="1"/>
+                            <field name="division_id" invisible="type != 'base' or type == False" required="type == 'base'" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="district_id" invisible="type != 'base' or type == False" required="type == 'base'" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" domain="[('division_id', '=', division_id)]"/>
+                            <field name="thana_id" invisible="type != 'base' or type == False" required="type == 'base'" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" domain="[('district_id', '=', district_id)]"/>
+                            <field name="postcode_id" invisible="type != 'base' or type == False" required="type == 'base'" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" domain="[('thana_id', '=', thana_id)]"/>
+                        </group>
+                    </group>
+                    <group string="Employees">
+                        <field name="region_employee_lines" nolabel="1">
+                            <tree editable="bottom" delete="1">
+                                <field name="employee_id" required="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="employee_user_id" invisible="1"/>
+                                <field name="department_id" readonly="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="designation_id" readonly="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            </tree>
+                            <form>
+                                <field name="employee_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="employee_user_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="department_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="designation_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            </form>
+                        </field>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_region_list_search" model="ir.ui.view">
+        <field name="name">region.list.search</field>
+        <field name="model">region.list</field>
+        <field name="arch" type="xml">
+            <search string="Search">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="parent_id"/>
+            </search>
+        </field>
+    </record>
+
+	<record id="view_region_list_tree" model="ir.ui.view">
+         <field name="name">region.list.tree</field>
+         <field name="model">region.list</field>
+         <field name="arch" type="xml">
+             <tree string="Region List">
+             	 <field name="type"/>
+                 <field name="name"/>
+                 <field name="parent_id"/>
+                 <field name="code"/>                 
+             </tree>
+         </field>
+    </record>
+
+    <record id="action_region_list" model="ir.actions.act_window">
+        <field name="type">ir.actions.act_window</field>
+        <field name="name">Region List</field>
+        <field name="res_model">region.list</field>
+        <field name="view_mode">tree,form</field>
+<!--        <field name="context">{'search_default_group_by_wings': 1, 'search_default_group_by_division': 1, 'search_default_group_by_region': 1, 'search_default_group_by_territory': 1, 'search_default_group_by_base': 1}</field>-->
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Create Region List!
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_region_list" name="Region List" parent="custom_common_settings.menu_other_settings_planning" action="action_region_list" groups="custom_common_settings.group_sale_controller" sequence="4"/>
+</odoo>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <data>
+        <record id="mrr_report_wizard_form" model="ir.ui.view">
+            <field name="name">stock.mrr.report.wizard.form</field>
+            <field name="model">stock.mrr.report.wizard</field>
+            <field name="arch" type="xml">
+                <form string="MRR Report">
+                    <group>
+                        <group>
+                            <field name="from_date" required="1"/>
+                        </group>
+                        <group>
+                             <field name="to_date" required="1"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="mrr_report_pdf" string="Download MRR(PDF)" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="mrr_report_action" model="ir.actions.act_window">
+            <field name="name">MRR Report</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">stock.mrr.report.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="mrr_report_wizard_form"/>
+            <field name="target">new</field>
+        </record>
+
+
+        <menuitem id="menu_mrr_report_wizard"
+              name="Stock MRR Report"
+              sequence="151"
+              action="mrr_report_action"
+              parent="stock.menu_warehouse_report" groups="stock.group_stock_manager"
+        />
+
+    </data>
+</odoo>

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <data>
+        <record id="view_employee_bonus_sheet_wizard_form" model="ir.ui.view">
+            <field name="name">employee.bonus.sheet.report.wizard.form</field>
+            <field name="model">employee.bonus.sheet.report.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Employee Bonus Sheet Wizard">
+                    <group>
+                        <group>
+                            <field name="report_type" widget="radio"/>
+                            <field name="start_date"/>
+                            <field name="end_date"/>
+                        </group>
+                        <group>
+                            <field name="company_id" placeholder="All" options="{'no_create_edit': True, 'no_open': True, 'no_create':True}" />
+                            <field name="user_work_location_id" placeholder="All" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="dept_id" placeholder="All" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="bonus_type_id" placeholder="All" required="report_type == '01'" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="state" required="1" />
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="employee_bonus_sheet_report_pdf" string="Download (PDF)" type="object" class="btn-primary"/>
+                        <button name="employee_bonus_sheet_report_excel" string="Download (Excel)" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_employee_bonus_sheet_wizard" model="ir.actions.act_window">
+            <field name="name">Employee Bonus Sheet</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">employee.bonus.sheet.report.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_employee_bonus_sheet_wizard_form"/>
+            <field name="target">new</field>
+        </record>
+
+        <!--<menuitem
+              name="Employee Bonus Sheet Report"
+              id="menu_employee_bonus_sheet"
+              sequence="50"
+              parent="hr_employee_bonus.menu_employee_bonus"
+              action="action_employee_bonus_sheet_wizard"
+              groups="hr.group_hr_manager,hr_payroll.group_hr_payroll_manager"
+        />-->
+        <menuitem
+              name="Employee Bonus Sheet Report"
+              id="menu_employee_bonus_sheet_payroll"
+              sequence="1"
+              parent="hr_employee_bonus.menu_report_payroll_bonus"
+              action="action_employee_bonus_sheet_wizard"
+              groups="hr.group_hr_manager,hr_payroll.group_hr_payroll_manager"
+        />
+
+
+
+        <record id="view_batch_bonus_sheet_wizard_form" model="ir.ui.view">
+            <field name="name">batch.bonus.sheet.report.wizard.form</field>
+            <field name="model">batch.bonus.sheet.report.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Batch Bonus Sheet Wizard">
+                    <group>
+                        <field name="batch_id" options="{'no_create_edit': True, 'no_open': True, 'no_create':True}" />
+                    </group>
+                    <footer>
+                        <!--<button name="batch_bonus_sheet_report_pdf" string="Download (PDF)" type="object" class="btn-primary"/>-->
+                        <button name="batch_bonus_sheet_report_excel" string="Download (Excel)" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_batch_bonus_sheet_wizard" model="ir.actions.act_window">
+            <field name="name">Batch Bonus Sheet</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">batch.bonus.sheet.report.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_batch_bonus_sheet_wizard_form"/>
+            <field name="target">new</field>
+        </record>
+
+
+        <!--<menuitem
+              name="Batch Bonus Sheet Report"
+              id="menu_batch_bonus_sheet"
+              sequence="51"
+              parent="hr_employee_bonus.menu_employee_bonus"
+              action="action_batch_bonus_sheet_wizard"
+              groups="hr.group_hr_manager,hr_payroll.group_hr_payroll_manager"
+        />-->
+        <menuitem
+              name="Batch Bonus Sheet Report"
+              id="menu_batch_bonus_sheet_payroll"
+              sequence="2"
+              parent="hr_employee_bonus.menu_report_payroll_bonus"
+              action="action_batch_bonus_sheet_wizard"
+              groups="hr.group_hr_manager,hr_payroll.group_hr_payroll_manager"
+        />
+
+    </data>
+</odoo>

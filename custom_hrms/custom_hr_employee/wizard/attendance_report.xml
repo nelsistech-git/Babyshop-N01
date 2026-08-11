@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="attendance_report_action_form" model="ir.ui.view">
+        <field name="name">evl.attendance.report.form</field>
+        <field name="model">evl.attendance.report</field>
+        <field name="arch" type="xml">
+            <form string="Create Report">
+                <group>
+                    <field name="company_id" options="{'no_create_edit': True, 'no_open': True, 'no_create':True}" />
+                </group>
+                <group col="4">
+                    <field name="work_section" domain="[('location_id','=','work_branch'),('company_id','=',company_id)]" placeholder="All" options="{'no_create_edit': True, 'no_open': True, 'no_create':True}" />
+                    <field name="employee_id" domain="[('wh_location_id','=',work_branch),('company_id','=',company_id)]" placeholder="All" options="{'no_create_edit': True, 'no_open': True, 'no_create':True}" />
+                </group>
+                <group col="4">
+                    <field name="joining_date" />
+                    <field name="report_type" />
+                </group>
+                <group col="4">
+                    <field name="month" invisible="report_type != 'month'" required="report_type == 'month'"/>
+                    <field name="year" invisible="report_type == 'all' or report_type == 'date'" required="report_type == 'year' or report_type == 'month'"/>
+                    <field name="date_from" invisible="report_type == 'all' or report_type == 'month' or report_type == 'year'"/>
+                    <field name="date_to" invisible="report_type == 'all' or report_type == 'month' or report_type == 'year'"/>
+                    <field name="report_option" />
+                </group>
+                <footer>
+                    <button name="print_preview" string="Preview" type="object" class="btn-primary"/>
+                    <button name="print_attendance_report" string="Print" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="attendance_report_action" model="ir.actions.act_window">
+            <field name="name">Attendance Report</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">evl.attendance.report</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="attendance_report_action_form"/>
+            <field name="target">new</field>
+    </record>
+
+    <menuitem
+          name="Attendance Report"
+          id="attendance_report"
+          parent="hr.hr_menu_hr_reports"
+          action="custom_hr_employee.attendance_report_action"
+    />
+
+</odoo>

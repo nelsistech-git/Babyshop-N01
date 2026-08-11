@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_attendance_extra_data_clean_wizard_form" model="ir.ui.view">
+            <field name="name">attendance.clean.before.joining.date.form</field>
+            <field name="model">attendance.extra.data.clean.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Attendance Extra Data Clean Wizard">
+                    <group>
+                        <group>
+                            <field name="employee_ids" widget="many2many_tags" required="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="attendance_extra_data_clean" string="Clean Data" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_attendance_extra_data_clean_wizard" model="ir.actions.act_window">
+            <field name="name">Attendance Extra Data (before joining and after resign) Clean</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">attendance.extra.data.clean.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_attendance_extra_data_clean_wizard_form"/>
+            <field name="target">new</field>
+        </record>
+
+        <menuitem id="menu_attendance_extra_data_clean_wizard"
+              name="Attendance Extra Data (join/resign) Clean"
+              sequence="17"
+              action="action_attendance_extra_data_clean_wizard"
+              parent="menu_hr_attendance_manage_attendances"
+              groups="hr_attendance.group_hr_attendance_manager"
+        />
+    </data>
+</odoo>

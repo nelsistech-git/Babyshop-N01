@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <report
+            id="action_employee_transfer_report"
+            model="hr.transfer"
+            string="Employee Transfer Statement"
+            report_type="qweb-pdf"
+            name="hr_transfer.employee_transfer_report"
+            file="hr_transfer.employee_transfer_report"
+            print_report_name="'Employee Transfer Statement- %s' % (object.employee_id.name)"
+    />
+    <template id="employee_transfer_report">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <style type="text/css">
+                            th, tr, td{
+                                background: white !important;
+                                border: none !important;
+                            }
+                        </style>
+                        <h2 class="text-center">
+                            Employee Transfer - <span t-field="o.name"/>
+                        </h2>
+
+                        <br/>
+                        <table class="table table-condensed">
+                            <tr>
+                                <td width="50%"><h5><strong>Transfer For</strong></h5>
+                                    <div><strong>Name: </strong><span t-field="o.employee_id"/></div>
+                                    <div><strong>Employee ID: </strong><span t-field="o.employee_id.id_card_no"/></div>
+                                </td>
+                                <td width="50%"><h5><strong>Transfer Info</strong></h5>
+                                    <div><strong>Status: </strong><span t-field="o.state"/></div>
+                                    <div><strong>Requester: </strong><span t-field="o.requester_id"/></div>
+                                    <div><strong>Requested Date: </strong><span t-field="o.date_requested" t-options='{"widget": "datetime"}'/></div>
+                                    <div><strong>Effective Date: </strong><span t-field="o.date_exec" t-options='{"widget": "date"}'/></div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td width="50%"><h5><strong>Current Allocation</strong></h5>
+                                    <div t-if="o.transfer_company == '1'"><strong>Company: </strong><span t-field="o.company_id"/></div>
+                                    <div><strong>Work/Job Location: </strong><span t-field="o.location_id"/></div>
+                                    <div><strong>Department: </strong><span t-field="o.department_id"/></div>
+                                    <div><strong>Designation: </strong><span t-field="o.job_position"/></div>
+                                    <div><strong>Reporting Manager: </strong><span t-field="o.manager_id"/></div>
+                                    <div><strong>Existing Contract: </strong><span t-field="o.from_emp_contract"/></div>
+                                    <div><strong>Gross Salary: </strong><span t-esc="'{0:,.2f}'.format(o.gross_salary)"/></div>
+                                    <div><strong>Working Schedule: </strong><span t-field="o.resource_calendar"/></div>
+
+                                </td>
+                                <td width="50%"><h5><strong>Revised Transfer</strong></h5>
+                                    <div><strong>Transfer To (Company): </strong><span t-field="o.transfer_company"/></div>
+                                    <div t-if="o.transfer_company == '0'"><strong>Work/Job Location: </strong><span t-field="o.to_wh_location_id"/></div>
+                                    <div t-if="o.transfer_company == '0'"><strong>Department: </strong><span t-field="o.to_department_id"/></div>
+                                    <div t-if="o.transfer_company == '0'"><strong>Designation: </strong><span t-field="o.to_position"/></div>
+                                    <div t-if="o.transfer_company == '0'"><strong>Reporting Manager: </strong><span t-field="o.to_manager_id"/></div>
+                                    <div t-if="o.transfer_company == '0'"><strong>Working Schedule: </strong><span t-field="o.to_resource_calendar"/></div>
+                                    <div t-if="o.transfer_company == '1'"><strong>Company: </strong><span t-field="o.other_company_name"/></div>
+                                    <div t-if="o.transfer_company == '1'"><strong>Work/Job Location: </strong><span t-field="o.other_company_job_location"/></div>
+                                    <div t-if="o.transfer_company == '1'"><strong>Department: </strong><span t-field="o.other_company_department"/></div>
+                                    <div t-if="o.transfer_company == '1'"><strong>Designation: </strong><span t-field="o.other_company_job_position"/></div>
+                                    <div t-if="o.transfer_company == '1'"><strong>Reporting Manager: </strong><span t-field="o.other_company_manager"/></div>
+                                    <div><strong>Note: </strong><span t-field="o.note"/></div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td width="50%"><h5><strong>Accounting Summary</strong></h5>
+                                    <div><strong>Loan Amount: </strong><span t-esc="'{0:,.2f}'.format(o.total_residual_loan)"/></div>
+                                    <div><strong>Salary Payables: </strong><span t-esc="'{0:,.2f}'.format(o.residual_Salary)"/></div>
+                                    <div><strong>Salary Advance: </strong><span t-esc="'{0:,.2f}'.format(o.advance_salary)"/></div>
+                                </td>
+                                <td>&amp;nbsp;</td>
+                            </tr>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

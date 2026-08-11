@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+
+        <!-- Wizard Form View -->
+        <record id="view_bd_barcode_label_wizard_form" model="ir.ui.view">
+            <field name="name">bd.barcode.label.wizard.form</field>
+            <field name="model">bd.barcode.label.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Generate Barcode Label">
+                    <group>
+                        <group>
+                            <!-- <field name="brand"
+                                   options="{'no_open': True, 'no_create': 1, 'no_create_edit': 1}"
+                                   required="1"/> -->
+                            <field name="product_id"
+                                   options="{'no_open': True, 'no_create': 1, 'no_create_edit': 1}"
+                                   required="1"/>
+                            <field name="name"/>
+                            <field name="categ_id"/>
+                            <field name="print_quantity" required="1"/>
+                        </group>
+                        <group>
+                            <field name="barcode"/>
+                            <field name="sale_price"/>
+                            <field name="ratio_type"/>
+                            <!--field name="per_sku_qty"/> -->
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="action_generate_barcode"
+                                string="Generate Barcode"
+                                type="object"
+                                class="btn-primary"/>
+                        <button string="Cancel"
+                                class="btn-secondary"
+                                special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <!-- Wizard Action -->
+        <record id="action_bd_barcode_label_wizard" model="ir.actions.act_window">
+            <field name="name">Generate Barcode Label</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">bd.barcode.label.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_bd_barcode_label_wizard_form"/>
+            <field name="target">new</field>
+        </record>
+
+        <!-- Menu: Products → Generate Barcode Label -->
+        <menuitem id="menu_bd_generate_barcode"
+          name="Generate Barcode"
+          action="custom_generate_barcode_label.action_bd_barcode_label_wizard"
+          parent="stock.menu_stock_inventory_control"
+          sequence="4"/>
+
+    </data>
+</odoo>

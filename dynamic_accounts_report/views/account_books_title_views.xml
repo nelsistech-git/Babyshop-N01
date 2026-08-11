@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Account Books Title Form View -->
+    <record id="view_account_books_title_form" model="ir.ui.view">
+        <field name="name">account.books.title.form</field>
+        <field name="model">account.books.title</field>
+        <field name="arch" type="xml">
+            <form string="Group wise Account Summary">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="account_tag_ids" widget="many2many_tags" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="account_ids" widget="many2many_tags" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Account Books Title Tree View -->
+    <record id="view_account_books_title_tree" model="ir.ui.view">
+        <field name="name">account.books.title.tree</field>
+        <field name="model">account.books.title</field>
+        <field name="arch" type="xml">
+            <tree string="Account Books Title">
+                <field name="name"/>
+                <field name="account_tag_ids" widget="many2many_tags" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                <field name="account_ids" widget="many2many_tags" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Account Books Title Action -->
+    <record id="action_account_books_title" model="ir.actions.act_window">
+        <field name="name">Books Title</field>
+        <field name="res_model">account.books.title</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a Books Title!
+            </p>
+        </field>
+    </record>
+
+    <!-- Account Books Title Menu -->
+    <menuitem id="menu_account_books_title" name="Books Title" parent="account.account_account_menu" action="action_account_books_title" sequence="51"/>
+</odoo>

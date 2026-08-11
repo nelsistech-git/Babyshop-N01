@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+
+        <record id="daily_attendance_sheet_report_id" model="ir.actions.report">
+            <field name="name">Daily Attendance Sheet</field>
+            <field name="model">daily.attendance.sheet.wizard</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">custom_hr_report.daily_attendance_sheet_report_view</field>
+            <field name="report_file">custom_hr_report.daily_attendance_sheet_report_view</field>
+        </record>
+
+		<template id="daily_attendance_sheet_report_view">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <style type="text/css">
+                            table, th, tr, td{
+                                background: white !important;
+                                border: 1px solid black !important;
+                            }
+                        </style>
+
+                        <t t-set="data" t-value="request.env['daily.attendance.sheet.wizard'].search([('id', '=', ftr_id)], limit=1).daily_attendance_sheet_sql()"/>
+
+                        <t t-set="model" t-value="data['model']"/>
+                        <t t-set="form" t-value="data['form']"/>
+                        <t t-set="csr" t-value="data['csr']"/>
+                        <t t-set="work_location_name" t-value="data['work_location_name']"/>
+                        <t t-set="dept_name" t-value="data['dept_name']"/>
+                        <t t-set="status_name" t-value="data['status_name']"/>
+                        <t t-set="emp_id_card_no" t-value="data['emp_id_card_no']"/>
+                        <t t-set="emp_name" t-value="data['emp_name']"/>
+                        <t t-set="emp_work_loc_name" t-value="data['emp_work_loc_name']"/>
+                        <t t-set="emp_dept_name" t-value="data['emp_dept_name']"/>
+                        <t t-set="emp_des_name" t-value="data['emp_des_name']"/>
+                        <t t-set="emp_joining_date" t-value="data['emp_joining_date']"/>
+
+                        <div class="oe_structure"/>
+<!--                        <div>
+                            <h3 class="text-center">
+                                <strong>
+&lt;!&ndash;                                    <span t-esc="form['company_id'][1]"/>&ndash;&gt;
+&lt;!&ndash;                                    <br/>&ndash;&gt;
+                                    Daily Attendance Sheet
+                                </strong>
+                            </h3>
+                        </div>-->
+                        <h4 class="text-center head_font_color">
+                            <strong>Daily Attendance Sheet</strong>
+                        </h4>
+                        <div class="row">
+                            <div class="col-6">
+                                <div style="color: #000; font-size: 15px;">
+                                    <strong>From Date:</strong> <t t-esc="form['from_date']" t-options='{"widget": "date"}'/>
+                                </div>
+                                <div style="color: #000; font-size: 15px;">
+                                    <strong>To Date:</strong> <t t-esc="form['to_date']" t-options='{"widget": "date"}'/>
+                                </div>
+                                <div t-if="form['employee_id']" style="color: #000; font-size: 15px;">
+                                    <strong>Employee ID:</strong> <t t-esc="emp_id_card_no"/>
+                                </div>
+                                <div t-if="form['employee_id']" style="color: #000; font-size: 15px;">
+                                    <strong>Employee:</strong> <t t-esc="emp_name"/>
+                                </div>
+                                <div t-if="not form['employee_id']" style="color: #000; font-size: 15px;">
+                                    <strong>Work Location:</strong> <t t-esc="work_location_name"/>
+                                </div>
+                            </div>
+                            <div class="col-6 text-right">
+                                <div t-if="form['employee_id']" style="color: #000; font-size: 15px;">
+                                    <strong>Work Location:</strong> <t t-esc="emp_work_loc_name"/>
+                                </div>
+                                <div t-if="not form['employee_id']" style="color: #000; font-size: 15px;">
+                                    <strong>Employee:</strong> <t t-esc="emp_name"/>
+                                </div>
+                                <div style="color: #000; font-size: 15px;">
+                                    <strong>Department:</strong> <t t-if="form['employee_id']" t-esc="emp_dept_name"/>
+                                    <t t-else="" t-esc="dept_name"/>
+                                </div>
+                                <div t-if="form['employee_id']" style="color: #000; font-size: 15px;">
+                                    <strong>Designation:</strong> <t t-esc="emp_des_name"/>
+                                </div>
+                                <div t-if="form['employee_id']" style="color: #000; font-size: 15px;">
+                                    <strong>Joining Date:</strong> <t t-esc="emp_joining_date" t-options='{"widget": "date"}'/>
+                                </div>
+                                <span t-if="not form['employee_id']" style="color: #000; font-size: 15px;">
+                                    <strong>Status:</strong> <t t-esc="status_name"/>
+                                </span>
+                            </div>
+                        </div>
+                        <table style="border-collapse: collapse;width: 100%; margin-top: 0.75em; margin-bottom: 0.75em;">
+                            <thead>
+                                <t t-if="employee_id">
+                                    <tr>
+                                        <th class="text-center align-middle bg_color font_color">Sl. No.</th>
+                                        <th class="text-center align-middle bg_color font_color">Date</th>
+                                        <th class="text-center align-middle bg_color font_color">Check-in</th>
+                                        <th class="text-center align-middle bg_color font_color">Check-out</th>
+                                        <th class="text-center align-middle bg_color font_color">Overtime</th>
+                                        <th class="text-center align-middle bg_color font_color">Late-in</th>
+                                        <th class="text-center align-middle bg_color font_color">Early-out</th>
+                                        <th class="text-center align-middle bg_color font_color">Auto/Manual</th>
+                                        <th class="text-center align-middle bg_color font_color">Remarks</th>
+                                    </tr>
+                                </t>
+                                <t t-else="">
+                                     <tr>
+                                        <th class="text-center align-middle bg_color font_color">Sl. No.</th>
+                                        <th class="text-center align-middle bg_color font_color">Date</th>
+                                        <th class="text-center align-middle bg_color font_color" t-if="not form['employee_id']">Employee</th>
+                                        <th class="text-center align-middle bg_color font_color" t-if="not form['employee_id']">Employee ID</th>
+                                        <th class="text-center align-middle bg_color font_color" t-if="not form['employee_id']">Work Location</th>
+                                        <th class="text-center align-middle bg_color font_color" t-if="not form['employee_id']">Department</th>
+                                        <th class="text-center align-middle bg_color font_color" t-if="not form['employee_id']">Designation</th>
+                                        <th class="text-center align-middle bg_color font_color">Check-in</th>
+                                        <th class="text-center align-middle bg_color font_color">Check-out</th>
+                                        <th class="text-center align-middle bg_color font_color">Overtime</th>
+                                        <th class="text-center align-middle bg_color font_color">Late-in</th>
+                                        <th class="text-center align-middle bg_color font_color">Early-out</th>
+                                        <th class="text-center align-middle bg_color font_color">Auto/Manual</th>
+                                        <th class="text-center align-middle bg_color font_color">Status</th>
+                                        <th class="text-center align-middle bg_color font_color">Remarks</th>
+                                    </tr>
+                                </t>
+                            </thead>
+                            <tbody class="consumed_tbody">
+                                <t t-set="sl_no" t-value="1"/>
+                                <t t-set="emp_id" t-value="-1"/>
+                                <t t-set="total_emp" t-value="0"/>
+                                <t t-if="(not form['status'] or form['status'] == 'present')" t-set="total_present" t-value="0"/>
+                                <t t-if="(not form['status'] or form['status'] == 'ab')" t-set="total_absent" t-value="0"/>
+                                <t t-if="(not form['status'] or form['status'] == 'late_in')" t-set="total_late_in" t-value="0"/>
+                                <t t-if="(not form['status'] or form['status'] == 'early_out')" t-set="total_early_out" t-value="0"/>
+                                <t t-if="(not form['status'] or form['status'] == 'leave')" t-set="total_leave" t-value="0"/>
+                                <t t-if="(not form['status'] or form['status'] == 'ph')" t-set="total_ph" t-value="0"/>
+                                <t t-if="(not form['status'] or form['status'] == 'weekend')" t-set="total_wk" t-value="0"/>
+                                <t t-foreach="csr" t-as="line">
+                                    <t t-if="emp_id != line['emp_id']" t-set="total_emp" t-value="total_emp + 1"/>
+                                    <t t-if="(not form['status'] or form['status'] == 'present') and not line['main_status']" t-set="total_present" t-value="total_present + 1"/>
+                                    <t t-if="(not form['status'] or form['status'] == 'ab') and line['main_status']=='ab'" t-set="total_absent" t-value="total_absent + 1"/>
+                                    <t t-if="(not form['status'] or form['status'] == 'late_in') and line['late_in'] > 0" t-set="total_late_in" t-value="total_late_in + 1"/>
+                                    <t t-if="(not form['status'] or form['status'] == 'early_out') and line['diff_time'] > 0" t-set="total_early_out" t-value="total_early_out + 1"/>
+                                    <t t-if="(not form['status'] or form['status'] == 'leave') and line['main_status']=='leave'" t-set="total_leave" t-value="total_leave + 1"/>
+                                    <t t-if="line['main_status']=='ph'" t-set="total_ph" t-value="total_ph + 1"/>
+                                    <t t-if="line['main_status']=='weekend'" t-set="total_wk" t-value="total_wk + 1"/>
+                                    <tr>
+                                        <td class="text-center align-middle">
+                                            <span t-esc="sl_no"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <span t-esc="line['date']" t-options="{'widget': 'date'}"/>
+                                        </td>
+                                        <td class="text-center align-middle body_col_bg_color"  t-if="not form['employee_id']">
+                                            <span t-esc="line['emp_name']"/>
+                                        </td>
+                                        <td class="text-center align-middle" t-if="not form['employee_id']">
+                                            <span t-esc="line['id_card_no']"/>
+                                        </td>
+                                        <td class="text-center align-middle" t-if="not form['employee_id']">
+                                            <span t-esc="line['loc_name']"/>
+                                        </td>
+                                        <td class="text-center align-middle" t-if="not form['employee_id']">
+                                            <span t-esc="line['dept_name']"/>
+                                        </td>
+                                        <td class="text-center align-middle" t-if="not form['employee_id']">
+                                            <span t-esc="line['desig_name']"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <span t-esc="line['check_in']" t-options="{'widget': 'float_time'}"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <span t-if="line['punch_count'] != 1" t-esc="line['check_out']" t-options="{'widget': 'float_time'}"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <span t-esc="line['overtime']" t-options="{'widget': 'float_time'}"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <span t-esc="line['late_in']" t-options="{'widget': 'float_time'}"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <span t-esc="line['diff_time']" t-options="{'widget': 'float_time'}"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <span t-esc="line['att_type']"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <span t-esc="line['status']"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <span t-esc="line['manual_reason']"/>
+                                        </td>
+                                        <t t-set="sl_no" t-value="sl_no + 1"/>
+                                        <t t-set="emp_id" t-value="line['emp_id']"/>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                        <div class="row" style="font-size: 13px !important;">
+                            <div class="col-3" style="border: 1px solid black; margin: auto;">
+                                <div>
+                                    <strong>Total Employee: <span t-esc="total_emp"/></strong>
+                                </div>
+                                <div t-if="(not form['status'] or form['status'] == 'present')">
+                                    <strong>Total Present: <span t-esc="total_present"/></strong>
+                                </div>
+                                <div t-if="(not form['status'] or form['status'] == 'ab')">
+                                    <strong>Total Absent: <span t-esc="total_absent"/></strong>
+                                </div>
+                                <div t-if="(not form['status'] or form['status'] == 'late_in')">
+                                    <strong>Total Late In: <span t-esc="total_late_in"/></strong>
+                                </div>
+                                <div t-if="(not form['status'] or form['status'] == 'early_out')">
+                                    <strong>Total Early Out: <span t-esc="total_early_out"/></strong>
+                                </div>
+                                <div t-if="(not form['status'] or form['status'] == 'leave')">
+                                    <strong>Total Leave: <span t-esc="total_leave"/></strong>
+                                </div>
+                                <div>
+                                    <strong>Total Weekend: <span t-esc="total_wk"/></strong>
+                                </div>
+                                <div>
+                                    <strong>Total Public Holiday: <span t-esc="total_ph"/></strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+		</template>
+	</data>
+</odoo>

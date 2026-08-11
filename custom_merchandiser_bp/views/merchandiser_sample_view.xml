@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View -->
+    <record id="view_merchandiser_sample_form" model="ir.ui.view">
+        <field name="name">merchandiser.sample.form</field>
+        <field name="model">merchandiser.sample</field>
+        <field name="arch" type="xml">
+            <form string="Sample Management">
+                <header>
+                    <button name="action_to_courier" string="→ Courier Info"
+                        type="object" class="oe_highlight"
+                        invisible="state != 'sample'"/>
+                    <button name="action_to_feedback" string="→ Feedback"
+                        type="object" class="oe_highlight"
+                        invisible="state != 'courier'"/>
+                    <button name="action_done" string="Done → Create Order"
+                        type="object" class="oe_highlight"
+                        invisible="state != 'feedback'"/>
+                    <field name="state" widget="statusbar"
+                        statusbar_visible="sample,courier,feedback,done"/>
+                </header>
+                <sheet>
+                    <group string="Sample Details">
+                        <group>
+                            <field name="sample_no"/>
+                            <field name="buyer_id" readonly="1"/>
+                            <field name="style_no" readonly="1"/>
+                            <field name="sample_type"/>
+                            <field name="season"/>
+                            <field name="merchandiser_name"/>
+                        </group>
+                        <group>
+                            <field name="sample_date"/>
+                            <field name="color" readonly="1"/>
+                            <field name="size"/>
+                            <field name="quantity"/>
+                            <field name="unit_price" readonly="1"/>
+                            <field name="fabric_type" readonly="1"/>
+                            <field name="gsm" readonly="1"/>
+                            <field name="measurement_status"/>
+                        </group>
+                    </group>
+
+                    <group string="Courier Info"
+                        invisible="state == 'sample'">
+                        <group>
+                            <field name="courier_name"/>
+                            <field name="tracking_no"/>
+                        </group>
+                        <group>
+                            <field name="sent_date"/>
+                            <field name="delivery_date"/>
+                        </group>
+                    </group>
+
+                    <group string="Feedback"
+                        invisible="state in ('sample', 'courier')">
+                        <field name="buyer_comment"/>
+                        <field name="correction_note"/>
+                        <field name="approval_date"/>
+                        <field name="attachment_name" invisible="1"/>
+                        <field name="attachment"
+                            filename="attachment_name" widget="binary"/>
+                    </group>
+                </sheet>
+
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree View -->
+    <record id="view_merchandiser_sample_tree" model="ir.ui.view">
+        <field name="name">merchandiser.sample.tree</field>
+        <field name="model">merchandiser.sample</field>
+        <field name="arch" type="xml">
+            <tree string="Samples">
+                <field name="sample_no"/>
+                <field name="buyer_id"/>
+                <field name="style_no"/>
+                <field name="sample_type"/>
+                <field name="sample_date"/>
+                <field name="measurement_status" widget="badge"
+                    decoration-success="measurement_status == 'pass'"
+                    decoration-danger="measurement_status == 'fail'"/>
+                <field name="state" widget="badge"
+                    decoration-success="state == 'done'"
+                    decoration-warning="state in ('sample','courier')"
+                    decoration-info="state == 'feedback'"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_merchandiser_sample_search" model="ir.ui.view">
+        <field name="name">merchandiser.sample.search</field>
+        <field name="model">merchandiser.sample</field>
+        <field name="arch" type="xml">
+            <search string="Search Samples">
+                <field name="sample_no"/>
+                <field name="buyer_id"/>
+                <field name="style_no"/>
+                <separator/>
+                <filter name="pass" string="Measurement Pass"
+                    domain="[('measurement_status','=','pass')]"/>
+                <filter name="fail" string="Measurement Fail"
+                    domain="[('measurement_status','=','fail')]"/>
+                <filter name="done" string="Done"
+                    domain="[('state','=','done')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_buyer" string="Buyer"
+                        context="{'group_by': 'buyer_id'}"/>
+                    <filter name="group_state" string="Status"
+                        context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_merchandiser_sample" model="ir.actions.act_window">
+        <field name="name">Sample Management</field>
+        <field name="res_model">merchandiser.sample</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_merchandiser_sample_search"/>
+    </record>
+
+    <!-- Menu -->
+    <menuitem id="menu_merchandiser_sample" name="Samples"
+        parent="menu_merchandiser_root"
+        action="action_merchandiser_sample" sequence="2"/>
+
+</odoo>

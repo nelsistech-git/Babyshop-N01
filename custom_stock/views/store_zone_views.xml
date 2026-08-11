@@ -1,0 +1,67 @@
+<odoo>
+	<data>
+		<record id="store_zone_view_form" model="ir.ui.view">
+			<field name="name">zone.form</field>
+			<field name="model">store.zone</field>
+			<field name="arch" type="xml">
+				<form string="Store Zone Form">
+					<sheet>
+						<group>
+							<group>
+								<field name="name" />
+								<field name="code"/>
+								<field name="manager_id" options="{'no_open': True, 'no_create': 1, 'no_create_edit': 1}"/>
+								<field name="active" />
+							</group>
+							<group></group>
+						</group>
+					</sheet>
+				</form>
+			</field>
+		</record>
+
+		<record id="store_zone_view_tree" model="ir.ui.view">
+			<field name="name">zone.tree</field>
+			<field name="model">store.zone</field>
+			<field name="arch" type="xml">
+				<tree string="Store Zone tree">
+					<field name="name" />
+					<field name="code" />
+					<field name="manager_id" />
+					<field name="active" />
+				</tree>
+			</field>
+		</record>
+		<record id="store_zone_view_search" model="ir.ui.view">
+			<field name="name">store.zone.search</field>
+			<field name="model">store.zone</field>
+			<field name="arch" type="xml">
+				<search string="Search Active and Inactive">
+
+					<filter string="Active" name="active" domain="[('active','=',True)]"
+						help="Filtered by Active Status" />
+					<filter string="Inactive" name="active" domain="[('active','=',False)]"
+						help="Filtered by Inactive Status" />
+
+					<separator />
+
+				</search>
+			</field>
+		</record>
+
+		<record id="store_zone_list_action" model="ir.actions.act_window">
+			<field name="name">Area/Territories</field>
+			<field name="res_model">store.zone</field>
+			<!-- <field name="view_type">form</field> -->
+			<field name="view_mode">tree,form</field>
+			<field name="help" type="html">
+				<p class="o_view_nocontent_smiling_face">Create Territory
+				</p>
+			</field>
+		</record>
+
+		<menuitem id="zone_menu" name="Area/Territories" parent="custom_common_settings.root_planning_menu"
+			action="store_zone_list_action" sequence="6" />
+
+	</data>
+</odoo>

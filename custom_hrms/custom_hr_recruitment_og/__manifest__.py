@@ -1,0 +1,20 @@
+{
+    'name': 'Custom HR Recruitment OG',
+    'version': "1.0.0",
+    'category': "Human Resources Recruitment",
+    'sequence': 1,
+    'summary': "Inherited HR Recruitment (Inherited HR Applicant). HR Recruitment module designed to customize the whole recruitment process for Odoo v17",
+    'description': """Inherited HR Recruitment (Inherited HR Applicant). HR Recruitment module designed to customize the whole recruitment process for Odoo v17""",
+    'author': "Nelsis Tech Limited",
+    'company': "Nelsis Tech Limited",
+    'maintainer': "Nelsis Tech Limited",
+    'website': 'https://nelsistech.com/',
+    'depends': ['custom_hr_employee', 'hr_recruitment'],
+    'data': [
+        'security/ir.model.access.csv',
+    ],
+    'demo': [],
+    'installable': True,
+    'application': True,
+    'license': 'LGPL-3',
+}

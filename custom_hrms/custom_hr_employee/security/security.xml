@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <record model="res.groups" id="group_employee_list_viewer">
+           <field name="name">Employee List Viewer</field>
+        </record>
+
+        <record model="res.groups" id="group_employee_department_head">
+           <field name="name">Employee Department Head</field>
+        </record>
+
+        <record id="group_employee_list_viewer_view_all" model="ir.rule">
+            <field name="name">Employee List Viewer</field>
+            <field name="model_id" ref="model_hr_employee_list"/>
+            <field name="domain_force">[('user_work_location_id.id','=',user.user_work_location_id.id)]</field>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+            <field name="groups" eval="[(4, ref('custom_hr_employee.group_employee_list_viewer'))]"/>
+        </record>
+    </data>
+</odoo>

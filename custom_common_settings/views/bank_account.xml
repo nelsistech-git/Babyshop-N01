@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="bank_account_view_form" model="ir.ui.view">
+        <field name="name">bank.account.form</field>
+        <field name="model">bank.account</field>
+        <field name="arch" type="xml">
+            <form string="Bank Information Form">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="bank_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" required="1"/>
+                            <field name="bank_branch_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" required="1"/>
+                            <field name="name"  required="1"/>
+                            <field name="acc_number"  required="1"/>
+                            <field name="account_type_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" required="1"/>
+                            <field name="remarks" />
+<!--                            <field name="active" />-->
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Cheque book bank accounts Form View -->
+	<record id="bank_account_view_tree" model="ir.ui.view">
+         <field name="name">bank.account.tree</field>
+         <field name="model">bank.account</field>
+         <field name="arch" type="xml">
+             <tree string="Bank Information List">
+             	<field name="bank_id"/>
+                 <field name="bank_branch_id"/>
+                 <field name="name"/>
+                 <field name="acc_number"/>
+                 <field name="account_type_id"/>
+             </tree>
+         </field>
+     </record>
+
+    <!-- Cheque book bank search View -->
+    <record id="bank_account_view_search" model="ir.ui.view">
+         <field name="name">bank.account.search</field>
+         <field name="model">bank.account</field>
+        <field name="arch" type="xml">
+            <search string="Search Bank Acc">
+                <field name="bank_id"/>
+                <field name="bank_branch_id"/>
+                <field name="name"/>
+                <field name="acc_number"/>
+                <field name="account_type_id"/>
+           </search>
+        </field>
+    </record>
+
+	<record id="bank_account_action" model="ir.actions.act_window">
+        <field name="name">Bank Account</field>
+        <field name="res_model">bank.account</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[]</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Please Create Bank Acc
+            </p>
+        </field>
+    </record>
+
+    <!-- Cheque book bank menu -->
+    <menuitem id="bank_account_menu_id" name="Bank Account" action="bank_account_action" sequence="14"
+                  parent="account.menu_finance_configuration"/>
+
+</odoo>

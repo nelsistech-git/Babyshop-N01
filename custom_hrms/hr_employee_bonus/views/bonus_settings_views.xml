@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<odoo>
+    <data>
+        <!--Tree View-->
+        <record id="hr_bonus_settings_view_tree" model="ir.ui.view">
+            <field name="name">hr.bonus.settings.tree</field>
+            <field name="model">hr.bonus.settings</field>
+            <field name="arch" type="xml">
+                <tree string="Bonus Settings" editable="bottom">
+                    <field name="head_id" required="1"/>
+                    <field name="settings_type"/>
+                    <field name="days_from" required="settings_type in ['serv_len','serv_len_emp_type']" readonly="settings_type == 'emp_type'"/>
+                    <field name="days_to" required="settings_type in ['serv_len','serv_len_emp_type']" readonly="settings_type == 'emp_type'"/>
+                    <field name="employee_type_id" required="settings_type in ['emp_type','serv_len_emp_type']" readonly="settings_type == 'serv_len'" options="{'no_open':True,'no_create_edit':1}" />
+
+                    <field name="reference"/>
+                    <field name="based_on_type"/>
+                    <field name="amount_percentage"/>
+                </tree>
+                
+            </field>
+        </record>
+		
+        <!--Action View-->
+        <record id="hr_bonus_settings_list_action" model="ir.actions.act_window">
+            <field name="name">Bonus Settings</field>
+            <field name="res_model">hr.bonus.settings</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_mode">tree</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">Create the first record</p>
+            </field>
+        </record>
+		
+        <!--Add Menu Item-->
+        <menuitem id="menu_hr_bonus_config" name="Employee Bonus Settings" parent="hr_payroll.menu_hr_salary_configuration"
+        sequence="92" action="hr_bonus_settings_list_action" groups="hr.group_hr_manager,hr_payroll.group_hr_payroll_manager"/>
+    </data>
+</odoo>
+
+

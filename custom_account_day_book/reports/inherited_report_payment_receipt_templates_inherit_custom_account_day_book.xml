@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="inherited_report_payment_receipt_document" inherit_id="account.report_payment_receipt_document">
+        <xpath expr="//t/div[hasclass('page')]" position="replace">
+            <div class="page">
+                <t t-if="o.payment_type == 'inbound'">
+                    <h3 class="text-center head_font_color"><strong>Receipt Voucher: <span t-field="o.name"/></strong></h3>
+                </t>
+                <t t-if="o.payment_type == 'outbound'">
+                    <h3 class="text-center head_font_color"><strong>Payment Voucher: <span t-field="o.name"/></strong></h3>
+                </t>
+                <br/>
+                <div class="container-fluid">
+                    <div class="row" style="border: 1px solid black !important;">
+                        <div class="col-6">
+                            <t t-if="o.date">
+                                <strong>Date: </strong> <span t-field="o.date"/>
+                            </t>
+                            <br/>
+                            <t t-if="o.amount">
+                                <strong>Amount: </strong><span t-field="o.amount" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                            </t>
+                            <br/>
+                            <t t-if="o.journal_id">
+                                <strong>Method: </strong><span t-field="o.journal_id.name"/>
+                            </t>
+                        </div>
+                        <div class="col-6">
+                            <t t-if="o.partner_id">
+                                <strong>Partner Name: </strong><span t-field="o.partner_id.name"/>
+                                <br/>
+                                <strong>Mobile: </strong><span t-field="o.partner_id.mobile"/>
+                                <br/>
+                                <strong>Address: </strong>
+                                <t t-if="o.partner_id.street"><span t-field="o.partner_id.street"/>, </t>
+                                <t t-if="o.partner_id.city"><span t-field="o.partner_id.city"/>, </t>
+                                <t t-if="o.partner_id.state_id.name"><span t-field="o.partner_id.state_id.name"/>-</t>
+                                <t t-if="o.partner_id.zip"><span t-field="o.partner_id.zip"/>, </t>
+                                <t t-if="o.partner_id.country_id.name"><span t-field="o.partner_id.country_id.name"/></t>
+                            </t>
+                        </div>
+                    </div>
+                </div>
+                <br/>
+                <div class="row">
+                    <div class="col-12">
+                        <h5 class="text-center head_font_color">
+                            <strong>
+                                <t t-if="o.partner_type == 'customer'">
+                                    Received with thanks from
+                                </t>
+                                <t t-if="o.partner_type == 'supplier'">
+                                    Paid to
+                                </t>
+                                <em><span t-field="o.partner_id.name"/></em>
+                            </strong>
+                        </h5>
+                    </div>
+                </div>
+                <br/>
+                <table class="table table-sm" name="invoice_table">
+                    <thead>
+                        <tr style="font-size: 15px !important;">
+                            <th class="text-center align-middle bg_color font_color"><span>Sl.</span></th>
+                            <th class="text-left align-middle bg_color font_color"><span>Invoice Date</span></th>
+                            <th class="text-left align-middle bg_color font_color"><span>Invoice No.</span></th>
+<!--                            <th class="text-left align-middle"><span>Ref.</span></th>-->
+                            <th class="text-right align-middle bg_color font_color"><span>Due Bills</span></th>
+<!--                            <th class="text-right align-middle"><span>Original Amount</span></th>-->
+                            <th class="text-right align-middle bg_color font_color"><span>Current Payment</span></th>
+<!--                            <th class="text-right align-middle"><span>Total Paid</span></th>-->
+<!--                            <th class="text-right align-middle"><span>Total Due</span></th>-->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-set="sl_no" t-value="1"/>
+                        <t t-set="total_amt" t-value="0"/>
+                        <t t-set="total_current_paid_amt" t-value="0"/>
+<!--                        <t t-set="total_paid_amt" t-value="0"/>-->
+                        <t t-set="total_due" t-value="0"/>
+                        <tr t-foreach="o.reconciled_invoice_ids" t-as="inv">
+                            <td class="text-center" style="border: 1px solid black;"><span t-esc="sl_no"/></td>.
+                            <td style="border: 1px solid black;"><span t-field="inv.invoice_date"/></td>
+                            <td style="border: 1px solid black;"><span t-field="inv.name"/></td>
+<!--                            <td><span t-field="inv.ref"/></td>-->
+<!--                            <td class="text-right"><span t-field="inv.amount_total"/></td>-->
+                            <td class="text-right" style="border: 1px solid black;"><span t-esc="inv.amount_residual" t-options="{'widget': 'monetary', 'display_currency': inv.currency_id}"/></td>
+                            <td class="text-right" style="border: 1px solid black;"><span t-esc="o.amount_total - o.amount_residual" t-options="{'widget': 'monetary', 'display_currency': inv.currency_id}"/></td>
+<!--                            <td class="text-right"><span t-esc="inv.amount_total - inv.amount_residual" t-options="{'widget': 'monetary', 'display_currency': inv.currency_id}"/></td>
+                            <td class="text-right"><span t-field="inv.amount_residual"/></td>-->
+
+<!--                            <t t-set="total_amt" t-value="total_amt + inv.amount_total"/>-->
+                            <t t-set="total_current_paid_amt" t-value="total_current_paid_amt + (o.amount_total - o.amount_residual)"/>
+<!--                            <t t-set="total_paid_amt" t-value="total_paid_amt + (inv.amount_total - inv.amount_residual)"/>-->
+                            <t t-set="total_due" t-value="total_due + (inv.amount_residual + (o.amount_total - o.amount_residual))"/>
+                            <t t-set="sl_no" t-value="sl_no + 1"/>
+                        </tr>
+                        <tr style="border: 1px solid black !important;" name="total_amt">
+                            <td colspan="3" class="text-right"><strong>TOTAL</strong></td>
+                            <td class="text-right"><strong>BDT <span t-esc="'{0:,.2f}'.format(total_due)"/></strong></td>
+<!--                            <td class="text-right"><strong>BDT <span t-esc="'{0:,.2f}'.format(total_amt)"/></strong></td>-->
+                            <td class="text-right"><strong>BDT <span t-esc="'{0:,.2f}'.format(total_current_paid_amt)"/></strong></td>
+<!--                            <td class="text-right"><strong>BDT <span t-esc="'{0:,.2f}'.format(total_paid_amt)"/></strong></td>
+                            <td class="text-right"><strong>BDT <span t-esc="'{0:,.2f}'.format(total_due)"/></strong></td>-->
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="row">
+                    <div class="col-7"/>
+                    <div class="col-5">
+<!--                        <table class="table table-sm">
+&lt;!&ndash;                            <t t-set="net_amt" t-value="total_amt + o.extra_amount"/>&ndash;&gt;
+                        <t t-set="total_adv_payment" t-value="o.compute_partner_ledger(o.partner_id)[0]"/>
+                        <t t-set="total_recv_payment" t-value="o.compute_partner_ledger(o.partner_id)[1]"/>
+                        <t t-set="current_ledger_blnc" t-value="total_recv_payment + total_adv_payment"/>
+                        <tbody>
+                            <tr style="border: 1px solid black !important;">
+                                <td class="text-right"><strong>Total Payment</strong></td>
+                                <td class="text-right"><strong>BDT <span t-esc="'{0:,.2f}'.format(total_paid_amt)"/></strong></td>
+                            </tr>
+                            <tr style="border: 1px solid black !important;">
+                                <td class="text-right"><strong>Current Advance Payment</strong></td>
+                                <td class="text-right">
+                                    <strong>
+                                        BDT <span t-if="o.extra_amount != 0" t-esc="'{0:,.2f}'.format(o.extra_amount)"/> <span t-else="" t-esc="'{0:,.2f}'.format(o.amount - total_current_paid_amt)"/>
+                                    </strong>
+                                </td>
+                            </tr>
+                            <tr style="border: 1px solid black !important;">
+                                <td class="text-right"><strong>Total Advance Payment</strong></td>
+                                <td class="text-right">
+                                    <strong>
+                                        BDT <span t-if="total_adv_payment &lt; 0" t-esc="'{0:,.2f}'.format(total_adv_payment * (-1))"/><span t-else="" t-esc="'{0:,.2f}'.format(total_adv_payment)"/>
+                                    </strong>
+                                </td>
+                            </tr>
+                            <tr style="border: 1px solid black !important;">
+                                <td class="text-right"><strong>Total Receivable</strong></td>
+                                <td class="text-right"><strong>BDT <span t-esc="'{0:,.2f}'.format(total_recv_payment)"/></strong></td>
+                            </tr>
+                            <tr style="border: 1px solid black !important;">
+                                <td class="text-right"><strong>Ledger Balance</strong></td>
+                                <td class="text-right"><strong>BDT <span t-esc="'{0:,.2f}'.format(current_ledger_blnc)"/></strong></td>
+                            </tr>
+                        </tbody>
+                    </table>-->
+                        <table class="table table-sm" t-if="(o.amount - total_current_paid_amt) > 0">
+                            <tbody>
+                                <tr style="border: 1px solid black !important;">
+                                    <td class="text-left"><strong>Advance Payment</strong></td>
+                                    <td class="text-right"><strong>BDT <span t-esc="'{0:,.2f}'.format(o.amount - total_current_paid_amt)"/></strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <br/>
+<!--                <h6>-->
+<!--                    <t t-set="pay_amount" t-value="o.amount_in_words(o.amount)"/>-->
+<!--                    <t t-if="o.payment_type == 'inbound'">-->
+<!--                        <strong>In Words (Paid Amount): </strong>-->
+<!--                        <t t-esc="pay_amount"/>-->
+<!--&lt;!&ndash;                        <span class="m-0" t-if="o.amount!=0" t-esc="o.amount_in_words(float(o.amount))"/>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <span class="m-0" t-else="" t-esc="o.amount_in_words(float(total_adv_payment))"/>&ndash;&gt;-->
+<!--                    </t>-->
+<!--                    <t t-if="o.payment_type == 'outbound'">-->
+<!--                        <strong>In Words (Paid Amount): </strong>-->
+<!--                         <t t-esc="pay_amount"/>-->
+<!--&lt;!&ndash;                        <span class="m-0" t-if="o.amount!=0" t-esc="o.amount_in_words(float(o.amount))"/>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <span class="m-0" t-else="" t-esc="o.amount_in_words(float(total_adv_payment))"/>&ndash;&gt;-->
+<!--                    </t>-->
+<!--                </h6>-->
+                <br/>
+
+<!--                <div class="row" t-if="o.remarks">-->
+<!--                    <div class="col-12">-->
+<!--                        <div>-->
+<!--                            <h6 class="text-left"><strong>Remarks:</strong></h6>-->
+<!--                        </div>-->
+<!--                        <span t-field="o.remarks"/>-->
+<!--                        <br/>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--                <div class="row">
+                    <div class="col-12 text-center">
+                        <br/>
+                        <strong style="font-size: 20px; border: 1px solid black !important; padding: 5px !important;">
+                            Ledger Balance of <em><span t-field="o.partner_id.name"/></em> is BDT <span class="m-0" t-esc="'{0:,.2f}'.format(current_ledger_blnc)"/>
+                        </strong>
+                    </div>
+                </div>-->
+<!--                <t t-if="o.partner_type == 'customer'">
+                    <div class="row" style="margin-top: 6em !important;">
+                        <div class="col-4 text-center">
+                            <strong style="padding-top: 120px;text-align:center;text-decoration: overline;">Received by</strong><br/>
+                            <span t-field="o.create_uid"/>
+                        </div>
+                        <div class="col-4 text-center">
+                            <strong style="padding-top: 120px;text-align:center;text-decoration: overline;">Accounts/Finance</strong>
+                        </div>
+                        <div class="col-4 text-center">
+                            <strong style="padding-top: 120px;text-align:center;text-decoration: overline;">CFO/ED</strong>
+                        </div>
+                    </div>
+                </t>-->
+                <!--<t t-if="o.partner_type == 'supplier'">
+                    <div class="row" style="margin-top: 6em !important;">
+                        <div class="col-3 text-center">
+                            <strong style="padding-top: 120px;text-align:center;text-decoration: overline;">Prepared by</strong><br/>
+                            <span t-field="o.create_uid"/>
+                        </div>
+                        <div class="col-3 text-center">
+                            <strong style="padding-top: 120px;text-align:center;text-decoration: overline;">Accounts/Finance</strong>
+                        </div>
+                        <div class="col-3 text-center">
+                            <strong style="padding-top: 120px;text-align:center;text-decoration: overline;">CFO/ED</strong>
+                        </div>
+                        <div class="col-3 text-center">
+                            <strong style="padding-top: 120px;text-align:center;text-decoration: overline;">Board of Directors</strong>
+                        </div>
+                    </div>
+                </t>-->
+                <t t-if="o.partner_type == 'supplier'">
+                    <table style="margin-top: 6em !important; width: 100%; border-style: none;">
+                        <tr>
+                            <td class="text-center" style="border-style: none !important; background-color: white !important;">
+                                <strong style="padding-top: 120px;text-align:center;text-decoration: overline;">Prepared by</strong><br/>
+                                <span t-field="o.create_uid"/>
+                            </td>
+                            <td class="text-center" style="border-style: none !important; background-color: white !important;">
+                                <strong style="padding-top: 120px;text-align:center;text-decoration: overline;">Accounts/Finance</strong>
+                            </td>
+                            <td class="text-center" style="border-style: none !important; background-color: white !important;">
+                                <strong style="padding-top: 120px;text-align:center;text-decoration: overline;">Audited by</strong>
+                            </td>
+                            <td class="text-center cfo_ed" style="border-style: none !important; background-color: white !important;">
+                                <strong style="padding-top: 120px;text-align:center;text-decoration: overline;">CFO/ED</strong>
+                            </td>
+                            <td class="text-center" style="border-style: none !important; background-color: white !important;">
+                                <strong style="padding-top: 120px;text-align:center;text-decoration: overline;">Board of Directors</strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="5" style="border-style: none !important; background-color: white !important;">&amp;nbsp;</td>
+                        </tr>
+                        <tr>
+                            <td colspan="5" style="border-style: none !important; background-color: white !important;">&amp;nbsp;</td>
+                        </tr>
+                        <tr>
+                            <td colspan="5" style="border-style: none !important; background-color: white !important;">&amp;nbsp;</td>
+                        </tr>
+                        <tr>
+                            <td colspan="5" style="border-style: none !important; background-color: white !important;">&amp;nbsp;</td>
+                        </tr>
+                        <tr>
+                            <td class="text-center" style="border-style: none !important; background-color: white !important;">
+                                <strong style="padding-top: 120px;text-align:center;text-decoration: overline;">Received by</strong><br/>
+                            </td>
+                            <td colspan="4" style="border-style: none !important; background-color: white !important;">&amp;nbsp;</td>
+                        </tr>
+                    </table>
+                </t>
+                <t t-if="o.partner_type == 'customer'">
+                    <table style="margin-top: 6em !important; width: 100%; border-style: none;">
+                        <tr>
+                            <td class="text-center" style="border-style: none !important; background-color: white !important;">
+                                <strong style="padding-top: 120px;text-align:center;text-decoration: overline;">Prepared by</strong><br/>
+                            </td>
+                            <td class="text-center" style="border-style: none !important; background-color: white !important;">
+                                <strong style="padding-top: 120px;text-align:center;text-decoration: overline;">Accounts/Finance</strong>
+                            </td>
+                            <td class="text-center" style="border-style: none !important; background-color: white !important;">
+                                <strong style="padding-top: 120px;text-align:center;text-decoration: overline;">Audited by</strong>
+                            </td>
+                            <td class="text-center cfo_ed" style="border-style: none !important; background-color: white !important;">
+                                <strong style="padding-top: 120px;text-align:center;text-decoration: overline;">CFO/ED</strong>
+                            </td>
+                            <td class="text-center" style="border-style: none !important; background-color: white !important;">
+                                <strong style="padding-top: 120px;text-align:center;text-decoration: overline;">Board of Directors</strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="5" style="border-style: none !important; background-color: white !important;">&amp;nbsp;</td>
+                        </tr>
+                        <tr>
+                            <td colspan="5" style="border-style: none !important; background-color: white !important;">&amp;nbsp;</td>
+                        </tr>
+                        <tr>
+                            <td colspan="5" style="border-style: none !important; background-color: white !important;">&amp;nbsp;</td>
+                        </tr>
+                        <tr>
+                            <td colspan="5" style="border-style: none !important; background-color: white !important;">&amp;nbsp;</td>
+                        </tr>
+                        <tr>
+                            <td class="text-center" style="border-style: none !important; background-color: white !important;">
+                                <strong style="padding-top: 120px;text-align:center;text-decoration: overline;">Received by</strong><br/>
+                                <span t-field="o.create_uid"/><br/>
+                            </td>
+                            <td colspan="4" style="border-style: none !important; background-color: white !important;">&amp;nbsp;</td>
+                        </tr>
+                    </table>
+                </t>
+            </div>
+        </xpath>
+    </template>
+</odoo>

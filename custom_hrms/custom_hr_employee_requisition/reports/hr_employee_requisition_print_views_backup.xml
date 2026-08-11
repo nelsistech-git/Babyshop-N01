@@ -1,0 +1,726 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <record id="hr_emp_rec_print_paperformat" model="report.paperformat">
+            <field name="name">HR Employee Requisition Print</field>
+            <field name="default" eval="True"/>
+            <field name="format">A4</field>
+            <field name="orientation">Portrait</field>
+            <field name="margin_top">39</field>
+            <field name="margin_bottom">7</field>
+            <field name="margin_left">7</field>
+            <field name="margin_right">7</field>
+            <field name="header_spacing">35</field>
+            <field name="dpi">90</field>
+            <field name="header_line" eval="False"/>
+        </record>
+
+        <record id="hr_emp_rec_print_report" model="ir.actions.report">
+            <field name="name">Employee Requisition Report</field>
+            <field name="model">hr.employee.requisition</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">custom_hr_employee_requisition.hr_emp_rec_print_qweb</field>
+            <field name="report_file">custom_hr_employee_requisition.hr_emp_rec_print_qweb</field>
+            <field name="binding_model_id" ref="model_hr_employee_requisition"/>
+            <field name="binding_type">action</field>
+            <field name="paperformat_id" ref="custom_hr_employee_requisition.hr_emp_rec_print_paperformat" />
+            <!--<field name="paperformat_id" ref="custom_common_settings.paperformat_custom_a4_bd" />-->
+        </record>
+
+        <!--Report Paper format-->
+        <!--<record id="hr_emp_rec_print_paperformat" model="report.paperformat">
+            <field name="name">HR Employee Requisition Print</field>
+            <field name="format">A4</field>
+            <field name="orientation">Portrait</field>
+            <field name="margin_top">39</field>
+            <field name="margin_bottom">7</field>
+            <field name="margin_left">7</field>
+            <field name="margin_right">7</field>
+            <field name="header_spacing">35</field>
+            <field name="dpi">90</field>
+        </record>-->
+
+
+        <!--<record id="custom_hr_employee_requisition.hr_emp_rec_print_report" model="ir.actions.report">
+            <field name="paperformat_id" ref="custom_hr_employee_requisition.hr_emp_rec_print_paperformat" />
+        </record>-->
+
+        <template id="hr_emp_rec_print_qweb">
+            <t t-call="web.html_container">
+                <link rel='stylesheet' href="/custom_hr_employee_requisition/static/src/css/custom_report.css" />
+                <t t-foreach="docs" t-as="o">
+                    <div class="article" t-att-data-oe-model="o._name" t-att-data-oe-id="o.id" t-att-data-oe-lang="o.env.context.get('lang', 'en_US')"/>
+                    <div class="requisition-info">
+                        <span t-esc="o.rec_no or 'N/A'"/>
+                        <span t-esc="o.rec_dept.name or 'Unknown'"/>
+                        <!-- Check if o.company_id exists, else use company from context -->
+                        <span t-esc="o.company_id.name if o.company_id else context.get('company', {}).get('name', 'Unknown')"/>
+                    </div>
+                </t>
+                <t t-call="custom_hr_employee_requisition.hr_emp_rec_print_layout_header" />
+                <t t-call="web.internal_layout">
+                    <div class="page" style="margin-top:0px;">
+                        <div class="oe_structure"/>
+                        <div class="container">
+                            <t t-foreach="data" t-as="doc">
+                                <div class="row">
+                                    <p>
+                                        <b>REQUISITION:</b>
+                                    </p>
+                                    <table class="col-xs-6">
+                                        <tr>
+                                            <td class="text-left" style="width: 40%;">
+                                                <p>Company requested for</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%;">:</td>
+                                            <td class="text-left" style="width: 50%;">
+                                                <span t-esc="other and other.get('requisition_company', 'N/A') or 'N/A'"/>
+
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%;">
+                                                <p>Position requested for</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%;">:</td>
+                                            <td class="text-left" style="width: 50%;">
+                                                <!-- <span t-esc="doc['department']" /> -->
+                                                <span t-esc="doc.get('department') if isinstance(doc, dict) and doc.get('department') else 'No department'"/>
+
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%;">
+                                                <p>Requested Position</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%;">:</td>
+                                            <td class="text-left" style="width: 50%;">
+                                                <!-- <span t-esc="doc['designation']" /> -->
+                                                <span t-esc="doc.get('designation') if isinstance(doc, dict) and doc.get('designation') else 'No designation'"/>
+
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%;">
+                                                <p>Position type</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%;">:</td>
+                                            <td class="text-left" style="width: 50%;">
+                                                <!-- <t t-if="doc['position_type']=='new'"> -->
+                                                <t t-if="isinstance(doc, dict) and doc.get('position_type') == 'new'">
+                                                    <span>New</span>
+                                                </t>
+                                                <t t-else="">
+                                                    <span>Replacement</span>
+                                                </t>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%;">
+                                                <p>Gender</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%;">:</td>
+                                            <td class="text-left" style="width: 50%;">
+                                                <!-- <t t-if="doc['gender']=='male'"> -->
+                                                <t t-if="isinstance(doc, dict) and doc.get('gender') == 'male'">
+
+                                                    <span>Male</span>
+                                                </t>
+                                                <t t-else="">
+                                                    <span>Female</span>
+                                                </t>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <table class="col-xs-6">
+                                        <tr>
+                                            <td class="text-left" style="width: 40%;">
+                                                <p>Date</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%;">:</td>
+                                            <td class="text-left" style="width: 50%;">
+                                                <!-- <span t-esc="doc['date']" /> -->
+                                                <span t-esc="doc and isinstance(doc, dict) and doc.get('date', '').strftime('%Y-%m-%d')"/>
+
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%;">
+                                                <p>Approved Manpower</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%;">:</td>
+                                            <td class="text-left" style="width: 50%;">
+                                                <!-- <span t-esc="doc['approved_man']" /> -->
+                                                <span t-esc="doc and isinstance(doc, dict) and doc.get('approved_man', '')"/>
+
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%;">
+                                                <p>Actual Manpower</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%;">:</td>
+                                            <td class="text-left" style="width: 50%;">
+                                                <!-- <span t-esc="doc['actual_man']" /> -->
+                                                <span t-esc="doc and isinstance(doc, dict) and doc.get('actual_man', '')"/>
+
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%;">
+                                                <p>Request Manpower</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%;">:</td>
+                                            <td class="text-left" style="width: 50%;">
+                                                <!-- <span t-esc="doc['request_man']" /> -->
+                                                <span t-esc="doc and isinstance(doc, dict) and doc.get('request_man', '')"/>
+
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%;">
+                                                <p>Estimated Salary</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%;">:</td>
+                                            <td class="text-left" style="width: 50%;">
+                                                <!-- <span t-esc="doc['est_salary']" /> -->
+                                                <span t-esc="doc and isinstance(doc, dict) and doc.get('est_salary', '')"/>
+
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%;">
+                                                <p>Actual Salary</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%;">:</td>
+                                            <td class="text-left" style="width: 50%;">
+                                                <!-- <span t-esc="doc['act_salary']" /> -->
+                                                <span t-esc="doc and isinstance(doc, dict) and doc.get('act_salary', '')"/>
+
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="row">
+                                    <p>
+                                        <b>RECOMMENDED APPLICANT DETAILS:</b>
+                                    </p>
+                                    <table class="col-xs-6">
+                                        <tr>
+                                            <td class="text-left" style="width: 40%;">
+                                                <p>1. Expertise</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%;">:</td>
+                                            <td class="text-left" style="width: 50%;">
+                                                <!-- <t t-if="doc['expertise']=='fresh'"> -->
+                                                <t t-if="doc and isinstance(doc, dict) and doc.get('expertise') == 'fresh'">
+
+                                                    <span>Fresh</span>
+                                                </t>
+                                                <t t-else="">
+                                                    <span>Experienced</span>
+                                                </t>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <table class="col-xs-6">
+                                        <!-- <t t-if="doc['expertise']=='experienced'"> -->
+                                        <t t-if="doc and isinstance(doc, dict) and doc.get('expertise') == 'experienced'">
+                                            <tr>
+                                                <td class="text-left" style="width: 40%;">
+                                                    <p>Experience(In Year)</p>
+                                                </td>
+                                                <td class="text-left" style="width: 5%;">:</td>
+                                                <td class="text-left" style="width: 50%;">
+                                                    <!-- ill be back  -->
+                                                    <!-- <span t-esc="doc['exp_year']" /> -->
+                                                    <span t-esc="doc and isinstance(doc, dict) and doc.get('exp_year', '')"/>
+
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </table>
+                                    <br/>
+                                    <table class="col-xs-12">
+                                        <tr>
+                                            <td class="text-left" style="width: 40%;">
+                                                <p>2. Educational Qualification</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%;">:</td>
+                                            <td class="text-left" style="width: 50%;">
+                                                <!-- <span t-esc="doc['edu_qual']" /> -->
+                                                <span t-esc="doc and isinstance(doc, dict) and doc.get('edu_qual', '')"/>
+
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%;">
+                                                <p>3. Provide some details regarding the type of employee required, as well as the qualifications and work experience, and any other factors which need to be considered</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%;">:</td>
+                                            <td class="text-left" style="width: 50%;">
+                                                <!-- <span t-esc="doc['requirements']" /> -->
+                                                <span t-esc="doc and isinstance(doc, dict) and doc.get('requirements', '')"/>
+
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <table class="col-xs-12">
+                                        <tr>
+                                            <td class="text-left" style="width: 70%;">
+                                                <p>4. Can the vacancy be filled by a temporary/part-time employee?</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%;">:</td>
+                                            <td class="text-left" style="width: 20%;">
+                                                <!-- <t t-if="doc['is_parttime'] == True"> -->
+                                                <t t-if="doc and isinstance(doc, dict) and doc.get('is_parttime') == True">
+                                                    <span>Yes</span>
+                                                </t>
+                                                <t t-else="">
+                                                    <span>No</span>
+                                                </t>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 70%;">
+                                                <p>5. Does a job description exist for this position?</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%;">:</td>
+                                            <td class="text-left" style="width: 20%;">
+                                                <!-- <t t-if="doc['is_desc_exist'] == True"> -->
+                                                <t t-if="doc and isinstance(doc, dict) and doc.get('is_desc_exist') == True">
+
+                                                    <span>Yes</span>
+                                                </t>
+                                                <t t-else="">
+                                                    <span>No</span>
+                                                </t>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <table class="col-xs-12">
+                                        <p>
+                                            <b>6. Can the job function be restructured in such as way as to:</b>
+                                        </p>
+                                        <tr>
+                                            <td class="text-left" style="width: 70%;padding-left:30px;">
+                                                <p>Reduce manpower requirements in the department?</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%;">:</td>
+                                            <td class="text-left" style="width: 20%;">
+                                                <!-- <t t-if="doc['is_reduce_mp'] == True"> -->
+                                                <t t-if="doc and isinstance(doc, dict) and doc.get('is_reduce_mp') == True">
+
+                                                    <span>Yes</span>
+                                                </t>
+                                                <t t-else="">
+                                                    <span>No</span>
+                                                </t>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 70%;padding-left:30px;">
+                                                <p>Make the functioning of the department more effective?</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%;">:</td>
+                                            <td class="text-left" style="width: 20%;">
+                                                <!-- <t t-if="doc['is_fucn_effective'] == True"> -->
+                                                <t t-if="doc and isinstance(doc, dict) and doc.get('is_fucn_effective') == True">
+
+                                                    <span>Yes</span>
+                                                </t>
+                                                <t t-else="">
+                                                    <span>No</span>
+                                                </t>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 70%;padding-left:30px;">
+                                                <p>Reduce the Payroll cost to company?</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%;">:</td>
+                                            <td class="text-left" style="width: 20%;">
+                                                <!-- <t t-if="doc['is_cost_reduce'] == True"> -->
+                                                <t t-if="doc and isinstance(doc, dict) and doc.get('is_cost_reduce') == True">
+
+                                                    <span>Yes</span>
+                                                </t>
+                                                <t t-else="">
+                                                    <span>No</span>
+                                                </t>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 70%;padding-left:30px;">
+                                                <p>Will the position be advertised internally first?</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%;">:</td>
+                                            <td class="text-left" style="width: 20%;">
+                                                <!-- <t t-if="doc['is_internal'] == True"> -->
+                                                <t t-if="doc and isinstance(doc, dict) and doc.get('is_internal') == True">
+
+                                                    <span>Yes</span>
+                                                </t>
+                                                <t t-else="">
+                                                    <span>No</span>
+                                                </t>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="row">
+                                    <table class="col-xs-12">
+                                        <p>
+                                            <b>JUSTIFICATION:</b>
+                                        </p>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%;">
+                                                <p>What are the prospects of filling this position with a qualified candidate?</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%;">:</td>
+                                            <td class="text-left" style="width: 55%;">
+                                                <!-- <span t-esc="doc['prospects']" /> -->
+                                                <span t-esc="doc and isinstance(doc, dict) and doc.get('prospects', '')"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%;">
+                                                <p>What investigations have been conducted to determine the availability of quality candidates?</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%;">:</td>
+                                            <td class="text-left" style="width: 55%;">
+                                                <!-- <span t-esc="doc['investigations']" /> -->
+                                                <span t-esc="doc and isinstance(doc, dict) and doc.get('investigations', '')"/>
+
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="row">
+                                    <p>
+                                        <b>PROPOSALS:</b>
+                                    </p>
+                                    <table class="col-xs-6">
+                                        <tr>
+                                            <td class="text-left" style="width: 40%;">
+                                                <p>Proposed date of commencement</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%;">:</td>
+                                            <td class="text-left" style="width: 50%;">
+                                                <!-- <span t-esc="doc['commencement_date']" /> -->
+                                                <span t-esc="doc and isinstance(doc, dict) and doc.get('commencement_date', '')"/>
+
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%;">
+                                                <p>Company Mobile Allowance</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%;">:</td>
+                                            <td class="text-left" style="width: 50%;">
+                                                <!-- <t t-if="doc['have_mobile_allowance'] == True"> -->
+                                                <t t-if="doc and isinstance(doc, dict) and doc.get('have_mobile_allowance') == True">
+                                                    <span>Yes</span>
+                                                </t>
+                                                <t t-else="">
+                                                    <span>No</span>
+                                                </t>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%;">
+                                                <p>Desktop/Laptop</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%;">:</td>
+                                            <td class="text-left" style="width: 50%;">
+                                                <!-- <t t-if="doc['need_computer'] == True"> -->
+                                                <t t-if="doc and isinstance(doc, dict) and doc.get('need_computer') == True">
+
+                                                    <span>Yes</span>
+                                                </t>
+                                                <t t-else="">
+                                                    <span>No</span>
+                                                </t>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <table class="col-xs-6">
+                                        <tr>
+                                            <td class="text-left" style="width: 40%;">
+                                                <p>Proposed Salary per annum</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%;">:</td>
+                                            <td class="text-left" style="width: 50%;">
+                                                <!-- <span t-esc="doc['proposed_salary']" /> -->
+                                                <span t-esc="doc and isinstance(doc, dict) and doc.get('proposed_salary', '')"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%;">
+                                                <p>Company Travel Allowance</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%;">:</td>
+                                            <td class="text-left" style="width: 50%;">
+                                                <!-- <t t-if="doc['have_travel_allowance'] == True"> -->
+                                                <t t-if="doc and isinstance(doc, dict) and doc.get('have_travel_allowance') == True">
+                                                    <span>Yes</span>
+                                                </t>
+                                                <t t-else="">
+                                                    <span>No</span>
+                                                </t>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%;">
+                                                <p>Company Provided Lunch</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%;">:</td>
+                                            <td class="text-left" style="width: 50%;">
+                                                <!-- <t t-if="doc['need_lunch'] == True"> -->
+                                                <t t-if="doc and isinstance(doc, dict) and doc.get('need_lunch') == True">
+
+                                                    <span>Yes</span>
+                                                </t>
+                                                <t t-else="">
+                                                    <span>No</span>
+                                                </t>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="row">
+                                    <table>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%;">
+                                                <p>Other benefits (please specify)</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%;">:</td>
+                                            <td class="text-left" style="width: 50%;">
+                                                <!-- <span t-esc="doc['other_benefits']" /> -->
+                                                <span t-esc="doc and isinstance(doc, dict) and doc.get('other_benefits', '')"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 70%;">
+                                                <p>Probation Period (Months)</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%;">:</td>
+                                            <td class="text-left" style="width: 20%;">
+                                                <!-- <span t-esc="doc['probation_name']" /> -->
+                                                <span t-esc="doc and isinstance(doc, dict) and doc.get('probation_name', '')"/>
+
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 70%;">
+                                                <p>Internal transfer/ promotion from within the Company?</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%;">:</td>
+                                            <td class="text-left" style="width: 20%;">
+                                                <!-- <t t-if="doc['internal_transfer'] == True"> -->
+                                                <t t-if="doc and isinstance(doc, dict) and doc.get('internal_transfer') == True">
+
+                                                    <span>Yes</span>
+                                                </t>
+                                                <t t-else="">
+                                                    <span>No</span>
+                                                </t>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 70%;">
+                                                <p>Training/ Induction Details (Required)</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%;">:</td>
+                                            <td class="text-left" style="width: 20%;">
+                                                <!-- <t t-if="doc['required_training'] == True"> -->
+                                                <t t-if="doc and isinstance(doc, dict) and doc.get('required_training') == True">
+
+                                                    <span>Yes</span>
+                                                </t>
+                                                <t t-else="">
+                                                    <span>No</span>
+                                                </t>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 70%;">
+                                                <p>Duration of Training (Weeks/Months)</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%;">:</td>
+                                            <td class="text-left" style="width: 20%;">
+                                                <!-- <span t-esc="doc['training_name']" /> -->
+                                                <span t-esc="doc and isinstance(doc, dict) and doc.get('training_name', '')"/>
+
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%;">
+                                                <p>Specify the required Training details</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%;">:</td>
+                                            <td class="text-left" style="width: 50%;">
+                                                <!-- <span t-esc="doc['training_details']" /> -->
+                                                <span t-esc="doc and isinstance(doc, dict) and doc.get('training_details', '')"/>
+
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <br/>
+                                <br/>
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <table>
+                                            <tr>
+                                                <ul class="list-inline">
+                                                    <li>Requested By:</li>
+                                                    <li>
+                                                    </li>
+                                                </ul>
+                                                <ul class="list-inline">
+                                                    <li>Designation:</li>
+                                                    <li>
+                                                    </li>
+                                                </ul>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                    <div class="col-xs-3">
+                                        <table>
+                                            <tr>
+                                                <ul class="list-inline">
+                                                    <li>Authorized By:</li>
+                                                    <li>
+                                                    </li>
+                                                </ul>
+                                                <ul class="list-inline">
+                                                    <li>Designation:</li>
+                                                    <li>
+                                                    </li>
+                                                </ul>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                    <div class="col-xs-3">
+                                        <table>
+                                            <tr>
+                                                <ul class="list-inline">
+                                                    <li>Recommended By:</li>
+                                                    <li>
+                                                    </li>
+                                                </ul>
+                                                <ul class="list-inline">
+                                                    <li>Designation:</li>
+                                                    <li>
+                                                    </li>
+                                                </ul>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                    <div class="col-xs-3">
+                                        <table>
+                                            <tr>
+                                                <ul class="list-inline">
+                                                    <li>Approved By:</li>
+                                                    <li>
+                                                    </li>
+                                                </ul>
+                                                <ul class="list-inline">
+                                                    <li>Designation:</li>
+                                                    <li>
+                                                    </li>
+                                                </ul>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+                </t>
+                <t t-call="custom_hr_employee_requisition.hr_emp_rec_print_layout_footer" />
+            </t>
+        </template>
+
+        <template id="custom_hr_employee_requisition.hr_emp_rec_print_layout_header">
+            <div class="header">
+                <table>
+                    <tr>
+                        <td style="width:10%;">
+                            <!-- <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" style="max-height:80px;" alt="Company Logo"/> -->
+                            <t t-if="o.company_id and o.company_id.logo">
+                                <img t-att-src="image_data_uri(o.company_id.logo)" style="max-height:80px;" alt="Company Logo"/>
+                            </t>
+
+                        </td>
+                        <td style="width:35%;" class="text-left">
+                            <strong>
+                                <div t-esc="context.get('company_name')" style="font-size:25px;"/>
+                            </strong>
+                            <!-- <span t-field="company.street"/> -->
+                            <span t-esc="context.get('company_street', '')"/>
+
+                            <!-- <span t-field="company.street2"/> -->
+                            <span t-esc="context.get('company_street2', '')"/>
+
+                            <!-- <span t-field="company.city"/> -->
+                            <span t-esc="context.get('company_city', '')"/>
+
+                            <!-- <span t-field="company.zip"/> -->
+                            <span t-esc="context.get('company_zip', '')"/>
+
+                            Phone:
+                            <!-- <span t-field="company.phone"/> -->
+                            <span t-esc="context.get('company_phone', '')"/>
+
+                            Fax:
+                            Web:
+                            <!-- <span t-field="company.website"/> -->
+                            <span t-esc="context.get('company_website', '')"/>
+
+                        </td>
+                        <td class="text-center" style="font-size:25px;padding-top:10px;width:50%;">
+                            <div align="right">
+                                <b>Employee Requisition Form</b>
+                                <b>
+                                    <h5>(From No. <span t-esc="other.get('form_no', 'N/A') if other is not None else 'N/A'"/>
+)</h5>
+                                </b>
+                                <h5>To be completed when hiring or replacing staff</h5>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </template>
+
+        <template id="custom_hr_employee_requisition.hr_emp_rec_print_layout_footer">
+            <div class="footer">
+
+                <div class="row" style="border-top:solid 1px #000;">
+                    <div class="col-4">
+                        <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%a, %d %b %Y %H:%M:%S')" />
+                    </div>
+                    <div class="col-xs-4">
+						Printed By:
+                        <span t-esc="user.name"></span>
+                    </div>
+                    <div class="col-4 text-right">
+                        <ul class="list-inline">
+                            <li>Page:</li>
+                            <li>
+                                <span class="page" />
+                            </li>
+                            <li>/</li>
+                            <li>
+                                <span class="topage" />
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+    </data>
+</odoo>

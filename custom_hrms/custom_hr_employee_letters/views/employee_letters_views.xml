@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <!--Form View -->
+        <record id="employee_letter_view_form" model="ir.ui.view">
+            <field name="name">employee.letter.form</field>
+            <field name="model">hr.employee.letters</field>
+            <field name="arch" type="xml">
+                <form string="Letter Template">
+                    <header>
+                        <button name="action_confirm" type="object"
+                                string="Confirm" class="oe_highlight"
+                                confirm="Are you sure you want to confirm?"
+                                groups="hr.group_hr_manager,hr.group_hr_user"
+                                invisible="state != 'draft'"/>
+
+                        <button name="action_approve" type="object"
+                                string="Approve" class="oe_highlight"
+                                confirm="Are you sure you want to approve?"
+                                groups="hr.group_hr_manager"
+                                invisible="state != 'confirm'"/>
+                        <button name="action_draft" type="object"
+                                string="Send to Draft"
+                                confirm="Are you sure you want send to draft?"
+                                groups="hr.group_hr_manager"
+                                invisible="state != 'confirm'"/>
+
+                        <button name="action_cancel" type="object"
+                                string="Cancel" confirm="Are you sure you want to cancel?"
+                                groups="hr.group_hr_manager,hr.group_hr_user"
+                                invisible="state != 'draft'"/>
+
+                        <button name="action_print_with_head"
+                                string="Print With Letter Head" type="object"
+                                groups="hr.group_hr_manager,hr.group_hr_user"/>
+
+                        <button name="action_print_without_head"
+                                string="Print Without Letter Head" type="object"
+                                groups="hr.group_hr_manager,hr.group_hr_user"/>
+
+                        <field name="state" widget="statusbar"/>
+                    </header>
+
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="type" readonly="state in ['confirm', 'approve', 'cancel']"/>
+                                <field name="letter_template_id" domain="[('type', '=', type)]"
+                                       options='{"no_open": True,"no_create": 1, "no_create_edit": 1}' readonly="state in ['confirm', 'approve', 'cancel']"/>
+                                <field name="letter_type"/>
+                                <field name="ref_no" invisible="letter_type in ['visa_request_letter']"
+                                       required="letter_type not in ['visa_request_letter']" readonly="state in ['confirm', 'approve', 'cancel']"/>
+                                <field name="current_date" readonly="state in ['confirm', 'approve', 'cancel']"/>
+                                <field name="effective_date"
+                                       invisible="letter_type in ['contract_letter','charge_handover','resignation_acceptance','warning_letter','visa_request_letter','introduction_letter','demotion_letter','release_letter','salary_refixation','offer_letter']"
+                                       required="letter_type in ['promotion_transfer','confirmation_service', 'dismissal_letter', 'termination_letter']" readonly="state in ['confirm', 'approve', 'cancel']"/>
+
+                            </group>
+                            <group>
+
+                                <field name="employee_id"
+                                       readonly="state in ['confirm', 'approve', 'cancel']"
+                                       options='{"no_open": False,"no_create": 1, "no_create_edit": 1}'
+                                       invisible="letter_type in ['offer_letter','contract_letter']"
+                                       required="letter_type in ['transfer_letter','confirmation_service','dismissal_letter','introduction_letter','demotion_letter','release_letter','salary_refixation', 'termination_letter']"/>
+
+                                <field name="company_id"
+                                       options='{"no_open": True,"no_create": 1, "no_create_edit": 1}'
+                                       readonly="1"
+                                       invisible="letter_type in ['offer_letter','contract_letter']"
+                                       required="letter_type in ['transfer_letter','confirmation_service','dismissal_letter','introduction_letter','demotion_letter','release_letter','salary_refixation', 'termination_letter']"
+                                       force_save="1"/>
+
+                                <field name="job_id"
+                                       readonly="1"
+                                       invisible="letter_type in ['offer_letter','contract_letter']"
+                                       required="letter_type in ['confirmation_service','dismissal_letter','introduction_letter','demotion_letter','release_letter','salary_refixation']"
+                                       options='{"no_open": True,"no_create": 1, "no_create_edit": 1}'
+                                       force_save="1"/>
+
+                                <field name="emp_position_id"
+                                       invisible="letter_type not in ['contract_letter','offer_letter']"
+                                       required="letter_type in ['contract_letter','offer_letter']"
+                                       options='{"no_open": True,"no_create": 1, "no_create_edit": 1}'
+                                       force_save="1"/>
+
+                                <field name="department_id"
+                                       readonly="1"
+                                       invisible="letter_type in ['offer_letter','contract_letter']"
+                                       required="letter_type in ['confirmation_service', 'dismissal_letter','introduction_letter','demotion_letter','release_letter','salary_refixation']"
+                                       options='{"no_open": True,"no_create": 1, "no_create_edit": 1}'
+                                       force_save="1"/>
+
+                                <field name="address_no" readonly="state in ['confirm', 'approve', 'cancel']"
+                                       invisible="letter_type not in ['contract_letter','termination_letter']"
+                                       required="letter_type in ['contract_letter','termination_letter']"/>
+
+                                <field name="present_address_no" readonly="state in ['confirm', 'approve', 'cancel']"
+                                       invisible="letter_type not in ['contract_letter']"
+                                       required="letter_type in ['contract_letter']"/>
+
+                                <field name="take_over_from_id" readonly="state in ['confirm', 'approve', 'cancel']"
+                                       options='{"no_open": True,"no_create": 1, "no_create_edit": 1}'
+                                       invisible="letter_type not in ['promotion_transfer','transfer_letter']"/>
+
+                                <field name="take_over_to_id" readonly="state in ['confirm', 'approve', 'cancel']"
+                                       options='{"no_open": True,"no_create": 1, "no_create_edit": 1}'
+                                       invisible="letter_type not in ['promotion_transfer','charge_handover','transfer_letter', 'resignation_acceptance']"
+                                       required="letter_type in ['charge_handover','resignation_acceptance']"/>
+
+                                <field name="agreement_date" readonly="state in ['confirm', 'approve', 'cancel']"
+                                       invisible="letter_type in ['contract_letter','promotion_transfer','charge_handover','resignation_acceptance','warning_letter','visa_request_letter','transfer_letter','confirmation_service','introduction_letter','demotion_letter','release_letter','salary_refixation','offer_letter','termination_letter']"
+                                       required="letter_type in ['dismissal_letter']"/>
+
+                                <field name="up_to_date" readonly="state in ['confirm', 'approve', 'cancel']"
+                                       invisible="letter_type not in ['demotion_letter','salary_refixation']"
+                                       required="letter_type in ['demotion_letter','salary_refixation']"/>
+
+                                <field name="last_business_date" readonly="state in ['confirm', 'approve', 'cancel']"
+                                       invisible="letter_type != 'release_letter'"
+                                       required="letter_type in ['release_letter']"/>
+
+                                <field name="report_department_id"
+                                       options='{"no_open": True,"no_create": 1, "no_create_edit": 1}'
+                                       invisible="letter_type not in ['charge_handover','resignation_acceptance']"
+                                       required="letter_type in ['charge_handover','resignation_acceptance']"/>
+                            </group>
+                        </group>
+                        <group>
+                            <group>
+                                <field name="letter_cc" readonly="state in ['confirm', 'approve', 'cancel']"
+                                       invisible="letter_type in ['contract_letter','introduction_letter','visa_request_letter']"
+                                       required="letter_type in ['charge_handover','warning_letter','transfer_letter','confirmation_service', 'dismissal_letter','demotion_letter','release_letter','salary_refixation','offer_letter', 'termination_letter']"/>
+                            </group>
+                        </group>
+                        <field name="letter_template_details" readonly="state in ['confirm', 'approve', 'cancel']"/>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!--Tree View -->
+        <record id="employee_letter_view_tree" model="ir.ui.view">
+            <field name="name">employee.letter.tree</field>
+            <field name="model">hr.employee.letters</field>
+            <field name="arch" type="xml">
+                <tree string="Employee Letter">
+                    <field name="type"/>
+                    <field name="letter_template_id"/>
+                    <field name="letter_type"/>
+                    <field name="ref_no"/>
+                    <field name="employee_id"/>
+                    <field name="company_id"/>
+                    <field name="job_id"/>
+                    <field name="department_id"/>
+                    <field name="current_date"/>
+                    <field name="effective_date"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <!--Search View -->
+        <!--		<record id="employee_letter_view_search" model="ir.ui.view">-->
+        <!--			<field name="name">employee.letter.search</field>-->
+        <!--			<field name="model">hr.employee.letters</field>-->
+        <!--			<field name="arch" type="xml">-->
+        <!--				<search>-->
+        <!--					<field name="type" />-->
+        <!--					<field name="letter_template_id" />-->
+        <!--					<field name="letter_type" />-->
+        <!--					<field name="ref_no" />-->
+        <!--					<field name="employee_id" />					-->
+        <!--					<field name="current_date" />-->
+        <!--					<field name="effective_date" />-->
+        <!--					-->
+        <!--					<filter string="Type" domain="[]"-->
+        <!--						context="{'group_by':'type'}" />-->
+        <!--					<filter string="Letter Type" domain="[]"-->
+        <!--						context="{'group_by':'letter_type'}" />-->
+        <!--					<filter string="Designation" domain="[]"-->
+        <!--						context="{'group_by':'job_id'}" />-->
+        <!--					<filter string="Department" domain="[]"-->
+        <!--						context="{'group_by':'department_id'}" />-->
+        <!--					<filter string="State" domain="[]"-->
+        <!--						context="{'group_by':'state'}" />-->
+        <!--					<separator />-->
+        <!--				</search>-->
+        <!--			</field>-->
+        <!--		</record>-->
+
+        <!--List Action -->
+        <record id="employee_letter_list_action"
+                model="ir.actions.act_window">
+            <field name="name">Employee Letter</field>
+            <field name="res_model">hr.employee.letters</field>
+            <!--			<field name="view_type">form</field>-->
+            <!--			<field name="view_mode">tree,form</field>-->
+            <field name="context">{'readonly_by_pass':
+                                       ['letter_type', 'job_id', 'department_id', 'letter_template_id']}</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">Create Letter</p>
+            </field>
+        </record>
+
+        <!--Menu Item -->
+        <menuitem id="menu_employee_letter" name="Letters"
+                  parent="custom_hr_employee.menu_hr_employee_operations" action="employee_letter_list_action"
+                  sequence="6" groups="hr.group_hr_manager,hr.group_hr_user"/>
+
+
+        <!--Tree View-->
+        <record id="hr_employee_letter_details_view_tree" model="ir.ui.view">
+            <field name="name">hr.employee.letters.history.tree</field>
+            <field name="model">hr.employee.letters.history</field>
+            <field name="arch" type="xml">
+                <tree string="Letter Details">
+                    <field name="employee_id"/>
+                    <field name="letter_name"/>
+                    <field name="letter_id"/>
+                </tree>
+            </field>
+        </record>
+        <record id="hr_employee_letter_details_view_form" model="ir.ui.view">
+            <field name="name">hr.employee.letters.history.form</field>
+            <field name="model">hr.employee.letters.history</field>
+            <field name="arch" type="xml">
+                <form string="Letter Details">
+                    <group create="false" edit="false" delete="false">
+                    <field name="employee_id" readonly="1"/>
+                    <field name="letter_name" readonly="1"/>
+                    <field name="letter_id" readonly="1"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record id="hr_employee_letter_details_view_list_action" model="ir.actions.act_window">
+            <field name="name">Letter Details</field>
+            <field name="res_model">hr.employee.letters.history</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">Letter Details</p>
+            </field>
+        </record>
+
+        <menuitem id="hr_employee_letter_details_view_menu" name="Letter Details"
+                  parent="custom_hr_employee.menu_hr_employee_details"
+                  sequence="55" action="hr_employee_letter_details_view_list_action" groups="hr.group_hr_manager"/>
+
+    </data>
+</odoo>
+

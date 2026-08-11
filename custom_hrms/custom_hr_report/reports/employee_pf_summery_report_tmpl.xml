@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <data>
+
+        <record model="ir.actions.report" id="emp_pf_summery_report_tmpl">
+            <field name="name">Employee PF Summary Report</field>
+            <field name="model">employee.pf.summery.report.wizard</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">custom_hr_report.employee_pf_summery_report_tmpl</field>
+            <field name="report_file">custom_hr_report.employee_pf_summery_report_tmpl</field>
+            <field name="paperformat_id" ref="custom_common_settings.paperformat_custom_a4_bd"/>
+        </record>
+
+
+        <template id="employee_pf_summery_report_tmpl">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <style type="text/css">
+                            th, tr, td{
+                            background: white !important;
+                            border: 1px solid black !important;
+                            }
+                        </style>
+                        <div class="oe_structure"/>
+                        <div>
+                            <h3 class="text-center head_font_color">
+                                <strong>
+                                    <span t-esc="form['company_id'][1]"/>
+                                    <br/>
+                                    Employee PF Summary Report
+                                </strong>
+                            </h3>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-6">
+                                <p style="color: #000; font-size: 20px;">
+                                    <strong>
+                                        Branch: <t t-esc="work_loc_name"/>
+                                    </strong>
+                                    <t t-if="buisness_unit">
+                                        <br/>
+                                        <strong>Office/business Unit:</strong>
+                                        <t t-esc="buisness_unit"/>
+                                    </t>
+                                </p>
+                            </div>
+                            <div class="col-6 text-right">
+                                <p style="color: #000; font-size: 20px;">
+                                    <strong>
+                                        Year: <t t-esc="from_year"/> - <t t-esc="to_year"/>
+                                    </strong>
+                                    <t t-if="tag_names_list">
+                                        <br/>
+                                        <strong>Tags:</strong>
+                                        <t t-esc="tag_names_list"/>
+                                    </t>
+                                </p>
+                            </div>
+                        </div>
+                        <t t-set="sl_no" t-value="1"/>
+                        <t t-set="total_pf_amt" t-value="0"/>
+                        <t t-set="t_total_pf_amt" t-value="0"/>
+
+                        <t t-foreach="csr" t-as="line">
+                            <t t-foreach="line" t-as="line2">
+                                <div>
+                                    <h6 class="text-left">
+                                        <strong>
+                                            Branch: <span t-esc="line[str(line2)][0]['loc_name']"/><br/>
+                                        </strong>
+                                    </h6>
+                                </div>
+                                <table style="border-collapse: collapse;width: 100%; margin-bottom: 2em;" class="table table-condensed">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center align-middle bg_color font_color">Sl. No.</th>
+                                            <th class="text-left align-middle bg_color font_color">Employee Name</th>
+                                            <th class="text-left align-middle bg_color font_color">Employee ID</th>
+                                            <th class="text-left align-middle bg_color font_color">Department</th>
+                                            <th class="text-left align-middle bg_color font_color">Designation</th>
+                                            <t t-foreach="len(year_list)" t-as="y">
+                                                <th class="text-center align-middle bg_color font_color ">
+                                                    <span t-esc="year_list[y]['year']"/>
+                                                </th>
+                                            </t>
+                                            <th class="text-center align-middle bg_color font_color">
+                                                Total
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="consumed_tbody">
+                                        <t t-foreach="line[str(line2)]" t-as="line3">
+                                            <tr>
+                                                <td class="text-center align-middle">
+                                                    <span t-esc="sl_no"/>
+                                                </td>
+                                                <td class="text-left align-middle">
+                                                    <span t-esc="line3['emp_name']"/>
+                                                </td>
+                                                <td class="text-left align-middle">
+                                                    <span t-esc="line3['old_emp_id']"/>
+                                                </td>
+                                                <td class="text-left align-middle">
+                                                    <span t-esc="line3['dept_name']"/>
+                                                </td>
+                                                <td class="text-left align-middle">
+                                                    <span t-esc="line3['job_name']"/>
+                                                </td>
+                                                <t t-foreach="line3['year_list']" t-as="year">
+                                                    <td class="text-center align-middle">
+                                                        <span t-esc="'{0:,.2f}'.format(year['amt'])"/>
+                                                        <t t-set="total_pf_amt" t-value="total_pf_amt + year['amt']"/>
+                                                    </td>
+                                                </t>
+                                                <td class="text-center align-middle">
+                                                    <span t-esc="'{0:,.2f}'.format(total_pf_amt)"/>
+                                                    <t t-set="t_total_pf_amt" t-value="t_total_pf_amt + total_pf_amt"/>
+                                                </td>
+                                            </tr>
+                                            <t t-set="sl_no" t-value="sl_no + 1"/>
+                                            <t t-set="total_pf_amt" t-value="0"/>
+                                        </t>
+                                        <tr>
+                                            <td colspan="5" class="text-right align-middle">
+                                                <strong>
+                                                    <span t-esc="'Total'"/>
+                                                </strong>
+                                            </td>
+                                            <t t-foreach="len(year_list)" t-as="y">
+                                                <td class="text-center align-middle">
+                                                    <strong>
+                                                        <span t-esc="'{0:,.2f}'.format(sum(year['amt'] for data in line[str(line2)] for year in data['year_list'] if year['year']==year_list[y]['year']))"/>
+                                                    </strong>
+                                                </td>
+                                            </t>
+                                            <td class="text-center align-middle">
+                                                <strong>
+                                                    <span t-esc="'{0:,.2f}'.format(t_total_pf_amt)"/>
+                                                </strong>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <t t-set="sl_no" t-value="1"/>
+                                <t t-set="t_total_pf_amt" t-value="0"/>
+                            </t>
+                        </t>
+                    </div>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

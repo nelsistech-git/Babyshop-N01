@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <record id="view_wppf_policy_form" model="ir.ui.view">
+            <field name="name">wppf.policy.form</field>
+            <field name="model">wppf.policy</field>
+            <field name="arch" type="xml">
+                <form string="WPPF Configuration">
+                    <sheet>
+                        <h1 class="mt0">
+                            <div>
+                                <field name="name" class="oe_inline" placeholder="Name"/>
+                            </div>
+                        </h1>
+                        <group>
+                            <group>
+                                <field name="fiscalyear_id" options="{'no_open': True,'no_create': True, 'no_create_edit': True}"/>
+                                <field name="eligibility_base"/>
+                                <field name="min_service_length_total" placeholder="In Month"/>
+                                <field name="min_service_length_period" placeholder="In Month"/>
+                            </group>
+                            <group>
+                                <field name="wppf_percent"/>
+                                <field name="tds_type" />
+                                <field name="tds_percent" />
+                                <field name="allow_bod"/>
+                                <field name="active"/>
+                            </group>
+                        </group>
+                        <group>
+                            <group>
+                                <button name="action_check_wppf_user" type="object" string="Update WPPF User" class="btn btn-primary active"
+                                    title="WPPF user update in employee list based on the fiscal year"/>
+
+                            </group>
+                            <group>
+                                <field name="wppf_user_count" readonly="1" force_save="1"/>
+                            </group>
+                        </group>
+
+                        <group >
+                                <group string="Settlement Accounts Settings" >
+
+                                   <field name="journal_id_payment" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                    <field name="payable_acc_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                   <field name="payment_acc_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                               </group>
+                                <group>
+                                </group>
+                            </group>
+
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_wppf_policy_tree" model="ir.ui.view">
+            <field name="name">wppf.policy.tree</field>
+            <field name="model">wppf.policy</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="fiscalyear_id"/>
+                    <field name="eligibility_base"/>
+                    <field name="min_service_length_total" />
+                    <field name="min_service_length_period" />
+                    <field name="wppf_percent"/>
+                    <field name="tds_type" />
+                    <field name="tds_percent" />
+                    <field name="allow_bod"/>
+                    <field name="wppf_user_count"/>
+                    <field name="active"/>
+                    <field name="create_date" optional="hide"/>
+                    <field name="write_date" optional="hide"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_wppf_policy">
+            <field name="name">WPPF Policy Configuration</field>
+            <field name="res_model">wppf.policy</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem id="menu_wppf_configuration" name="Configuration" parent="menu_hr_employee_wppf_root" groups="provident_fund.group_provident_fund_officer" sequence="100"/>
+
+
+        <menuitem id="menu_wppf_policy"
+                  name="WPPF Policy"
+                  parent="menu_wppf_configuration"
+                  action="action_wppf_policy"
+                  sequence="1"/>
+
+
+        <!--WPPF profit disb configuration-->
+        <record id="view_wppf_profit_disb_configuration_form" model="ir.ui.view">
+            <field name="name">wppf.profit.disb.configuration.form</field>
+            <field name="model">wppf.profit.disb.configuration</field>
+            <field name="arch" type="xml">
+                <form string="wppf Profit Disbursement Configuration">
+                    <sheet>
+                        <group >
+                            <group string="Disbursement Journal">
+                               <field name="disburse_journal_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" />
+                               <field name="disburse_debit_acc_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" />
+                               <field name="disburse_fund_credit_acc_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" />
+                               <field name="disburse_disb_credit_acc_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" />
+                               <field name="disburse_tds_credit_acc_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" />
+                            </group>
+                            <group string="Payment Journal">
+                                <field name="payment_journal_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" />
+                                <field name="payment_debit_acc_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" />
+                                <field name="payment_credit_acc_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" />
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_wppf_profit_disb_configuration_tree" model="ir.ui.view">
+            <field name="name">wppf.profit.disb.configuration.tree</field>
+            <field name="model">wppf.profit.disb.configuration</field>
+            <field name="arch" type="xml">
+                <tree string="wppf Profit Disbursement Configuration">
+                    <field name="disburse_journal_id" />
+                    <field name="payment_journal_id" />
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="wppf_profit_disb_configuration_action">
+            <field name="name">WPPF Profit Disbursement Settings</field>
+            <field name="res_model">wppf.profit.disb.configuration</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem id="menu_wppf_profit_disb_config"
+                  name="WPPF Profit Disbursement Settings"
+                  parent="menu_wppf_configuration"
+                  action="wppf_profit_disb_configuration_action"
+                  sequence="2"/>
+    </data>
+</odoo>

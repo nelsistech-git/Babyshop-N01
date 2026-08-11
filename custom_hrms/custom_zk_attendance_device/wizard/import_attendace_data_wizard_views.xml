@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Import Attendance Data Form View -->
+    <record id="view_import_attendance_data_wizard_form" model="ir.ui.view">
+        <field name="name">import.attendance.data.wizard.form</field>
+        <field name="model">import.attendance.data.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Import Attendance Data Form">
+                    <group>
+                        <group>
+                            <field name="device_id" required="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="import_type" widget="radio"/>
+                            <field name="upload_csv_file" help="CSV format (Column1: %m/%d/%Y %H:%M or %m/%d/%Y %H:%M:%S, Column2: Biometric ID)" invisible="import_type == 'txt'" />
+                            <field name="upload_des" invisible="upload_des == False" readonly="1"/>
+<!--                            <field name="text" attrs="{'required': [('import_type', '=', 'txt')], 'invisible': [('import_type', '!=', 'txt')]}"/>-->
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="action_import_attendance_data" type="object" string="Import"
+                            class="oe_highlight fa fa-upload" confirm="Are you sure you want to Import?"/>
+                        <button name="action_sample_download" class="oe_highlight fa fa-download" type="object" string=" Sample"/>
+                        <button string="Cancel" special="cancel" class="oe_link" />
+                    </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

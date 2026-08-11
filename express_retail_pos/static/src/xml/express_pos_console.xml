@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates xml:space="preserve">
+
+<t t-name="express_retail_pos.ExpressPosConsole" owl="1">
+    <div class="o_express_pos_console" t-attf-style="--epc-accent: {{ currentBranchColor }}">
+
+        <!-- ============================ HEADER ============================ -->
+        <div class="o_epc_header">
+            <div class="o_epc_header_brand">
+                <div class="o_epc_logo">EX</div>
+                <div class="o_epc_brand_text">
+                    <div class="o_epc_company"><t t-esc="state.session.company_name"/></div>
+                    <select class="o_epc_branch_select" t-on-change="switchBranch">
+                        <option value="" t-att-selected="!state.order.branch_id">All / No Branch</option>
+                        <t t-foreach="state.session.branches" t-as="branch" t-key="branch.id">
+                            <option t-att-value="branch.id" t-att-selected="branch.id === state.order.branch_id">
+                                <t t-esc="branch.brand_name"/>
+                                ·
+                                <t t-esc="branch.name"/>
+                            </option>
+                        </t>
+                    </select>
+                </div>
+            </div>
+
+            <div class="o_epc_kpi_ribbon">
+                <div class="o_epc_kpi">
+                    <span class="o_epc_kpi_label">Today's Sales</span>
+                    <span class="o_epc_kpi_value"><t t-esc="state.session.currency_symbol"/>
+                        <t t-esc="state.kpis.today_sales.toFixed(0)"/></span>
+                </div>
+                <div class="o_epc_kpi">
+                    <span class="o_epc_kpi_label">Orders</span>
+                    <span class="o_epc_kpi_value"><t t-esc="state.kpis.today_orders"/></span>
+                </div>
+                <div class="o_epc_kpi">
+                    <span class="o_epc_kpi_label">Avg Basket</span>
+                    <span class="o_epc_kpi_value"><t t-esc="state.kpis.avg_basket.toFixed(0)"/></span>
+                </div>
+            </div>
+
+            <div class="o_epc_header_actions">
+                <div class="o_epc_clock"><t t-esc="state.clock"/></div>
+                <div class="o_epc_cashier">
+                    <span class="o_epc_cashier_avatar"><t t-esc="(state.session.cashier_name || '?').charAt(0)"/></span>
+                    <t t-esc="state.session.cashier_name"/>
+                </div>
+                <button class="o_epc_btn_ghost" t-on-click="openReturnDialog">↩ Return</button>
+                <button class="o_epc_btn_ghost o_epc_btn_held" t-on-click="toggleParkedOrders">
+                    🕓 Held (<t t-esc="state.kpis.held_orders"/>)
+                </button>
+            </div>
+        </div>
+
+        <!-- ============================ BODY ============================ -->
+        <div class="o_epc_body">
+            <div class="o_express_pos_left">
+                <div class="o_express_pos_topbar">
+                    <input t-ref="barcodeInput"
+                           class="o_express_barcode_input"
+                           placeholder="Scan barcode and press Enter..."
+                           t-on-input="onBarcodeInput"
+                           t-on-keydown="onBarcodeKeydown"/>
+                </div>
+
+                <input t-ref="searchInput"
+                       class="o_express_pos_search"
+                       placeholder="Search product by name, code or barcode (F2)..."
+                       t-model="state.searchQuery"
+                       t-on-input="onSearchInput"/>
+
+                <div class="o_express_pos_product_grid">
+                    <div t-if="!state.products.length" class="text-muted p-4">No products found.</div>
+                    <div t-foreach="state.products" t-as="product" t-key="product.id"
+                         class="o_express_pos_product_card"
+                         t-on-click="() => this.addProduct(product.id)">
+                        <div class="o_epc_card_thumb"><t t-esc="product.name.charAt(0)"/></div>
+                        <div class="o_epc_name"><t t-esc="product.name"/></div>
+                        <div class="o_epc_price"><t t-esc="state.session.currency_symbol"/>
+                            <t t-esc="product.list_price.toFixed(2)"/></div>
+                        <div t-attf-class="o_epc_stock {{ product.qty_available &lt;= 0 ? 'o_epc_stock_low' : '' }}">
+                            <t t-if="product.qty_available &gt; 0">In stock: <t t-esc="product.qty_available"/></t>
+                            <t t-else="">Out of stock</t>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="o_express_pos_right">
+                <div class="o_express_pos_customer_row">
+                    <div class="o_epc_customer_name"><t t-esc="state.order.partner_name"/></div>
+                    <button class="o_epc_add_customer_btn" title="Quick create customer"
+                            t-on-click="openQuickCustomerDialog">+ Customer</button>
+                </div>
+
+                <div class="o_express_pos_customer_row">
+                    <input class="o_express_pos_search o_epc_loyalty_input"
+                           placeholder="Loyalty card code, then Enter..."
+                           t-on-keydown="lookupLoyaltyCard"/>
+                    <span t-if="state.loyalty.card_id" class="o_epc_loyalty_badge">
+                        <t t-esc="state.loyalty.points"/>
+                        pts
+                    </span>
+                </div>
+
+                <div class="o_express_pos_cart">
+                    <div t-if="!state.order.lines.length" class="o_epc_cart_empty">
+                        Cart is empty.<br/>Scan or tap a product to begin.
+                    </div>
+                    <div t-foreach="state.order.lines" t-as="line" t-key="line.id" class="o_express_pos_cart_line">
+                        <span class="o_ecl_name">
+                            <t t-esc="line.name"/>
+                            <span t-if="line.discount" class="o_ecl_discount_tag">-<t t-esc="line.discount"/>%</span>
+                        </span>
+                        <div class="o_ecl_stepper">
+                            <button class="o_ecl_step_btn" t-on-click="() => this.incrementLine(line, -1)">−</button>
+                            <input class="o_ecl_qty" type="number" step="0.01"
+                                   t-att-value="line.product_uom_qty"
+                                   t-on-change="(ev) => this.updateLineQty(line, ev.target.value)"/>
+                            <button class="o_ecl_step_btn" t-on-click="() => this.incrementLine(line, 1)">+</button>
+                        </div>
+                        <span class="o_ecl_subtotal"><t t-esc="line.price_subtotal.toFixed(2)"/></span>
+                        <span class="o_ecl_remove" t-on-click="() => this.removeLine(line)">✕</span>
+                    </div>
+                </div>
+
+                <div class="o_express_pos_totals">
+                    <div><span>Untaxed</span>
+                        <span><t t-esc="state.order.amount_untaxed.toFixed(2)"/></span></div>
+                    <div><span>Tax</span>
+                        <span><t t-esc="state.order.amount_tax.toFixed(2)"/></span></div>
+                    <div class="o_ept_grand"><span>Total</span>
+                        <span><t t-esc="state.session.currency_symbol"/>
+                            <t t-esc="formattedTotal"/></span></div>
+                </div>
+
+                <div class="o_express_pos_actions">
+                    <button class="o_epc_btn_secondary" t-on-click="holdCart">Hold Cart</button>
+                    <button class="o_epc_btn_secondary" t-on-click="applyOffers">Apply Offers</button>
+                    <button class="o_epc_btn_pay" t-on-click="openPaymentDialog" t-att-disabled="state.loading">
+                        <t t-if="state.loading">Processing…</t>
+                        <t t-else="">Pay and Print <span class="o_epc_kbd">Space</span></t>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================ HELD ORDERS DRAWER ============================ -->
+        <div t-if="state.showParkedOrders" class="o_epc_drawer_overlay" t-on-click="toggleParkedOrders">
+            <div class="o_epc_drawer" t-on-click.stop="() => {}">
+                <div class="o_epc_drawer_header">
+                    <span>Held / Parked Orders</span>
+                    <span class="o_epc_drawer_close" t-on-click="toggleParkedOrders">✕</span>
+                </div>
+                <div t-if="!state.parkedOrders.length" class="text-muted p-4">No parked orders today.</div>
+                <div t-foreach="state.parkedOrders" t-as="po" t-key="po.id"
+                     class="o_epc_drawer_line"
+                     t-on-click="() => this.resumeParkedOrder(po.id)">
+                    <div class="o_epc_drawer_line_main">
+                        <span class="o_epc_drawer_line_name"><t t-esc="po.name"/></span>
+                        <span class="o_epc_drawer_line_customer"><t t-esc="po.partner_name"/>
+                            ·
+                            <t t-esc="po.line_count"/>
+                            items</span>
+                    </div>
+                    <span class="o_epc_drawer_line_amount"><t t-esc="po.amount_total.toFixed(2)"/></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</t>
+
+</templates>

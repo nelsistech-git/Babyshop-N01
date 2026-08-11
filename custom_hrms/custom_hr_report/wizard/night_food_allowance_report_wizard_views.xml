@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <data>
+        <record id="view_night_food_allowance_report_wizard_form" model="ir.ui.view">
+            <field name="name">night.food.allowance.report.wizard.form</field>
+            <field name="model">night.food.allowance.report.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Tiffin Bill Allowance Report">
+                    <group>
+                        <group>
+                            <field name="start_date" required="1"/>
+                            <field name="end_date" required="1"/>
+                            <field name="based_on" required="1"/>
+                            <field name="eligible_hour" invisible="based_on == '2'"/>
+                            <field name="touch_time_after" invisible="based_on == '1'"/>
+                        </group>
+                        <group>
+                            <field name="company_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="user_work_location_id" placeholder="All" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="department_ids" placeholder="All" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" widget="many2many_tags"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="night_food_allowance_report_pdf" string="Download (PDF)" type="object" class="btn-primary"/>
+                        <button name="night_food_allowance_report_excel" string="Download (Excel)" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="night_food_allowance_report_wizard_action" model="ir.actions.act_window">
+            <field name="name">Tiffin Bill Report</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">night.food.allowance.report.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_night_food_allowance_report_wizard_form"/>
+            <field name="target">new</field>
+        </record>
+
+        <!--<menuitem
+              name="Tiffin Bill Report"
+              id="menu_night_food_allowance_report"
+              sequence="40"
+              parent="custom_hr_report.menu_attendance_report_root"
+              action="night_food_allowance_report_wizard_action"
+              groups="hr.group_hr_user"
+        />-->
+        <menuitem
+              id="menu_night_food_allowance_report_att"
+              name="Tiffin Bill Report"
+              sequence="50"
+              parent="custom_hr_attendance_sheet.menu_attendance_report_root_attendance_sub"
+              action="night_food_allowance_report_wizard_action"
+              groups="hr.group_hr_user"
+        />
+
+    </data>
+</odoo>

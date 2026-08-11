@@ -1,0 +1,190 @@
+<odoo>
+    <data>
+        <record model="ir.ui.view" id="custom_hr_employee_travelling.form">
+            <field name="name">Employee Travelling Form</field>
+            <field name="model">hr_employee_travelling</field>
+            <field name="arch" type="xml">
+                <form string="Employee Travelling Form">
+
+                    <header>
+                        <button name="button_confirm" string="Confirm"
+                                type="object" groups="hr.group_hr_manager,hr.group_hr_user"
+                                invisible="state in ('confirm', 'approve', 'done', 'cancel')"/>
+                        <button name="button_approve" string="Approve"
+                                type="object" groups="hr.group_hr_manager"
+                                invisible="state in ('draft', 'approve', 'done', 'cancel')"/>
+                        <button name="button_done" string="Done"
+                                type="object" groups="hr.group_hr_manager"
+                                invisible="state in ('draft', 'confirm', 'done', 'cancel')"/>
+                        <button name="button_cancel" string="Cancel"
+                                type="object" groups="hr.group_hr_manager,hr.group_hr_user"
+                                invisible="state in ('confirm', 'approve', 'done', 'cancel')"/>
+                        <button name="button_draft" string="Reset to Draft"
+                                type="object" groups="hr.group_hr_manager,hr.group_hr_user"
+                                invisible="state in ('draft', 'approve', 'done', 'cancel')"/>
+
+                        <field name="state" widget="statusbar" clickable="0"/>
+                    </header>
+
+                    <sheet>
+                        <group name="main" string="Employee Travelling Form">
+                            <group>
+                                <field name="company_id" options="{'no_open':True,'no_create':1,'no_create_edit':1}"/>
+                                <field name="employee_id" options="{'no_open':True,'no_create':1,'no_create_edit':1}"
+                                       domain="[('company_id', '=', company_id)]"/>
+                                <field name="date"/>
+                            </group>
+                            <group>
+                                <field name="designation_id"
+                                       options="{'no_open':True,'no_create':1,'no_create_edit':1}"/>
+                                <field name="department_id"
+                                       options="{'no_open':True,'no_create':1,'no_create_edit':1}"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Travelling Program">
+                                <field name="employee_travelling_line_ids"
+                                       mode="tree" options="{'reload_whole_on_button': true}">
+                                    <tree string="Travelling Program">
+                                        <field name="travel_date"/>
+                                        <field name="travel_time" widget="float_time"/>
+                                        <field name="location_from"/>
+                                        <field name="location_to"/>
+                                        <field name="purpose_of_visit"/>
+                                    </tree>
+                                    <form string="Travelling Program" create="false">
+                                        <group>
+                                            <group>
+                                                <field name="travel_date"/>
+                                                <field name="travel_time" widget="float_time"/>
+                                            </group>
+                                            <group>
+                                                <field name="location_from"/>
+                                                <field name="location_to"/>
+                                            </group>
+                                            <group colspan="2">
+                                                <field name="purpose_of_visit"/>
+                                            </group>
+                                        </group>
+                                        <!--                    <group string="Travel Expenses">-->
+                                        <field name="travelling_expense_ids"
+                                               mode="tree" options="{'reload_whole_on_button': true}">
+                                            <tree delete="true">
+                                                <field name="travel_expense_date"/>
+                                                <field name="location_from"/>
+                                                <field name="location_to"/>
+                                                <field name="transport_mode"/>
+                                                <field name="transport_cost"/>
+                                                <field name="lodge"/>
+                                                <field name="daily_allowance"/>
+                                                <field name="refreshment"/>
+                                                <field name="other_entertainment"/>
+                                                <field name="total" readonly="1" force_save="1"/>
+                                            </tree>
+                                            <form string="Travelling Expenses" create="false" edit="false">
+                                                <group>
+                                                    <group>
+                                                        <field name="travel_expense_date"/>
+                                                        <field name="location_from"/>
+                                                        <field name="location_to"/>
+                                                    </group>
+                                                    <group>
+                                                        <field name="transport_mode"/>
+                                                        <field name="transport_cost"/>
+                                                    </group>
+                                                    <group>
+                                                        <field name="lodge"/>
+                                                        <field name="daily_allowance"/>
+                                                    </group>
+                                                    <group>
+                                                        <field name="refreshment"/>
+                                                        <field name="other_entertainment"/>
+                                                    </group>
+                                                    <group colspan="2">
+                                                        <field name="total" readonly="1"/>
+                                                    </group>
+                                                </group>
+                                            </form>
+                                        </field>
+                                        <!--                    </group>-->
+                                    </form>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- explicit list view definition -->
+        <record model="ir.ui.view" id="custom_hr_employee_travelling.list">
+            <field name="name">Employee Travelling List</field>
+            <field name="model">hr_employee_travelling</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="employee_id"/>
+                    <field name="designation_id"/>
+                    <field name="department_id"/>
+                    <field name="company_id"/>
+                    <field name="date"/>
+                </tree>
+            </field>
+        </record>
+
+
+        <!-- actions opening views on models -->
+
+        <record model="ir.actions.act_window" id="hr_employee_travelling_action_window">
+            <field name="name">Employee Travelling</field>
+            <field name="res_model">hr_employee_travelling</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+
+        <!-- server action to the one above -->
+        <!--
+            <record model="ir.actions.server" id="custom_hr_employee_travelling.action_server">
+              <field name="name">hr_employee_travelling server</field>
+              <field name="model_id" ref="model_hr_employee_travelling_hr_employee_travelling"/>
+              <field name="state">code</field>
+              <field name="code">
+                action = {
+                  "type": "ir.actions.act_window",
+                  "view_mode": "tree,form",
+                  "res_model": model._name,
+                }
+              </field>
+            </record>
+        -->
+
+        <!-- Top menu item -->
+
+        <menuitem name="HR- Travelling &amp; Conveyance" id="hr_employee_travelling_menu_root"
+                  groups="custom_common_settings.group_hr_travelling_conv_root_menu" sequence="45"
+                  web_icon="custom_hr_employee_travelling,static/description/icon.png"/>
+
+        <!-- menu categories -->
+        <!--
+            <menuitem name="Menu 1" id="custom_hr_employee_travelling.menu_1" parent="custom_hr_employee_travelling.menu_root"/>
+            <menuitem name="Menu 2" id="custom_hr_employee_travelling.menu_2" parent="custom_hr_employee_travelling.menu_root"/>
+        -->
+        <!-- actions -->
+
+        <menuitem name="Employee Travelling" id="employee_travelling_tree"
+                  parent="hr_employee_travelling_menu_root"
+                  action="hr_employee_travelling_action_window"/>
+
+        <menuitem id="employee_travelling_configuration"
+                  name="Configuration" parent="hr_employee_travelling_menu_root" sequence="98"
+                  groups="hr.group_hr_manager"/>
+
+        <menuitem id="employee_conveyance_type"
+                  name="Conveyance Settings" parent="employee_travelling_configuration" sequence="1"
+                  action="action_employee_conveyance_type"
+                  groups="hr.group_hr_user"/>
+        <!--
+        <menuitem name="Server to list" id="hr_employee_travelling" parent="custom_hr_employee_travelling.menu_2"
+                  action="custom_hr_employee_travelling.action_server"/>
+    -->
+    </data>
+</odoo>

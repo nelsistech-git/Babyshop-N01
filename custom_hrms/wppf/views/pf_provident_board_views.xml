@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+                <record id="wppf_provident_board_view_form" model="ir.ui.view">
+            <field name="name">pf.provident.board.wppf.form</field>
+            <field name="model">pf.provident.board</field>
+            <field name="arch" type="xml">
+                <form string="WPPF Fund">
+                    <header>
+                        <button name="button_confirm" string="Confirm" invisible="state != 'draft'" type="object"/>
+                        <button name="button_unlock" string="Unlock" invisible="state != 'confirm'" type="object"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,confirm"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1 col="4">
+                                <field name="name" placeholder="Name Here"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="type" readonly="1" force_save="1"/>
+                                <field name="emp_type" widget="selection" invisible="1"/>
+                                <field name="company_id" invisible="1"/>
+                            </group>
+
+                        </group>
+                        <notebook colspan="4">
+                            <page string="Employee Lines">
+                                <field name="employee_lines">
+                                    <tree string="Employee Lines" editable="false">
+                                        <field name="employee_id" domain="[('is_wppf_user','=',True)]" options='{"no_create_edit": True, "no_create": True}'/>
+                                        <field name="start_date"/>
+                                        <field name="company_id" invisible="1"/>
+                                    </tree>
+                                </field>
+                            </page>
+
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+        <record model="ir.actions.act_window" id="provident_fund_board_action_wppf">
+            <field name="name">WPPF Board</field>
+            <field name="res_model">pf.provident.board</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('type', '=', 'wppf')]</field>
+            <field name="context">{'default_type': 'wppf'}</field>
+        </record>
+        <record id="provident_fund_board_action_wppf_tree" model="ir.actions.act_window.view">
+            <field eval="2" name="sequence"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="provident_fund.pf_provident_board_view_tree"/>
+            <field name="act_window_id" ref="provident_fund_board_action_wppf"/>
+        </record>
+        <record id="provident_fund_board_action_wppf_form" model="ir.actions.act_window.view">
+            <field eval="2" name="sequence"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="wppf_provident_board_view_form"/>
+            <field name="act_window_id" ref="provident_fund_board_action_wppf"/>
+        </record>
+
+        <menuitem id="menu_hr_employee_wppf_sub_board_committee"
+          name="Board &amp; Committee"
+          sequence="7"
+          parent="menu_hr_employee_wppf_root" />
+
+        <menuitem id="menu_hr_provident_fund_board_wppf"
+                  name="WPPF Board"
+                  action="provident_fund_board_action_wppf"
+                  parent="menu_hr_employee_wppf_sub_board_committee"
+                  groups="provident_fund.group_provident_fund_manager"
+                  sequence="1"/>
+
+    </data>
+</odoo>

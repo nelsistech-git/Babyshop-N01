@@ -1,0 +1,107 @@
+<odoo>
+    <data>
+
+
+        <record model="ir.actions.report" id="employee_length_of_service_report_tmpl">
+            <field name="name">Employee Length of Service Report</field>
+            <field name="model">employee.length.of.service.report.wizard</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">custom_hr_report.employee_length_of_service_report_templ</field>
+            <field name="report_file">custom_hr_report.employee_length_of_service_report_templ</field>
+            <field name="paperformat_id" ref="custom_common_settings.paperformat_custom_a4_bd"/>
+        </record>
+
+
+        <template id="employee_length_of_service_report_templ">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <style type="text/css">table, th, tr, td{ background: white !important; border: 1px solid black;
+                            }
+                        </style>
+                        <div class="oe_structure"/>
+                        <h3 class="text-center head_font_color">
+                            <strong>
+                                <span t-esc="form['company_id'][1]"/>
+                            </strong>
+                        </h3>
+                        <div>
+                            <h3 class="text-center head_font_color">
+                                <strong>
+                                    Employee Length of Service Report
+                                    <br/>
+                                </strong>
+                            </h3>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <p style="color: #000; font-size: 15px;">
+                                    <strong>Work/Job Location:</strong>
+                                    <t t-esc="work_location_name"/>
+                                </p>
+                            </div>
+                            <div class="col-6 text-right">
+                                <p style="color: #000; font-size: 15px;">
+                                    <strong>Department Name:</strong>
+                                    <t t-esc="department_name"/>
+                                    <t t-if="buisness_unit">
+                                        <br/>
+                                        <strong>Office/business Unit:</strong>  <t t-esc="buisness_unit"/>
+                                    </t>
+                                    <t t-if="tag_names_list">
+                                        <br/>
+                                        <strong>Tags:</strong>  <t t-esc="tag_names_list"/>
+                                    </t>
+                                </p>
+                            </div>
+                        </div>
+                        <br/>
+                        <table style="border-collapse: collapse;width: 100%; margin-bottom: 2em;"
+                               class="table table-condensed">
+                            <thead>
+                                <tr>
+                                    <th class="text-center align-middle bg_color font_color">Sl.</th>
+                                    <th class="text-left align-middle bg_color font_color">Employee ID No</th>
+                                    <th class="text-left align-middle bg_color font_color">Employee Name</th>
+                                    <th class="text-left align-middle bg_color font_color">Joining Date</th>
+                                    <th class="text-left align-middle bg_color font_color">Designation</th>
+                                    <th class="text-left align-middle bg_color font_color">Location</th>
+                                    <th class="text-left align-middle bg_color font_color">Length of Service</th>
+                                </tr>
+                            </thead>
+                            <tbody class="consumed_tbody">
+                                <t t-set="sl_no" t-value="1"/>
+                                <t t-foreach="csr" t-as="line">
+                                    <tr>
+                                        <td class="text-left align-middle">
+                                            <span t-esc="sl_no"/>
+                                        </td>
+                                        <td class="text-left align-middle">
+                                            <span t-esc="line['emp_id']"/>
+                                        </td>
+                                        <td class="text-left align-middle">
+                                            <span t-esc="line['emp_name']"/>
+                                        </td>
+                                        <td class="text-left align-middle">
+                                            <span t-esc="line['emp_joining_date']"/>
+                                        </td>
+                                        <td class="text-left align-middle">
+                                            <span t-esc="line['department_name']"/>
+                                        </td>
+                                        <td class="text-left align-middle">
+                                            <span t-esc="line['work_location_name']"/>
+                                        </td>
+                                        <td class="text-left align-middle">
+                                            <span t-esc="line['length_of_service']"/>
+                                        </td>
+                                    </tr>
+                                    <t t-set="sl_no" t-value="sl_no + 1"/>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

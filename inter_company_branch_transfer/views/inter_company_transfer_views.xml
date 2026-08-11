@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View -->
+    <record id="view_inter_company_transfer_form" model="ir.ui.view">
+        <field name="name">inter.company.transfer.form</field>
+        <field name="model">inter.company.transfer</field>
+        <field name="arch" type="xml">
+            <form string="Inter-Company Transfer">
+                <header>
+                    <button name="action_confirm_transfer" string="Confirm Transfer"
+                            type="object" class="oe_highlight"
+                            invisible="state != 'draft'"/>
+                    <button name="action_done" string="Mark as Done"
+                            type="object" class="oe_highlight"
+                            invisible="state != 'confirmed'"/>
+                    <button name="action_create_invoices" string="Create Invoice/Bill"
+                            type="object"
+                            invisible="state != 'done' or invoice_id or bill_id"/>
+                    <button name="action_reverse_transfer" string="Reverse Transfer"
+                            type="object"
+                            invisible="state != 'done' or reversal_count &gt; 0 or reversal_of_id"/>
+                    <button name="action_cancel" string="Cancel"
+                            type="object"
+                            invisible="state not in ('draft', 'confirmed')"/>
+                    <button name="action_draft" string="Reset to Draft"
+                            type="object"
+                            invisible="state != 'cancel'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,confirmed,done"/>
+                </header>
+                <sheet>
+                    <field name="sale_order_id" invisible="1"/>
+                    <field name="purchase_order_id" invisible="1"/>
+                    <field name="invoice_id" invisible="1"/>
+                    <field name="bill_id" invisible="1"/>
+                    <field name="reversal_of_id" invisible="1"/>
+                    <field name="reversal_count" invisible="1"/>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_sale_order" type="object"
+                                class="oe_stat_button" icon="fa-file-text-o"
+                                invisible="not sale_order_id">
+                            <field name="sale_order_id" widget="statinfo" string="Sales Order"/>
+                        </button>
+                        <button name="action_view_purchase_order" type="object"
+                                class="oe_stat_button" icon="fa-shopping-cart"
+                                invisible="not purchase_order_id">
+                            <field name="purchase_order_id" widget="statinfo" string="Purchase Order"/>
+                        </button>
+                        <button name="action_view_delivery" type="object"
+                                class="oe_stat_button" icon="fa-truck"
+                                invisible="not sale_order_id">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Delivery</span>
+                            </div>
+                        </button>
+                        <button name="action_view_receipt" type="object"
+                                class="oe_stat_button" icon="fa-truck"
+                                invisible="not purchase_order_id">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Receipt</span>
+                            </div>
+                        </button>
+                        <button name="action_view_invoice" type="object"
+                                class="oe_stat_button" icon="fa-usd"
+                                invisible="not invoice_id">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Invoice</span>
+                            </div>
+                        </button>
+                        <button name="action_view_bill" type="object"
+                                class="oe_stat_button" icon="fa-usd"
+                                invisible="not bill_id">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Bill</span>
+                            </div>
+                        </button>
+                        <button name="action_view_reversals" type="object"
+                                class="oe_stat_button" icon="fa-undo"
+                                invisible="reversal_count == 0">
+                            <field name="reversal_count" widget="statinfo" string="Return(s)"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Return Transfer" bg_color="bg-info"
+                            invisible="not reversal_of_id"/>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                        <div invisible="not reversal_of_id">
+                            <field name="reversal_of_id" readonly="1"/>
+                        </div>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="transfer_type" readonly="state != 'draft'"/>
+                            <field name="source_company_id" options="{'no_create': True}"
+                                   readonly="state != 'draft'"/>
+                            <field name="source_warehouse_id" options="{'no_create': True}"
+                                   readonly="state != 'draft'"/>
+                        </group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="dest_company_id" options="{'no_create': True}"
+                                   readonly="state != 'draft'"/>
+                            <field name="dest_warehouse_id" options="{'no_create': True}"
+                                   readonly="state != 'draft'"/>
+                        </group>
+                    </group>
+                    <group string="Automation">
+                        <group>
+                            <field name="sync_delivery_receipt"/>
+                            <field name="create_invoice"/>
+                            <field name="validate_invoice" invisible="not create_invoice"/>
+                        </group>
+                        <group invisible="state == 'draft'">
+                            <field name="delivery_state" widget="badge"
+                                   decoration-success="delivery_state == 'done'"
+                                   decoration-warning="delivery_state in ('confirmed', 'assigned', 'waiting')"/>
+                            <field name="receipt_state" widget="badge"
+                                   decoration-success="receipt_state == 'done'"
+                                   decoration-warning="receipt_state in ('confirmed', 'assigned', 'waiting')"/>
+                            <field name="invoice_state" widget="badge"
+                                   invisible="not invoice_id"
+                                   decoration-success="invoice_state == 'posted'"
+                                   decoration-warning="invoice_state == 'draft'"/>
+                            <field name="bill_state" widget="badge"
+                                   invisible="not bill_id"
+                                   decoration-success="bill_state == 'posted'"
+                                   decoration-warning="bill_state == 'draft'"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Transfer Lines" name="lines">
+                            <div class="mb-2" invisible="state != 'draft'">
+                                <button name="action_open_bulk_import_wizard" type="object"
+                                        string="Import Lines" class="btn-secondary" icon="fa-upload"/>
+                            </div>
+                            <field name="line_ids" readonly="state != 'draft'">
+                                <tree editable="bottom">
+                                    <field name="product_id"/>
+                                    <field name="product_uom_qty"/>
+                                    <field name="product_uom_id" groups="uom.group_uom"/>
+                                    <field name="qty_delivered" readonly="1"/>
+                                    <field name="qty_received" readonly="1"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Notes" name="notes">
+                            <field name="note" placeholder="Internal notes about this transfer..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View -->
+    <record id="view_inter_company_transfer_list" model="ir.ui.view">
+        <field name="name">inter.company.transfer.list</field>
+        <field name="model">inter.company.transfer</field>
+        <field name="arch" type="xml">
+            <tree string="Inter-Company Transfers" decoration-muted="state == 'cancel'"
+                  decoration-success="state == 'done'">
+                <field name="name"/>
+                <field name="source_company_id"/>
+                <field name="dest_company_id"/>
+                <field name="source_warehouse_id"/>
+                <field name="dest_warehouse_id"/>
+                <field name="sale_order_id"/>
+                <field name="purchase_order_id"/>
+                <field name="delivery_state" widget="badge" optional="show"/>
+                <field name="receipt_state" widget="badge" optional="show"/>
+                <field name="invoice_state" widget="badge" optional="hide"/>
+                <field name="bill_state" widget="badge" optional="hide"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-warning="state == 'confirmed'"
+                       decoration-success="state == 'done'"
+                       decoration-danger="state == 'cancel'"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_inter_company_transfer_search" model="ir.ui.view">
+        <field name="name">inter.company.transfer.search</field>
+        <field name="model">inter.company.transfer</field>
+        <field name="arch" type="xml">
+            <search string="Search Inter-Company Transfers">
+                <field name="name"/>
+                <field name="source_company_id"/>
+                <field name="dest_company_id"/>
+                <field name="sale_order_id"/>
+                <field name="purchase_order_id"/>
+                <filter string="Draft" name="filter_draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="In Progress" name="filter_confirmed" domain="[('state', '=', 'confirmed')]"/>
+                <filter string="Done" name="filter_done" domain="[('state', '=', 'done')]"/>
+                <filter string="Cancelled" name="filter_cancel" domain="[('state', '=', 'cancel')]"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter string="Source Company" name="group_source" context="{'group_by': 'source_company_id'}"/>
+                    <filter string="Destination Company" name="group_dest" context="{'group_by': 'dest_company_id'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_inter_company_transfer" model="ir.actions.act_window">
+        <field name="name">Inter-Company Transfers</field>
+        <field name="res_model">inter.company.transfer</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_filter_draft': 0}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smart_action">
+                Create a new Inter-Company / Branch Stock Transfer
+            </p>
+            <p>
+                Transfer stock between companies or branches. Confirming a
+                transfer automatically generates a linked Sales Order in the
+                source company and a Purchase Order in the destination company.
+            </p>
+        </field>
+    </record>
+
+</odoo>

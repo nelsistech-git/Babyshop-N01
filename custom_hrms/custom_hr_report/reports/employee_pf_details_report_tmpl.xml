@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <data>
+
+        <record model="ir.actions.report" id="emp_pf_details_report_tmpl">
+            <field name="name">Employee PF Details Report</field>
+            <field name="model">employee.pf.details.report.wizard</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">custom_hr_report.employee_pf_details_report_tmpl</field>
+            <field name="report_file">custom_hr_report.employee_pf_details_report_tmpl</field>
+        </record>
+
+        <template id="employee_pf_details_report_tmpl">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <style type="text/css">
+                            th, tr, td{
+                            background: white !important;
+                            border: 1px solid black !important;
+                            }
+                        </style>
+                        <div class="oe_structure"/>
+                        <div>
+                            <h3 class="text-center head_font_color">
+                                <strong>
+                                    <span t-esc="form['company_id'][1]"/>
+                                    <br/>
+                                    Employee PF Details Report
+                                </strong>
+                            </h3>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-6">
+                                <p style="color: #000; font-size: 20px;">
+                                    <strong>
+                                        Branch:
+                                        <t t-esc="work_loc_name"/>
+                                    </strong>
+                                </p>
+                            </div>
+                            <div class="col-6 text-right">
+                                <p style="color: #000; font-size: 20px;">
+                                    <strong>Year:
+                                        <t t-esc="year"/>
+                                    </strong>
+                                </p>
+                            </div>
+                        </div>
+                        <table style="border-collapse: collapse;width: 100%; margin-bottom: 2em;"
+                               class="table table-condensed">
+                            <thead>
+                                <tr>
+                                    <th class="text-center align-middle bg_color font_color">Sl. No.</th>
+                                    <th class="text-left align-middle bg_color font_color">Employee Name</th>
+                                    <th class="text-left align-middle bg_color font_color">Employee ID</th>
+                                    <th class="text-left align-middle bg_color font_color">Department</th>
+                                    <th class="text-left align-middle bg_color font_color">Designation</th>
+
+                                    <th class="text-center align-middle bg_color font_color">Jan</th>
+                                    <th class="text-center align-middle bg_color font_color">Feb</th>
+                                    <th class="text-center align-middle bg_color font_color">Mar</th>
+                                    <th class="text-center align-middle bg_color font_color">Apr</th>
+                                    <th class="text-center align-middle bg_color font_color">May</th>
+                                    <th class="text-center align-middle bg_color font_color">Jun</th>
+                                    <th class="text-center align-middle bg_color font_color">Jul</th>
+                                    <th class="text-center align-middle bg_color font_color">Aug</th>
+                                    <th class="text-center align-middle bg_color font_color">Sep</th>
+                                    <th class="text-center align-middle bg_color font_color">Oct</th>
+                                    <th class="text-center align-middle bg_color font_color">Nov</th>
+                                    <th class="text-center align-middle bg_color font_color">Dec</th>
+
+                                    <th class="text-right align-middle">
+                                        Total
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="consumed_tbody">
+                                <t t-foreach="csr" t-as="line">
+                                    <t t-set="sl_no" t-value="1"/>
+                                    <div>
+                                        <h6 class="text-left">
+                                            <strong>
+                                                Branch:
+                                                <span t-esc="line[str(line2)][0]['work_loc_name']"/>
+                                                <br/>
+                                            </strong>
+                                        </h6>
+                                    </div>
+                                    <tr>
+                                        <td class="text-middle align-middle">
+                                            <span t-esc="sl_no"/>
+                                        </td>
+                                        <td class="text-left align-middle">
+                                            <span t-esc="line['employee_name']"/>
+                                        </td>
+                                        <td class="text-left align-middle">
+                                            <span t-esc="line['id_card_no']"/>
+                                        </td>
+                                        <td class="text-left align-middle">
+                                            <span t-esc="line['dept_name']"/>
+                                        </td>
+                                        <td class="text-left align-middle">
+                                            <span t-esc="line['emp_designation']"/>
+                                        </td>
+                                        <td class="text-left align-middle">
+                                            <span t-esc="line['january']"/>
+                                        </td>
+                                        <td class="text-left align-middle">
+                                            <span t-esc="line['february']"/>
+                                        </td>
+                                        <td class="text-left align-middle">
+                                            <span t-esc="line['march']"/>
+                                        </td>
+                                        <td class="text-left align-middle">
+                                            <span t-esc="line['april']"/>
+                                        </td>
+                                        <td class="text-left align-middle">
+                                            <span t-esc="line['may']"/>
+                                        </td>
+                                        <td class="text-left align-middle">
+                                            <span t-esc="line['june']"/>
+                                        </td>
+                                        <td class="text-left align-middle">
+                                            <span t-esc="line['july']"/>
+                                        </td>
+                                        <td class="text-left align-middle">
+                                            <span t-esc="line['august']"/>
+                                        </td>
+                                        <td class="text-left align-middle">
+                                            <span t-esc="line['september']"/>
+                                        </td>
+                                        <td class="text-left align-middle">
+                                            <span t-esc="line['october']"/>
+                                        </td>
+                                        <td class="text-left align-middle">
+                                            <span t-esc="line['november']"/>
+                                        </td>
+                                        <td class="text-left align-middle">
+                                            <span t-esc="line['december']"/>
+                                        </td>
+                                        <td class="text-left align-middle" style="border: 1px solid black;">
+                                            <span t-esc="line['total_pf_amount']"/>
+                                        </td>
+                                    </tr>
+                                    <t t-set="sl_no" t-value="sl_no + 1"/>
+                                </t>
+                                <tr>
+                                    <td class="text-middle align-middle" colspan="5">
+                                        Total
+                                    </td>
+                                    <td class="text-middle align-middle">
+                                        <span t-esc="total_january"/>
+                                    </td>
+                                    <td class="text-middle align-middle">
+                                        <span t-esc="total_february"/>
+                                    </td>
+                                    <td class="text-middle align-middle">
+                                        <span t-esc="total_march"/>
+                                    </td>
+                                    <td class="text-middle align-middle">
+                                        <span t-esc="total_april"/>
+                                    </td>
+                                    <td class="text-middle align-middle">
+                                        <span t-esc="total_may"/>
+                                    </td>
+                                    <td class="text-middle align-middle">
+                                        <span t-esc="total_june"/>
+                                    </td>
+                                    <td class="text-middle align-middle">
+                                        <span t-esc="total_july"/>
+                                    </td>
+                                    <td class="text-middle align-middle">
+                                        <span t-esc="total_august"/>
+                                    </td>
+                                    <td class="text-middle align-middle">
+                                        <span t-esc="total_september"/>
+                                    </td>
+                                    <td class="text-middle align-middle">
+                                        <span t-esc="total_october"/>
+                                    </td>
+                                    <td class="text-middle align-middle">
+                                        <span t-esc="total_november"/>
+                                    </td>
+                                    <td class="text-middle align-middle">
+                                        <span t-esc="total_december"/>
+                                    </td>
+                                    <td class="text-middle align-middle">
+                                        <span t-esc="total"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

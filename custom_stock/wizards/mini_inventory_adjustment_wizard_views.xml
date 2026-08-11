@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+	<data>
+		<record id="mini_inventory_adjustment_wizard_view_form"
+			model="ir.ui.view">
+			<field name="name">mini.inventory.adjustment.wizard.view.form</field>
+			<field name="model">mini.inventory.adjustment.wizard</field>
+			<field name="arch" type="xml">
+				<form string="Inventory Adjustment">
+					<group>
+						<group>
+							<field name="type" widget="radio"/>
+                            <field invisible="type == '01'" name="upload_csv_file" help="CSV format with columns(Barcode, Sale Price)"/>
+                            <field invisible="type == '02'" placeholder="Barcode &amp; Qty" name="scrap_scan_barcode" />
+                        </group>
+						<group>
+							<field required='1' name="location_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+							<field required='1' name="approved_by_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+							<field required='1' name="state"/>
+						</group>
+                    </group>
+					 <button style="padding: 5px 30px; margin-bottom: 10px; background: #50a0bc;" invisible="type == '02'" name="check_barcode_validity" class="oe_highlight" type="object" string="Scan"/>
+					 <field name="product_line_ids" invisible="type == '02'" >
+						<tree editable="top" >
+							<field name="pro_id" readonly="1" />
+							<field name="qty" required="1"/>
+						</tree>
+					 </field>
+					<group>
+						<field name="upload_des" invisible="upload_des == False" readonly="1"/>
+					</group>
+					<footer>
+                    <button name="action_adjustment_file_upload" invisible="type == '01'" type="object" string=" Upload" class="oe_highlight fa fa-upload" confirm="Are you sure you want to upload?"/>
+                    <button name="action_adjustment_file_upload" invisible="type == '02'" type="object" string="Submit" class="oe_highlight" confirm="Are you sure you want to Submit?"/>
+                    <button name="action_sample_download" invisible="type == '01'" class="oe_highlight fa fa-download" type="object" string=" Sample"/>
+                    <button string="Close" class="btn-secondary" special="cancel"/>
+					</footer>
+				</form>
+			</field>
+		</record>
+
+		<record id="mini_inventory_adjustment_action_new" model="ir.actions.act_window">
+            <field name="name">Inventory Adjustment (Qty .1 - Qty .99)</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">mini.inventory.adjustment.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="mini_inventory_adjustment_wizard_view_form"/>
+            <field name="target">new</field>
+        </record>
+
+		<menuitem id="menu_mini_inventory_adjustment_wizard"
+                 name="Inventory Adjustment (Qty .1 - Qty .99)"
+                 sequence="36"
+				 groups="custom_stock.group_pos_inventory_adjustment"
+                 action="mini_inventory_adjustment_action_new"
+                 parent="stock.menu_stock_warehouse_mgmt"/>
+
+	</data>
+</odoo>

@@ -1,0 +1,26 @@
+<odoo>
+    <!-- Custom Product Access Category -->
+    <record id="custom_product_group_category" model="ir.module.category">
+        <field name="name">Custom Product</field>
+        <field name="description">Custom Product</field>
+        <field name="sequence">4</field>
+    </record>
+
+    <!-- User Group -->
+    <record id="group_user" model="res.groups">
+        <field name="name">User</field>
+        <field name="category_id" ref="custom_product_common.custom_product_group_category"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <!-- Manager Group -->
+    <record id="group_manager" model="res.groups">
+        <field name="name">Manager</field>
+        <field name="category_id" ref="custom_product_common.custom_product_group_category"/>
+        <field name="implied_ids" eval="[(4, ref('custom_product_common.group_user'))]"/>
+    </record>
+
+    <record id="group_product_controller" model="res.groups">
+       <field name="name">Product Controller</field>
+    </record>
+</odoo>

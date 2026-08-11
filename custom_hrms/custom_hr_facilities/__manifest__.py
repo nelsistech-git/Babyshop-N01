@@ -1,0 +1,22 @@
+{
+    'name': "Custom HR Facilities",
+    'version': "1.0.0",
+    'category': "Human Resources Employee Facilities",
+    'sequence': 1,
+    'summary': "Employee Facility tracking modulefor Odoo v17",
+    'description': """Employee Facility tracking module for Odoo v17""",
+    'author': "Nelsis Tech Limited",
+    'company': "Nelsis Tech Limited",
+    'maintainer': "Nelsis Tech Limited",
+    'website': 'https://nelsistech.com/',
+    'depends': ['custom_hr_employee'],
+    'data': [
+        'security/ir.model.access.csv',
+        'views/particulars_views.xml',
+        'views/inherited_hr_employee_inherit_hr_facilities.xml',
+    ],
+    'installable': True,
+    'application': True,
+    'auto_install': False,
+    'license': 'LGPL-3',
+}

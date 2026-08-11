@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<odoo>
+    <data>
+        <record id="district_view_form" model="ir.ui.view">
+            <field name="name">district.form</field>
+            <field name="model">district</field>
+            <field name="arch" type="xml">
+                <form string="District Form">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="country_id" options="{'no_open':True,'no_create':1,'no_create_edit':1}"/>
+                                <field name="division_id" options="{'no_open':True,'no_create':1,'no_create_edit':1}"
+                                       invisible="country_id == False"
+                                       domain="[('country_id', '=', country_id)]"/>
+                                <field name="name" options="{'no_open':True,'no_create':1,'no_create_edit':1}"
+                                       invisible="division_id == False"/>
+                            </group>
+                            <group></group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="district_view_tree" model="ir.ui.view">
+            <field name="name">district.tree</field>
+            <field name="model">district</field>
+            <field name="arch" type="xml">
+                <tree string="District tree">
+                    <field name="name"/>
+                    <field name="division_id"/>
+                    <field name="country_id"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="district_view_search" model="ir.ui.view">
+            <field name="name">district.search</field>
+            <field name="model">district</field>
+            <field name="arch" type="xml">
+                <search>                                        
+                    <group expand="0" string="Group By">
+                        <filter name="group_country" string="Country" context="{'group_by':'country_id'}"/>
+                        <filter name="group_division" string="Division" context="{'group_by':'division_id'}"/>                        
+                    </group>
+                        <field name="name"/>
+                        <field name="division_id"/>
+                        <field name="country_id"/>
+                </search>
+            </field>
+        </record>
+		
+        <record id="district_list_action" model="ir.actions.act_window">
+            <field name="name">Districts</field>
+            <field name="res_model">district</field>
+            <!-- <field name="view_type">form</field> -->
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">Create Districts
+                </p>
+            </field>
+        </record>
+		
+<!--        <menuitem id="district_menu" name="Districts" parent="custom_stock.root_planning_menu"-->
+<!--                  action="district_list_action" sequence="10"/>-->
+
+    </data>
+</odoo>

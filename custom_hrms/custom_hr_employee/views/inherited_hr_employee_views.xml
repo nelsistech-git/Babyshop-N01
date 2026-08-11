@@ -1,0 +1,747 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+	<data>
+		<record model="ir.actions.act_window" id="action_map_employee">
+			<field name="name">Map Employee</field>
+			<field name="res_model">map.employee.wizard</field>
+			<field name="view_mode">form</field>
+			<field name="target">new</field>
+		</record>
+
+		<!--Employee Form View -->
+		<record id="inherited_hr_emp_employee_view_form" model="ir.ui.view">
+			<field name="name">HR inherited</field>
+			<field name="model">hr.employee</field>
+			<field name="inherit_id" ref="hr.view_employee_form"/>
+			<field name="arch" type="xml">
+				<!--Rename HR_settings page string -->
+				<xpath expr="//header" position="inside">
+					<button id='map_employee' name="%(custom_hr_employee.action_map_employee)d" string="Map Employee" type="action" invisible="user_id or address_home_id" groups="hr.group_hr_manager,hr.group_hr_user"/>
+					<button confirm="Are you Sure?" name="action_create_contract" string="Create Contract" type="object" groups="hr.group_hr_manager,hr.group_hr_user" invisible="not active or contract_created"/>
+				</xpath>
+				<xpath expr="//page[@name='public']/div/div/group[4]" position="attributes">
+					<attribute name='groups'/>
+				</xpath>
+				<xpath expr="//page[@name='hr_settings']" position="attributes">
+					<attribute name='string'>Additional Info</attribute>
+				</xpath>
+				<xpath expr="//field[@name='work_email']" position="attributes">
+                    <attribute name="required">True</attribute>
+                </xpath>
+				<xpath expr="//field[@name='work_email']" position="after">
+                    <field name="contact_no" required="1"/>
+                </xpath>
+<!--				<xpath expr="//field[@name='pin']" position="before">-->
+<!--					<field name="device_user_id" /> &lt;!&ndash; attrs="{'readonly': [('device_user_id', '!=', False)]}" &ndash;&gt;-->
+<!--				</xpath>-->
+<!--				<xpath expr="//field[@name='company_id']" position="replace">-->
+<!--				</xpath>-->
+				
+				<xpath expr="//field[@name='barcode']" position="replace">
+					<field name="barcode" readonly="1"/>
+				</xpath>
+				
+				<xpath expr="//field[@name='department_id']" position="before">
+					<field name="company_id" groups="base.group_multi_company"
+						options="{'no_open':True,'no_create':1,'no_create_edit':1}" />
+				</xpath>
+
+				<xpath expr="//field[@name='department_id']" position="replace">
+					<field name="department_id"
+						options="{'no_open':True,'no_create':1,'no_create_edit':1}" />
+				</xpath>
+
+				<xpath expr="//field[@name='job_id']" position="replace">
+					<field name="job_id"
+						domain="['|', ('department_id', '=', False), ('department_id','=',department_id)]"
+						options="{'no_open':True,'no_create':1,'no_create_edit':1}" />
+				</xpath>
+
+				<xpath expr="//field[@name='parent_id']" position="replace">
+					<field name="parent_id" context="{'show_designation': True}"
+						options="{'always_reload': True, 'no_open':True,'no_create':1,'no_create_edit':1}" domain="[]"/>
+					<field name="reporting_body" string="Reporting Desig."
+						options="{'no_open':True,'no_create':1,'no_create_edit':1}"
+						readonly="1" />
+					<field name="sbu_unit_id" options="{'no_open':True,'no_create':1,'no_create_edit':1}"/>
+
+<!--					<field name = "old_empid"/>-->
+<!--					<label for="emp_attendance_id"/>-->
+<!--					<div class="o_row">-->
+<!--						<field name="emp_attendance_id" readonly="1"/>-->
+<!--						<button string="Generate" class="btn btn-link" type="object" name="generate_emp_attendance_id" attrs="{'invisible': [('emp_attendance_id', '!=', False)]}"/>-->
+<!--					</div>-->
+				</xpath>
+
+				<!--Edit public information Page -->
+				<xpath expr="//page[@name='public']" position="before">
+					<page name="official_record" string="Official Record *">
+						<group>
+							<group string="ID Card" name="emp_id_group">
+								<label for="identification_id"/>
+                                <div class="o_row">
+                                    <field name="identification_id" readonly="1"/>
+                                    <button string="Generate" class="btn btn-link" type="object" name="generate_random_barcode" invisible="identification_id"/>
+                                    <button name="%(custom_hr_employee.hr_employee_print_badge_custom)d" string="Print ID" class="btn btn-link" type="action" invisible="not identification_id"/>
+                                </div>
+								<field name="id_card_no" required="1"/>
+								<field name="contract_created" invisible="1"/>
+								<field name="device_user_id" required="1"/>
+								<field name="door_card_no" />
+							</group>
+							<group string="Department" name="emp_dept_group">
+								<!-- <field name="department_id" string="Department" attrs="{'required':True}" 
+									options="{'no_open':True,'no_create':1,'no_create_edit':1}" /> <field name="job_id" 
+									string="Designation" options="{'no_open':True,'no_create':1,'no_create_edit':1}" 
+									domain="[('department_id','=',department_id)]" /> -->
+								<field name="parent_dept_id" string="Parent Department"
+									options="{'no_open':True,'no_create':1,'no_create_edit':1}"
+									readonly="1" />
+							</group>
+							<!-- <group string="Working Unit"> <field name="concern_unit" options="{'no_open':True,'no_create':1,'no_create_edit':1}"/> 
+								</group> -->
+							<group string="Official Contact" name="emp_official_cnt_group">
+								<field name="mobile_phone" string="Cell No(Official)"/>
+								<field name="work_email" widget="email"
+									string="E-mail(Official)" />
+								<field name="fax_no" />
+							</group>
+
+							<group name='contact_info' string="Contract Information">
+<!--								<field name="employee_type" string="Employee Type" required="1"-->
+<!--									options="{'no_open':True,'no_create':1,'no_create_edit':1}" />-->
+								<field name="employee_type_id" string="Employee Type" required="1"
+									options="{'no_open':True,'no_create':1,'no_create_edit':1}" />
+								<field name="initial_employment_date"
+									string="Date of Joining" required="1"/><!--  -->
+								<field name="probation_period"
+									options="{'no_open':True, 'no_create':True, 'no_create_edit':True}" />
+								<field name="date_of_confirmation" />
+								<field name="length_of_service" />
+								<field name="remaining_confirmation_day" invisible="1"/>
+<!--								<field name="start_date_of_contract" />-->
+<!--								<field name="end_date_of_contract" />-->
+								<field name="reference" />
+								<!-- <field name="signature" widget="image" class="oe_avatar" options='{"zoom":
+									true}'/> -->
+								<field name="signature" widget="signature" />
+								<field name="is_bod" />
+
+<!--								<group name="prev_application">-->
+<!--									<field name="is_previous_applicant"/>-->
+<!--								</group>-->
+<!--								<group>-->
+<!--									<field name="previous_applied_post" attrs="{'invisible': [('is_previous_applicant', '=', False)]}"/></group>-->
+<!--								<group>-->
+<!--									<field name="previous_applied_year" attrs="{'invisible': [('is_previous_applicant', '=', False)]}"/>-->
+<!--								</group>-->
+								<!--TODO Have to add KPI -->
+								<!--TODO have to add appraisal history -->
+							</group>
+							<group string="Employee Personal Information" name="emp_personal_info_group">
+								<field name="blood_group" />
+								<field name="tax_id" />
+							</group>
+							<group string="Job Description" name="emp_jd_group">
+								<field name="job_description" />
+								<field name="is_engineer"/>
+							</group>
+						</group>
+
+						<group name="OfficialBankInfo">
+							<group string="Bank Info (Official/Salary)">
+								<field name="disbursement_type" />
+
+								<field name="s_bank_name"
+									options="{'no_open':True,'no_create_edit':1}" />
+								<field name="s_bank_account_no" />
+								<field name="s_account_holder" />
+								<field name="s_account_type" />
+								<field name="s_name_of_nominee" />
+								<field name="s_relation_with_nominee" options="{'no_open':True,'no_create_edit':1}"/>
+								<field name="s_occupation_of_nominee" />
+								<field name="s_contact_email_of_nominee" />
+								<field name="s_office_address_of_nominee" />
+								<field name="s_nominee_image" widget="image" style="height: 90px;width: 90px;" />
+							</group>
+							<group></group>
+						</group>
+					</page>
+				</xpath>
+
+				<xpath expr="//page[@name='personal_information']" position="replace"/>
+
+				<!--Edit personal Information page -->
+				<!-- <xpath expr="//page[2]" position="replace"></xpath> -->
+				<xpath expr="//page[@name='official_record']" position="after">
+					<page name="personal_information_new"
+						string="Personal Information *">
+						<group>
+							<group string="Nationality">
+								<field name="country_id"
+									options="{'no_open':True,'no_create':1,'no_create_edit':1}" />
+								<field name="home_division_id" domain="[('country_id','=',country_id)]" options="{'no_open':True,'no_create':1,'no_create_edit':1}"/>
+								<field name="home_town_id" domain="[('division_id','=',home_division_id)]" options="{'no_open':True,'no_create':1,'no_create_edit':1}"/>
+								<field name="home_upazila_id" domain="[('district_id','=',home_town_id)]" options="{'no_open':True,'no_create':1,'no_create_edit':1}"/>
+								<field name="home_postcode_id" domain="[('thana_id','=',home_upazila_id)]" options="{'no_open':True,'no_create':1,'no_create_edit':1}"/>
+								<field name="place_of_birth" />
+								<field name="gender" />
+								<field name="height"/>
+								<field name="weight"/>
+								<field name="birthday" />
+								<field name="age" />
+								<field name="religion" />
+							</group>
+							<group name='personal_contact_info' string="Contact">
+								<field name="present_address" />
+								<field name="address_home_id" string="Partner Ref"
+									options="{'no_open': True, 'no_create': 1, 'no_create_edit': 1}"
+									invisible="1" />
+								<field name="p_address_id" string="Permanent Address" />
+								<field name="address_home_id" string="Private Address"/>
+								<!--Housing & Previous applications-->
+								<field name="housing_status"/>
+
+<!--								<field name="contact_no" />-->
+								<field name="email_personal" string="Email(Personal)" />
+							</group>
+
+							<group string="Family Information">
+								<field name="fam_father" />
+								<field name="fam_father_occupation"/>
+								<field name="fam_father_mobile"/>
+								<field name="fam_mother" />
+								<field name="fam_mother_occupation"/>
+								<field name="fam_mother_mobile"/>
+								<field name="guardian_name"/>
+							</group>
+							<group string="Marital Status">
+								<field name="marital" />
+								<field name="fam_spouse" invisible="marital == 'single'"/>
+<!--									attrs="{'required':[('marital', '=', 'married')]}" />-->
+								<field name="fam_spouse_occupation" invisible="marital == 'single'"/>
+								<field name="fam_spouse_mobile" invisible="marital == 'single'"/>
+								<field name="fam_spouse_qualification" invisible="marital == 'single'"/>
+								<field name="no_of_male_children" invisible="marital == 'single'"/>
+								<field name="no_of_female_children" invisible="marital == 'single'"/>
+							</group>
+
+							<group string="Legal Information">
+								<field name="passport_id" />
+								<field name="nid" string="NID/Birth Certificate" />
+								<field name="driving_license" />
+							</group>
+							<group string="Bank Info (Personal)">
+								<field name="p_bank_name"
+									options="{'no_open':True,'no_create_edit':1}" />
+								<field name="p_bank_account_no" />
+								<field name="p_account_holder" />
+								<field name="p_name_of_nominee" />
+								<field name="p_relation_with_nominee" options="{'no_open':True,'no_create_edit':1}"/>
+								<field name="p_account_type" />
+							</group>
+
+						</group>
+
+						<group string="Emergency">
+							<field name="em_contact_ids" string="Emergency Contacts">
+								<tree string="Emergency Contact List" editable="bottom">
+									<field name="contact_no" />
+									<field name="contact_rel" />
+									<field name="contact_name" />
+									<field name="contact_address" />
+								</tree>
+							</field>
+						</group>
+						<!--Dependents-->
+						<separator string="Dependents" colspan="2"/>
+						<group name="dependents" colspan="2">
+                        <field name="dependent_ids" context="{'default_employee_id': active_id}" >
+                            <tree string="Dependents">
+                                <field name="dependent_name" string="Name"/>
+                                <field name="dependent_age" string="Age"/>
+                                <field name="dependent_rel" string="Relationship"/>
+                            </tree>
+                            <form string="Dependents">
+                                <group name="dependents_info">
+<!--                                    <group>-->
+<!--                                    <label for="dependent_name" class="oe_edit_only"/>-->
+                                    <field name="dependent_name" colspan="2"/>
+<!--                                    </group>-->
+                                    <group>
+                                        <field name="dependent_age" string="Age"/>
+                                        <field name="dependent_rel" string="Relationship"/>
+                                    </group>
+                                </group>
+                            </form>
+                        </field>
+                    	</group>
+
+						<!--Siblings Details-->
+                    <separator string="Name of brothers &amp; sisters with their personal details" colspan="2"/>
+                    <group name="siblings" colspan="2">
+                        <field name="sibling_ids" context="{'default_employee_id': active_id}" >
+                            <tree string="Name of brothers &amp; sisters with their personal details">
+                                <field name="sibling_name"/>
+                                <field name="sibling_age"/>
+                                <field name="sibling_occupation"/>
+                                <field name="sibling_organization"/>
+                                <field name="sibling_contact"/>
+                            </tree>
+                            <form string="Name of brothers &amp; sisters with their personal details">
+                                <group name="siblings_info">
+<!--                                    <group>-->
+<!--                                    <label for="dependent_name" class="oe_edit_only"/>-->
+                                    <field name="sibling_name" colspan="2"/>
+<!--                                    </group>-->
+                                    <group>
+                                        <field name="sibling_age"/>
+                                        <field name="sibling_contact"/>
+                                    </group>
+                                    <group>
+                                        <field name="sibling_occupation"/>
+                                        <field name="sibling_organization"/>
+                                    </group>
+                                </group>
+                            </form>
+                        </field>
+                    </group>
+
+					<!--Extra Curricular Activities-->
+                    <separator string="Extra Curricular Activities &amp; Interests" colspan="2"/>
+                    <group name="extra_curricular" colspan="2">
+                        <field name="extra_curri_ids" context="{'default_employee_id': active_id}" >
+                            <tree string="Extra Curricular Activities &amp; Interests">
+                                <field name="activity_name"/>
+                                <field name="award"/>
+                            </tree>
+                            <form string="Extra Curricular Activities &amp; Interests">
+                                <group name="extra_curricular_info">
+                                    <group>
+                                        <field name="activity_name"/>
+                                    </group>
+                                    <group>
+                                        <field name="award"/>
+                                    </group>
+                                </group>
+                            </form>
+                        </field>
+                    </group>
+
+						 <!--Relatives, friends & known persons-->
+                    <separator string="Relatives, friends &amp; known persons" colspan="2"/>
+                    <!--In The Company-->
+                    <group name="known_people" colspan="2" string="Relatives, friends &amp; known persons in this company">
+                        <field name="known_people_ids" context="{'default_employee_id': active_id}" >
+                            <tree string="Relatives, friends &amp; known persons in this company">
+                                <field name="name"/>
+                                <field name="designation"/>
+                                <field name="department"/>
+                                <field name="organization"/>
+                                <field name="relation"/>
+                            </tree>
+                            <form string="Relatives, friends &amp; known persons in this company">
+                                <group name="known_people_info">
+                                    <field name="name"/>
+                                    <group>
+                                        <field name="designation"/>
+                                        <field name="department"/>
+                                    </group>
+                                    <group>
+                                        <field name="organization"/>
+                                        <field name="relation"/>
+                                    </group>
+                                </group>
+                            </form>
+                        </field>
+                    </group>
+                    <!--Outside The Company-->
+                    <group name="known_people_outside" colspan="2" string="Relatives, friends &amp; known persons in other company">
+                        <field name="known_people_outside_ids" context="{'default_employee_id': active_id}" >
+                            <tree string="Relatives, friends &amp; known persons in other company">
+                                <field name="name"/>
+                                <field name="designation_department"/>
+                                <field name="organization"/>
+                                <field name="org_contact"/>
+                                <field name="relation"/>
+                            </tree>
+                            <form string="Relatives, friends &amp; known persons in other company">
+                                <group name="known_people_outside_info">
+                                    <field name="name"/>
+                                    <group>
+                                        <field name="designation_department"/>
+                                        <field name="organization"/>
+                                    </group>
+                                    <group>
+                                        <field name="org_contact"/>
+                                    </group>
+                                    <group>
+                                        <field name="relation"/>
+                                    </group>
+                                </group>
+                            </form>
+                        </field>
+                    </group>
+
+					</page>
+				</xpath>
+				<xpath expr="//page[@name='public']" position="before">
+					<page name="hr_documents" string="Documents">
+						<group name="hr_doc_group">
+							<field name="document_line_ids" string="Document List">
+								<tree string="Document List">
+									<field name="doc_type" />
+									<field name="document_name" />
+									<field name="attachement_file_ids" />
+								</tree>
+								<form string="Document List">
+									<group>
+										<field name="doc_type" />
+										<field name="document_name" />
+										<field name="attachement_file_ids"
+											widget="many2many_binary" />
+									</group>
+								</form>
+							</field>
+						</group>
+						<!-- <group string="Letters">
+							<field name="letter_ids" string="Letters List" >
+								<tree string="Letters List" editable="bottom">
+									<field name="letter_name" />
+									<field name="letters" options="{'no_open':True,'no_create_edit':1}"/>
+								</tree>
+							</field>
+						</group> -->
+					</page>
+				</xpath>
+
+				<xpath expr="//group[@name='active_group']" position="after">
+					<group name="job_grade_info" string="Grade Details">
+						<field name="job_grade" readonly="1"
+							options="{'no_open':True,'no_create':1,'no_create_edit':1}" />
+						<field name="grade_type" readonly="1"
+							options="{'no_open':True,'no_create':1,'no_create_edit':1}" />
+						<field name="job_level" readonly="1"
+							options="{'no_open':True,'no_create':1,'no_create_edit':1}" />
+					</group>
+				</xpath>
+
+				<xpath expr="//field[@name='user_id']" position="attributes">
+					<attribute name="string">Related User</attribute>
+					<attribute name="options">{'no_edit':True, 'no_create':True,
+						'no_create_edit':True}
+					</attribute>
+				</xpath>
+
+				<xpath expr="//field[@name='address_id']" position="replace">
+					<field name="address_id" context="{'show_address': 1}"
+						options='{"always_reload": True, "highlight_first_line": True,"no_open":True,"no_create":1,"no_create_edit":1}'
+						string="Company Address" readonly="1" />
+				</xpath>
+
+				<xpath expr="//field[@name='mobile_phone']" position="before">
+
+					<field name="company_unit_id" string="Company Unit"
+						domain="[('company_id','=',company_id)]" invisible="1"
+						options='{"always_reload": True, "highlight_first_line": True,"no_open":True,"no_create":1,"no_create_edit":1}' />
+						
+					<field name="user_work_location_id" string="Work/Job Location"
+						context="{'show_address': 1}" required="1"
+						options='{"always_reload": True, "highlight_first_line": True,"no_open":True,"no_create":1,"no_create_edit":1}' />
+
+					<field name="inter_company_id" string="Internal Company"
+						invisible="1" options='{"always_reload": True, "highlight_first_line": True,"no_open":True,"no_create":1,"no_create_edit":1}' />
+				</xpath>
+<!--				<xpath expr="//field[@name='work_location']" position="replace">-->
+<!--				</xpath>-->
+				
+				<xpath expr="//field[@name='coach_id']" position="replace">
+					<field name="coach_id" context="{'show_designation': True}"
+						options="{'always_reload': True, 'no_open':False,'no_create':1,'no_create_edit':1}" />
+				</xpath>
+
+				<!--Remove Create permission for user_id -->
+				<!-- <xpath expr="//field[@name='user_id']" position="replace"> <field 
+					name="user_id" string="Related User" options="{'no_edit':True, 'no_create':True, 
+					'no_create_edit':True}"/> </xpath> -->
+
+				<xpath expr="//page[@name='personal_information_new']/group" position="after">
+					<group name="education_ids" string="Education Details">
+						<field name="education_last"/>
+
+                        <field name="education_ids">
+                            <tree editable="bottom" create="true">
+                                <field name="degree"/>
+                                <field name="group"/>
+                                <field name="passing_year"/>
+                                <field name="result"/>
+                                <field name="attachment_ids" widget="many2many_binary"/>
+                            </tree>
+                        </field>
+                    </group>
+
+					<h2 style="color:#7C7BAD">Experience</h2>
+					 <field name="resume_line_ids">
+						<tree create="true">
+							<field name="name"/>
+							<field name="institute_id"/>
+							<field name="line_type_id"/>
+							<field name="display_type"/>
+							<field name="date_start"/>
+							<field name="date_end"/>
+							<field name="designation"/>
+<!--								<field name="salary_started"/>-->
+							<field name="salary_leaving"/>
+							<field name="supervisor_details"/>
+							<field name="achievements"/>
+							<field name="job_leave_reason"/>
+						</tree>
+					</field>
+
+					<h2 style="color:#7C7BAD">Skills</h2>
+					 <field name="employee_skill_ids">
+						<tree create="true">
+							<field name="skill_type_id"/>
+							<field name="skill_id"/>
+							<field name="skill_level_id"/>
+							<field name="level_progress" readonly="1" force_Save="1"/>
+							<field name="level_progress_range" readonly="1" force_Save="1"/>
+						</tree>
+					</field>
+
+					<group name="fam_ids" colspan="4" string="Dependence Details">
+                        <field name="fam_ids">
+                            <tree editable="bottom" create="true">
+                                <field name="member_name" required="1"/>
+                                <field name="relation_id" required="1"/>
+                                <field name="member_contact"/>
+                                <field name="birth_date"/>
+                            </tree>
+                        </field>
+                    </group>
+					<group name="identification_id" string="Identification ID">
+                        <field name="identification_id"/>
+                        <field name="id_expiry_date"  groups="hr.group_hr_user" invisible="identification_id in [None, False]"/>
+                        <field name="id_attachment_id" groups="hr.group_hr_user" widget="many2many_binary" class="oe_inline" invisible="identification_id in [None, False]"/>
+                    </group>
+                    <group name="passport_id" string="Passport ID">
+                        <field name="passport_id"/>
+                        <field name="passport_expiry_date" groups="hr.group_hr_user" invisible="passport_id in [None, False]"/>
+                        <field name="passport_attachment_id" groups="hr.group_hr_user" widget="many2many_binary" class="oe_inline" invisible="passport_id in [None, False]"/>
+                    </group>
+                </xpath>
+
+<!--                <xpath expr="//page[@name='hr_settings']/group/group[1]/field[@name='user_id']" position="after">-->
+<!--                    <field name="joining_date"/>-->
+<!--                </xpath>-->
+
+				<xpath expr="//page[@name='skills_resume']" position="replace"/>
+				<xpath expr="//page[@name='hr_settings']" position="after">
+					<page name="skills_resume" string="Resume">
+						<div class="row">
+							<div class="o_hr_skills_editable o_hr_skills_group o_group_resume col-lg-7 d-flex flex-column">
+								<separator string="Resume" class="mb-4"/>
+								<!-- This field uses a custom tree view rendered by the 'resume_one2many' widget.
+									Adding fields in the tree arch below makes them accessible to the widget
+								-->
+								<field mode="tree" nolabel="1" name="resume_line_ids" widget="resume_one2many">
+									<tree>
+										<field name="line_type_id"/>
+										<field name="name"/>
+										<field name="description"/>
+										<field name="date_start"/>
+										<field name="date_end"/>
+										<field name="display_type" column_invisible="True"/>
+									</tree>
+								</field>
+
+							</div>
+							<div class="o_hr_skills_editable o_hr_skills_group o_group_skills col-lg-5 d-flex flex-column">
+								<field mode="tree" nolabel="1" name="employee_skill_ids" widget="skills_one2many" class="mt-2">
+									<tree>
+										<field name="skill_id"/>
+										<field name="skill_level_id"/>
+										<field name="level_progress" widget="progressbar"/>
+										<field name="skill_type_id" optional="hidden"/>
+									</tree>
+								</field>
+							</div>
+						</div>
+					</page>
+				</xpath>
+
+			</field>
+		</record>
+
+		<!--Employee Tree View -->
+		<record id="inherited_hr_emp_employee_view_tree"
+			model="ir.ui.view">
+			<field name="name">hr.employee.tree</field>
+			<field name="model">hr.employee</field>
+			<field name="inherit_id" ref="hr.view_employee_tree" />
+			<field name="arch" type="xml">
+				<xpath expr="//tree/field[@name='work_phone']" position="replace"></xpath>
+				<xpath expr="//tree/field[@name='work_email']" position="replace"></xpath>
+				<xpath expr="//tree/field[@name='parent_id']" position="replace"></xpath>
+				<xpath expr="//tree/field[@name='coach_id']" position="replace"></xpath>
+
+				<!--<xpath expr="//tree/field[@name='work_location_id']" position="attributes">
+					<attribute name="string">Emp Location</attribute>
+				</xpath>-->
+
+				<xpath expr="//tree/field[@name='job_id']" position="replace">
+					<field name="job_id" string="Designation" />
+				</xpath>
+
+				<xpath expr="//tree/field[@name='name']" position="after">
+					<field name="id_card_no"/>
+					<field name="device_user_id" />
+				</xpath>
+
+				<xpath expr="//tree/field[@name='name']" position="before">
+					<field name="identification_id" />
+				</xpath>
+
+				<xpath expr="//tree/field[@name='department_id']"
+					position="after">
+					<field name="company_unit_id" string="Company unit" optional="hide"/>
+					<field name="user_work_location_id" string="Job Location" />
+					<field name="inter_company_id" string="Internal Company" optional="hide"/>
+				</xpath>
+
+				<xpath expr="//tree/field[@name='job_id']" position="after">
+					<field name="mobile_phone" string="Cell No (Official)" />
+					<field name="contact_no" string="Mobile (Personal)" />
+					<field name="work_email" string="E-mail (Official)" />
+					<field name="email_personal" string="E-mail(Personal)" />
+				</xpath>
+			</field>
+		</record>
+		
+		<!--Employee Tree View -->
+		<record id="inherited_hr_emp_employee_view_search"
+			model="ir.ui.view">
+			<field name="name">inherited.hr.employee.search</field>
+			<field name="model">hr.employee</field>
+			<field name="inherit_id" ref="hr.view_employee_filter" />
+			<field name="arch" type="xml">
+				<xpath expr="//search/field[@name='name']" position="before">
+<!--						<field name="old_emp_id"/>-->
+					<field name="id_card_no" filter_domain="[('id_card_no', '=', self)]"/>
+				</xpath>
+				<xpath expr="//search/field[@name='name']" position="after">
+					<field name="device_user_id" filter_domain="[('device_user_id', '=', self)]"/>
+					<field name="identification_id" />
+					<field name="nid" />
+					<field name="department_id" />
+					<field name="parent_id" />
+					<field name="mobile_phone" />
+					<field name="home_town_id" />
+					<field name="contact_no" string="Mobile (personal)" />
+					<!--<field name="company_unit_id" />-->
+					<field name="inter_company_id" />
+					<field name="user_work_location_id" />
+
+					<separator/>
+					<filter string="Mapped" domain="[('address_home_id', '!=', None)]" name="mapped_emp"/>
+					<filter string="Not Mapped" domain="[('address_home_id', '=', None)]" name="not_mapped_emp"/>
+                	<separator/>
+
+				</xpath>
+
+			</field>
+		</record>
+		
+		<!--Institution Action View -->
+		<record id="institution_list_action"
+			model="ir.actions.act_window">
+			<field name="name">institution</field>
+			<field name="res_model">res.partner</field>
+			<!-- <field name="view_type">form</field> -->
+			<field name="type">ir.actions.act_window</field>
+			<field name="view_mode">tree,form</field>
+			<field name="help" type="html">
+				<p class="oe_view_nocontent_create">Create the first Institution</p>
+			</field>
+		</record>
+
+
+
+		<!--Inherit hr.employee action view -->
+		<record id="hr.open_view_employee_list_my"
+			model="ir.actions.act_window">
+			<field name="context">{'readonly_by_pass':['job_grade','grade_type','job_level']}
+			</field>
+		</record>
+
+
+
+		<!-- ================= resource calendar ======================== -->
+		<record id="inherited_resource_calendar_form_hr_employee" model="ir.ui.view">
+			<field name="name">resource.calendar.form.hr.employee</field>
+			<field name="model">resource.calendar</field>
+			<field name="inherit_id" ref="resource.resource_calendar_form" />
+			<field name="arch" type="xml">
+				<xpath expr="//group[@name='resource_details']" position="replace">
+					<group name="resource_details">
+						<group>
+							<field name="company_id" groups="base.group_multi_company"/>
+							<field name="hours_per_day" widget="float_time"/>
+							<field name="tz" widget="timezone_mismatch" options="{'tz_offset_field': 'tz_offset', 'mismatch_title': 'Timezone Mismatch : This timezone is different from that of your browser.\nPlease, be mindful of this when setting the working hours or the time off.'}"/>
+							<field name="tz_offset" invisible="1"/>
+
+							<field name="short_name" required="1"/>
+							 <field name="is_default"/>
+							 <field name="is_over_ride_day"/>
+							 <field name="check_in_start" widget="float_time" required="1" help="Check IN time for new day start and Previous Day end point!"/>
+							 <!--<field name="check_in_end" widget="float_time" required="1"/>-->
+							 <!--<field name="check_out_start" widget="float_time"/>
+							 <field name="check_out_end" widget="float_time" help="Over-Ride day last checkout time."/>-->
+						</group>
+						<group>
+							<field name="hour_from_per_day_m" widget="float_time"/>
+							<field name="hour_to_per_day_m" widget="float_time"/>
+							<field name="hour_from_per_day_e" widget="float_time"/>
+							<field name="hour_to_per_day_e" widget="float_time"/>
+							<field name="active" invisible="1"/>
+						</group>
+					</group>
+				</xpath>
+				<!--<xpath expr="//field[@name='tz']" position="after">
+					 <field name="short_name"/>
+					 <field name="is_default"/>
+					 <field name="is_over_ride_day"/>
+					 <field name="check_in_start" widget="float_time"/>
+					 <field name="check_in_end" widget="float_time"/>
+					 <field name="check_out_start" widget="float_time"/>
+					 <field name="check_out_end" widget="float_time" required="1" help="Over-Ride day last checkout time."/>
+				</xpath>-->
+			</field>
+    	</record>
+
+		<record id="inherited_resource_calendar_tree_hr_employee" model="ir.ui.view">
+			<field name="name">resource.calendar.tree.hr.employee</field>
+			<field name="model">resource.calendar</field>
+			<field name="inherit_id" ref="resource.view_resource_calendar_tree" />
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='name']" position="after">
+					 <field name="short_name"/>
+					 <field name="is_default"/>
+					 <field name="is_over_ride_day"/>
+
+					<field name="check_in_start" widget="float_time"/>
+
+					<field name="hour_from_per_day_m" widget="float_time"/>
+					<field name="hour_to_per_day_m" widget="float_time"/>
+					<field name="hour_from_per_day_e" widget="float_time"/>
+					<field name="hour_to_per_day_e" widget="float_time"/>
+
+					<!--<field name="check_in_end" widget="float_time"/>-->
+					<!--<field name="check_out_start" widget="float_time" optional="hide"/>
+					<field name="check_out_end" widget="float_time" optional="hide"/>-->
+				</xpath>
+			</field>
+		</record>
+
+	</data>
+</odoo>

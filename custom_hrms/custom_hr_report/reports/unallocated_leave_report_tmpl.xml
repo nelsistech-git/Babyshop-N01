@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+	<data>
+        <record id="unallocated_leave_report_tmpl" model="ir.actions.report">
+            <field name="name">Unallocated Employee Leave Report</field>
+            <field name="model">unallocated.employee.leave.report.wizard</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">custom_hr_report.unallocated_leave_report_view</field>
+            <field name="report_file">custom_hr_report.unallocated_leave_report_view</field>
+        </record>
+
+		<template id="unallocated_leave_report_view">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <style type="text/css">
+                            table, th, tr, td{
+                                background: white !important;
+                                border: 1px solid black;
+                            }
+                        </style>
+                        <div class="oe_structure"/>
+                        <div>
+                            <h3 class="text-center head_font_color">
+                                <strong>
+                                    <span t-esc="form['company_id'][1]"/>
+                                    <br/>
+                                    Unallocated Employee Leave Report
+                                </strong>
+                            </h3>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <div>
+                                    <span style="color: #000; font-size: 15px;"><strong>Year:</strong> <t t-esc="form['year']"/></span>
+                                </div>
+                                <div>
+                                    <span style="color: #000; font-size: 15px;"><strong>Leave Type:</strong> <t t-esc="leave_type_name"/></span>
+                                </div>
+                            </div>
+                            <div class="col-6 text-right">
+                                <div>
+                                    <span style="color: #000; font-size: 15px;"><strong>Work/Job Location:</strong> <t t-esc="work_loc_name"/></span>
+                                </div>
+                                <div>
+                                    <span style="color: #000; font-size: 15px;"><strong>Department:</strong>  <t t-esc="dept_name"/></span>
+                                </div>
+                                <div>
+                                    <span style="color: #000; font-size: 15px;"><strong>Employee:</strong> <t t-esc="employee_name"/></span>
+                                </div>
+                            </div>
+                        </div>
+                        <table style="border-collapse: collapse;width: 100%; margin-bottom: 2em;" class="table table-condensed">
+                            <thead>
+                                <tr style="color: black !important;">
+                                    <th class="text-center align-middle bg_color font_color">Sl. No.</th>
+                                    <th class="text-center align-middle bg_color font_color">Employee ID</th>
+                                    <th class="text-left align-middle bg_color font_color">Employee Name</th>
+                                    <th class="text-center align-middle bg_color font_color">Joining Date</th>
+                                    <th class="text-left align-middle bg_color font_color">Work/Job Location</th>
+                                    <th class="text-left align-middle bg_color font_color">Department</th>
+                                    <th class="text-left align-middle bg_color font_color">Designation</th>
+                                </tr>
+                            </thead>
+                            <tbody class="consumed_tbody">
+                                <t t-set="sl_no" t-value="1"/>
+                                <t t-foreach="csr" t-as="line">
+                                    <tr>
+                                        <td class="text-center align-middle">
+                                            <t t-esc="sl_no"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <span t-esc="line['emp_id_card']"/>
+                                        </td>
+                                        <td class="text-left align-middle">
+                                            <span t-esc="line['emp_name']"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <span t-esc="line['emp_joining_date']" t-options='{"widget": "date"}'/>
+                                        </td>
+                                        <td class="text-left align-middle">
+                                            <span t-esc="line['work_location_name']"/>
+                                        </td>
+                                        <td class="text-left align-middle">
+                                            <span t-esc="line['dept_name']"/>
+                                        </td>
+                                        <td class="text-left align-middle">
+                                            <span t-esc="line['desig_name']"/>
+                                        </td>
+                                    </tr>
+                                    <t t-set="sl_no" t-value="sl_no + 1"/>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+		</template>
+	</data>
+</odoo>

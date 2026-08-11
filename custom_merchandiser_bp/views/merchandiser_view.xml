@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View -->
+    <record id="view_merchandiser_info_form" model="ir.ui.view">
+        <field name="name">merchandiser.info.form</field>
+        <field name="model">merchandiser.info</field>
+        <field name="arch" type="xml">
+            <form string="Costing Management">
+                <header>
+                    <button name="action_confirm_costing" string="Confirm Costing"
+                        type="object" class="oe_highlight"
+                        invisible="state != 'draft'"/>
+                    <button name="action_create_sample" string="Next → Create Sample"
+                        type="object" class="oe_highlight"
+                        invisible="state != 'costing_management'"/>
+                    <button name="action_cancel" string="Cancel"
+                        type="object"
+                        groups="custom_merchandiser_bp.group_merchandiser_manager"
+                        invisible="state == 'cancel'"/>
+                    <button name="action_draft" string="Reset to Draft"
+                        type="object"
+                        groups="custom_merchandiser_bp.group_merchandiser_manager"
+                        invisible="state != 'cancel'"/>
+                    <field name="state" widget="statusbar"
+                        statusbar_visible="draft,costing_management,sample_created"/>
+                </header>
+
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_samples" type="object"
+                            class="oe_stat_button" icon="fa-cubes"
+                            invisible="sample_count == 0">
+                            <div class="o_stat_info">
+                                <field name="sample_count" class="o_stat_value"/>
+                                <span class="o_stat_text">Samples</span>
+                            </div>
+                        </button>
+                    </div>
+
+                    <group string="Buyer Information">
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="brand"/>
+                            <field name="contact_person_id"/>
+                        </group>
+                        <group>
+                            <field name="email" widget="email"/>
+                            <field name="shipment_terms"/>
+                            <field name="country"/>
+                        </group>
+                    </group>
+
+                    <group string="Product Information">
+                        <group>
+                            <field name="style_no"/>
+                            <field name="item_id"/>
+                            <field name="fabric_type"/>
+                            <field name="gsm"/>
+                        </group>
+                        <group>
+                            <field name="color"/>
+                            <field name="size_range"/>
+                            <field name="tech_pack_name" invisible="1"/>
+                            <field name="tech_pack_attachment"
+                                filename="tech_pack_name" widget="binary"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Costing Management"
+                            invisible="state == 'draft'">
+                            <group>
+                                <group>
+                                    <field name="costing_product_id"/>
+                                    <field name="bom_qty"/>
+                                </group>
+                                <group>
+                                    <field name="company_id" readonly="1"/>
+                                </group>
+                            </group>
+                            <field name="costing_line_ids">
+                                <tree editable="bottom">
+                                    <field name="product_id"/>
+                                    <field name="quantity"/>
+                                    <field name="unit_price"/>
+                                    <field name="subtotal" readonly="1" sum="Total Cost"/>
+                                </tree>
+                            </field>
+                            <group class="oe_right">
+                                <field name="profit_percentage"/>
+                                <field name="total_component_cost" readonly="1"/>
+                                <field name="final_total_price" readonly="1"/>
+                            </group>
+                            <field name="costing_note"
+                                placeholder="Add costing notes here..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree View -->
+    <record id="view_merchandiser_info_tree" model="ir.ui.view">
+        <field name="name">merchandiser.info.tree</field>
+        <field name="model">merchandiser.info</field>
+        <field name="arch" type="xml">
+            <tree string="Costing Management">
+                <field name="style_no"/>
+                <field name="partner_id"/>
+                <field name="brand"/>
+                <field name="fabric_type"/>
+                <field name="color"/>
+                <field name="final_total_price" string="Total Price"/>
+                <field name="state" widget="badge"
+                    decoration-success="state == 'sample_created'"
+                    decoration-warning="state == 'costing_management'"
+                    decoration-danger="state == 'cancel'"
+                    decoration-muted="state == 'draft'"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_merchandiser_info_search" model="ir.ui.view">
+        <field name="name">merchandiser.info.search</field>
+        <field name="model">merchandiser.info</field>
+        <field name="arch" type="xml">
+            <search string="Search Costing">
+                <field name="style_no"/>
+                <field name="partner_id"/>
+                <field name="brand"/>
+                <separator/>
+                <filter name="draft" string="Draft"
+                    domain="[('state','=','draft')]"/>
+                <filter name="costing" string="Costing"
+                    domain="[('state','=','costing_management')]"/>
+                <filter name="sample_created" string="Sample Created"
+                    domain="[('state','=','sample_created')]"/>
+                <filter name="cancel" string="Cancelled"
+                    domain="[('state','=','cancel')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_buyer" string="Buyer"
+                        context="{'group_by': 'partner_id'}"/>
+                    <filter name="group_state" string="Status"
+                        context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_merchandiser_info" model="ir.actions.act_window">
+        <field name="name">Costing Management</field>
+        <field name="res_model">merchandiser.info</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_merchandiser_info_search"/>
+    </record>
+
+    <!-- Root Menu — accessible only to module users -->
+    <menuitem id="menu_merchandiser_root" name="Merchandiser BP"
+        sequence="10"
+        groups="custom_merchandiser_bp.group_merchandiser_user"/>
+
+    <menuitem id="menu_merchandiser_info" name="Costing Management"
+        parent="menu_merchandiser_root"
+        action="action_merchandiser_info" sequence="1"/>
+
+</odoo>

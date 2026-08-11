@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="chatroom.ConversationHeader" owl="1">
+        <div class="o_ConversationHeader">
+            <t t-if="props.selectedConversation">
+                <div class="o_ConversationHeader_inner d-flex align-items-center gap-2 w-100 min-w-0">
+                    <div class="o_ConversationHeader_avatar flex-shrink-0">
+                        <img t-if="props.selectedConversation.imageUrl"
+                            t-att-src="props.selectedConversation.imageUrl"
+                            t-att-alt="props.selectedConversation.name"
+                            draggable="false" />
+                        <span t-else="" class="o_ConversationHeader_avatar_placeholder"
+                            t-out="avatarInitials()" />
+                    </div>
+                    <div class="o_ConversationHeader_body flex-grow-1 min-w-0">
+                        <div class="o_ConversationHeader_title_row d-flex align-items-center gap-2 min-w-0">
+                            <span class="o_ConversationHeader_name fw-semibold text-truncate"
+                                t-att-title="props.selectedConversation.name"
+                                t-out="props.selectedConversation.name" />
+                            <div t-attf-class="{{props.selectedConversation.getIconClass()}} o_ConversationHeader_channel_icon flex-shrink-0"
+                                t-if="props.selectedConversation.showIcon" />
+                        </div>
+                        <div class="o_ConversationHeader_meta text-muted small text-truncate"
+                            t-if="props.selectedConversation.numberFormat">
+                            <span t-out="props.selectedConversation.numberFormat" />
+                            <t t-if="connectorLabel()">
+                                <span class="mx-1">·</span>
+                                <span t-out="connectorLabel()" />
+                            </t>
+                        </div>
+                        <div class="o_ConversationHeader_badges d-flex flex-wrap align-items-center gap-1 mt-1">
+                            <span t-attf-class="{{ statusBadgeClass() }}" t-out="statusLabel()" />
+                            <span t-if="props.selectedConversation.assigned"
+                                class="badge rounded-pill text-bg-danger"
+                                t-att-title="assignedHint()">
+                                <i class="fa fa-exclamation-circle me-1"/><t t-out="assignedShortLabel()" />
+                            </span>
+                            <span t-if="agentLabel()" class="badge text-bg-light text-muted border agent-badge"
+                                t-out="agentLabel()" />
+                        </div>
+                    </div>
+                </div>
+            </t>
+            <t t-else="">
+                <span class="text-muted">Select a conversation to begin to chat</span>
+            </t>
+        </div>
+    </t>
+
+</templates>

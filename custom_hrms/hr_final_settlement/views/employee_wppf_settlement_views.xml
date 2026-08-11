@@ -1,0 +1,169 @@
+<odoo>
+    <data>
+        <record id="view_employee_wppf_settlement_form" model="ir.ui.view">
+            <field name="name">view.employee.wppf.settlement.form</field>
+            <field name="model">employee.wppf.settlement</field>
+            <field name="arch" type="xml">
+                <form delete ="0" string="">
+                    <header>
+                        <button name="action_draft" string="Send to Draft" type="object" invisible="state not in ['confirm', 'cancel']"/>
+
+                        <button name="action_submit" type="object" string="Submit" invisible="state not in ['draft']" class="oe_highlight" />
+                        <button name="action_hr_approve"  type="object" string="HR Approve" invisible="state not in ['confirm']" class="oe_highlight" confirm="Are you sure you want to Approve?"/>
+
+                        <button name="action_accounts_approve"  type="object" string="Accounts Approve" invisible="state not in ['hr']"  class="oe_highlight" confirm="Are you sure you want to Approve?"/>
+                        <button name="action_admin_approve"  type="object" string="Trusty Approve" invisible="state not in ['account']"  class="oe_highlight" confirm="Are you sure you want to Approve?"/>
+
+                        <button name="action_done"  type="object" string="Payment" invisible="state not in ['admin']" class="oe_highlight" confirm="Are you sure you want to Payment?"/>
+
+                        <button name="action_print"  type="object" string="Print" invisible="state in ['cancel']"/>
+                        <button name="action_cancel" type="object" string="Cancel" invisible="state in ['admin', 'done']" confirm="Are you sure you want to Cancel?" />
+                        <field name="state" widget="statusbar" statusbar_visible="draft,confirm,admin,account,hr,done,cancel"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box" groups="base.group_user">
+                            <button name="act_current_employee_wppf" type="object" class="oe_stat_button" icon="fa-calendar" >
+                                <field name="pf_count" widget="statinfo" string="WPPF Details" />
+                            </button>
+
+                        </div>
+
+                        <group>
+                            <group>
+                                <field name="name" required="1" readonly="state != 'draft'"/>
+                                <field name="pf_policy_id" required="1" options="{'no_open':True,'no_create':1,'no_create_edit':1}" readonly="state != 'draft'"/>
+                            </group>
+                            <group></group>
+                        </group>
+
+                        <group>
+                            <group string="Employee Information">
+                                <field name="pf_profile_id" required="1" options="{'no_open':True,'no_create':1,'no_create_edit':1}" readonly="state != 'draft'"/>
+                                <field name="employee_id" required="1" readonly="1" force_save="1" domain="[('pf_settlement_status', '=', False)]" options="{'no_open':True,'no_create':1,'no_create_edit':1}"/>
+                                <field name="pf_board_id" readonly="1" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1}"/>
+                                <field name="company_id" readonly="1" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1}"/>
+                                <field name="job_position" readonly="1" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1}" />
+                                <field name="old_empid" readonly="1" force_save="1"/>
+                                <field name="user_work_location_id" readonly="1" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1}"/>
+                                <field name="department_id" readonly="1" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1}"/>
+                                <field name="initial_employment_date" readonly="1" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1}"/>
+                                <field name="length_of_service" readonly="1" force_save="1"/>
+                                <field name="membership_period" readonly="1" force_save="1"/>
+
+                                <field name="ref_id" readonly="1" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1}"/>
+                            </group>
+                            <group string="Effective Information">
+                                <field name="date_requested" readonly="1" force_save="1"/>
+                                <field name="last_day_of_work" readonly="1" force_save="1"/>
+                                <field name="date_of_separation" readonly="1" force_save="1"/>
+                                <field name="resignation_type_id" readonly="1" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1}"/>
+                                <field name="notice_served" readonly="state != 'draft'"/>
+                                <field name="notice_period" readonly="state != 'draft'"/>
+                                <field name="notice_period_days" invisible="notice_period == 'no'" readonly="state != 'draft'"/>
+                                <field name="date_of_notice" readonly="state != 'draft'"/>
+
+                            </group>
+                        </group>
+
+                        <group>
+                            <group string="Employee (WPPF)">
+                                <field name="contribution_pf" readonly="1" force_save="1"/>
+                                <field name="contribution_eligible_pf" readonly="1" force_save="1"  decoration-success="(contribution_eligible_pf &gt; 0)"/>
+
+                            </group>
+                            <group string="Company (CPF)">
+                                <field name="contribution_cpf" readonly="1" force_save="1"/>
+                                <field name="contribution_eligible_cpf" readonly="1" force_save="1" decoration-success="(contribution_eligible_cpf &gt; 0)"/>
+                            </group>
+                        </group>
+                        <group>
+                            <group string="Total Contribution and Eligible">
+                                <field name="total_contribution" readonly="1" force_save="1"/>
+                                <field name="total_eligible" readonly="1" force_save="1" decoration-success="(total_eligible &gt; 0)"/>
+                            </group>
+
+                            <group string="Total Amount">
+                                <field name="total_amount" readonly="1" force_save="1" style="font-weight:bold;" decoration-success="(total_amount &gt; 0)"/>
+                            </group>
+
+                        </group>
+
+
+                        <group invisible="state not in ['admin','done']">
+                             <group string="Payment Journal Entry">
+                               <field name="journal_id_payment" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" required="state == 'admin'" readonly="state not in ['admin']"/>
+                               <field name="payable_acc_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" required="state == 'admin'" readonly="state not in ['admin']"/>
+                                <field name="payment_acc_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" required="state == 'admin'" readonly="state not in ['admin']"/>
+                                <field name="payment_move_id" readonly="1" />
+                                <field name="date_payment" readonly="1"/>
+                            </group>
+
+
+                        </group>
+
+                    </sheet>
+
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"
+                            groups="base.group_user" />
+                        <field name="message_ids" widget="mail_thread" />
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_employee_wppf_settlement_tree" model="ir.ui.view">
+            <field name="name">view.employee.wppf.settlement.tree</field>
+            <field name="model">employee.wppf.settlement</field>
+            <field name="arch" type="xml">
+                <tree delete ="0" string="Final Settlement" decoration-muted="state=='cancel'" decoration-info="state=='draft'"
+					decoration-success="state=='done'">
+                    <field name="name"/>
+                    <field name="date_requested"/>
+                    <field name="employee_id"/>
+                    <field name="resignation_type_id"/>
+                    <field name="date_of_separation"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="search_employee_wppf_settlement_search" model="ir.ui.view">
+			<field name="name">search.employee.wppf.settlement.form</field>
+			<field name="model">employee.wppf.settlement</field>
+			<field name="arch" type="xml">
+				<search string="Search Employee WPPF">
+                    <field name="name"/>
+                    <field name="employee_id"/>
+                    <field name="old_empid"/>
+                    <field name="user_work_location_id"/>
+                    <field name="department_id"/>
+                    <field name="date_requested"/>
+                    <field name="resignation_type_id"/>
+					<separator />
+					<filter name="state" string="Not Cancel"
+						domain="[('state', '!=', 'cancel')]" />
+					<separator />
+				</search>
+			</field>
+		</record>
+
+        <record id="employee_wppf_settlement_action" model="ir.actions.act_window">
+            <field name="name">WPPF Final Settlement</field>
+            <field name="res_model">employee.wppf.settlement</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{'search_default_state':1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create a WPPF Final Settlement of a Employee
+                </p>
+            </field>
+        </record>
+
+
+        <menuitem id="menu_employee_wppf_settlement_wppf_menu" name="WPPF Settlement" parent="wppf.menu_hr_employee_wppf_root"
+                  action="hr_final_settlement.employee_wppf_settlement_action" sequence="10"/>
+
+
+    </data>
+</odoo>

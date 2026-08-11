@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_batch_employee_bonus_wizard" model="ir.ui.view">
+        <field name="name">view.batch.employee.bonus.wizard</field>
+        <field name="model">batch.employee.bonus.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Batch Employee Bonus">
+                <group>
+                    <group>
+                        <field name="bonus_batch_id" readonly="1" force_save="1" options="{'no_open':True,'no_create_edit':1}"/>
+                        <field name="bonus_date" readonly="1" force_save="1"/>
+                        <field name="user_work_location_id" readonly="1" force_save="1" options="{'no_open':True,'no_create_edit':1}"/>
+                        <field name="department_id" readonly="1" force_save="1" options="{'no_open':True,'no_create_edit':1}"/>
+                    </group>
+                    <group>
+                        <field name="bonus_type_id" readonly="1" force_save="1" options="{'no_open':True,'no_create_edit':1}"/>
+                        <field name="calculation_type" invisible="1" />
+                        <field name="percentage_from_settings" readonly="1" force_save="1" invisible="calculation_type != 'percentage'"/>
+                        <field name="settings_type" readonly="1" force_save="1" invisible="not percentage_from_settings"/>
+                        <field name="allowed_employee_type_ids" widget="many2many_tags" options="{'no_open':True,'no_create_edit':1}"/>
+
+                        <field name="based_on_type" string="Based On" invisible="calculation_type == 'fixed' or percentage_from_settings"/>
+                            <field name="amount_percentage" string="Amount"
+								invisible="calculation_type == 'percentage' or percentage_from_settings" required="1"/>
+
+                            <field name="amount_percentage"
+								string="(%)"
+								invisible="calculation_type == 'fixed' or percentage_from_settings" required="1"/>
+
+                    </group>
+                </group>
+
+                <!--<group >-->
+                    <separator string="Employee(s)" />
+                    <!--<newline/>-->
+                    <field name="employee_ids" nolabel="1">
+                        <tree create="false" edit="false" editable="bottom">
+                            <field name="user_work_location_id" readonly="1" force_save="1" options="{'no_open':True,'no_create_edit':1}"/>
+                            <field name="department_id" domain="[]" options="{'no_open':True,'no_create_edit':1}" readonly="1" force_save="1" />
+                            <field name="job_id" domain="[]" options="{'no_open':True,'no_create_edit':1}" readonly="1" force_save="1"/>
+                            <field name="id_card_no" readonly="1" force_save="1"/>
+                            <field name="name" readonly="1" force_save="1"/>
+                        </tree>
+                        <form create="false" edit="false">
+                            <group >
+                                <field name="user_work_location_id" readonly="1" force_save="1" options="{'no_open':True,'no_create_edit':1}"/>
+                                <field name="id_card_no" readonly="1" force_save="1"/>
+                                <field name="name" readonly="1" force_save="1"/>
+                            </group>
+                        </form>
+                    </field>
+
+                <!--</group>-->
+                <footer>
+                    <button icon="fa-cogs" string="Generate Bonus" name="generate_emp_bonus" type="object" class="oe_highlight"/>
+                    <button string="Cancel" class="btn btn-secondary" special="cancel"/>
+                </footer>
+           </form>
+        </field>
+    </record>
+
+    <record id="action_batch_employee_bonus_wizard" model="ir.actions.act_window">
+        <field name="name">Generate Employee Bonus</field>
+        <field name="res_model">batch.employee.bonus.wizard</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_batch_employee_bonus_wizard"/>
+        <field name="target">new</field>
+    </record>
+</odoo>

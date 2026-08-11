@@ -1,0 +1,1400 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+<!--        <report-->
+<!--            id="hr_employee_details_report"-->
+<!--            string="Print Employee Details"-->
+<!--            model="hr.employee"-->
+<!--            report_type="qweb-html"-->
+<!--            name="custom_hr_employee.hr_employee_details_view"-->
+<!--            file="custom_hr_employee.hr_employee_details_view"/>-->
+
+        <!--Report Paper format-->
+        <record id="hr_employee_details_report_paperformat" model="report.paperformat">
+            <field name="name">Employee Details</field>
+            <field name="default" eval="True" />
+			<field name="format">A4</field>
+			<field name="page_height">0</field>
+			<field name="page_width">0</field>
+			<field name="orientation">Portrait</field>
+			<field name="margin_top">10</field>
+			<field name="margin_bottom">10</field>
+			<field name="margin_left">10</field>
+			<field name="margin_right">10</field>
+			<field name="header_line" eval="False" />
+			<field name="header_spacing">5</field>
+			<field name="dpi">90</field>
+        </record>
+
+        <record id="hr_employee_details_report" model="ir.actions.report">
+            <field name="name">Print Employee Details</field>
+            <field name="model">hr.employee</field>
+            <field name="report_type">qweb-html</field>
+            <field name="report_name">custom_hr_employee.hr_employee_details_view</field>
+            <field name="report_file">custom_hr_employee.hr_employee_details_view</field>
+            <field name="paperformat_id" ref="custom_hr_employee.hr_employee_details_report_paperformat" />
+        </record>
+    
+        <template id="hr_employee_details_view">
+            <t t-call="web.html_container">
+                <link rel='stylesheet' href="/custom_hr_employee/static/src/css/custom_report.css" />
+                <t t-if="o and 'company_id' in o">
+                    <t t-set="company" t-value="o.company_id"></t>
+                </t>
+                <t t-if="not o or not 'company_id' in o">
+                    <t t-set="company" t-value="res_company"></t>
+                    <t t-foreach="docs" t-as="employee">
+                    	<t t-if="employee.company_id"><t t-set="company" t-value="employee.company_id"></t></t>
+                    </t>
+                </t>
+                
+                <t t-call="custom_hr_employee.hr_employee_details_report_layout_header" />
+                
+                <t t-call="web.internal_layout">
+                    <div class="page" style="margin-top:50px;">
+                        <div class="container">
+                            <t t-foreach="docs" t-as="employee">
+                                <div class="row">
+                                    <table class="col-8">
+                                        <tr>
+                                            <td class="text-left" style="width: 100%%; padding-left: 5px; margin: 5px;">
+                                                <b><span style="font-size:25px;" t-esc="employee.name" /></b>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 100%%; padding: 5px; margin: 5px;">
+                                                <span t-field="employee.job_id.name" />, <span t-field="employee.department_id.name"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 100%%; padding: 5px; margin: 5px;">
+                                                <span t-field="employee.mobile_phone" />
+                                                <t t-if="employee.work_email"> | <span t-field="employee.work_email" /></t>
+                                                <t t-if="employee.fax_no"> | <span t-field="employee.fax_no" /></t>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <table class="col-4">
+                                        <tr style="height:70%;">
+                                            <td align="center" valign="center">
+<!--                                                <img t-if="employee.image" t-att-src="'data:image/png;base64,%s' % (employee.image,)" style="max-height:85pt;max-width:90%" alt="Employee Image"/>-->
+                                                <img t-if="employee.image_1920" t-att-src="image_data_uri(employee.image_1920)" style="max-height:85pt;max-width:90%" alt="Employee Image"/>
+                                            </td>
+                                        </tr>
+                                        <tr style="height:25%;">
+                                            <td align="center" style="padding: 5px;">
+                                                <img t-if="employee.barcode" t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('Code128', employee.barcode, 600, 120)" style="max-height:30pt;max-width:100%;" />
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+
+                                <p><b><span style="font-size:20px;">Personal Details:</span></b></p>
+                                <div class="row" style="margin-top: 10px;">
+                                    <table class="col-xs-6">
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>Father's Name</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%;">
+                                                <span t-esc="employee.fam_father" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>Mother's Name</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%;">
+                                                <span t-esc="employee['fam_mother']" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>Marital Status</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%;">
+                                                <t t-set="marital_status" t-value="dict(employee._fields['marital'].selection).get(employee.marital)"></t>
+                                                <span t-esc="marital_status" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>Spouse's Name</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%;">
+                                                <span t-esc="employee['fam_spouse']" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>Gender</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%;">
+                                                <t t-set="gender" t-value="dict(employee._fields['gender'].selection).get(employee.gender)"></t>
+                                                <span t-esc="gender" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>Date of Birth</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%;">
+                                                <span t-esc="employee['birthday']" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>Age</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%;">
+                                                <span t-esc="employee['age']" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>Place of Birth</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%;">
+                                                <span t-esc="employee['place_of_birth']" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>Home District</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%;">
+                                                <span t-esc="employee['home_town_id'].name" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>Home Division</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%;">
+                                                <span t-esc="employee['home_division_id'].name" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>Nationality (Country)</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%;">
+                                                <span t-esc="employee.country_id.name" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>Religion</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%;">
+                                                <t t-set="religion" t-value="dict(employee._fields['religion'].selection).get(employee.religion)"></t>
+                                                <span t-esc="religion" />
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <table class="col-xs-6">
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>Permanent Address</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%;">
+                                                <span t-esc="employee['p_address_id']" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>Present Address</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%;">
+                                                <span t-esc="employee['present_address']" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>Contact Number</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%;">
+                                                <span t-esc="employee['contact_no']" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>Email (Personal)</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%;">
+                                                <span t-esc="employee['email_personal']" />
+                                            </td>
+                                        </tr>
+<!--                                        <tr>-->
+<!--                                            <td class="text-left" style="width: 40%%;">-->
+<!--                                                <p>Emergency Contact</p>-->
+<!--                                            </td>-->
+<!--                                            <td class="text-left" style="width: 5%%;">:</td>-->
+<!--                                            <td class="text-left" style="width: 50%%;">-->
+<!--                                                <span t-esc="employee['e_contact_no']" />-->
+<!--                                            </td>-->
+<!--                                        </tr>-->
+<!--                                        <tr>-->
+<!--                                            <td class="text-left" style="width: 40%%;">-->
+<!--                                                <p>Relation with Emergency Contact</p>-->
+<!--                                            </td>-->
+<!--                                            <td class="text-left" style="width: 5%%;">:</td>-->
+<!--                                            <td class="text-left" style="width: 50%%;">-->
+<!--                                                <span t-esc="employee['r_e_contact_no']" />-->
+<!--                                            </td>-->
+<!--                                        </tr>-->
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>Blood Group</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%;">
+                                                <t t-set="blood_grp" t-value="dict(employee._fields['blood_group'].selection).get(employee.blood_group)"></t>
+                                                <span t-esc="blood_grp" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>TIN</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%;">
+                                                <span t-esc="employee.tax_id" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>Passport</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%;">
+                                                <span t-esc="employee['passport_id']" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>NID/Birth Certificate</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%;">
+                                                <span t-esc="employee['nid']" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>Driving License</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%;">
+                                                <span t-esc="employee['driving_license']" />
+                                            </td>
+                                        </tr>
+<!--                                        <tr>-->
+<!--                                            <td class="text-left" style="width: 40%%;">-->
+<!--                                                <p>Personal Nominee Name</p>-->
+<!--                                            </td>-->
+<!--                                            <td class="text-left" style="width: 5%%;">:</td>-->
+<!--                                            <td class="text-left" style="width: 50%%;">-->
+<!--                                                <span t-esc="employee['p_name_of_nominee']" />-->
+<!--                                            </td>-->
+<!--                                        </tr>-->
+<!--                                        <tr>-->
+<!--                                            <td class="text-left" style="width: 40%%;">-->
+<!--                                                <p>Relation with Personal Nominee</p>-->
+<!--                                            </td>-->
+<!--                                            <td class="text-left" style="width: 5%%;">:</td>-->
+<!--                                            <td class="text-left" style="width: 50%%;">-->
+<!--                                                <span t-esc="employee.p_relation_with_nominee.name" />-->
+<!--                                            </td>-->
+<!--                                        </tr>-->
+                                    </table>
+                                </div>
+
+                                <p><b>Emergency Contacts:</b></p>
+                                <div class="row" style="margin-top: 5px;">
+                                    <table class="table-bordered" style="width: 100%">
+                                        <tr>
+                                            <td class="text-center">
+                                                <p>Name</p>
+                                            </td>
+                                            <td class="text-center">
+                                                <p>Relation</p>
+                                            </td>
+                                            <td class="text-center">
+                                                <p>Contact No</p>
+                                            </td>
+                                            <td class="text-center">
+                                                <p>Address</p>
+                                            </td>
+                                        </tr>
+                                        <t t-if="employee['em_contact_ids']">
+                                            <t t-foreach="employee['em_contact_ids']" t-as="em_contact_id">
+                                                <tr>
+                                                    <td><span t-field="em_contact_id.contact_name"/></td>
+                                                    <td><span t-field="em_contact_id.contact_rel"/></td>
+                                                    <td><span t-field="em_contact_id.contact_no"/></td>
+                                                    <td><span t-field="em_contact_id.contact_address"/></td>
+                                                </tr>
+                                            </t>
+                                        </t>
+                                        <t t-else="">
+                                            <tr>
+                                                <td class="text-center">
+                                                    <p>-</p>
+                                                </td>
+                                                <td class="text-center">
+                                                    <p>-</p>
+                                                </td>
+                                                <td class="text-center">
+                                                    <p>-</p>
+                                                </td>
+                                                <td class="text-center">
+                                                    <p>-</p>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </table>
+                                </div>
+
+                                <p><b>Bank Details (Personal):</b></p>
+                                <div class="row" style="margin-top: 5px;">
+                                    <table class="col-xs-6">
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>Bank Name</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%;">
+                                                <span t-esc="employee.p_bank_name.name" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>Account No.</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%;">
+                                                <t t-if="employee.p_bank_account_no">
+                                                    <span t-esc="employee.p_bank_account_no" />
+                                                </t>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>Account Holder</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%;">
+                                                <t t-if="employee.p_bank_account_no">
+                                                    <span t-esc="employee.p_account_holder" />
+                                                </t>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <table class="col-xs-6">
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>Account Type</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%;">
+                                                <span t-esc="employee.p_account_type" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>Nominee Name</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%;">
+                                                <span t-esc="employee.p_name_of_nominee" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>Relation(Nominee)</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%;">
+                                                <span t-esc="employee.p_relation_with_nominee.name" />
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+
+                                <p><b><span style="font-size:20px;">Official Record:</span></b></p>
+                                <div class="row">
+                                    <table class="col-xs-6">
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>ID Card No.</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%;">
+                                                <span t-esc="employee.id_card_no" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>Designation</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%; f">
+                                               <span t-field="employee.job_id.name" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>Department</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%; f">
+                                               <span t-field="employee.department_id.name"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>Parent Department</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%; f">
+                                               <span t-field="employee.parent_dept_id.name"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>Reporting Body</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%; f">
+                                               <span t-field="employee.reporting_body.name"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>Reference</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%;">
+                                                <span t-esc="employee.reference" />
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <table class="col-xs-6">
+                                        <!-- <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>Shift</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%;">
+                                                <span t-esc="employee.shift.name" />
+                                            </td>
+                                        </tr> -->
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>Employee Type</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%;">
+                                                <span t-esc="employee.employee_type_id.name" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>Date of Joining</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%;">
+                                                <span t-esc="employee.initial_employment_date" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>Probation Period</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%;">
+                                                <span t-esc="employee.probation_period.name" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>Date of Confirmation</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%;">
+                                                <span t-esc="employee.date_of_confirmation" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>Length of Service</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%;">
+                                                <span t-esc="employee.length_of_service" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>Contract Start Date</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%;">
+                                                <span t-esc="employee.start_date_of_contract" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>Contract End Date</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%;">
+                                                <span t-esc="employee.end_date_of_contract" />
+                                            </td>
+                                        </tr>
+<!--                                        <tr>-->
+<!--                                            <td class="text-left" style="width: 40%%;">-->
+<!--                                                <p>Nominee of Salary A/C</p>-->
+<!--                                            </td>-->
+<!--                                            <td class="text-left" style="width: 5%%;">:</td>-->
+<!--                                            <td class="text-left" style="width: 50%%;">-->
+<!--                                                <span t-esc="employee['s_name_of_nominee']" />-->
+<!--                                            </td>-->
+<!--                                        </tr>-->
+<!--                                        <tr>-->
+<!--                                            <td class="text-left" style="width: 40%%;">-->
+<!--                                                <p>Relation with Personal Nominee</p>-->
+<!--                                            </td>-->
+<!--                                            <td class="text-left" style="width: 5%%;">:</td>-->
+<!--                                            <td class="text-left" style="width: 50%%;">-->
+<!--                                                <span t-esc="employee.s_relation_with_nominee.name" />-->
+<!--                                            </td>-->
+<!--                                        </tr>-->
+                                    </table>
+                                </div>
+
+                                <div class="">
+                                    <p style="margin-right: 1rem"><b>Job Description: </b></p>
+                                    <table style="width: 100%">
+                                        <tr>
+                                            <td class="text-left">
+                                                <t t-if="employee['job_description']">
+                                                    <span t-esc="employee['job_description']" />
+                                                </t>
+                                                <t t-else="">
+                                                    <span>N/A</span>
+                                                </t>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+
+                                <p><b>Bank Details (Official)</b></p>
+                                <div class="row" style="margin-top: 5px;">
+                                    <table class="col-xs-6">
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>Bank Name</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%;">
+                                                <span t-esc="employee.s_bank_name.name" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>Account No.</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%;">
+                                                <t t-if="employee.s_bank_account_no">
+                                                    <span t-esc="employee.s_bank_account_no" />
+                                                </t>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>Account Holder</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%;">
+                                                <t t-if="employee.s_account_holder">
+                                                    <span t-esc="employee.s_account_holder" />
+                                                </t>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <table class="col-xs-6">
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>Account Type</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%;">
+                                                <span t-esc="employee.s_account_type" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>Nominee Name</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%;">
+                                                <span t-esc="employee.s_name_of_nominee" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>Relation(Nominee)</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%;">
+                                                <span t-esc="employee.s_relation_with_nominee.name" />
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                
+                                <!--<p><b>Status, Grade Details</b></p>-->
+                                <div class="row" style="margin-top: 5px;">
+                                    <table class="col-xs-6">
+                                        <tr>
+                                            <td style="width: 40%">
+                                                <p><b><span style="font-size:18px;">Status</span></b></p>
+                                            </td>
+                                            <td style="width: 5%"></td>
+                                            <td style="width: 50%"></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>Shop Location</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%;">
+<!--                                                <t t-if="employee.shop_id">-->
+<!--                                                    <span t-esc="employee.shop_id.name" />-->
+<!--                                                </t>-->
+<!--                                                <t t-else="">-->
+<!--                                                    <span>N/A</span>-->
+<!--                                                </t>-->
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>Badge ID</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%;">
+                                                <t t-if="employee.barcode">
+                                                    <span t-esc="employee.barcode" />
+                                                </t>
+                                                <t t-else="">
+                                                    <span>N/A</span>
+                                                </t>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>PIN for CheckIn/CheckOut</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%;">
+                                                <t t-if="employee.pin">
+                                                    <span t-esc="employee.pin" />
+                                                </t>
+                                                <t t-else="">
+                                                    <span>N/A</span>
+                                                </t>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>Medical Exam</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%;">
+                                                <t t-if="employee.medic_exam">
+                                                    <span t-esc="employee.medic_exam" />
+                                                </t>
+                                                <t t-else="">
+                                                    <span>N/A</span>
+                                                </t>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>Company Vehicle</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%;">
+                                                <t t-if="employee.vehicle">
+                                                    <span t-esc="employee.vehicle" />
+                                                </t>
+                                                <t t-else="">
+                                                    <span>N/A</span>
+                                                </t>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>Home-Work Distance</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%;">
+<!--                                                <t t-if="employee.vehicle_distance">-->
+<!--                                                    <span t-esc="employee.vehicle_distance" /> km-->
+<!--                                                </t>-->
+<!--                                                <t t-else="">-->
+<!--                                                    <span>N/A</span>-->
+<!--                                                </t>-->
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <table class="col-xs-6">
+                                        <tr>
+                                            <td style="width: 40%">
+                                                <p><b><span style="font-size:18px;">Grade</span></b></p>
+                                            </td>
+                                            <td style="width: 5%"></td>
+                                            <td style="width: 50%"></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>Job Grade</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%;">
+                                                <t t-if="employee.job_grade">
+                                                    <span t-esc="employee.job_grade.name" />
+                                                </t>
+                                                <t t-else="">
+                                                    <span>N/A</span>
+                                                </t>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>Grade Type</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%;">
+                                                <t t-if="employee.grade_type">
+                                                    <span t-esc="employee.grade_type.name" />
+                                                </t>
+                                                <t t-else="">
+                                                    <span>N/A</span>
+                                                </t>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>Job Level</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%;">
+                                                <t t-if="employee.job_level">
+                                                    <span t-esc="employee.job_level.name" />
+                                                </t>
+                                                <t t-else="">
+                                                    <span>N/A</span>
+                                                </t>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="width: 40%%;">
+                                                <p>Salary Band</p>
+                                            </td>
+                                            <td class="text-left" style="width: 5%%;">:</td>
+                                            <td class="text-left" style="width: 50%%;">
+<!--                                                <t t-if="employee.salary_structure">-->
+<!--                                                    <span t-esc="employee.salary_structure.name" />-->
+<!--                                                </t>-->
+<!--                                                <t t-else="">-->
+<!--                                                    <span>N/A</span>-->
+<!--                                                </t>-->
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+
+                                <p><b><span style="font-size:18px;">Experience</span></b></p>
+                                <div class="row" style="margin-top: 5px;">
+                                    <table class="table-bordered" style="width: 100%">
+                                        <tr>
+                                            <td class="text-center">
+                                                <p>Position</p>
+                                            </td>
+                                            <td class="text-center">
+                                                <p>Company</p>
+                                            </td>
+                                            <td class="text-center">
+                                                <p>Start Date</p>
+                                            </td>
+                                            <td class="text-center">
+                                                <p>End Date</p>
+                                            </td>
+                                            <td class="text-center">
+                                                <p>Service Length</p>
+                                            </td>
+                                            <td class="text-center">
+                                                <p>Description</p>
+                                            </td>
+                                        </tr>
+                                        <t t-if=" len(employee['resume_line_ids'])>=1">
+                                            <t t-foreach="employee['resume_line_ids']" t-as="resume_line_id">
+                                                <t t-if="resume_line_id.line_type_id.sequence == 1">
+                                                    <tr>
+                                                        <td><span t-field="resume_line_id.name"/></td>
+                                                        <td><span t-field="resume_line_id.institute_id"/></td>
+                                                        <td><span t-field="resume_line_id.date_start"/></td>
+                                                        <td><span t-field="resume_line_id.date_end"/></td>
+                                                        <td><span t-field="resume_line_id.duration"/></td>
+                                                        <td><span t-field="resume_line_id.description"/></td>
+                                                    </tr>
+                                                </t>
+                                            </t>
+                                        </t>
+                                        <t t-else="">
+                                            <tr>
+                                                <td class="text-center">
+                                                    <p>-</p>
+                                                </td>
+                                                <td class="text-center">
+                                                    <p>-</p>
+                                                </td>
+                                                <td class="text-center">
+                                                    <p>-</p>
+                                                </td>
+                                                <td class="text-center">
+                                                    <p>-</p>
+                                                </td>
+                                                <td class="text-center">
+                                                    <p>-</p>
+                                                </td>
+                                                <td class="text-center">
+                                                    <p>-</p>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </table>
+                                </div>
+
+                                <p><b><span style="font-size:18px;">Education</span></b></p>
+                                <div class="row" style="margin-top: 5px;">
+                                    <table class="table-bordered" style="width: 100%">
+                                        <tr>
+                                            <td class="text-center">
+                                                <p>Name of Degree</p>
+                                            </td>
+                                            <td class="text-center">
+                                                <p>Institution</p>
+                                            </td>
+                                            <!-- <td class="text-center">
+                                                <p>Start Date</p>
+                                            </td>
+                                            <td class="text-center">
+                                                <p>End Date</p>
+                                            </td> -->
+                                            <td class="text-center">
+                                                <p>Passing Year</p>
+                                            </td>
+                                            <!-- <td class="text-center">
+                                                <p>Duration</p>
+                                            </td> -->
+                                            <td class="text-center">
+                                                <p>Result</p>
+                                            </td>
+                                            <td class="text-center">
+                                                <p>Details</p>
+                                            </td>
+<!--                                            <td class="text-center">-->
+<!--                                                <p>Name of Degree</p>-->
+<!--                                            </td>-->
+
+<!--                                            <td class="text-center">-->
+<!--                                                <p>Result</p>-->
+<!--                                            </td>-->
+<!--                                            <td class="text-center">-->
+<!--                                                <p>Passing Year</p>-->
+<!--                                            </td>-->
+<!--                                            <td class="text-center">-->
+<!--                                                <p>Group/Department</p>-->
+<!--                                            </td>-->
+                                        </tr>
+                                        <t t-if="employee['resume_line_ids']">
+                                            <t t-foreach="employee['resume_line_ids']" t-as="resume_line_id">
+                                                <t t-if="resume_line_id.line_type_id.sequence == 2">
+                                                    <tr>
+                                                        <td><span t-field="resume_line_id.name"/></td>
+                                                        <td><span t-field="resume_line_id.institute_id"/></td>
+                                                        <!-- <td><span t-field="resume_line_id.date_start"/></td>
+                                                        <td><span t-field="resume_line_id.date_end"/></td> -->
+                                                        <td><span t-field="resume_line_id.passing_year"/></td>
+                                                        <!-- <td><span t-field="resume_line_id.duration"/></td> -->
+                                                        <td><span t-field="resume_line_id.result"/></td>
+                                                        <td><span t-field="resume_line_id.description"/></td>
+<!--                                                        <td><span t-field="resume_line_id.institute_id"/></td>-->
+<!--                                                        <td><span t-field="resume_line_id.diploma"/></td>-->
+<!--                                                        <td><span t-field="resume_line_id.passing_year"/></td>-->
+<!--                                                        <td><span t-field="resume_line_id.study_field"/></td>-->
+                                                    </tr>
+                                                </t>
+                                            </t>
+                                        </t>
+                                        <t t-else="">
+                                            <tr>
+                                                <td class="text-center">
+                                                    <p>-</p>
+                                                </td>
+                                                <td class="text-center">
+                                                    <p>-</p>
+                                                </td>
+                                                <td class="text-center">
+                                                    <p>-</p>
+                                                </td>
+                                                <td class="text-center">
+                                                    <p>-</p>
+                                                </td>
+<!--                                                <td class="text-center">-->
+<!--                                                    <p>-</p>-->
+<!--                                                </td>-->
+                                            </tr>
+                                        </t>
+                                    </table>
+                                </div>
+
+                                <p><b><span style="font-size:18px;">Professional Qualifications</span></b></p>
+                                <div class="row" style="margin-top: 5px;">
+                                    <table class="table-bordered" style="width: 100%">
+                                        <tr>
+<!--                                            <td class="text-center">-->
+<!--                                                <p>Training Type</p>-->
+<!--                                            </td>-->
+<!--                                            <td class="text-center">-->
+<!--                                                <p>Training Mode</p>-->
+<!--                                            </td>-->
+                                            <td class="text-center">
+                                                <p>Name of Qualification</p>
+                                            </td>
+                                            <td class="text-center">
+                                                <p>Institution</p>
+                                            </td>
+                                            <td class="text-center">
+                                                <p>Start Date</p>
+                                            </td>
+                                            <td class="text-center">
+                                                <p>End Date</p>
+                                            </td>
+                                            <td class="text-center">
+                                                <p>Passing Year</p>
+                                            </td>
+                                            <td class="text-center">
+                                                <p>Duration</p>
+                                            </td>
+                                            <td class="text-center">
+                                                <p>Result</p>
+                                            </td>
+                                            <td class="text-center">
+                                                <p>Details</p>
+                                            </td>
+                                        </tr>
+                                        <t t-if="employee['resume_line_ids']">
+                                            <t t-foreach="employee['resume_line_ids']" t-as="resume_line_id">
+                                                <t t-if="resume_line_id.line_type_id.sequence == 3">
+                                                    <tr>
+    <!--                                                    <td><span t-field="certification_id.type_cer"/></td>-->
+    <!--                                                    <td><span t-field="certification_id.training_mode"/></td>-->
+                                                        <td><span t-field="resume_line_id.name"/></td>
+                                                        <td><span t-field="resume_line_id.institute_id"/></td>
+                                                        <td><span t-field="resume_line_id.date_start"/></td>
+                                                        <td><span t-field="resume_line_id.date_end"/></td>
+                                                        <td><span t-field="resume_line_id.passing_year"/></td>
+                                                        <td><span t-field="resume_line_id.duration"/></td>
+                                                        <td><span t-field="resume_line_id.result"/></td>
+                                                        <td><span t-field="resume_line_id.description"/></td>
+                                                    </tr>
+                                                </t>
+                                            </t>
+                                        </t>
+                                        <t t-else="">
+                                            <tr>
+                                                <td class="text-center">
+                                                    <p>-</p>
+                                                </td>
+                                                <td class="text-center">
+                                                    <p>-</p>
+                                                </td>
+                                                <td class="text-center">
+                                                    <p>-</p>
+                                                </td>
+                                                <td class="text-center">
+                                                    <p>-</p>
+                                                </td>
+                                                <td class="text-center">
+                                                    <p>-</p>
+                                                </td>
+                                                <td class="text-center">
+                                                    <p>-</p>
+                                                </td>
+                                                <td class="text-center">
+                                                    <p>-</p>
+                                                </td>
+                                                <td class="text-center">
+                                                    <p>-</p>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </table>
+                                </div>
+
+                                <p><b><span style="font-size:18px;">Professional Trainings </span></b></p>
+                                <div class="row" style="margin-top: 5px;">
+                                    <table class="table-bordered" style="width: 100%">
+                                        <tr>
+                                            <td class="text-center">
+                                                <p>Name of Training</p>
+                                            </td>
+                                            <td class="text-center">
+                                                <p>Institution</p>
+                                            </td>
+                                            <td class="text-center">
+                                                <p>Start Date</p>
+                                            </td>
+                                            <td class="text-center">
+                                                <p>End Date</p>
+                                            </td>
+                                            <td class="text-center">
+                                                <p>Passing Year</p>
+                                            </td>
+                                            <td class="text-center">
+                                                <p>Duration</p>
+                                            </td>
+                                            <td class="text-center">
+                                                <p>Result</p>
+                                            </td>
+                                            <td class="text-center">
+                                                <p>Details</p>
+                                            </td>
+                                        </tr>
+                                        <t t-if="employee['resume_line_ids']">
+                                            <t t-foreach="employee['resume_line_ids']" t-as="resume_line_id">
+                                                <t t-if="resume_line_id.line_type_id.sequence == 4">
+                                                    <tr>
+                                                        <td><span t-field="resume_line_id.name"/></td>
+                                                        <td><span t-field="resume_line_id.institute_id"/></td>
+                                                        <td><span t-field="resume_line_id.date_start"/></td>
+                                                        <td><span t-field="resume_line_id.date_end"/></td>
+                                                        <td><span t-field="resume_line_id.passing_year"/></td>
+                                                        <td><span t-field="resume_line_id.duration"/></td>
+                                                        <td><span t-field="resume_line_id.result"/></td>
+                                                        <td><span t-field="resume_line_id.description"/></td>
+                                                    </tr>
+                                                </t>
+                                            </t>
+                                        </t>
+                                        <t t-else="">
+                                            <tr>
+                                                <td class="text-center">
+                                                    <p>-</p>
+                                                </td>
+                                                <td class="text-center">
+                                                    <p>-</p>
+                                                </td>
+                                                <td class="text-center">
+                                                    <p>-</p>
+                                                </td>
+                                                <td class="text-center">
+                                                    <p>-</p>
+                                                </td>
+                                                <td class="text-center">
+                                                    <p>-</p>
+                                                </td>
+                                                <td class="text-center">
+                                                    <p>-</p>
+                                                </td>
+                                                <td class="text-center">
+                                                    <p>-</p>
+                                                </td>
+                                                <td class="text-center">
+                                                    <p>-</p>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </table>
+                                </div>
+
+                                <p><b><span style="font-size:18px;">Transfer History</span></b></p>
+                                <div class="row" style="margin-top: 5px;">
+
+                                    <table class="table-bordered" style="width: 100%">
+                                        <tr>
+                                            <td class="text-center">
+                                                <p>From</p>
+                                            </td>
+                                            <td class="text-center">
+                                                <p>To</p>
+                                            </td>
+                                            <td class="text-center">
+                                                <p>Effective Date</p>
+                                            </td>
+                                        </tr>
+<!--                                        <t t-if="employee['transfer_ids']">-->
+<!--                                            <t t-foreach="employee['transfer_ids']" t-as="transfer_id">-->
+<!--                                                <tr>-->
+<!--                                                    <td><span t-field="transfer_id.from_location"/></td>-->
+<!--                                                    <td><span t-field="transfer_id.to_location"/></td>-->
+<!--                                                    <td><span t-field="transfer_id.effective_date"/></td>-->
+<!--                                                </tr>-->
+<!--                                            </t>-->
+<!--                                        </t>-->
+<!--                                        <t t-else="">-->
+                                            <tr>
+                                                <td class="text-center">
+                                                    <p>-</p>
+                                                </td>
+                                                <td class="text-center">
+                                                    <p>-</p>
+                                                </td>
+                                                <td class="text-center">
+                                                    <p>-</p>
+                                                </td>
+                                            </tr>
+<!--                                        </t>-->
+                                    </table>
+                                </div>
+
+                                <p><b><span style="font-size:18px;">Promotion/Demotion/Re-Designation History</span></b></p>
+                                <div class="row" style="margin-top: 5px;">
+                                    <table class="table-bordered" style="width: 100%">
+                                        <tr>
+                                            <td class="text-center">
+                                                <p>Type</p>
+                                            </td>
+                                            <td class="text-center">
+                                                <p>New Designation</p>
+                                            </td>
+                                            <td class="text-center">
+                                                <p>Effective Date</p>
+                                            </td>
+                                        </tr>
+<!--                                        <t t-if="employee['promotion_demotion_ids']">-->
+<!--                                            <t t-foreach="employee['promotion_demotion_ids']" t-as="promo_demo_id">-->
+<!--                                                <tr>-->
+<!--                                                    <t t-set="desig_type" t-value="dict(promo_demo_id._fields['type'].selection).get(promo_demo_id.type)"></t>-->
+<!--                                                    <td><span t-esc="desig_type"/></td>-->
+<!--                                                    <td><span t-field="promo_demo_id.to_designation"/></td>-->
+<!--                                                    <td><span t-field="promo_demo_id.effective_date"/></td>-->
+<!--                                                </tr>-->
+<!--                                            </t>-->
+<!--                                        </t>-->
+<!--                                        <t t-else="">-->
+                                            <tr>
+                                                <td class="text-center">
+                                                    <p>-</p>
+                                                </td>
+                                                <td class="text-center">
+                                                    <p>-</p>
+                                                </td>
+                                                <td class="text-center">
+                                                    <p>-</p>
+                                                </td>
+                                            </tr>
+<!--                                        </t>-->
+                                    </table>
+                                </div>
+
+                                <p><b><span style="font-size:18px;">Disciplinary Record</span></b></p>
+                                <div class="row" style="margin-top: 5px;">
+                                    <table class="table-bordered" style="width: 100%">
+                                        <tr>
+                                            <td class="text-center">
+                                                <p>Type</p>
+                                            </td>
+                                            <td class="text-center">
+                                                <p>Effective Date</p>
+                                            </td>
+                                            <td class="text-center">
+                                                <p>Description</p>
+                                            </td>
+                                        </tr>
+<!--                                        <t t-if="employee['disciplinary_record_ids']">-->
+<!--                                            <t t-foreach="employee['disciplinary_record_ids']" t-as="disciplinary_id">-->
+<!--                                                <tr>-->
+<!--                                                    <td><span t-field="disciplinary_id.disciplinary_type_id.name"/></td>-->
+<!--                                                    <td><span t-field="disciplinary_id.effective_date"/></td>-->
+<!--                                                    <td><span t-field="disciplinary_id.description"/></td>-->
+<!--                                                </tr>-->
+<!--                                            </t>-->
+<!--                                        </t>-->
+<!--                                        <t t-else="">-->
+                                            <tr>
+                                                <td class="text-center">
+                                                    <p>-</p>
+                                                </td>
+                                                <td class="text-center">
+                                                    <p>-</p>
+                                                </td>
+                                                <td class="text-center">
+                                                    <p>-</p>
+                                                </td>
+                                            </tr>
+<!--                                        </t>-->
+                                    </table>
+                                </div>
+
+                                <p><b><span style="font-size:18px;">Job Separation Record</span></b></p>
+                                <div class="row" style="margin-top: 5px;">
+                                    <table class="table-bordered" style="width: 100%">
+                                        <tr>
+                                            <td class="text-center">
+                                                <p>Type</p>
+                                            </td>
+                                            <td class="text-center">
+                                                <p>Effective Date</p>
+                                            </td>
+                                            <td class="text-center">
+                                                <p>Reason</p>
+                                            </td>
+                                        </tr>
+<!--                                        <t t-if="employee['job_separation_ids']">-->
+<!--                                            <t t-foreach="employee['job_separation_ids']" t-as="separation_id">-->
+<!--                                                <tr>-->
+<!--&lt;!&ndash;                                                    <t t-set="separation_type" t-value="dict(separation_id._fields['separation_type_id'].selection).get(separation_id.separation_type_id)"></t>&ndash;&gt;-->
+<!--                                                    <td><span t-esc="separation_id.separation_type_id.name"/></td>-->
+<!--                                                    <td><span t-field="separation_id.effective_date"/></td>-->
+<!--                                                    <td><span t-field="separation_id.reason"/></td>-->
+<!--                                                </tr>-->
+<!--                                            </t>-->
+<!--                                        </t>-->
+<!--                                        <t t-else="">-->
+                                            <tr>
+                                                <td class="text-center">
+                                                    <p>-</p>
+                                                </td>
+                                                <td class="text-center">
+                                                    <p>-</p>
+                                                </td>
+                                                <td class="text-center">
+                                                    <p>-</p>
+                                                </td>
+                                            </tr>
+<!--                                        </t>-->
+                                    </table>
+                                </div>
+
+                                <p><b><span style="font-size:18px;">Fringe Benefits</span></b></p>
+                                <div class="row" style="margin-top: 5px;">
+                                    <table class="table-bordered" style="width: 100%">
+                                        <tr>
+                                            <td class="text-center">
+                                                <p>Particular</p>
+                                            </td>
+                                            <td class="text-center">
+                                                <p>Value</p>
+                                            </td>
+                                        </tr>
+<!--                                        <t t-if="employee['facility_ids']">-->
+<!--                                            <t t-foreach="employee['facility_ids']" t-as="facility_id">-->
+<!--                                                <tr>-->
+<!--                                                    <td><span t-field="facility_id.particular_id.name"/></td>-->
+<!--                                                    <td><span t-field="facility_id.value"/></td>-->
+<!--                                                </tr>-->
+<!--                                            </t>-->
+<!--                                        </t>-->
+<!--                                        <t t-else="">-->
+                                            <tr>
+                                                <td class="text-center">
+                                                    <p>-</p>
+                                                </td>
+                                                <td class="text-center">
+                                                    <p>-</p>
+                                                </td>
+                                            </tr>
+<!--                                        </t>-->
+                                    </table>
+                                </div>
+                                
+                            </t> <!--End of FOREACH Loop-->
+                        </div>
+                    </div>
+                </t>
+                
+                <t t-call="custom_hr_employee.hr_employee_details_report_layout_footer"/>
+            </t>
+        </template>
+        
+        <template id="hr_employee_details_report_layout_header">
+            <div class="header row">
+                <table class="col-xs-12 mr-4 text-left">
+                    <tr>
+                        <td style="width:10%;">
+                            <img t-if="company.logo" t-att-src="image_data_uri(company.logo)"
+                                 style="max-height:60px;" alt="Company Logo"/>
+                        </td>
+                        <td style="width:45%;" class="text-left">
+                            <strong>
+                                <div t-field="company.name" style="font-size:25px;"/>
+                            </strong>
+                            <span t-field="company.street"/>
+                            <span t-field="company.street2"/>
+                            <span t-field="company.city"/>
+                            <span t-field="company.zip"/>
+                            Phone:
+                            <span t-field="company.phone"/>
+<!--                            Fax:-->
+<!--                            <span t-field="company.fax"/>-->
+                            Web:
+                            <span t-field="company.website"/>
+                        </td>
+                        <td class="text-center" style="font-size:20px;padding-top:10px;width:40%;">
+                            <div align="right">
+                                <b>HR Employee Details</b>
+<!--                                <b><h5>(From No. &lt;!&ndash; <span t-esc="other['form_no']"/> &ndash;&gt;)</h5></b>-->
+<!--                                <h5>To be completed when hiring or replacing staff</h5>-->
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </template>
+
+        <template id="hr_employee_details_report_layout_footer">
+            <div class="footer">
+                <div class="row" style="border-top:solid 1px #000;">
+                    <div class="col-4">
+                        <span
+                            t-esc="context_timestamp(datetime.datetime.now()).strftime('%a, %d %b %Y %H:%M:%S')" />
+                    </div>
+                    <div class="col-4">
+						Printed By:
+						<span t-esc="user.name"></span>
+					</div>
+                    <div class="col-4 text-right">
+                        Page:
+                        <span class="page"/>
+                        of
+                        <span class="topage"/>
+                    </div>
+                </div>
+            </div>
+        </template>
+        
+    </data>
+</odoo>

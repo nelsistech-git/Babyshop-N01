@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <template id="bd_barcode_label_template">
+            <t t-call="web.basic_layout">
+                <t t-foreach="(data or {}).get('label_list', [])" t-as="label">
+                    <div class="page" style="
+                        width: 33mm;
+                        height: 25mm;
+                        margin: 0;
+                        padding: 1mm 1.5mm;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                        font-family: Arial, Helvetica, sans-serif;
+                        box-sizing: border-box;
+                        overflow: hidden;
+                        page-break-after: always;
+                    ">
+                        <!-- Brand Logo + Name -->
+                        <div style="
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            gap: 1.5mm;
+                            line-height: 1;
+                        ">
+                            <t t-if="label.get('brand_logo_src')">
+                                <img t-att-src="label['brand_logo_src']"
+                                     style="height: 5mm; width: auto; object-fit: contain;"/>
+                            </t>
+
+                        </div>
+
+                        <!-- Product Name -->
+                        <div style="
+                            font-size: 6pt;
+                            font-weight: bold;
+                            text-align: center;
+                            margin-top: 0.4mm;
+                            line-height: 1.2;
+                        ">
+                            <t t-esc="label['product_name']"/>
+                        </div>
+
+                        <!-- Sale Price -->
+                        <div style="
+                            font-size: 5.5pt;
+                            text-align: center;
+                            margin-top: 0.3mm;
+                            line-height: 1.2;
+                        ">
+                            Tk <t t-esc="'%.0f' % label['sale_price']"/>/-
+                            (Vat Included)
+                        </div>
+
+                        <!-- Barcode Image -->
+                        <div style="margin-top: 0.4mm; text-align: center; line-height: 1;">
+                            <t t-if="label.get('barcode_src')">
+                                <img t-att-src="label['barcode_src']"
+                                     style="width: 28mm; height: 5.5mm;"/>
+                            </t>
+                        </div>
+
+                        <!-- Barcode Text + Per SKU Qty -->
+                        <div style="
+                            font-size: 5pt;
+                            text-align: center;
+                            margin-top: 0.3mm;
+                            line-height: 1.1;
+                        ">
+                            <t t-esc="label['barcode']"/>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

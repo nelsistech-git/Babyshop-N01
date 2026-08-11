@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <record id="scrap_report_html_id" model="ir.actions.report">
+            <field name="name">Scrap Report</field>
+            <field name="model">scrap.report.wizard</field>
+            <field name="report_type">qweb-html</field>
+            <field name="report_name">custom_stock.scrap_report_view</field>
+            <field name="report_file">custom_stock.scrap_report_view</field>
+            <field name="print_report_name">Print_Scrap_Report</field>
+        </record>
+
+        <record id="scrap_report_id" model="ir.actions.report">
+            <field name="name">Scrap Report</field>
+            <field name="model">scrap.report.wizard</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">custom_stock.scrap_report_view</field>
+            <field name="report_file">custom_stock.scrap_report_view</field>
+            <field name="print_report_name">Print_Scrap_Report</field>
+        </record>
+
+        <template id="scrap_report_view">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <style type="text/css">
+                            table, th, tr, td{
+                                background: white !important;
+                            }
+
+                            h2 {
+                                text-align:center !important;
+                            }
+
+                        </style>
+
+                        <div class="oe_structure"/>
+
+                        <div class="row">
+                            <div class="col-lg-12 head_font_color">
+                                <h2>Scrap Report</h2>
+                                <br/>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-6">
+                                <p style="color: #000; font-size: 15px;">From Date:  <t t-esc="form['start_date']" t-options='{"widget": "date"}'/></p>
+                                <p style="color: #000; font-size: 15px;">Category:  <t t-esc="categ_name"/></p>
+                            </div>
+                            <div class="col-6">
+                                <p class="text-right" style="color: #000; font-size: 15px;">To Date: <t t-esc="form['end_date']" t-options='{"widget": "date"}'/></p>
+                                <p class="text-right" style="color: #000; font-size: 15px;">Location: <t t-esc="loc_name"/></p>
+                            </div>
+                        </div>
+                        <br/>
+
+                        <div class="row">
+                            <table class="table table-condensed">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center align-middle bg_color font_color"><strong>Sl. No.</strong></th>
+                                        <th t-if="loc_name=='All Locations'" class="align-middle text-left bg_color font_color">
+                                            <strong>Location</strong>
+                                        </th>
+                                        <th class="align-middle text-left bg_color font_color"><strong>Product</strong></th>
+                                        <th class="align-middle text-right bg_color font_color"><strong>Scrap Qty</strong></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-set="sl_no" t-value="1"/>
+                                    <t t-set="total_scrap_qty" t-value="0"/>
+                                    <t t-foreach="csr" t-as="line">
+                                        <tr style="border: 1px solid #000;" t-if="line['scrap_qty'] != 0">
+                                            <td class="text-center align-middle">
+                                                <t t-esc="sl_no"/>
+                                            </td>
+                                            <td t-if="loc_name=='All Locations'" class="text-left align-middle">
+                                                <t t-esc="line['location_name']"/>
+                                            </td>
+                                            <td class="text-left align-middle">
+                                                <t t-esc="line['product_name']"/>
+                                            </td>
+                                            <td class="text-right align-middle">
+                                                <t t-esc="'{0:,.3f}'.format(line['scrap_qty'])"/>
+                                                <t t-set="total_scrap_qty" t-value="total_scrap_qty + line['scrap_qty']"/>
+                                            </td>
+                                            <t t-set="sl_no" t-value="sl_no + 1"/>
+                                        </tr>
+                                    </t>
+                                    <tr style="border: 1px solid black;">
+                                        <t t-if="loc_name=='All Locations'">
+                                            <td class="text-right align-middle" colspan="3"><strong>TOTAL</strong></td>
+                                        </t>
+                                        <t t-else="">
+                                            <td class="text-right align-middle" colspan="2"><strong>TOTAL</strong></td>
+                                        </t>
+                                        <td class="text-right align-middle">
+                                            <strong><t t-esc="'{0:,.3f}'.format(total_scrap_qty)"/></strong>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

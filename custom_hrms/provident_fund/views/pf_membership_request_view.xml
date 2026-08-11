@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="pf_membership_request_view_form" model="ir.ui.view">
+        <field name="name">pf.membership.request.form</field>
+        <field name="model">pf.membership.request</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_apply" invisible="state != 'draft'" string="Apply" type="object"
+                            class="oe_highlight"/>
+                    <button name="action_approve" groups="provident_fund.group_provident_fund_officer"
+                            invisible="state != 'apply'" string="Approve" type="object" class="oe_highlight"/>
+                    <button name="action_cancel" groups="provident_fund.group_provident_fund_officer"
+                            invisible="state not in ['draft','apply']" string="Refuse" type="object"
+                            class="btn-danger"/>
+
+                    <button name="action_apply_all" invisible="state != 'draft'" string="Apply All" type="object"
+                            groups="base.group_system"/>
+                    <button name="action_approve_all" invisible="state != 'apply'" string="Approve All" type="object"
+                            groups="base.group_system"/>
+
+                    <field name="state" widget="statusbar" statusbar_visible="draft,apply,approved,cancel"/>
+                </header>
+                <sheet string="Membership Form">
+                    <div class="oe_title">
+                        <h3 col="4">
+                            <field name="name"/>
+                        </h3>
+                    </div>
+                    <div id="o_profile_container">
+                        <div id="o_profile_main">
+                            <group>
+                                <group string="Basic Information">
+                                    <field name="is_manager" invisible="1"/>
+                                    <field name="employee_id" readonly="not is_manager"
+                                           options='{"no_open": True, "no_create_edit": True, "no_create": True}'/>
+                                    <field name="employee_name" invisible="1"/>
+                                    <field name="employee_uid" invisible="1"/>
+                                    <field name="emp_type"/>
+                                    <field name="job_id" options='{"no_open": True}'/>
+                                    <field name="join_date"/>
+                                    <field name="tax_identification"/>
+                                    <field name="is_interest_free" readonly="state in ['approved','cancel']"/>
+                                </group>
+                                <group string="Fund Information">
+                                    <field name="pf_board_id" readonly="state != 'draft'"
+                                           options='{"no_open": True, "no_create_edit": True, "no_create": True}'
+                                           required="1" domain="[('type', '=', 'pf')]"/>
+                                    <field name="date_start" readonly="state != 'draft'"/>
+                                    <field name="date_apply" force_save="1"/>
+                                    <field name="company_id" readonly="1"
+                                           options='{"no_open": True, "no_create_edit": True, "no_create": True}'/>
+                                </group>
+                            </group>
+                        </div>
+                    </div>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_pf_membership_request_tree" model="ir.ui.view">
+        <field name="name">pf.membership.request.tree</field>
+        <field name="model">pf.membership.request</field>
+        <field name="arch" type="xml">
+            <tree string="PF Membership Request">
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="job_id"/>
+                <field name="pf_board_id"/>
+                <field name="is_interest_free"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_pf_membership_request_filter" model="ir.ui.view">
+        <field name="name">pf.membership.request.filter</field>
+        <field name="model">pf.membership.request</field>
+        <field name="arch" type="xml">
+            <search string="Search Name List">
+                <field name="employee_id" string="Employee"/>
+            </search>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_pf_membership_request">
+        <field name="name">PF Membership Request</field>
+        <field name="res_model">pf.membership.request</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_pf_membership_request" name="PF Membership Request"
+              parent="base.menu_hr_employee_pf_root"
+              action="action_pf_membership_request"
+              groups="base.group_user"
+              sequence="3"/>
+
+</odoo>

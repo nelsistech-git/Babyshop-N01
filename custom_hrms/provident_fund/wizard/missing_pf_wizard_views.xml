@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <data>
+        <record id="view_missing_pf_generate_wizard_form" model="ir.ui.view">
+            <field name="name">missing.pf.wizard.form</field>
+            <field name="model">missing.pf.wizard</field>
+            <field name="arch" type="xml">
+                <form string="CPF/Missing PF Generate">
+                    <group>
+                        <group>
+                            <field name="year"/>
+                            <field name="month"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="missing_pf_generate" string="Add Missing PF" type="object" class="btn-primary"
+                                confirm="Are you sure to Add Missing PF?"/>
+                        or
+                        <button name="cpf_generate" string="Set CPF" type="object" class="btn-primary"
+                                confirm="Are you sure to Set CPF?"/>
+
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="missing_pf_generate_wizard_action" model="ir.actions.act_window">
+            <field name="name">Missing PF/CPF Add or Update(On Draft record)</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">missing.pf.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_missing_pf_generate_wizard_form"/>
+            <field name="target">new</field>
+        </record>
+
+        <menuitem id="menu_missing_pf_generate_wizard"
+                  name="Missing PF/CPF Add"
+                  sequence="90"
+                  action="missing_pf_generate_wizard_action"
+                  parent="menu_hr_employee_pf_root_sub"
+                  groups="hr.group_hr_manager"
+        />
+
+
+        <record id="view_pf_done_generate_wizard_form" model="ir.ui.view">
+            <field name="name">pf.done.wizard.form</field>
+            <field name="model">pf.done.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Pending PF Process">
+                    <group>
+                        <group>
+                            <field name="year"/>
+                            <field name="month"/>
+                        </group>
+
+                    </group>
+                    <group string="Journal Entry">
+                        <field name="journal_date"/>
+                        <field name="journal_type"/>
+                        <field name="journal_id"
+                               options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                        <field name="debit_acc_id"
+                               options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                        <field name="credit_acc_id"
+                               options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                    </group>
+
+                    <footer>
+                        <button name="action_pf_done" string="Done/Lock PF" type="object" class="btn-primary"
+                                confirm="Are you sure to Done PF?"/>
+
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="pf_done_generate_wizard_action" model="ir.actions.act_window">
+            <field name="name">Pending PF Process</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">pf.done.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_pf_done_generate_wizard_form"/>
+            <field name="target">new</field>
+        </record>
+
+        <menuitem id="menu_pf_done_generate_wizard"
+                  name="Pending PF Process"
+                  sequence="91"
+                  action="pf_done_generate_wizard_action"
+                  parent="menu_hr_employee_pf_root_sub"
+                  groups="hr.group_hr_manager"
+        />
+    </data>
+</odoo>

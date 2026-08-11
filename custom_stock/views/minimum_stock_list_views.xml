@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Reserve Stock List Tree View -->
+        <record id="view_minimum_stock_list_tree" model="ir.ui.view">
+            <field name="name">minimum.stock.list.tree</field>
+            <field name="model">minimum.stock.list</field>
+            <field name="arch" type="xml">
+                <tree string="Minimum Stock List" create="false" edit="false" delete="false" decoration-danger="(minimum_stock &gt; on_hand_stock)">
+                    <field name="product_id"/>
+                    <field name="minimum_stock" force_save="1"/>
+                    <field name="on_hand_stock"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Reserve Stock List Search View -->
+        <record id="view_minimum_stock_list_search" model="ir.ui.view">
+            <field name="name">minimum.stock.list.search</field>
+            <field name="model">minimum.stock.list</field>
+            <field name="arch" type="xml">
+                <search string="Search">
+                    <field name="product_id"/>
+<!--                    <separator />-->
+<!--                    <group expand="0" string="Group By">-->
+<!--                        <filter string="Product" name="group_by_product_id" context="{'group_by': 'product_id'}"/>-->
+<!--                        <filter string="Location" name="group_by_location_id" context="{'group_by': 'location_id'}"/>-->
+<!--                    </group>-->
+                </search>
+            </field>
+        </record>
+
+        <!-- Reserve Stock List Window Action -->
+        <record id="action_minimum_stock_list" model="ir.actions.act_window">
+            <field name="type">ir.actions.act_window</field>
+            <field name="name">Minimum Stock List</field>
+            <field name="res_model">minimum.stock.list</field>
+            <field name="view_mode">tree</field>
+<!--            <field name="context">{'search_default_group_by_product_id': 1, 'search_default_group_by_location_id': 1}</field>-->
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    View Minimum Stock List
+                </p>
+            </field>
+        </record>
+
+        <!--  Reserve Stock List Server Action -->
+        <record id="minimum_stock_list_srv_action" model="ir.actions.server">
+            <field name="name">Minimum Stock List Server Action</field>
+            <field name="type">ir.actions.server</field>
+            <field name="model_id" ref="model_minimum_stock_list"/>
+            <field name="state">code</field>
+            <field name="code">action = model.action_generate_minimum_stock_list_report()</field>
+        </record>
+
+        <menuitem id="menu_minimum_stock_list" name="Inventory Minimum Stock" parent="stock.menu_warehouse_report"
+                  action="minimum_stock_list_srv_action" sequence="1"/>
+    </data>
+</odoo>

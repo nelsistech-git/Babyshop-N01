@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+
+        <record id="custom_expense_form_view_advance_req" model="ir.ui.view">
+            <field name="name">hr.expense.form</field>
+            <field name="model">hr.expense</field>
+            <field name="inherit_id" ref="hr_expense.hr_expense_view_form"/>
+            <field name="arch" type="xml">
+                <!-- <xpath expr = "//field[@name='reference']" position="after"> -->
+                 <xpath expr = "//field[@name='accounting_date']" position="before">
+                    <!-- <field name="custom_advance_expense_id" domain="[('employee_id', '=', employee_id),('product_id', '=', product_id),('reambursment', '=', False)]"/> -->
+                    <field name="custom_advance_expense_id"/>
+                    <field name="custom_advance_currency_id" invisible="1" />
+                    <field name="custom_advance_amount" widget="monetary" options="{'currency_field': 'custom_advance_currency_id'}"/>
+                </xpath>
+            </field>
+        </record>
+        
+    </data>
+</odoo>

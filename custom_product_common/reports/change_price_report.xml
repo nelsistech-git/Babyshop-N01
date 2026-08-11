@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+	<data>
+        <record id="paperformat_change_price_report" model="report.paperformat">
+            <field name="name">Sale Price Change Report Paperformat</field>
+            <field name="default" eval="True"/>
+            <field name="format">A4</field>
+            <field name="orientation">Portrait</field>
+            <field name="margin_top">30</field>
+            <field name="margin_bottom">20</field>
+            <field name="margin_left">5</field>
+            <field name="margin_right">5</field>
+            <field name="header_line" eval="False"/>
+            <field name="header_spacing">25</field>
+            <field name="dpi">100</field>
+        </record>
+        <report
+            id="change_price_report_tmpl"
+            string="Sale Price Change Report"
+            model="change.price.report.wizard"
+            report_type="qweb-pdf"
+            name="custom_product_common.change_price_report_view"
+            file="custom_product_common.change_price_report_view"
+            paperformat="custom_product_common.paperformat_change_price_report"
+        />
+
+		<template id="change_price_report_view">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <style type="text/css">
+                            th, tr, td{
+                                background: white !important;
+                                page-break-inside:avoid !important; page-break-after:auto !important;
+                            }
+                        </style>
+                        <div class="oe_structure"/>
+                        <div>
+                            <h5 class="text-center head_font_color">
+                                <strong>Sale Price Change Report</strong>
+                            </h5>
+                            <h6 class="text-center">
+                                <div class="mt-2">
+                                    <strong>Date Range: <span t-esc="start_date"/> To: <span t-esc="end_date"/></strong>
+                                </div>
+                            </h6>
+                        </div>
+                        <table style="border-collapse: collapse;width: 100%; page-break-after:auto" class="table table-condensed">
+                            <thead>
+                                <tr>
+                                    <th class="text-left bg_color font_color">Date</th>
+                                    <th class="text-left bg_color font_color">Barcode</th>
+                                    <th class="text-left bg_color font_color">Product Name</th>
+                                    <th class="text-center bg_color font_color">Before Price</th>
+                                    <th class="text-center bg_color font_color">After Price</th>
+                                    <th class="text-center bg_color font_color">Entry By</th>
+                                    <th class="text-center bg_color font_color">Approved By</th>
+                                </tr>
+                            </thead>
+                            <tbody class="consumed_tbody">
+                                <t t-foreach="csr" t-as="line">
+                                    <tr>
+                                        <td class="text-center">
+                                            <span t-esc="line['create_date']"/>
+                                        </td>
+                                        <td class="text-left">
+                                            <t t-if="line['code']==False">
+                                                <span>-</span>
+                                            </t>
+                                            <t else="">
+                                                <span t-esc="line['code']"/>
+                                            </t>
+                                        </td>
+                                        <td class="text-left">
+                                            <span t-esc="line['product_name']"/>
+                                        </td>
+                                        <td class="text-center">
+                                            <span t-esc="line['old_sales_price']"/>
+                                        </td>
+                                        <td class="text-center">
+                                            <span t-esc="line['new_sales_price']"/>
+                                        </td>
+                                        <td class="text-center">
+                                            <span t-esc="line['created_by']"/>
+                                        </td>
+                                        <td class="text-center">
+                                            <span t-esc="line['approved_by']"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+		</template>
+	</data>
+</odoo>

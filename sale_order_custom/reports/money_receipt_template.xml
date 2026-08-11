@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="paperformat_money_receipt" model="report.paperformat">
+        <field name="name">Money Receipt A4</field>
+        <field name="default" eval="False"/>
+        <field name="format">A4</field>
+        <field name="page_height">0</field>
+        <field name="page_width">0</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">0</field>
+        <field name="margin_bottom">10</field>
+        <field name="margin_left">10</field>
+        <field name="margin_right">10</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">0</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <record id="action_report_money_receipt" model="ir.actions.report">
+        <field name="name">Money Receipt</field>
+        <field name="model">account.move</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">sale_order_custom.money_receipt_template</field>
+        <field name="report_file">sale_order_custom.money_receipt_template</field>
+        <field name="paperformat_id" ref="paperformat_money_receipt"/>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="money_receipt_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.basic_layout">
+                    <div class="page" style="padding: 0 30px 20px 30px; margin-top: 5px;">
+
+                        <style>
+                            .from-by-table {
+                                width: 100%;
+                                border-collapse: collapse;
+                                margin-bottom: 5px;
+                            }
+                            .from-by-table td {
+                                border: 1px solid #999;
+                                padding: 10px 14px;
+                                font-size: 15px;
+                                vertical-align: top;
+                                width: 50%;
+                                line-height: 1.5;
+                            }
+                            .from-by-header {
+                                font-weight: bold;
+                                font-size: 16px;
+                                padding: 7px 14px;
+                            }
+                            .payment-table {
+                                width: 100%;
+                                border-collapse: collapse;
+                                margin-bottom: 15px;
+                            }
+                            .payment-table th {
+                                background-color: #6C7E7F;
+                                color: white;
+                                padding: 9px 14px;
+                                text-align: center;
+                                font-size: 15px;
+                                border: 1px solid #999;
+                            }
+                            .payment-table td {
+                                padding: 8px 14px;
+                                border: 1px solid #999;
+                                font-size: 15px;
+                            }
+                            .td-center { text-align: center; }
+                            .row-total {
+                                background-color: #E8ECEC;
+                                font-weight: bold;
+                            }
+                            .row-due {
+                                background-color: #6C7E7F;
+                                color: white;
+                                font-weight: bold;
+                            }
+                            .words-section {
+                                margin-bottom: 15px;
+                            }
+                            .words-label {
+                                font-weight: bold;
+                                font-size: 15px;
+                                margin-bottom: 6px;
+                            }
+                            .signature-table {
+                                width: 100%;
+                                border-collapse: collapse;
+                                margin-top: 70px;
+                            }
+                            .signature-table td {
+                                text-align: center;
+                                padding: 8px;
+                                font-size: 15px;
+                                border: none;
+                                background-color: transparent;
+                                width: 33.33%;
+                            }
+                            .sig-line {
+                                border-top: 1px solid #333;
+                                width: 80%;
+                                margin: 0 auto 8px auto;
+                            }
+                        </style>
+
+                        <!-- TITLE + RECEIPT NO/DATE -->
+                        <table style="width:100%; border-collapse:collapse; margin-bottom:18px; margin-top:0;">
+                            <tr>
+                                <td style="vertical-align:middle; border:none; width:55%;">
+                                    <div style="font-size:44px; font-weight:bold; color:#6C7E7F; letter-spacing:3px;">
+                                        MONEY RECEIPT
+                                    </div>
+                                </td>
+                                <td style="border:none; width:45%;">
+                                    <table style="width:100%; border-collapse:collapse;">
+                                        <tr>
+                                            <td style="padding:7px 12px; border:1px solid #999; font-weight:bold; background-color:#f0f0f0; width:140px; font-size:15px;">
+                                                Receipt No.
+                                            </td>
+                                            <td style="padding:7px 12px; border:1px solid #999; font-weight:bold; text-align:center; font-size:15px;">
+                                                <t t-esc="o.name"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding:7px 12px; border:1px solid #999; font-weight:bold; background-color:#f0f0f0; font-size:15px;">
+                                                Receipt Date
+                                            </td>
+                                            <td style="padding:7px 12px; border:1px solid #999; text-align:center; font-size:15px;">
+                                                <t t-esc="o.invoice_date and o.invoice_date.strftime('%d.%m.%Y') or ''"/>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- RECEIVED FROM / RECEIVED BY -->
+                        <table class="from-by-table">
+                            <tr>
+                                <td class="from-by-header">RECEIVED FROM</td>
+                                <td class="from-by-header">RECEIVED BY</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <strong>Company Name:</strong>
+                                    <t t-esc="o.partner_id.company_name or o.partner_id.name"/>
+                                    <br/>
+                                    <strong>Client Name:</strong>
+                                    <t t-esc="o.partner_id.name"/>
+                                    <br/>
+                                    <t t-if="o.partner_id.street">
+                                        <strong>Office Address:</strong>
+                                        <t t-esc="o.partner_id.street"/>
+                                        <t t-if="o.partner_id.street2">,
+                                            <t t-esc="o.partner_id.street2"/>
+                                        </t>
+                                        <t t-if="o.partner_id.city">,
+                                            <t t-esc="o.partner_id.city"/>
+                                        </t>
+                                        <t t-if="o.partner_id.zip">-
+                                            <t t-esc="o.partner_id.zip"/>
+                                        </t>
+                                        <br/>
+                                    </t>
+                                    <t t-if="o.partner_id.phone">
+                                        <strong>Contact:</strong>
+                                        <t t-esc="o.partner_id.phone"/>
+                                    </t>
+                                </td>
+                                <td>
+                                    <strong>Company Name:</strong>
+                                    <t t-esc="o.company_id.name"/>
+                                    <br/>
+                                    <t t-if="o.company_id.street">
+                                        <strong>Corporate Office:</strong>
+                                        <t t-esc="o.company_id.street"/>
+                                        <t t-if="o.company_id.street2">,
+                                            <t t-esc="o.company_id.street2"/>
+                                        </t>
+                                        <t t-if="o.company_id.city">,
+                                            <t t-esc="o.company_id.city"/>
+                                        </t>
+                                        <t t-if="o.company_id.zip">-
+                                            <t t-esc="o.company_id.zip"/>
+                                        </t>
+                                        <br/>
+                                    </t>
+                                    <t t-if="o.company_id.phone">
+                                        <strong>Contact:</strong>
+                                        <t t-esc="o.company_id.phone"/>
+                                    </t>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- RECEIPT OF PAYMENT -->
+                        <div style="font-weight:bold; font-size:12px; margin-bottom:6px;">Receipt of Payment:</div>
+
+                        <table class="payment-table">
+                            <thead>
+                                <tr>
+                                    <th style="width:50%;">Particulars</th>
+                                    <th style="width:50%;">Payment Details</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Invoice No.</td>
+                                    <td class="td-center">
+                                        <t t-esc="o.name"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Invoice Date</td>
+                                    <td class="td-center">
+                                        <t t-esc="o.invoice_date and o.invoice_date.strftime('%d.%m.%Y') or ''"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Reference</td>
+                                    <td class="td-center">
+                                        Payment Received against
+                                        <t t-esc="o.name"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Payment Method</td>
+                                    <td class="td-center">
+                                        <t t-set="reconciled_payments" t-value="o._get_reconciled_payments()"/>
+                                        <t t-if="reconciled_payments">
+                                            <t t-foreach="reconciled_payments" t-as="pay">
+                                                <t t-if="not pay_first"> / </t>
+                                                <t t-esc="pay.journal_id.name or ''"/>
+                                            </t>
+                                        </t>
+                                        <t t-else="">-</t>
+                                    </td>
+                                </tr>
+                                <tr class="row-total">
+                                    <td>
+                                        <strong>Total Bill Amount</strong>
+                                    </td>
+                                    <td class="td-center">
+                                        <strong>
+                                            <t t-esc="'{:,.2f}'.format(o.amount_total)"/>
+                                        </strong>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Advance Received</td>
+                                    <td class="td-center">
+                                        <t t-esc="'{:,.2f}'.format(o.advance_paid)"/>
+                                    </td>
+                                </tr>
+                                <tr class="row-due">
+                                    <td>
+                                        <strong>Due Amount</strong>
+                                    </td>
+                                    <td class="td-center">
+                                        <strong>
+                                            <t t-esc="'{:,.2f}'.format(o.amount_total - o.advance_paid)"/>
+                                        </strong>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- AMOUNT IN WORDS -->
+                        <div class="words-section">
+                            <div class="words-label">AMOUNT IN WORDS:</div>
+                            <table style="width:100%; border-collapse:collapse; border:1px solid #999;">
+                                <tr>
+                                    <td style="padding:7px 12px; font-style:italic; font-size:12px; border-right:1px solid #999;">
+                                        <t t-esc="o.currency_id.amount_to_text(o.amount_total - o.advance_paid)"/>
+                                    </td>
+                                    <td style="background-color:#6C7E7F; color:white; font-weight:bold; padding:7px 12px; font-size:12px; text-align:center; width:55px;">
+                                        TK.
+                                    </td>
+                                    <td style="padding:7px 12px; font-weight:bold; font-size:12px; text-align:center; width:120px;">
+                                        <t t-esc="'{:,.2f}'.format(o.amount_total - o.advance_paid)"/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <!-- SIGNATURES -->
+                        <table class="signature-table">
+                            <tr>
+                                <td>
+                                    <div class="sig-line"></div>
+                                    Accounts Department
+                                </td>
+                                <td>
+                                    <div class="sig-line"></div>
+                                    Deputy Sales
+                                </td>
+                                <td>
+                                    <div class="sig-line"></div>
+                                    CFO
+                                </td>
+                            </tr>
+                        </table>
+
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

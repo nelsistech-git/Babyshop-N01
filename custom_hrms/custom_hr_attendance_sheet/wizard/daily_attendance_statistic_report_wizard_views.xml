@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_daily_attendance_statistic_report_wizard_form" model="ir.ui.view">
+            <field name="name">daily.attendance.statistic.report.wizard.form</field>
+            <field name="model">daily.attendance.statistic.report.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Daily Attendance Statistic Report">
+                    <group>
+                        <group>
+                            <field name="report_type" widget="radio"/>
+                            <field name="year" required="1"/>
+                            <field name="month" required="1"/>
+                            <field name="start_date" required="1"/>
+                            <field name="end_date" required="1"/>
+                            <field name="is_deducted"/>
+                        </group>
+                        <group>
+                            <field name="company_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="user_work_location_id" placeholder="All" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="department_ids" placeholder="All" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" widget="many2many_tags"/>
+                            <field name="employee_id" placeholder="All" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="sbu_unit_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="category_ids" widget="many2many_tags" options="{'color_field': 'color', 'no_open': True, 'no_create': 1, 'no_create_edit': 1, 'no_quick_create': True}" />
+
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="daily_attendance_statistic_report_pdf" string="PDF - Attendance" type="object" class="btn-primary"/>
+
+                        <button name="daily_attendance_statistic_report_excel" string="Excel - Attendance" type="object" class="btn-primary"/>
+
+                        <button name="daily_attendance_statistic_report_html" string="View - Attendance" type="object" class="btn-primary"/>
+
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_daily_attendance_statistic_report_wizard" model="ir.actions.act_window">
+            <field name="name">Daily Attendance Statistic Report</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">daily.attendance.statistic.report.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_daily_attendance_statistic_report_wizard_form"/>
+            <field name="target">new</field>
+        </record>
+        <!--            comment-for-upgrade-->
+        <!--        <menuitem id="menu_daily_attendance_statistic_report"-->
+        <!-- name="Daily Attendance Statistic Report"-->
+        <!-- sequence="20"-->
+        <!-- action="action_daily_attendance_statistic_report_wizard"-->
+        <!-- parent="custom_hr_report.menu_attendance_report_root"-->
+        <!-- groups="hr.group_hr_user,custom_common_settings.group_branch_manager"-->
+        <!--        />-->
+    </data>
+</odoo>

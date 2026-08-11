@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_express_pos_day_closing_tree" model="ir.ui.view">
+        <field name="name">express.pos.day.closing.tree</field>
+        <field name="model">express.pos.day.closing</field>
+        <field name="arch" type="xml">
+            <tree decoration-danger="variance != 0">
+                <field name="date"/>
+                <field name="branch_id"/>
+                <field name="journal_id"/>
+                <field name="opening_balance"/>
+                <field name="system_closing_balance"/>
+                <field name="counted_closing_balance"/>
+                <field name="variance"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_express_pos_day_closing_form" model="ir.ui.view">
+        <field name="name">express.pos.day.closing.form</field>
+        <field name="model">express.pos.day.closing</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_close_day" type="object" string="Close Day" class="btn-primary"
+                            invisible="state == 'closed'"/>
+                    <button name="action_reopen_day" type="object" string="Request Reopen"
+                            invisible="state != 'closed'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,closed"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="date"/>
+                            <field name="branch_id"/>
+                            <field name="journal_id"/>
+                            <field name="responsible_id"/>
+                        </group>
+                        <group>
+                            <field name="opening_balance"/>
+                            <field name="system_inflow" readonly="1"/>
+                            <field name="system_outflow" readonly="1"/>
+                            <field name="system_closing_balance" readonly="1"/>
+                            <field name="counted_closing_balance"/>
+                            <field name="variance" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Notes">
+                        <field name="note" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_express_pos_day_closing" model="ir.actions.act_window">
+        <field name="name">Opening/Closing Balance</field>
+        <field name="res_model">express.pos.day.closing</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'default_opening_balance': 0.0}</field>
+        <field name="help">Record the opening and closing cash/bank balance for each showroom and journal, and compare against system-recorded receipts.</field>
+    </record>
+</odoo>

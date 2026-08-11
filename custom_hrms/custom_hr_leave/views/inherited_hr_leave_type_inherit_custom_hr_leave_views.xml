@@ -1,0 +1,90 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<odoo>
+    <record id="inherited_edit_holiday_status_inherit_custom_hr_leave_form" model="ir.ui.view">
+        <field name="name">inherited.edit.holiday.status.inherit.custom_hr.leave.form</field>
+        <field name="model">hr.leave.type</field>
+        <field name="inherit_id" ref="hr_holidays.edit_holiday_status_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form/sheet/group[1]" position="before">
+                <group>
+                    <!--<field name="sequence" required="1"/>-->
+                    <field name="type_code" required="1"/>
+                </group>
+            </xpath>
+<!--            <xpath expr="//field[@name='validity_start']" position="before">-->
+<!--                <field name="year" required="1"/>-->
+<!--            </xpath>-->
+<!--            <xpath expr="//field[@name='time_type']" position="before">-->
+<!--                <field name="year" required="1"/>-->
+<!--            </xpath>-->
+
+            <xpath expr="//field[@name='time_type']" position="after">
+                <!--<field name="is_dept_approval" />-->
+                <field name="is_allow_probation" required="1"/>
+                <field name="is_allow_leave_encashment"/>
+                <field name="is_auto_allocate"/>
+                <field name="auto_allocate_days" required="is_auto_allocate == True"/>
+                <field name="auto_allocate_based_on" required="is_auto_allocate == True" />
+                <field name="is_female_only" />
+            </xpath>
+
+           <!-- <xpath expr="//group[@name='visibility']" position="after">-->
+            <xpath expr="//group[@name='visual']" position="after">
+                <group name="exclude_holidays" string="Leave Exclusion">
+                    <field name="exclude_weekends"/>
+                    <field name="exclude_ph"/>
+                </group>
+            </xpath>
+            <!--<xpath expr="//field[@name='responsible_id']" position="attributes">
+                <attribute name="options">{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}
+                </attribute>
+            </xpath>-->
+
+        </field>
+    </record>
+
+    <record id="inherited_view_holiday_status_normal_inherit_custom_hr_leave_tree" model="ir.ui.view">
+        <field name="name">inherited.holiday.status.normal.inherit.custom_hr.leave.tree</field>
+        <field name="model">hr.leave.type</field>
+        <field name="inherit_id" ref="hr_holidays.view_holiday_status_normal_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='display_name']" position="after">
+                <field name="type_code"/>
+                <field name="is_allow_probation" string="Allow Probation"/>
+                <field name="is_allow_leave_encashment" string="Leave Encashment"/>
+            </xpath>
+            <!--<xpath expr="//field[@name='code']" position="attributes">
+                <attribute name="string">Payroll Code</attribute>
+            </xpath>-->
+        </field>
+    </record>
+
+    <!--<record model="ir.ui.menu" id="hr_holidays.menu_hr_holidays_dashboard">
+        <field name="groups_id" eval="[(6,0,[ref('hr_holidays.group_hr_holidays_responsible')])]"/>
+    </record>
+
+    <record model="ir.ui.menu" id="hr_holidays.menu_hr_holidays_my_leaves">
+        <field name="groups_id" eval="[(6,0,[ref('hr_holidays.group_hr_holidays_responsible')])]"/>
+    </record>
+
+    <record model="ir.ui.menu" id="hr_holidays.menu_hr_holidays_approvals">
+        <field name="groups_id" eval="[(6,0,[ref('hr_holidays.group_hr_holidays_responsible')]), (4,ref('custom_hr_leave.group_leave_requester'))]"/>
+    </record>
+
+    <record id="make_invisible" model="res.groups">
+        <field name="name">Leave Invisible</field>
+    </record>
+
+    <record model="ir.ui.menu" id="hr_holidays.hr_holidays_menu_manager_approve">
+         <field name="groups_id" eval="[(6,0,[ref('make_invisible')])]"/>
+    </record>
+
+    <record model="ir.ui.menu" id="hr_holidays.hr_holidays_menu_manager_all">
+        <field name="groups_id" eval="[(6,0,[ref('hr_holidays.group_hr_holidays_manager')]),(6,0,[ref('hr_holidays.group_hr_holidays_user')]), (4,ref('custom_hr_leave.group_leave_requester'))]"/>
+    </record>
+
+    <record model="ir.ui.menu" id="hr_holidays.menu_open_employee_leave">
+        <field name="groups_id" eval="[(6,0,[ref('hr_holidays.group_hr_holidays_manager')]),(6,0,[ref('hr_holidays.group_hr_holidays_user')]), (4,ref('custom_hr_leave.group_leave_requester'))]"/>
+    </record>-->
+
+</odoo>

@@ -1,0 +1,62 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<odoo>
+    <data>
+        <record id='product_category_inherit_view_from' model='ir.ui.view'>
+            <field name='name'>product.category.from.inherit</field>
+            <field name='model'>product.category</field>
+            <field name='inherit_id' ref='product.product_category_form_view'/>
+            <field name='arch' type='xml'>
+                 <xpath expr="//field[@name='name']" position="after">
+                     <separator/>
+                     <button name="action_get_last_product_code" class="btn-primary"
+                        type="object" string="Get last product code"/>
+                </xpath>
+                <xpath expr="//form/sheet/group[@name='first']/field[@name='parent_id']" position="before">
+                    <field name="code" class="oe_inline" string="Code"></field>
+                </xpath>
+                <xpath expr="//field[@name='parent_id']" position="after">
+                    <field name="is_saleable"/>
+                    <field name="default_uom_id" class="oe_inline" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                    <field name="last_product_code" readonly="1" force_save="1"/>
+                </xpath>
+
+                <xpath expr="//form/sheet/group" position="after">
+<!--                    <field name="default_qty" class="oe_inline" string="Default Quantity"></field>-->
+<!--                    <separator/>-->
+                    <group style="width: 50%">
+                        <field name="product_uom_line_ids" >
+                            <tree editable="bottom">
+                                <field name="product_uom_id" required="1" />
+                                <field name="default_qty" required="1" />
+                            </tree>
+                        </field>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="product_category_list_view_inherit" model="ir.ui.view">
+            <field name="name">product.category.list.inherit</field>
+            <field name="model">product.category</field>
+            <field name='inherit_id' ref='product.product_category_list_view'/>
+            <field name="arch" type="xml">
+                <xpath expr="//tree/field[@name='display_name']" position="after">
+                    <field name="parent_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                    <field name="code" string="Code"/>
+                    <field name="last_product_code"/>
+                </xpath>
+            </field>
+        </record>
+
+<!--        <record id="product_product_form_view_common" model="ir.ui.view">-->
+<!--            <field name="model">product.product</field>-->
+<!--            <field name="inherit_id" ref="product.product_normal_form_view" />-->
+<!--            <field name="arch" type="xml">-->
+<!--                <xpath expr="//field[@name='default_code']" position="before">-->
+<!--                    <field name="other_cost" readonly="1" force_save="1"/>-->
+<!--                </xpath>-->
+<!--            </field>-->
+<!--        </record>-->
+
+    </data>
+</odoo>

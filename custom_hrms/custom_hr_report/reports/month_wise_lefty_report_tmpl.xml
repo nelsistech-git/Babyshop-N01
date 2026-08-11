@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+	<data>
+
+        <record id="month_wise_lefty_report_tmpl" model="ir.actions.report">
+            <field name="name">Month wise Lefty Report</field>
+            <field name="model">month.wise.lefty.report.wizard</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">custom_hr_report.month_wise_lefty_report_view</field>
+            <field name="report_file">custom_hr_report.month_wise_lefty_report_view</field>
+            <field name="paperformat_id" ref="custom_common_settings.paperformat_custom_a4_bd"/>
+        </record>
+
+		<template id="month_wise_lefty_report_view">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <style type="text/css">
+                            table, th, tr, td{
+                                background: white !important;
+                                border: 1px solid black;
+                            }
+                        </style>
+                        <div class="oe_structure"/>
+                        <div>
+                            <h3 class="text-center head_font_color">
+                                <strong>
+                                    <span t-esc="form['company_id'][1]"/>
+                                    <br/>
+                                    Month wise Lefty Report
+                                    (<span t-esc="month"/> <span t-esc="year"/>)
+                                    <br/>
+                                </strong>
+                            </h3>
+                        </div>
+                        <br/>
+                        <div>
+                            <t t-if="buisness_unit">
+                                <br/>
+                                <strong>Office/business Unit:</strong>  <t t-esc="buisness_unit"/>
+                            </t>
+                            <t t-if="tag_names_list">
+                                <br/>
+                                <strong>Tags:</strong>  <t t-esc="tag_names_list"/>
+                            </t>
+                        </div>
+                        <table style="border-collapse: collapse;width: 100%; margin-bottom: 2em;" class="table table-condensed">
+                            <thead>
+                                <tr style="color: black !important;">
+                                    <th class="text-center align-middle bg_color font_color">Sl. No.</th>
+                                    <th class="text-center align-middle bg_color font_color">Employee ID</th>
+                                    <th class="text-left align-middle bg_color font_color">Employee Name</th>
+                                    <th class="text-left align-middle bg_color font_color">Department</th>
+                                    <th class="text-left align-middle bg_color font_color">Designation</th>
+                                    <th class="text-center align-middle bg_color font_color">Last Present Date</th>
+                                    <th class="text-center align-middle bg_color font_color">Total Absent Day</th>
+                                    <th class="text-center align-middle bg_color font_color">Total Present Day</th>
+                                </tr>
+                            </thead>
+                            <tbody class="consumed_tbody">
+                                <t t-set="sl_no" t-value="1"/>
+                                <t t-foreach="csr" t-as="line">
+                                    <tr>
+                                        <td class="text-center align-middle">
+                                            <t t-esc="sl_no"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <span t-esc="line['emp_id_card']"/>
+                                        </td>
+                                        <td class="text-left align-middle">
+                                            <span t-esc="line['emp_name']"/>
+                                        </td>
+                                        <td class="text-left align-middle">
+                                            <span t-esc="line['dept_name']"/>
+                                        </td>
+                                        <td class="text-left align-middle">
+                                            <span t-esc="line['des_name']"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <span t-esc="line['last_present_day']" t-options='{"widget": "date"}'/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <span t-esc="line['absent_day']"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                          <span t-esc="line['present_day']"/>
+                                        </td>
+                                    </tr>
+                                    <t t-set="sl_no" t-value="sl_no + 1"/>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+		</template>
+	</data>
+</odoo>

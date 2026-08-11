@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+	<data>
+		<!-- start -->
+		<record id="coa_export_wizard_view_form" model="ir.ui.view">
+			<field name="name">account.open.chart.export.wizard.form
+			</field>
+			<field name="model">account.open.chart.export.wizard</field>
+			<field name="arch" type="xml">
+				<form string="COA Export">
+					<header>
+						<button name="generate_xlsx_report" string="Generate Excel Report"
+							type="object" class="btn-primary" />
+						
+					</header>
+					
+					<group>
+						<group>
+							<field name="excel_file" readonly="1" filename="file_name"/>
+                        	<field name="file_name" invisible="1"/>
+						</group>
+						
+						<group></group>
+					</group>
+					<footer>
+
+						<button string="Cancel" class="btn-default" special="cancel" />
+
+					</footer>
+				</form>
+			</field>
+		</record>
+		
+		<record id="coa_export_wiz_action" model="ir.actions.act_window">
+			<field name="name">Chart of Accounts Export</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="res_model">account.open.chart.export.wizard</field>
+			<field name="view_mode">form</field>
+			<field name="view_id" ref="coa_export_wizard_view_form" />
+			<field name="target">new</field>
+		</record>
+
+        <record id="coa_export_wizard_menu" model="ir.ui.menu" >
+            <field name="name">Chart of Accounts Export</field>
+            <field name="sequence" eval="22"/>
+            <field name="parent_id" ref="account.menu_finance_entries" />
+			<field name="action" ref="coa_export_wiz_action"/>
+            <field name="groups_id" eval="[(6,0,[ref('account.group_account_manager')])]"/>
+        </record>
+
+	</data>
+</odoo>

@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<template id="report_daily_kpi_template">
+    <t t-call="web.html_container">
+        <t t-foreach="docs" t-as="doc">
+            <t t-call="web.external_layout">
+                <div class="page">
+
+                    <!-- Company Header -->
+                    <div class="text-center mb-4">
+                        <h2 style="color:#2E75B6; margin-bottom:2px;">
+                            <t t-esc="doc.env.company.name"/>
+                        </h2>
+                        <p style="margin:0; font-size:11px; color:#555;">
+                            <t t-esc="doc.env.company.street or ''"/>
+                            <t t-if="doc.env.company.city">, <t t-esc="doc.env.company.city"/></t>
+                            <t t-if="doc.env.company.country_id">, <t t-esc="doc.env.company.country_id.name"/></t>
+                        </p>
+                        <hr style="border-top:2px solid #2E75B6; margin:6px 0;"/>
+                        <h3 style="color:#2E75B6;">Daily KPI Report</h3>
+                    </div>
+
+                    <!-- Employee Info -->
+                    <table class="table table-bordered" style="font-size:11px; margin-bottom:12px;">
+                        <tbody>
+                            <tr>
+                                <td style="background:#D6E4F0; font-weight:bold; width:20%;">Reference</td>
+                                <td style="width:30%;"><t t-esc="doc.name"/></td>
+                                <td style="background:#D6E4F0; font-weight:bold; width:20%;">Date</td>
+                                <td style="width:30%;"><t t-esc="doc.date"/></td>
+                            </tr>
+                            <tr>
+                                <td style="background:#D6E4F0; font-weight:bold;">Employee</td>
+                                <td><t t-esc="doc.employee_id.name or ''"/></td>
+                                <td style="background:#D6E4F0; font-weight:bold;">Status</td>
+                                <td>
+                                    <t t-esc="dict([('draft','Draft'),('submitted','Submitted'),('approved','Approved'),('rejected','Rejected')]).get(doc.state, doc.state)"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="background:#D6E4F0; font-weight:bold;">Designation</td>
+                                <td><t t-esc="doc.designation or ''"/></td>
+                                <td style="background:#D6E4F0; font-weight:bold;">Staff ID</td>
+                                <td><t t-esc="doc.staff_id or ''"/></td>
+                            </tr>
+                            <tr>
+                                <td style="background:#D6E4F0; font-weight:bold;">Department</td>
+                                <td><t t-esc="doc.department_id.name if doc.department_id else ''"/></td>
+                                <td style="background:#D6E4F0; font-weight:bold;">KPI Level</td>
+                                <td>
+                                    <strong>
+                                        <t t-esc="(doc.kpi_level or '').upper()"/>
+                                        — <t t-esc="'%.1f' % doc.incentive_percent"/>% Incentive
+                                    </strong>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- KPI Tasks Table -->
+                    <h5 style="color:#2E75B6; margin-bottom:6px;">KPI Tasks</h5>
+                    <table class="table table-bordered table-sm" style="font-size:10px;">
+                        <thead>
+                            <tr style="background-color:#2E75B6; color:white;">
+                                <th class="text-center" style="width:4%;">#</th>
+                                <th style="width:18%;">Task Name</th>
+                                <th style="width:18%;">Description</th>
+                                <th class="text-center" style="width:7%;">Target</th>
+                                <th class="text-center" style="width:7%;">Achieved</th>
+                                <th class="text-center" style="width:9%;">Achievement%</th>
+                                <th class="text-center" style="width:6%;">Level</th>
+                                <th class="text-center" style="width:8%;">Incentive%</th>
+                                <th class="text-center" style="width:8%;">Inc.Amount</th>
+                                <th class="text-center" style="width:7%;">Time(hrs)</th>
+                                <th class="text-center" style="width:9%;">Rating</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="doc.line_ids" t-as="line">
+                                <tr t-attf-style="background-color:#{('#EBF3FB' if line_index % 2 == 0 else '#FFFFFF')};">
+                                    <td class="text-center"><t t-esc="line_index + 1"/></td>
+                                    <td><t t-esc="line.task_name or ''"/></td>
+                                    <td><t t-esc="line.description or ''"/></td>
+                                    <td class="text-center"><t t-esc="'%.1f' % line.target_value"/></td>
+                                    <td class="text-center"><t t-esc="'%.1f' % line.achieved_value"/></td>
+                                    <td class="text-center"><t t-esc="'%.1f' % line.achievement_percent"/>%</td>
+                                    <td class="text-center"><t t-esc="(line.kpi_level or '').upper()"/></td>
+                                    <td class="text-center"><t t-esc="'%.1f' % line.incentive_percent"/>%</td>
+                                    <td class="text-center"><t t-esc="'%.2f' % line.incentive_amount"/></td>
+                                    <td class="text-center"><t t-esc="'%.1f' % line.time_spent"/></td>
+                                    <td class="text-center">
+                                        <t t-esc="dict([('outstanding','Outstanding'),('exceeds','Exceeds'),('meets','Meets'),('below','Below'),('unsatisfactory','Unsatisfactory')]).get(line.performance_rating, '')"/>
+                                    </td>
+                                </tr>
+                            </t>
+                            <!-- Total Row -->
+                            <tr style="background-color:#2E75B6; color:white; font-weight:bold;">
+                                <td colspan="3" class="text-center">TOTAL</td>
+                                <td class="text-center"><t t-esc="'%.1f' % doc.total_target"/></td>
+                                <td class="text-center"><t t-esc="'%.1f' % doc.total_achieved"/></td>
+                                <td class="text-center"><t t-esc="'%.1f' % doc.achievement_percent"/>%</td>
+                                <td class="text-center"><t t-esc="(doc.kpi_level or '').upper()"/></td>
+                                <td class="text-center"><t t-esc="'%.1f' % doc.incentive_percent"/>%</td>
+                                <td class="text-center"><t t-esc="'%.2f' % doc.total_incentive"/></td>
+                                <td class="text-center"><t t-esc="'%.1f' % doc.total_time_spent"/></td>
+                                <td class="text-center">
+                                    <t t-esc="dict([('outstanding','Outstanding'),('exceeds','Exceeds Expectations'),('meets','Meets Expectations'),('below','Below Expectations'),('unsatisfactory','Unsatisfactory')]).get(doc.overall_rating, '')"/>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Manager Remarks -->
+                    <t t-if="doc.manager_remarks">
+                        <div style="margin-top:10px; padding:8px; border:1px solid #D6E4F0; border-radius:4px;">
+                            <strong style="color:#2E75B6;">Manager Remarks:</strong>
+                            <p style="margin:4px 0 0;"><t t-esc="doc.manager_remarks"/></p>
+                        </div>
+                    </t>
+
+                    <!-- Signature Block -->
+                    <div style="margin-top:40px;">
+                        <table style="width:100%; font-size:12px;">
+                            <tr>
+                                <td style="width:33%; text-align:center; padding:0 16px;">
+                                    <div style="border-top:1px solid #333; padding-top:6px; margin-top:40px;">
+                                        <strong>Employee</strong><br/>
+                                        <span style="color:#555;"><t t-esc="doc.employee_id.name or ''"/></span>
+                                    </div>
+                                </td>
+                                <td style="width:33%; text-align:center; padding:0 16px;">
+                                    <div style="border-top:1px solid #333; padding-top:6px; margin-top:40px;">
+                                        <strong>Reviewer</strong><br/>
+                                        <span style="color:#555;">Authorized Signatory</span>
+                                    </div>
+                                </td>
+                                <td style="width:33%; text-align:center; padding:0 16px;">
+                                    <div style="border-top:1px solid #333; padding-top:6px; margin-top:40px;">
+                                        <strong>HR Manager</strong><br/>
+                                        <span style="color:#555;">HR Department</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+
+                </div>
+            </t>
+        </t>
+    </t>
+</template>
+</odoo>

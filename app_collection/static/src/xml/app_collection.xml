@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="app_collection.NavBar" t-inherit="web.NavBar" t-inherit-mode="extension">
+        <xpath expr="//AppsMenu/DropdownItem" position="replace">
+            <AppCollectionGrid apps="this.appMenuService.getAppsMenuItems()"/>
+        </xpath>
+    </t>
+
+    <!-- ─────────────────────────────────────────────────────────────────────── -->
+    <t t-name="app_collection.AppCollectionGrid">
+
+        <!-- ══════ TAB BAR ══════ -->
+        <div class="o_col_tab_bar">
+
+            <!-- All Apps tab -->
+            <button
+                t-on-click="() => this.selectTab(null)"
+                t-attf-class="o_col_tab {{ !state.activeTab ? 'active' : '' }}"
+            >
+                🏠 All Apps
+            </button>
+
+            <!-- Folder tabs -->
+            <t t-foreach="collections" t-as="col" t-key="col.id">
+
+                <!-- Rename mode: show controlled input -->
+                <div t-if="state.editingTabId === col.id" class="o_col_tab o_col_tab_editing">
+                    <span class="o_col_tab_icon" t-out="col.icon"/>
+                    <input
+                        class="o_col_tab_rename_input"
+                        t-att-value="state.editingTabName"
+                        t-on-input="(ev) => this.onRenameInput(ev)"
+                        t-on-keydown="(ev) => this.onRenameKeydown(ev, col)"
+                        t-on-keypress.stop=""
+                        t-on-blur="() => this.confirmRename(col)"
+                        t-on-click.stop=""
+                        t-on-mousedown.stop=""
+                        placeholder="Folder name"
+                        autofocus="autofocus"
+                    />
+                </div>
+
+                <!-- Normal mode -->
+                <button
+                    t-else=""
+                    t-on-click="() => this.selectTab(col.id)"
+                    t-on-dragenter="(ev) => this.onFolderDragEnter(ev, col.id)"
+                    t-on-dragover="(ev) => this.onFolderDragOver(ev, col.id)"
+                    t-on-dragleave="(ev) => this.onFolderDragLeave(ev, col.id)"
+                    t-on-drop="(ev) => this.onFolderDrop(ev, col)"
+                    t-attf-class="o_col_tab
+                        {{ state.activeTab === col.id ? 'active' : '' }}
+                        {{ state.dropOnFolderId === col.id ? 'drop-over' : '' }}"
+                    t-att-title="'Drop apps here to add to ' + col.name"
+                >
+                    <span class="o_col_tab_icon" t-out="col.icon"/>
+                    <span class="o_col_tab_name" t-out="col.name"/>
+                    <span class="o_col_tab_count" t-out="col.menu_ids.length"/>
+                    <span class="o_col_tab_actions">
+                        <span
+                            class="o_col_tab_btn o_col_rename_btn"
+                            t-on-click="(ev) => this.startRename(ev, col)"
+                            title="Rename"
+                        >✎</span>
+                        <span
+                            class="o_col_tab_btn o_col_delete_btn"
+                            t-on-click="(ev) => this.deleteFolder(ev, col)"
+                            title="Delete folder"
+                        >✕</span>
+                    </span>
+                </button>
+
+            </t>
+
+            <!-- Add folder button -->
+            <button class="o_col_add_btn" t-on-click="() => this.addFolder()" title="New folder">
+                + New
+            </button>
+
+        </div>
+
+        <!-- ══════ MAIN GRID: All Apps ══════ -->
+        <t t-if="!state.activeTab">
+
+            <div t-if="state.draggedAppId" class="o_col_drag_hint">
+                Drop onto another app to create a folder · Drop onto a folder tab or icon to add
+            </div>
+
+            <!-- Standalone apps (not in any folder) -->
+            <div
+                t-foreach="standaloneApps"
+                t-as="app"
+                t-key="app.id"
+                t-attf-class="o_app
+                    {{ state.draggedAppId === app.id ? 'o_app_dragging' : '' }}
+                    {{ state.dropOnAppId === app.id ? 'o_app_folder_target' : '' }}"
+                draggable="true"
+                t-on-dragstart="(ev) => this.onAppDragStart(ev, app)"
+                t-on-dragend="() => this.onDragEnd()"
+                t-on-dragover="(ev) => this.onAppOverDragOver(ev, app)"
+                t-on-dragleave="(ev) => this.onAppOverDragLeave(ev, app)"
+                t-on-drop="(ev) => this.onAppOverDrop(ev, app)"
+            >
+                <a t-att-href="app.href" t-on-click.prevent="() => this.launchApp(app)">
+                    <img t-if="app.webIconData" class="mk_app_icon" t-att-src="app.webIconData"/>
+                    <img t-else="" class="mk_app_icon" src="/base/static/description/icon.png"/>
+                    <span class="mk_app_name"><t t-out="app.name"/></span>
+                    <div t-if="state.dropOnAppId === app.id" class="o_create_folder_badge">📁</div>
+                </a>
+            </div>
+
+            <!-- Folder icons (iOS style) -->
+            <!--
+                IMPORTANT: pointer-events:none is set on all inner children via CSS so
+                that dragover/dragleave/drop always fire on this outer div, not on the
+                inner mosaic images (which would swallow the drop event).
+            -->
+            <div
+                t-foreach="collections"
+                t-as="col"
+                t-key="col.id"
+                t-attf-class="o_app o_folder_item {{ state.dropOnFolderId === col.id ? 'drop-over' : '' }}"
+                t-on-dragenter="(ev) => this.onFolderDragEnter(ev, col.id)"
+                t-on-dragover="(ev) => this.onFolderDragOver(ev, col.id)"
+                t-on-dragleave="(ev) => this.onFolderDragLeave(ev, col.id)"
+                t-on-drop="(ev) => this.onFolderDrop(ev, col)"
+            >
+                <a href="#" t-on-click.prevent="() => this.selectTab(col.id)">
+                    <div class="o_folder_icon mk_app_icon">
+                        <t t-foreach="getFolderPreview(col)" t-as="slot" t-key="slot_index">
+                            <img t-if="slot and slot.webIconData" t-att-src="slot.webIconData" t-att-alt="slot.name"/>
+                            <img t-elif="slot" src="/base/static/description/icon.png" t-att-alt="slot.name"/>
+                            <div t-else="" class="o_folder_empty_slot"/>
+                        </t>
+                        <div t-if="state.dropOnFolderId === col.id" class="o_folder_drop_plus">+</div>
+                    </div>
+                    <span class="mk_app_name"><t t-out="col.icon"/> <t t-out="col.name"/></span>
+                </a>
+            </div>
+
+            <!-- First-time hint -->
+            <div t-if="collections.length === 0 and standaloneApps.length > 0" class="o_col_first_hint">
+                Drag one app onto another to create a folder, or click <strong>+ New</strong>
+            </div>
+
+        </t>
+
+        <!-- ══════ FOLDER VIEW: specific folder tab ══════ -->
+        <t t-else="">
+            <t t-set="activeCol" t-value="getActiveCollection()"/>
+            <t t-if="activeCol">
+
+                <!-- Folder sub-header inside the grid area -->
+                <div class="o_folder_grid_header">
+                    <span class="o_folder_grid_icon" t-out="activeCol.icon"/>
+                    <span class="o_folder_grid_title" t-out="activeCol.name"/>
+                    <span class="o_folder_grid_count">
+                        <t t-out="getCollectionApps(activeCol).length"/> app(s)
+                    </span>
+                    <span class="o_folder_grid_tip">Drag apps from another folder or All Apps onto the tab above to add</span>
+                </div>
+
+                <!-- Empty state -->
+                <div t-if="getCollectionApps(activeCol).length === 0" class="o_folder_empty_state">
+                    <div>📭</div>
+                    <p>No apps yet. Switch to <strong>All Apps</strong> and drag apps onto the <strong><t t-out="activeCol.icon"/> <t t-out="activeCol.name"/></strong> tab.</p>
+                </div>
+
+                <!-- Apps inside the folder -->
+                <div
+                    t-foreach="getCollectionApps(activeCol)"
+                    t-as="fapp"
+                    t-key="fapp.id"
+                    class="o_app o_folder_app"
+                >
+                    <a t-att-href="fapp.href" t-on-click.prevent="() => this.launchApp(fapp)">
+                        <img t-if="fapp.webIconData" class="mk_app_icon" t-att-src="fapp.webIconData"/>
+                        <img t-else="" class="mk_app_icon" src="/base/static/description/icon.png"/>
+                        <span class="mk_app_name"><t t-out="fapp.name"/></span>
+                    </a>
+                    <button
+                        class="o_remove_app_btn"
+                        t-on-click="() => this.removeFromFolder(fapp)"
+                        title="Remove from folder"
+                    >✕</button>
+                </div>
+
+            </t>
+        </t>
+
+    </t>
+
+</templates>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<odoo>
+    <data>
+        <record id="shop_type_view_form" model="ir.ui.view">
+            <field name="name">shop.type.form</field>
+            <field name="model">shop.type</field>
+            <field name="arch" type="xml">
+                <form string="Category Form">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                                <field name="active"/>
+                                <field name="description"/>
+                            </group>
+                            <group>
+
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="shop_type_view_tree" model="ir.ui.view">
+            <field name="name">shop.type.tree</field>
+            <field name="model">shop.type</field>
+            <field name="arch" type="xml">
+                <tree string="Category tree">
+                    <field name="name"/>
+                   <field name="active"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="shop_type_view_search" model="ir.ui.view">
+            <field name="name">shop.type.search</field>
+            <field name="model">shop.type</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name"/>
+                    <filter string="Active" name="active" domain="[('active','=',True)]" help="Filtered by Active Status" />
+                    <filter string="Inactive" name="inactive" domain="[('active','=',False)]" help="Filtered by Inactive Status" />
+                    <separator/>                    
+                </search>
+            </field>
+        </record>
+
+        <record id="shop_type_list_action" model="ir.actions.act_window">
+            <field name="name">Category</field>
+            <field name="res_model">shop.type</field>
+            <!-- <field name="view_type">form</field> -->
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">Create Location Category
+                </p>
+            </field>
+        </record>
+		
+        <menuitem id="shop_type_menu" name="Location Category" parent="custom_common_settings.root_planning_menu"
+                  action="shop_type_list_action" sequence="4"/>
+    </data>
+</odoo>

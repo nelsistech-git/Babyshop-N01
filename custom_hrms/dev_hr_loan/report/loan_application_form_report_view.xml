@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+
+        <record id="report_loan_application_tmpl" model="ir.actions.report">
+            <field name="name">Loan Application Form</field>
+            <field name="model">employee.loan</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">dev_hr_loan.report_loan_applicant_qweb</field>
+            <field name="report_file">dev_hr_loan.report_loan_applicant_qweb</field>
+            <field name="paperformat_id" ref="custom_common_settings.paperformat_custom_a4_bd" />
+        </record>
+
+        <template id="report_loan_applicant_qweb">
+            <t t-call="web.html_container" >
+                <t t-call="web.external_layout" >
+                    <div class="page" style="margin-top:0px;">
+                        <style type="text/css">
+                            th, tr, td{
+                            background: white !important;
+                            padding: 0px!important;
+                            border: 0px!important;
+                            }
+
+                            .td_bold{
+                                font-weight:bold;
+                            }
+                        </style>
+
+                        <div>
+
+                            <h3 class="text-center head_font_color">
+                                <strong>
+                                    <span t-esc="loan_type" /> Loan Application
+                                    <br/>
+                                </strong>
+                            </h3>
+                        </div>
+
+                    <t t-foreach="request.env['employee.loan'].search([('id', '=', id)], limit=1)" t-as="doc">
+                        <div class="row" >
+                            <div class="col-6 text-left" style="margin-left:0px; padding-left:0px;">
+                                <p style="color: #000; font-size: 22px;">
+                                   To be Filled by Applicants:
+                                </p>
+                            </div>
+                            <div class="col-6 text-right">
+                                <p style="color: #000; font-size: 20px;">
+                                    Date: <span t-esc="doc.date.strftime('%d-%m-%Y')" />
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="row" style="margin-top: 0px;">
+
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="width: 50%; border:0px;">
+                                        <table class="table" style="border:0px!important;">
+                                            <tr>
+                                                <td class="text-left" style="width: 50%;">
+                                                    <p><b>Name</b></p>
+                                                </td>
+                                                <td class="text-left" style="width: 50%;">
+                                                   : <span t-esc="doc.employee_id.name" />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-left" style="width: 50%;">
+                                                    <p><b>Office ID</b></p>
+                                                </td>
+                                                <td class="text-left" style="width: 50%;">
+                                                    : <span t-esc="doc.employee_id.id_card_no" />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-left" style="width: 50%;">
+                                                    <p><b>Joining Date</b></p>
+
+                                                </td>
+                                                <td class="text-left" style="width: 50%;">
+                                                    : <span t-if="doc.joining_date" t-esc="doc.joining_date.strftime('%d-%m-%Y')" />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-left" style="width: 50%;">
+                                                    <p><b>Employment Year</b></p>
+                                                </td>
+                                                <td class="text-left" style="width: 50%;">
+                                                    : <span t-if="doc.joining_date" t-esc="doc.joining_date.year" />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-left" style="width: 50%;">
+                                                    <p><b>Department</b></p>
+                                                </td>
+                                                <td class="text-left" style="width: 50%;">
+                                                     : <span t-esc="doc.employee_id.department_id.name or ''" />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-left" style="width: 50%;">
+                                                    <p><b>Outstanding Loan (If any)</b></p>
+                                                </td>
+                                                <td class="text-left" style="width: 50%;">
+                                                    : <span t-esc="'{0:,.2f}'.format(loan_outstanding)" />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-left" style="width: 50%;">
+                                                    <p><b>Previous EMI/Inst. (If any)</b></p>
+                                                </td>
+                                                <td class="text-left" style="width: 50%;">
+                                                    : <span t-esc="'{0:,.2f}'.format(doc.installment_amount_previous)" />
+                                                </td>
+                                            </tr>
+                                        </table>
+
+                                    </td>
+                                    <td style="width: 50%; border:0px;">
+                                        <table class="table" style="border:0px!important;">
+                                            <tr>
+                                                <td class="text-left" style="width: 50%;">
+                                                    <p><b>Requested Loan Amount</b></p>
+                                                </td>
+                                                <td class="text-left" style="width: 50%; border-style:underline !important;">
+                                                    : <b><span t-esc="'{0:,.2f}'.format(doc.requested_amount)" /> BDT</b>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-left" style="width: 50%;">
+                                                    <p><b>Proposed Installments</b></p>
+                                                </td>
+                                                <td class="text-left" style="width: 50%;">
+                                                    : <span t-esc="'{0:,.2f}'.format(doc.requested_installment_amount)" /><b> / <span t-esc="doc.requested_term" /></b>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-left" colspan="2">
+                                                    <p>Not less than 2000 BDT* <br/>
+                                                    Not more than 60 Installments (5 years)*</p>
+                                                </td>
+
+                                            </tr>
+                                            <tr>
+                                                <td class="text-left" style="width: 50%;">
+                                                    <p><b>Reason</b></p>
+                                                </td>
+                                                <td class="text-left" style="width: 50%;">
+                                                    : <b><span t-esc="doc.notes" /></b>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-left" style="width: 50%;">
+                                                    <br/><br/>
+                                                </td>
+                                                <td class="text-left" style="width: 50%; ">
+                                                    <img t-if="doc.employee_id.signature" t-att-src="image_data_uri(doc.employee_id.signature)" style="max-height:30pt;max-width:90%;position: absolute;" alt="Signature"/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-left" style="width: 50%;">
+                                                </td>
+                                                <td class="text-left o_text_overflow" style="width: 50%;">
+                                                    <p ><b>Borrowers Signature</b></p>
+                                                </td>
+                                            </tr>
+                                        </table>
+
+                                    </td>
+
+                                </tr>
+                            </table>
+
+                        </div>
+
+
+                        <br/>
+                        <div class="row" >
+                            <div class="col-12" style="margin-left:0px; padding-left:0px;">
+                                <p style="color: #000; font-size: 22px;">
+                                    To be Filled by Accounts:
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="row" style="margin-top: 0px;">
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="width: 50%;">
+                                        <table class="table" style="border:0px!important;">
+                                            <tr>
+                                                <td class="text-left" style="width: 50%;">
+                                                    <p><b>Amount Approved</b></p>
+                                                </td>
+                                                <td class="text-left" style="width: 50%;">
+                                                   : <b><span t-if="doc.approved_amount > 0" t-esc="'{0:,.2f}'.format(doc.approved_amount)" /></b>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-left" style="width: 50%;">
+                                                    <p><b>Actual Loan Amount (Top-Up)</b></p>
+                                                </td>
+                                                <td class="text-left" style="width: 50%;">
+                                                   : <b><span t-if="doc.loan_amount > 0" t-esc="'{0:,.2f}'.format(doc.loan_amount)" /></b>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-left" style="width: 50%; ">
+                                                    <p><b>Installment Amount</b></p>
+                                                </td>
+                                                <td class="text-left" style="width: 50%;">
+                                                    : <b><span t-if="doc.installment_amount > 0" t-esc="'{0:,.2f}'.format(doc.installment_amount)" /></b>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-left" style="width: 50%;">
+                                                    <p><b>No of Installment</b></p>
+                                                </td>
+                                                <td class="text-left" style="width: 50%;">
+                                                    : <b><span t-if="doc.term > 0" t-esc="doc.term" /></b>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-left" style="width: 50%;">
+                                                    <p><b>Installment Start Month</b></p>
+                                                </td>
+                                                <td class="text-left" style="width: 50%;">
+                                                     : <b><span t-esc="doc.start_date.strftime('%d-%m-%Y')" /></b>
+                                                </td>
+                                            </tr>
+                                        </table>
+
+                                    </td>
+                                    <td style="width: 50%;">
+                                        <table class="table" style="border:0px!important;">
+                                            <tr>
+                                                <td class="text-left" style="width: 50%;">
+                                                    <p><b>Processing Year</b></p>
+                                                </td>
+                                                <td class="text-left" style="width: 50%;">
+                                                    : <span t-esc="doc.start_date.year" />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-left" style="width: 50%;">
+                                                    <p><b>Processing Fee</b></p>
+                                                </td>
+                                                <td class="text-left" style="width: 50%;">
+                                                    : 0
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-left" style="width: 50%;">
+                                                    <p><b>Payment after Charge</b></p>
+                                                </td>
+                                                <td class="text-left" style="width: 50%;">
+                                                    : <b><span t-if="doc.approved_amount > 0" t-esc="'{0:,.2f}'.format(doc.approved_amount)" /></b>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+
+                        </div>
+
+
+                    <br/>
+                    <p class="text-left">The above information and the reason for requesting loan is correct.</p>
+                    <br/><br/><br/><br/>
+
+                        <div class="row">
+                            <table style="width: 100%; border: none !important;">
+                                <tr>
+                                    <td style="width: 25%;text-align:center;border: none !important;">
+                                        <img t-if="doc.manager_id.signature" t-att-src="image_data_uri(doc.manager_id.signature)"
+                                     style="max-height:30pt;max-width:90%;" alt="-"/>
+                                    </td>
+                                    <td style="width: 25%;text-align:center;border: none !important;">
+                                        <img t-if="doc.hr_manager_id.signature" t-att-src="image_data_uri(doc.hr_manager_id.signature)"
+                                     style="max-height:30pt;max-width:90%;" alt="-"/>
+                                    </td>
+                                    <td style="width: 25%;text-align:center;border: none !important;">
+                                        <img t-if="doc.acc_manager_id.signature" t-att-src="image_data_uri(doc.acc_manager_id.signature)"
+                                     style="max-height:30pt;max-width:90%;" alt="-"/>
+                                    </td>
+                                    <td style="width: 25%;text-align:center;border: none !important;">
+                                        <img t-if="doc.trusty_manager_id.signature" t-att-src="image_data_uri(doc.trusty_manager_id.signature)"
+                                     style="max-height:30pt;max-width:90%;" alt="-"/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="row">
+                            <table style="width: 100%; border: none !important;">
+                                <tr >
+                                    <td style="width: 25%; text-align:center;border: none !important;">
+                                        <p style="color: #000; font-size: 20px;">
+                                            Department
+                                        </p>
+                                    </td>
+                                    <td style="width: 25%;text-align:center;border: none !important;">
+                                        <p style="color: #000; font-size: 20px;">
+                                            HR
+                                        </p>
+                                    </td>
+                                    <td style="width: 25%;text-align:center;border: none !important;">
+                                        <p style="color: #000; font-size: 20px; ">
+                                            Accounts
+                                        </p>
+                                    </td>
+                                    <td style="width: 25%;text-align:center;border: none !important;">
+                                        <p style="color: #000; font-size: 20px; ">
+                                            Trusty
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        </t>
+
+
+                    </div>
+                </t>
+            </t>
+		</template>
+
+    </data>
+</odoo>

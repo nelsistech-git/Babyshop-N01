@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <!-- particulars View Tree -->
+        <record id="hr_particulars_view_tree" model="ir.ui.view">
+            <field name="name">hr.particulars.tree</field>
+            <field name="model">hr.particulars</field>
+            <field name="arch" type="xml">
+                <tree string="Particulars">
+                    <field name="dept_name"/>
+                    <field name="name"/>
+                    <field name="active"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- particulars View form-->
+        <record id="hr_particulars_view_form" model="ir.ui.view">
+            <field name="name">hr.particulars.form</field>
+            <field name="model">hr.particulars</field>
+            <field name="arch" type="xml">
+                <form string="Particulars">
+                    <sheet>
+                        <group name="main">
+                            <group>
+                                <field name="dept_name" required="1"/>
+                                <field name="name" required="1"/>
+                            </group>
+                            <group>
+                                <field name="active" />
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!--particulars View Search -->
+<!--        <record id="hr_particulars_view_search" model="ir.ui.view">-->
+<!--            <field name="name">hr.particulars.search</field>-->
+<!--            <field name="model">hr.particulars</field>-->
+<!--            <field name="arch" type="xml">-->
+<!--                <search string="Particulars">-->
+<!--                    <filter string="Active" name="active" domain="[('active','=',True)]" help="Filtered by Active Status" />-->
+<!--                    <filter string="Inactive" name="inactive" domain="[('active','=',False)]" help="Filtered by Inactive Status" />-->
+<!--                </search>-->
+<!--            </field>-->
+<!--        </record>-->
+
+        <!--Action View-->
+        <record id="hr_particulars_list_action" model="ir.actions.act_window">
+            <field name="name">Fringe Benefits Particulars</field>
+            <field name="res_model">hr.particulars</field>
+<!--            <field name="view_type">form</field>-->
+<!--            <field name="view_mode">tree,form</field>-->
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">Create the first particulars</p>
+            </field>
+        </record>
+
+        <!--Add Menu Item-->
+        <menuitem id="menu_hr_particulars_config" name="Fringe Benefits Particulars" parent="custom_hr_employee.menu_hr_employee_settings_root"
+        sequence="35" action="hr_particulars_list_action" groups="hr.group_hr_manager,hr.group_hr_user"/>
+
+        <!--Fringe Benefits Details-->
+        <!--Form View-->
+        <record id="hr_employee_fringe_benefits_details_view_form" model="ir.ui.view">
+            <field name="name">hr.employee.form</field>
+            <field name="model">hr.facilities</field>
+            <field name="arch" type="xml">
+                <form string="Fringe Benefits Details">
+                    <sheet>
+                        <group name="main">
+                            <group>
+                                <field name="employee_id" required="1" string="Employee" options="{'no_open':True,'no_create':1,'no_create_edit':1}"/>
+                                <field name="dept_name" required="1"/>
+                                <field name="particular_id" options="{'no_open':True,'no_create':1,'no_create_edit':1}" required="1"/>
+                                <field name="date" />
+                                <field name="value" required="1"/>
+                                <field name="qty" required="1"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!--Tree View-->
+        <record id="hr_employee_fringe_benefits_details_view_tree" model="ir.ui.view">
+            <field name="name">hr.employee.tree</field>
+            <field name="model">hr.facilities</field>
+            <field name="arch" type="xml">
+                <tree string="Fringe Benefits Details">
+                    <field name="employee_id" required="1" string="Employee"/>
+                    <field name="dept_name"/>
+                    <field name="particular_id"/>
+                    <field name="date"/>
+                    <field name="value"/>
+                    <field name="qty"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="hr_employee_fringe_benefits_details_view_list_action" model="ir.actions.act_window">
+            <field name="name">Fringe Benefits Details</field>
+            <field name="res_model">hr.facilities</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">Create the first Fringe Benefits Details</p>
+            </field>
+        </record>
+
+        <menuitem id="hr_employee_fringe_benefits_details" name="Fringe Benefits Details" parent="custom_hr_employee.menu_hr_employee_details"
+        sequence="30" action="hr_employee_fringe_benefits_details_view_list_action" groups="hr.group_hr_manager"/>
+
+    </data>
+</odoo>

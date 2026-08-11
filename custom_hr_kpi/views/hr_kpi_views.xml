@@ -1,0 +1,1361 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Corporate KPI line tree -->
+    <record id="view_hr_kpi_corporate_line_tree_ghl" model="ir.ui.view">
+        <field name="name">hr.kpi.corporate.performance.tree.ghl</field>
+        <field name="model">hr.kpi.corporate.performance</field>
+        <field name="arch" type="xml">
+            <tree string="Corporate KPIs" class="kpi_corporate_style">
+                <field name="kpi_type_id" />
+                <field name="kpi_name_id" />
+                <field name="kpi_name_description" />
+                <field name="kpi_name_weight" />
+                <field name="kpi_name_timeframe" />
+                <field name="target_l1" />
+                <field name="target_l2" />
+                <field name="target_l3" />
+                <field name="target_l4" />
+                <field name="target_l5" />
+                <field name="achieved_value" force_save="1"/>
+                <field name="achieved_level" />
+                <field name="kpi_weightage_incentive_payout" string="Incentive Payout (KPI)" sum="Total"/>
+                <field name="kpi_weightage_performace_rating" string="Performace Rating (KPI)" sum="Total"/>
+                <field name="weighted_achivement_incentive_payout" string="Incentive Payout (Achivement)" sum="Total" />
+                <field name="weighted_achivement_performace_rating" string="Performace Rating (Achivement)" sum="Total"/>
+            </tree>
+        </field>
+    </record>
+
+
+    <!-- Corporate KPI line form -->
+    <record id="view_hr_kpi_corporate_line_form_ghl" model="ir.ui.view">
+        <field name="name">hr.kpi.corporate.performance.form.ghl</field>
+        <field name="model">hr.kpi.corporate.performance</field>
+        <field name="arch" type="xml">
+            <form string="Corporate KPI Performance">
+                <style>
+                .kpi_form_sheet {
+                    background-color: #f8f9fa;
+                    font-family: 'Inter', sans-serif;
+                }
+                .kpi_header {
+                    padding: 12px;
+                    background: linear-gradient(135deg, #0b3a85, #041c4a);
+                    border-radius: 6px;
+                    margin-bottom: 12px;
+                    color: white;
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+                }
+                .kpi_header h1 {
+                    font-size: 18px;
+                    font-weight: 600;
+                    margin: 0;
+                    padding: 0;
+                    color: white !important;
+                }
+                .kpi_header .kpi_type {
+                    font-size: 12px;
+                    opacity: 1;
+                    margin-top: 2px;
+                }
+                .kpi_card {
+                    background-color: #ffffff;
+                    border-radius: 6px;
+                    padding: 10px;
+                    margin-bottom: 12px;
+                    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.03);
+                    border: 1px solid #e9ecef;
+                }
+                .kpi_card h2 {
+                    font-size: 14px;
+                    font-weight: 500;
+                    color: #495057;
+                    border-bottom: 1px solid #dee2e6;
+                    padding-bottom: 6px;
+                    margin-top: 0;
+                    margin-bottom: 10px;
+                }
+                .kpi_field_group {
+                    display: flex;
+                    flex-direction: column;
+                    margin-bottom: 10px;
+                }
+                .kpi_label {
+                    font-size: 10px;
+                    font-weight: 500;
+                    color: #6c757d;
+                    margin-bottom: 3px;
+                    text-transform: uppercase;
+                }
+                .kpi_value {
+                    font-size: 13px;
+                    color: #212529;
+                }
+                .kpi_description {
+                    font-style: italic;
+                    color: #495057;
+                    background-color: #f8f9fa;
+                    padding: 6px;
+                    border-radius: 5px;
+                    border-left: 3px solid #007bff;
+                }
+                .kpi_targets_container {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+                    gap: 10px;
+                    text-align: center;
+                }
+                .kpi_target_box {
+                    background-color: #f8f9fa;
+                    padding: 10px;
+                    border-radius: 5px;
+                    border: 1px solid #e9ecef;
+                    transition: all 0.18s ease;
+                }
+                .kpi_target_box:hover {
+                    transform: translateY(-1px);
+                    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+                }
+                .kpi_achievement_panel {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 10px;
+                    background-color: #e8f5e9;
+                    border-left: 3px solid #4caf50;
+                    padding: 10px;
+                    border-radius: 8px;
+                }
+                .kpi_achievement_panel .kpi_label {
+                    color: #2e7d32;
+                }
+                .kpi_achievement_panel .kpi_value {
+                    font-size: 16px;
+                    font-weight: 700;
+                    color: #1b5e20;
+                }
+                .kpi_results_grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+                    gap: 10px;
+                }
+                .kpi_result_item {
+                    padding: 10px;
+                    border-radius: 5px;
+                    background-color: #f8f9fa;
+                }
+                .kpi_result_item .kpi_label {
+                    color: #007bff;
+                }
+                .kpi_result_item.rating .kpi_label {
+                    color: #6f42c1;
+                }
+                .kpi_result_item .kpi_value {
+                    font-size: 14px;
+                    font-weight: 600;
+                }
+
+                @media (max-width: 768px) {
+                    .kpi_header h1 { font-size: 16px; }
+                    .kpi_card { padding: 8px; }
+                    .kpi_achievement_panel { grid-template-columns: 1fr; }
+                    .kpi_results_grid { grid-template-columns: 1fr; }
+                }
+                </style>
+
+                <sheet class="kpi_form_sheet">
+                    <div class="kpi_header">
+                        <h1>
+                            <field name="kpi_type_id" placeholder="KPI Type" class="oe_inline"/>
+                        </h1>
+                        <div class="kpi_type">
+                            <field name="kpi_name_id" placeholder="KPI Name" class="oe_inline"/>
+                        </div>
+                    </div>
+
+                    <div class="oe_form_sheet_bg">
+                        <div class="row">
+                            <div class="col-lg-7">
+                                <div class="kpi_card">
+                                    <h2>KPI Details</h2>
+                                    <div class="kpi_field_group">
+                                        <span class="kpi_label">Description</span>
+                                        <div class="kpi_value kpi_description">
+                                            <field name="kpi_name_description" nolabel="1"/>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <div class="kpi_field_group">
+                                                <span class="kpi_label">Weight</span>
+                                                <div class="kpi_value">
+                                                    <field name="kpi_name_weight" nolabel="1"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="kpi_field_group">
+                                                <span class="kpi_label">Timeframe</span>
+                                                <div class="kpi_value">
+                                                    <field name="kpi_name_timeframe" nolabel="1"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="kpi_card">
+                                    <h2>Target Levels</h2>
+                                    <div class="kpi_targets_container">
+                                        <div class="kpi_target_box">
+                                            <span class="kpi_label">Level 1</span>
+                                            <div class="kpi_value">
+                                                <field name="target_l1" nolabel="1"/>
+                                            </div>
+                                        </div>
+                                        <div class="kpi_target_box">
+                                            <span class="kpi_label">Level 2</span>
+                                            <div class="kpi_value">
+                                                <field name="target_l2" nolabel="1"/>
+                                            </div>
+                                        </div>
+                                        <div class="kpi_target_box">
+                                            <span class="kpi_label">Level 3</span>
+                                            <div class="kpi_value">
+                                                <field name="target_l3" nolabel="1"/>
+                                            </div>
+                                        </div>
+                                        <div class="kpi_target_box">
+                                            <span class="kpi_label">Level 4</span>
+                                            <div class="kpi_value">
+                                                <field name="target_l4" nolabel="1"/>
+                                            </div>
+                                        </div>
+                                        <div class="kpi_target_box">
+                                            <span class="kpi_label">Level 5</span>
+                                            <div class="kpi_value">
+                                                <field name="target_l5" nolabel="1"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-5">
+                                <div class="kpi_card">
+                                    <h2>Actual Achievement</h2>
+                                    <div class="kpi_achievement_panel">
+                                        <div class="kpi_field_group">
+                                            <span class="kpi_label">Achieved Value</span>
+                                            <div class="kpi_value">
+                                                <field name="achieved_value" nolabel="1" force_save="1"/>
+                                            </div>
+                                        </div>
+                                        <div class="kpi_field_group">
+                                            <span class="kpi_label">Achieved Level</span>
+                                            <div class="kpi_value">
+                                                <field name="achieved_level" nolabel="1"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="kpi_card">
+                                    <h2>Calculated Results</h2>
+                                    <div class="kpi_results_grid">
+                                        <div class="kpi_result_item incentive">
+                                            <div class="kpi_field_group">
+                                                <span class="kpi_label">Incentive Payout (KPI)</span>
+                                                <div class="kpi_value">
+                                                    <field name="kpi_weightage_incentive_payout" nolabel="1"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="kpi_result_item rating">
+                                            <div class="kpi_field_group">
+                                                <span class="kpi_label">Performance Rating (KPI)</span>
+                                                <div class="kpi_value">
+                                                    <field name="kpi_weightage_performace_rating" nolabel="1"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="kpi_result_item incentive">
+                                            <div class="kpi_field_group">
+                                                <span class="kpi_label">Incentive Payout (Achieved)</span>
+                                                <div class="kpi_value">
+                                                    <field name="weighted_achivement_incentive_payout" nolabel="1"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="kpi_result_item rating">
+                                            <div class="kpi_field_group">
+                                                <span class="kpi_label">Performance Rating (Achieved)</span>
+                                                <div class="kpi_value">
+                                                    <field name="weighted_achivement_performace_rating" nolabel="1"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+
+    <!-- Individual KPI line tree -->
+    <record id="view_hr_kpi_individual_line_tree_ghl" model="ir.ui.view">
+        <field name="name">hr.kpi.individual.performance.tree.ghl</field>
+        <field name="model">hr.kpi.individual.performance</field>
+        <field name="arch" type="xml">
+            <tree string="Individual KPIs" class="kpi_individual_style">
+                <field name="kpi_type_id" />
+                <field name="kpi_name_id" />
+                <field name="kpi_name_description" />
+                <field name="kpi_name_weight" />
+                <field name="target_l1" />
+                <field name="target_l2" />
+                <field name="target_l3" />
+                <field name="target_l4" />
+                <field name="target_l5" />
+                <field name="achieved_value" force_save="1"/>
+                <field name="achieved_level" />
+                <field name="kpi_weightage_incentive_payout" string="Incentive Payout (KPI)" sum="Total"/>
+                <field name="kpi_weightage_performace_rating" string="Performace Rating (KPI)" sum="Total"/>
+                <field name="weighted_achivement_incentive_payout" string="Incentive Payout (Achivement)" sum="Total"/>
+                <field name="weighted_achivement_performace_rating" string="Performace Rating (Achivement)" sum="Total"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Individual KPI line form -->
+    <record id="view_hr_kpi_individual_line_form_ghl" model="ir.ui.view">
+        <field name="name">hr.kpi.individual.performance.form.ghl</field>
+        <field name="model">hr.kpi.individual.performance</field>
+        <field name="arch" type="xml">
+            <form string="Individual KPI Performance">
+                <style>
+            .kpi_form_sheet {
+                background-color: #fdfdfc;
+                font-family: 'Inter', sans-serif;
+            }
+            .kpi_header {
+                padding: 12px;
+                background: linear-gradient(135deg, #6A1B9A, #2c1a3b);
+                border-radius: 6px;
+                margin-bottom: 12px;
+                color: white;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            }
+            .kpi_header h1 {
+                font-size: 18px;
+                font-weight: 600;
+                margin: 0;
+                padding: 0;
+                color: white !important;
+            }
+            .kpi_header .kpi_type {
+                font-size: 12px;
+                opacity: 1;
+                margin-top: 2px;
+            }
+            .kpi_card {
+                background-color: #ffffff;
+                border-radius: 6px;
+                padding: 10px;
+                margin-bottom: 12px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+                border: 1px solid #f0f0f0;
+            }
+            .kpi_card h2 {
+                font-size: 14px;
+                font-weight: 500;
+                color: #4a4a4a;
+                border-bottom: 1px solid #eeeeee;
+                padding-bottom: 6px;
+                margin-top: 0;
+                margin-bottom: 10px;
+            }
+            .kpi_field_group {
+                display: flex;
+                flex-direction: column;
+                margin-bottom: 10px;
+            }
+            .kpi_label {
+                font-size: 10px;
+                font-weight: 500;
+                color: #888888;
+                margin-bottom: 3px;
+                text-transform: uppercase;
+            }
+            .kpi_value {
+                font-size: 13px;
+                color: #333333;
+            }
+            .kpi_description {
+                font-style: italic;
+                color: #4a4a4a;
+                background-color: #f9f9f9;
+                padding: 6px;
+                border-radius: 5px;
+                border-left: 3px solid #b29465; 
+            }
+            .kpi_targets_container {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+                gap: 10px;
+                text-align: center;
+            }
+            .kpi_target_box {
+                background-color: #fcfcfc;
+                padding: 10px;
+                border-radius: 5px;
+                border: 1px solid #f0f0f0;
+                transition: all 0.18s ease;
+            }
+            .kpi_target_box:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+                border-color: #e0e0e0;
+            }
+            .kpi_achievement_panel {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+                background-color: #f0f7f4;          
+                border-left: 3px solid #4a6c5a;     
+                padding: 10px;
+                border-radius: 8px;
+            }
+            .kpi_achievement_panel .kpi_label {
+                color: #4a6c5a;
+            }
+            .kpi_achievement_panel .kpi_value {
+                font-size: 16px;
+                font-weight: 700;
+                color: #1e3a2b;
+            }
+            .kpi_results_grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+                gap: 10px;
+            }
+            .kpi_result_item {
+                padding: 10px;
+                border-radius: 5px;
+                background-color: #f9f9f9;
+            }
+            .kpi_result_item.incentive .kpi_label {
+                color: #b29465; 
+            }
+            .kpi_result_item.rating .kpi_label {
+                color: #6a5a7f; 
+            }
+            .kpi_result_item .kpi_value {
+                font-size: 14px;
+                font-weight: 600;
+            }
+
+            @media (max-width: 768px) {
+                .kpi_header h1 { font-size: 16px; }
+                .kpi_card { padding: 8px; }
+                .kpi_achievement_panel { grid-template-columns: 1fr; }
+                .kpi_results_grid { grid-template-columns: 1fr; }
+            }
+                </style>
+
+                <sheet class="kpi_form_sheet">
+                    <div class="kpi_header">
+                        <h1>
+                            <field name="kpi_type_id" placeholder="KPI Type" class="oe_inline"/>
+                        </h1>
+                        <div class="kpi_type">
+                            <field name="kpi_name_id" placeholder="KPI Name" class="oe_inline"/>
+                        </div>
+                    </div>
+
+                    <div class="oe_form_sheet_bg">
+                        <div class="row">
+                            <div class="col-lg-7">
+                                <div class="kpi_card">
+                                    <h2>KPI Details</h2>
+                                    <div class="kpi_field_group">
+                                        <span class="kpi_label">Description</span>
+                                        <div class="kpi_value kpi_description">
+                                            <field name="kpi_name_description" nolabel="1"/>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <div class="kpi_field_group">
+                                                <span class="kpi_label">Weight</span>
+                                                <div class="kpi_value">
+                                                    <field name="kpi_name_weight" nolabel="1"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="kpi_field_group">
+                                                <span class="kpi_label">Timeframe</span>
+                                                <div class="kpi_value">
+                                                    <field name="kpi_name_timeframe" nolabel="1"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="kpi_card">
+                                    <h2>Target Levels</h2>
+                                    <div class="kpi_targets_container">
+                                        <div class="kpi_target_box">
+                                            <span class="kpi_label">Level 1</span>
+                                            <div class="kpi_value">
+                                                <field name="target_l1" nolabel="1"/>
+                                            </div>
+                                        </div>
+                                        <div class="kpi_target_box">
+                                            <span class="kpi_label">Level 2</span>
+                                            <div class="kpi_value">
+                                                <field name="target_l2" nolabel="1"/>
+                                            </div>
+                                        </div>
+                                        <div class="kpi_target_box">
+                                            <span class="kpi_label">Level 3</span>
+                                            <div class="kpi_value">
+                                                <field name="target_l3" nolabel="1"/>
+                                            </div>
+                                        </div>
+                                        <div class="kpi_target_box">
+                                            <span class="kpi_label">Level 4</span>
+                                            <div class="kpi_value">
+                                                <field name="target_l4" nolabel="1"/>
+                                            </div>
+                                        </div>
+                                        <div class="kpi_target_box">
+                                            <span class="kpi_label">Level 5</span>
+                                            <div class="kpi_value">
+                                                <field name="target_l5" nolabel="1"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-5">
+                                <div class="kpi_card">
+                                    <h2>Actual Achievement</h2>
+                                    <div class="kpi_achievement_panel">
+                                        <div class="kpi_field_group">
+                                            <span class="kpi_label">Achieved Value</span>
+                                            <div class="kpi_value">
+                                                <field name="achieved_value" nolabel="1" force_save="1"/>
+                                            </div>
+                                        </div>
+                                        <div class="kpi_field_group">
+                                            <span class="kpi_label">Achieved Level</span>
+                                            <div class="kpi_value">
+                                                <field name="achieved_level" nolabel="1"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="kpi_card">
+                                    <h2>Calculated Results</h2>
+                                    <div class="kpi_results_grid">
+                                        <div class="kpi_result_item incentive">
+                                            <div class="kpi_field_group">
+                                                <span class="kpi_label">Incentive Payout (KPI)</span>
+                                                <div class="kpi_value">
+                                                    <field name="kpi_weightage_incentive_payout" nolabel="1"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="kpi_result_item rating">
+                                            <div class="kpi_field_group">
+                                                <span class="kpi_label">Performance Rating (KPI)</span>
+                                                <div class="kpi_value">
+                                                    <field name="kpi_weightage_performace_rating" nolabel="1"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="kpi_result_item incentive">
+                                            <div class="kpi_field_group">
+                                                <span class="kpi_label">Incentive Payout (Achieved)</span>
+                                                <div class="kpi_value">
+                                                    <field name="weighted_achivement_incentive_payout" nolabel="1"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="kpi_result_item rating">
+                                            <div class="kpi_field_group">
+                                                <span class="kpi_label">Performance Rating (Achieved)</span>
+                                                <div class="kpi_value">
+                                                    <field name="weighted_achivement_performace_rating" nolabel="1"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+
+    <!-- Main tree view for hr.kpi -->
+    <record id="view_hr_kpi_tree_ghl" model="ir.ui.view">
+        <field name="name">hr.kpi.tree.ghl</field>
+        <field name="model">hr.kpi</field>
+        <field name="arch" type="xml">
+            <tree string="GHL KPIs">
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="staff_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Main form view for hr.kpi -->
+    <record id="view_hr_kpi_form_ghl" model="ir.ui.view">
+        <field name="name">hr.kpi.form.ghl</field>
+        <field name="model">hr.kpi</field>
+        <field name="arch" type="xml">
+            <form string="GHL KPI">
+                <style>
+                @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600&amp;display=swap');
+
+                .kpi_corporate_style {
+                    --primary-color: #0D47A1;      
+                    --primary-color-dark: #0b3a85;
+                    --primary-color-light: #d4e3ff;
+                    --primary-color-hover: #e7f0ff;
+                    --accent-gold: #FFAB00;       
+                    --accent-teal: #00838F;       
+                    --accent-green: #4CAF50;
+
+                    --text-color-dark: #263238;
+                    --text-color-light: #455A64;
+                    --text-color-white: #ffffff;
+                    --text-color-muted: #6c757d;
+
+                    --border-color: #cfd8dc;
+                    --border-radius: 12px;
+
+                    --header-bg-start: #f5f7fa;
+                    --header-bg-end: #e8eef3;
+                    --row-bg-even: #f8fafc;
+                    --row-bg-empty: #f8f9fa;
+                }
+
+                .kpi_corporate_style .o_list_view {
+                    border: 1px solid var(--border-color) !important;
+                    border-radius: var(--border-radius) !important;
+                    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.07) !important;
+                    overflow: hidden !important;
+                    font-family: 'Roboto', sans-serif !important;
+                    font-size: 12px !important;
+                    font-weight: 900 !important;
+                    padding: 20px 20px;
+                }
+
+                .kpi_corporate_style .o_list_view > thead {
+                    background-image: linear-gradient(to bottom, var(--header-bg-start), var(--header-bg-end)) !important;
+                    border-bottom: 3px solid var(--primary-color) !important;
+                }
+                .kpi_corporate_style .o_list_view > thead > tr > th {
+                    color: var(--primary-color) !important;
+                    font-weight: 600 !important;
+                    font-size: 14px !important;
+                    text-transform: uppercase !important;
+                    letter-spacing: 0.8px !important;
+                    padding: 14px 18px !important;
+                    text-align: left !important;
+                    white-space: nowrap !important;
+                }
+
+                .kpi_corporate_style .o_list_view > tbody > tr > td {
+                    padding: 14px 18px !important;
+                    vertical-align: middle !important;
+                    font-size: 14px !important;
+                    color: var(--text-color-light) !important;
+                    border-top: 1px solid var(--border-color) !important;
+                    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+                }
+                .kpi_corporate_style .o_list_view > tbody > tr:nth-child(even) {
+                    background-color: var(--row-bg-even) !important;
+                }
+                .kpi_corporate_style .o_list_view > tbody > tr:not(.o_data_row_selected):hover > td {
+                    background-color: var(--primary-color-hover) !important;
+                    color: var(--text-color-dark) !important;
+                }
+
+                .kpi_corporate_style .o_list_view td[data-name="kpi_name_id"] { font-weight: 600 !important; color: var(--primary-color) !important; }
+                .kpi_corporate_style .o_list_view td[data-name="achieved_level"] { font-weight: bold !important; font-size: 15px !important; color: var(--accent-teal) !important; }
+                .kpi_corporate_style .o_list_view td[data-name="weighted_achivement_incentive_payout"],
+                .kpi_corporate_style .o_list_view td[data-name="weighted_achivement_performace_rating"] { text-align: right !important; font-weight: bold !important; font-size: 15px !important; color: var(--accent-green) !important; }
+                
+                .kpi_corporate_style .o_field_x2many_list_row_add > a {
+                    display: inline-block !important; padding: 10px 22px !important; font-size: 14px !important;
+                    font-weight: 600 !important; color: var(--text-color-white) !important; background-color: var(--primary-color) !important;
+                    border: none !important; border-radius: 25px !important; text-decoration: none !important;
+                    transition: all 0.2s ease-in-out !important; box-shadow: 0 4px 8px rgba(13, 71, 161, 0.3) !important;
+                    margin-top: 12px !important;
+                }
+                .kpi_corporate_style .o_field_x2many_list_row_add > a:hover {
+                    background-color: var(--primary-color-dark) !important; box-shadow: 0 6px 12px rgba(11, 58, 133, 0.4) !important;
+                    transform: translateY(-2px) !important;
+                }
+                
+                .kpi_corporate_style .o_list_view .o_list_empty_row td {
+                    text-align: center !important; padding: 50px !important; font-size: 18px !important;
+                    color: var(--text-color-muted) !important; background-color: var(--row-bg-empty) !important;
+                }
+                .kpi_corporate_style .o_list_view .o_list_empty_row td::before {
+                    content: "\f0ae"; font-family: "FontAwesome"; font-size: 52px;
+                    display: block; margin-bottom: 20px; color: var(--accent-gold);
+                }
+
+
+                /* common one2many style */
+
+                .kpi_common_style {
+                    --primary-color: #0D47A1;      
+                    --primary-color-dark: #0b3a85;
+                    --primary-color-light: #d4e3ff;
+                    --primary-color-hover: #e7f0ff;
+                    --accent-gold: #FFAB00;       
+                    --accent-teal: #00838F;       
+                    --accent-green: #4CAF50;
+
+                    --text-color-dark: #263238;
+                    --text-color-light: #455A64;
+                    --text-color-white: #ffffff;
+                    --text-color-muted: #6c757d;
+
+                    --border-color: #cfd8dc;
+                    --border-radius: 12px;
+
+                    --header-bg-start: #f5f7fa;
+                    --header-bg-end: #e8eef3;
+                    --row-bg-even: #f8fafc;
+                    --row-bg-empty: #f8f9fa;
+                }
+
+                .kpi_common_style .o_list_view {
+                    border: 1px solid var(--border-color) !important;
+                    border-radius: var(--border-radius) !important;
+                    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.07) !important;
+                    overflow: hidden !important;
+                    font-family: 'Roboto', sans-serif !important;
+                    font-size: 12px !important;
+                    font-weight: 900 !important;
+                    padding: 20px 20px;
+                }
+
+                .kpi_common_style .o_list_view > thead {
+                    background-image: linear-gradient(to bottom, var(--header-bg-start), var(--header-bg-end)) !important;
+                    border-bottom: 3px solid var(--primary-color) !important;
+                }
+                .kpi_common_style .o_list_view > thead > tr > th {
+                    color: var(--primary-color) !important;
+                    font-weight: 600 !important;
+                    font-size: 14px !important;
+                    text-transform: uppercase !important;
+                    letter-spacing: 0.8px !important;
+                    padding: 14px 18px !important;
+                    text-align: left !important;
+                    white-space: nowrap !important;
+                }
+
+                .kpi_common_style .o_list_view > tbody > tr > td {
+                    padding: 14px 18px !important;
+                    vertical-align: middle !important;
+                    font-size: 14px !important;
+                    color: var(--text-color-light) !important;
+                    border-top: 1px solid var(--border-color) !important;
+                    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+                }
+                .kpi_common_style .o_list_view > tbody > tr:nth-child(even) {
+                    background-color: var(--row-bg-even) !important;
+                }
+                .kpi_common_style .o_list_view > tbody > tr:not(.o_data_row_selected):hover > td {
+                    background-color: var(--primary-color-hover) !important;
+                    color: var(--text-color-dark) !important;
+                }
+
+                .kpi_common_style .o_list_view td[data-name="kpi_name_id"] { font-weight: 600 !important; color: var(--primary-color) !important; }
+                .kpi_common_style .o_list_view td[data-name="achieved_level"] { font-weight: bold !important; font-size: 15px !important; color: var(--accent-teal) !important; }
+                .kpi_common_style .o_list_view td[data-name="weighted_achivement_incentive_payout"],
+                .kpi_common_style .o_list_view td[data-name="weighted_achivement_performace_rating"] { text-align: right !important; font-weight: bold !important; font-size: 15px !important; color: var(--accent-green) !important; }
+                
+                .kpi_common_style .o_field_x2many_list_row_add > a {
+                    display: inline-block !important; padding: 10px 22px !important; font-size: 14px !important;
+                    font-weight: 600 !important; color: var(--text-color-white) !important; background-color: var(--primary-color) !important;
+                    border: none !important; border-radius: 25px !important; text-decoration: none !important;
+                    transition: all 0.2s ease-in-out !important; box-shadow: 0 4px 8px rgba(13, 71, 161, 0.3) !important;
+                    margin-top: 12px !important;
+                }
+                .kpi_common_style .o_field_x2many_list_row_add > a:hover {
+                    background-color: var(--primary-color-dark) !important; box-shadow: 0 6px 12px rgba(11, 58, 133, 0.4) !important;
+                    transform: translateY(-2px) !important;
+                }
+                
+                .kpi_common_style .o_list_view .o_list_empty_row td {
+                    text-align: center !important; padding: 50px !important; font-size: 18px !important;
+                    color: var(--text-color-muted) !important; background-color: var(--row-bg-empty) !important;
+                }
+                .kpi_common_style .o_list_view .o_list_empty_row td::before {
+                    content: "\f0ae"; font-family: "FontAwesome"; font-size: 52px;
+                    display: block; margin-bottom: 20px; color: var(--accent-gold);
+                }
+
+                /* Individual one2many style */
+
+
+
+                .kpi_individual_style {
+                    --primary-color: #6A1B9A;     
+                    --primary-color-dark: #4A148C;
+                    --primary-color-light: #f3e5f5;
+                    --primary-color-hover: #faf5fe;
+                    --accent-cyan: #00ACC1;       
+                    --accent-magenta: #AD1457;    
+                    --accent-green: #2E7D32;
+
+                    --text-color-dark: #311B92;
+                    --text-color-light: #4A148C;
+                    --text-color-white: #ffffff;
+                    --text-color-muted: #6c757d;
+
+                    --border-color: #d1c4e9;
+                    --border-radius: 12px;
+
+                    --header-bg-start: #f8f5fa;
+                    --header-bg-end: #f1eaf5;
+                    --row-bg-even: #fcf9fd;
+                    --row-bg-empty: #f8f5fa;
+                }
+
+                .kpi_individual_style .o_list_view {
+                    border: 1px solid var(--border-color) !important;
+                    border-radius: var(--border-radius) !important;
+                    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.07) !important;
+                    overflow: hidden !important;
+                    font-family: 'Roboto', sans-serif !important;
+                    font-size: 12px !important;
+                    font-weight: 900 !important;
+                    padding: 20px 20px;                }
+
+                .kpi_individual_style .o_list_view > thead {
+                    background-image: linear-gradient(to bottom, var(--header-bg-start), var(--header-bg-end)) !important;
+                    border-bottom: 3px solid var(--primary-color) !important;
+                }
+                .kpi_individual_style .o_list_view > thead > tr > th {
+                    color: var(--primary-color) !important;
+                    font-weight: 600 !important;
+                    font-size: 14px !important;
+                    text-transform: uppercase !important;
+                    letter-spacing: 0.8px !important;
+                    padding: 14px 18px !important;
+                    text-align: left !important;
+                    white-space: nowrap !important;
+                }
+
+                .kpi_individual_style .o_list_view > tbody > tr > td {
+                    padding: 14px 18px !important;
+                    vertical-align: middle !important;
+                    font-size: 14px !important;
+                    color: var(--text-color-light) !important;
+                    border-top: 1px solid var(--border-color) !important;
+                    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+                }
+                .kpi_individual_style .o_list_view > tbody > tr:nth-child(even) {
+                    background-color: var(--row-bg-even) !important;
+                }
+                .kpi_individual_style .o_list_view > tbody > tr:not(.o_data_row_selected):hover > td {
+                    background-color: var(--primary-color-hover) !important;
+                    color: var(--text-color-dark) !important;
+                }
+
+                .kpi_individual_style .o_list_view td[data-name="kpi_name_id"] { font-weight: 600 !important; color: var(--primary-color) !important; }
+                .kpi_individual_style .o_list_view td[data-name="achieved_level"] { font-weight: bold !important; font-size: 15px !important; color: var(--accent-magenta) !important; }
+                .kpi_individual_style .o_list_view td[data-name="weighted_achivement_incentive_payout"],
+                .kpi_individual_style .o_list_view td[data-name="weighted_achivement_performace_rating"] { text-align: right !important; font-weight: bold !important; font-size: 15px !important; color: var(--accent-green) !important; }
+                .kpi_individual_style .o_list_view td[data-name="target_l1"] { padding-left: 4px !important; padding-right: 4px !important; }
+
+                .kpi_individual_style .o_field_x2many_list_row_add > a {
+                    display: inline-block !important; padding: 10px 22px !important; font-size: 14px !important;
+                    font-weight: 600 !important; color: var(--text-color-white) !important; background-color: var(--primary-color) !important;
+                    border: none !important; border-radius: 25px !important; text-decoration: none !important;
+                    transition: all 0.2s ease-in-out !important; box-shadow: 0 4px 8px rgba(106, 27, 154, 0.3) !important;
+                    margin-top: 12px !important;
+                }
+                .kpi_individual_style .o_field_x2many_list_row_add > a:hover {
+                    background-color: var(--primary-color-dark) !important; box-shadow: 0 6px 12px rgba(74, 20, 140, 0.4) !important;
+                    transform: translateY(-2px) !important;
+                }
+
+                .kpi_individual_style .o_list_view .o_list_empty_row td {
+                    text-align: center !important; padding: 50px !important; font-size: 18px !important;
+                    color: var(--text-color-muted) !important; background-color: var(--row-bg-empty) !important;
+                }
+                .kpi_individual_style .o_list_view .o_list_empty_row td::before {
+                    content: "\f007"; font-family: "FontAwesome"; font-size: 52px;
+                    display: block; margin-bottom: 20px; color: var(--accent-cyan);
+                    
+                }
+
+                .additional_header{
+                    margin-top:80px; font-size:20px; font-weight:700; color:#0f172a; border-bottom:3px solid #3b82f6; padding-bottom:10px; letter-spacing:0.5px; font-family:'Segoe UI',sans-serif;
+                }                 
+                .additional_header_indi{
+                    margin-top:80px; font-size:20px; font-weight:700; color:#0f172a; border-bottom:3px solid #6A1B9A; padding-bottom:10px; letter-spacing:0.5px; font-family:'Segoe UI',sans-serif;
+                } 
+                
+                /* Notebook Styles */ 
+
+                .o_form_sheet_bg, .o_form_view .o_form_sheet {
+                    background-color: #fafafaff !important; 
+                }
+
+                .o_form_view .o_notebook > .nav-tabs {
+                    border-bottom: none; 
+                    display: flex;
+                    justify-content: center; 
+                    gap: 12px; 
+                    padding: 12px 0;
+                }
+
+                .o_form_view .o_notebook > .nav-tabs .nav-item .nav-link {
+                    background-color: #ffffff;
+                    color: #4b5563;
+                    border: 1px solid #d1d5db;
+                    border-radius: 12px; 
+                    padding: 12px 24px;
+                    font-weight: 600;
+                    font-size: 15px;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+                    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+                }
+
+                .nav-tabs{
+                    border-top-right-radius: 16px;
+                    border-bottom-right-radius: 16px;                    
+                    max-width: fit-content;
+                }
+
+                .o_form_view .o_notebook > .nav-tabs .nav-item .nav-link:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 8px rgba(0,0,0,0.07);
+                }
+
+                .o_form_view .o_notebook > .nav-tabs .nav-item .nav-link.active {
+                    background-color: #4f46e5;
+                    color: #ffffff;
+                    border-color: #4f46e5;
+                    box-shadow: 0 10px 20px -5px rgba(79, 70, 229, 0.4);
+                    transform: translateY(-4px) scale(1.03);
+                }
+
+                /* Fot enlarging the One2many START*/
+
+                .o_form_view .o_notebook > .tab-content {
+                    margin: 0 !important;
+                    margin-top: 16px;
+                    padding: 0 !important;
+                    width: 100%;
+                }
+
+                .o_form_view .o_notebook > .tab-content:has(.kpi_corporate_style),
+                .o_form_view .o_notebook > .tab-content:has(.kpi_individual_style) {
+                    transform: scale(1.025); 
+                }
+                
+                /* For enlarging the One2many END*/
+
+                .o_form_view .o_notebook > .tab-content > .tab-pane {
+                }
+
+                @keyframes fadeIn {
+                    from { opacity: 0; transform: translateY(10px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+                .o_form_view .o_notebook > .tab-content > .tab-pane.active {
+                    animation: fadeIn 0.4s ease-out;
+                }
+                
+                .payout-container.light-tech {
+                    border-radius: 5px;
+                    padding: 15px 20px 0 20px;
+                    display: flex;
+                    color: #fff;
+                    justify-content: space-between;
+                    align-items: baseline;
+                    box-shadow: 0 4px 15px rgba(0, 20, 50, 0.1);
+                    margin-top: 20px;
+                    background-color: #0b3a85 !important;
+                    max-width: fit-content;
+                    margin-left:auto;
+                    font-family: 'Roboto', sans-serif;
+                    font-weight: 900;
+
+                }
+
+                .payout-container.light-tech p {
+                    font-family: 'Roboto', sans-serif;
+                    color: #fff; 
+                    font-size: 12px;
+                    font-weight: 900;
+                    text-transform: uppercase;
+                    letter-spacing: 1.5px;
+                }
+
+                .payout-container.light-tech .payout-amount {
+                    color: var(--accent-color);
+                    font-size: 22px; 
+                    font-weight: 700;
+                    padding: 10px 20px;
+                    border-radius: 4px;
+                    border: 1px solid var(--accent-color);
+                    box-shadow: inset 0 2px 4px rgba(0, 123, 255, 0.15);
+                    transition: all 0.2s ease-in-out;
+                }
+
+                .payout-container.light-tech:hover .payout-amount {
+                    transform: scale(1.05);
+                    box-shadow: 0 0 12px rgba(0, 123, 255, 0.4), 
+                inset 0 2px 4px rgba(0, 123, 255, 0.2);
+                }
+
+
+
+                /* Individual footer */
+
+                .payout-container.light-tech-indi {
+                    border-radius: 5px;
+                    padding: 15px 20px 0 20px;
+                    background-color:#6A1B9A;
+                    color:#fff;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: baseline;
+                    box-shadow: 0 4px 15px rgba(20, 0, 50, 0.1);
+                    margin-top: 20px;
+                    max-width: fit-content;
+                    margin-left:auto;
+                    font-family: 'Roboto', sans-serif;
+                    font-weight: 900;
+
+                }
+
+                .payout-container.light-tech-indi p {
+                    font-family: 'Roboto', sans-serif;
+                    color: #fff;
+                    font-size: 12px;
+                    font-weight: 900;
+                    text-transform: uppercase;
+                    letter-spacing: 1.5px;
+                }
+
+                .payout-container.light-tech-indi .payout-amount {
+                    color: var(--accent-color);
+                    background-color: #FFFFFF;
+                    font-size: 22px;
+                    font-weight: 700;
+                    padding: 10px 20px;
+                    border-radius: 4px;
+                    border: 1px solid var(--accent-color);
+                    box-shadow: inset 0 2px 4px rgba(106, 27, 154, 0.15); 
+                    transition: all 0.2s ease-in-out;
+                }
+
+                .payout-container.light-tech-indi:hover .payout-amount {
+                    transform: scale(1.05);
+                    box-shadow: 0 0 12px rgba(106, 27, 154, 0.4),           
+                                inset 0 2px 4px rgba(106, 27, 154, 0.2);    
+                }
+                </style>
+                <header>
+                    <button name="%(custom_hr_kpi.action_report_hr_kpi_excel)d" string="Download Excel Report" type="action" class="oe_highlight"/>
+
+                    <field name="state" widget="statusbar" statusbar_visible="draft,in_review,approved,rejected"/>
+                    <button name="action_submit_for_review" type="object" string="Submit" invisible="state != 'draft'" class="oe_highlight"/>
+                    <button name="action_approve" type="object" string="Approve" invisible="state != 'in_review'" class="btn-success"/>
+                    <button name="action_reject" type="object" string="Reject" invisible="state != 'in_review'" class="btn-danger"/>
+                    <button name="action_set_draft" type="object" string="Reset to Draft" invisible="state not in ('rejected','approved')"/>
+                </header>
+                <sheet style="background-color: #f8f9fa; font-family: 'Roboto', sans-serif;">
+                    <div class="oe_title mb-3">
+                        <h1 class="d-flex align-items-center" style="font-family: 'Roboto', sans-serif;">
+                            <field name="name" readonly="1" required="0" style="font-family: 'Roboto', sans-serif;"/>
+                        </h1>
+                        <div class="row bg-white shadow-sm mt-2 p-2 pt-3" style="margin-left: 1px; border-radius: 8px; border: 1px solid #dee2e6;">
+                            <div class="col-lg-4">
+                                <label for="employee_id" class="text-muted"/>
+                                <h4 class="mt-2" style="color: #343a40; margin-left:8px; font-family: 'Roboto', sans-serif; font-weight: 900; color:#000; font-size:16px;">
+                                    <field name="employee_id" placeholder="Select Employee" options="{'no_create': True, 'no_edit': True}" style="font-family: 'Roboto', sans-serif;"/>
+                                </h4>
+                            </div>
+                            <div class="col-lg-4">
+                                <label for="period_start" class="text-muted"/>
+                                <h4 class="mt-2 d-flex align-items-center" style="color: #343a40; margin-left:20px; font-family: 'Roboto', sans-serif; font-weight: 900; color:#000; font-size:16px;">
+                                    <field name="period_start" class="oe_inline" style="font-family: 'Roboto', sans-serif; font-weight: 900;"/>
+                                    <span class="mx-2 oe_inline" style="font-family: 'Roboto', sans-serif; font-weight: 900; margin-bottom: 8px;">To</span>
+                                    <field name="period_end" class="oe_inline" style="font-family: 'Roboto', sans-serif; font-weight: 900;"/>
+                                </h4>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr style="border-top: 2px solid #dee2e6;"/>
+
+                    <div class="row mt-4 bg-white p-3 pt-4" style="font-family: 'Roboto', sans-serif;">
+                        <div class="col-lg-6">
+                            <div class="card mb-3" style="border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-radius: 0.5rem;">
+                                <div class="card-header" style="background: linear-gradient(120deg, #0b3a85 0%, #2563eb 100%); color: white; border-top-left-radius: 0.5rem; border-top-right-radius: 0.5rem;">
+                                    <h5 class="card-title mb-0 text-white">
+                                        <i class="fa fa-id-card-o mr-2" style="opacity: 0.9; margin-right: 8px;"/>
+                                        <span>Employee &amp; Position Details</span>
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <group>
+                                        <field name="staff_id" options="{'no_create': True, 'no_edit': True}"/>
+                                        <field name="job_id" options="{'no_create': True, 'no_edit': True}"/>
+                                        <field name="department_id" readonly="1" options="{'no_create': True, 'no_edit': True}"/>
+                                    </group>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6" style="font-family: 'Roboto', sans-serif;">
+                            <div class="card mb-3" style="border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-radius: 0.5rem;">
+                                <div class="card-header" style="background: linear-gradient(120deg, #2563eb 0%, #0b3a85 100%); color: white; border-top-left-radius: 0.5rem; border-top-right-radius: 0.5rem;">
+                                    <h5 class="card-title mb-0 text-white">
+                                        <i class="fa fa-sitemap mr-2" style="opacity: 0.9; margin-right: 8px;"/>
+                                        <span>Approval Hierarchy</span>
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <group>
+                                        <field name="supervisor_id" readonly="1" options="{'no_create': True, 'no_edit': True}" force_save="1"/>
+                                        <field name="supervisor_position" force_save="1"/>
+                                        <field name="next_level_supervisor_id" force_save="1" readonly="1" options="{'no_create': True, 'no_edit': True}"/>
+                                        <field name="next_level_supervisor_position" force_save="1"/>
+                                    </group>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <notebook>
+                        <page string="Corporate Performance">
+                            <h4 class="additional_header">Corporate Performance</h4>
+                            <field name="corporate_performance_ids" nolabel="1" class="kpi_corporate_style">
+                                <tree ref="view_hr_kpi_corporate_line_tree_ghl"/>
+                            </field>
+                            <div class="payout-container light-tech" style="display: flex; justify-content: flex-end; margin-top: 20px;">
+                                <p>Rounded Incentive Payout (Achivement):</p>
+                                <span class="mx-1"></span>
+                                <!-- <label style="font-weight:900; color:#ffffff; font-family: 'Roboto', sans-serif; opacity:1;" string="Rounded Incentive Payout (Achivement)" for='mapped_weighted_achievement_incentive_payout'></label> -->
+                                <field style="font-weight:900; font-size:14px; color:#ffffff; font-family: 'Roboto', sans-serif;" name="mapped_weighted_achievement_incentive_payout" readonly="1"/>
+                            </div>
+                        </page>
+                        <page string="Individual Performance">
+                            <h4 class="additional_header_indi">Individual Performance</h4>
+                            <field name="individual_performance_ids" nolabel="1" class="kpi_individual_style">
+                                <tree ref="view_hr_kpi_individual_line_tree_ghl"/>
+                            </field>
+                            <div class="payout-container light-tech-indi" style="display: flex; justify-content: flex-end; margin-top: 20px;">
+                                <p>Rounded Incentive Payout (Achivement):</p>
+                                <span class="mx-1"></span>
+                                <!-- <label style="font-weight:900; color:#ffffff; font-family: 'Roboto', sans-serif;  opacity:1;" string="Rounded Incentive Payout (Achivement)" for='mapped_weighted_achievement_incentive_payout_individuals'></label> -->
+                                <field style="font-weight:900; font-size:14px; color:#ffffff; font-family: 'Roboto', sans-serif;" name="mapped_weighted_achievement_incentive_payout_individuals" readonly="1"/>
+                            </div>
+                        </page>
+                        <page string="Summary &amp; Development">
+                            <h4 class="additional_header">Summary of Performance</h4>
+                            <div class="table-responsive" style="margin-top:18px; border-radius:12px; overflow:hidden; box-shadow:0 6px 18px rgba(11,36,71,0.08); border:1px solid rgba(11,36,71,0.06); background:#ffffff;">
+                                <table class="table table-bordered table-striped table-hover" style="width:100%; border-collapse:collapse; font-family:'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial; font-size:14px; color:#0f172a;">
+                                    <tbody>
+                                        <tr style="background:linear-gradient(90deg,#2968ccff,#0b3a85);">
+                                            <th style="padding:14px 16px; text-align:left; font-weight:700; color:#ffffff; border:1px solid rgba(37,99,235,0.12); font-size:14px;">Area</th>
+                                            <th style="padding:14px 16px; text-align:center; font-weight:700; color:#ffffff; border:1px solid rgba(37,99,235,0.12); font-size:14px;">Weighted Achievement for Incentive payout</th>
+                                            <th style="padding:14px 16px; text-align:center; font-weight:700; color:#ffffff; border:1px solid rgba(37,99,235,0.12); font-size:14px;">Weighted Achievement for Performance Appraisal</th>
+                                        </tr>
+                                        <tr style="background:#ffffff;">
+                                            <td style="padding:14px 16px; vertical-align:middle; border:1px solid #eef2f7; font-weight:600; color:#0b1220;">Company Performance Score</td>
+                                            <td style="padding:12px 16px; vertical-align:middle; border:1px solid #eef2f7; text-align:center; background:#f8fafc;">
+                                                <field name="mapped_weighted_achievement_incentive_payout" style="display:block; width:100%; padding:8px 10px; border-radius:8px; border:1px solid #e6eefb; background:transparent; font-size:14px; text-align:center; font-weight:900;"/>
+                                            </td>
+                                            <td style="padding:12px 16px; vertical-align:middle; border:1px solid #eef2f7; text-align:center; background:#f8fafc;">
+                                                <field name="total_weighted_achivement_performace_rating" style="display:block; width:100%; padding:8px 10px; border-radius:8px; border:1px solid #e6eefb; background:transparent; font-size:14px; text-align:center; font-weight:900;"/>
+                                            </td>
+                                        </tr>
+                                        <tr style="background:#f9fafb;">
+                                            <td style="padding:14px 16px; vertical-align:middle; border:1px solid #eef2f7; font-weight:600; color:#0b1220;">Individual Performance Score</td>
+                                            <td style="padding:12px 16px; vertical-align:middle; border:1px solid #eef2f7; text-align:center; background:#ffffff;">
+                                                <field name="mapped_weighted_achievement_incentive_payout_individuals" style="display:block; width:100%; padding:8px 10px; border-radius:8px; border:1px solid #e6eefb; background:transparent; font-size:14px; text-align:center; font-weight:900;"/>
+                                            </td>
+                                            <td style="padding:12px 16px; vertical-align:middle; border:1px solid #eef2f7; text-align:center; background:#ffffff;">
+                                                <field name="total_weighted_achivement_performace_rating_individuals" style="display:block; width:100%; padding:8px 10px; border-radius:8px; border:1px solid #e6eefb; background:transparent; font-size:14px; text-align:center; font-weight:900;"/>
+                                            </td>
+                                        </tr>
+                                        <tr style="background:#ffffff;">
+                                            <td style="padding:14px 16px; vertical-align:middle; border:1px solid #eef2f7; font-weight:600; color:#0b1220;">Individual Performance Score after Alignment with Company Performance Score</td>
+                                            <td style="padding:12px 16px; vertical-align:middle; border:1px solid #eef2f7; text-align:center; color:#6b7280; background:#f8fafc; font-weight:900;">N/A</td>
+                                            <td style="padding:12px 16px; vertical-align:middle; border:1px solid #eef2f7; text-align:center; background:#f8fafc;">
+                                                <field name="individual_performance_score_after_alignment" style="display:block; width:100%; padding:8px 10px; border-radius:8px; border:1px solid #e6eefb; background:transparent; font-size:14px; text-align:center; font-weight:900;"/>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <h4 class="additional_header">Consolidated Performance Rating</h4>
+                            <field name="evaluation_line_ids" nolabel="1" class="rounded shadow-sm p-3 border">
+                                <tree editable="bottom" string="Behaviour / Competency Lines" class="kpi_common_style">
+                                    <field name="evaluation_area" readonly="code" />
+                                    <field name="code" column_invisible='1'/>
+                                    <field name="rating" readonly="code == '2A'" />
+                                    <field name="weight"/>
+                                    <field name="weighted_rating" readonly="1"/>
+                                </tree>
+                            </field>
+                            <div class="payout-container light-tech" style="display: flex; justify-content: flex-end; margin-top: 20px;">
+                                <p>Final Individual Performance Rating:</p>
+                                <span class="mx-1"></span>
+                                <!-- <label style="font-weight:900; color:#ffffff; font-family: 'Roboto', sans-serif;  opacity:1;" for='final_individual_performance_rating'></label> -->
+                                <field style="font-weight:900; font-size:14px; color:#ffffff; font-family: 'Roboto', sans-serif;" name="final_individual_performance_rating" readonly="1"/>
+                            </div>
+                            <h4 class="additional_header">Summary of Achievements</h4>
+                            <div class="table-responsive rounded shadow-sm p-3 border">
+                                <table class="table table-bordered table-striped table-hover rounded shadow-sm p-3 border">
+                                    <thead>
+                                        <tr>
+                                            <th style="font-weight:900; background:linear-gradient(90deg,#0b3a85,#2968ccff); color:#fff;">Company Performance Score for Incentive</th>
+                                            <th style="font-weight:900; background:linear-gradient(90deg,#2968ccff,#0b3a85); color:#fff;">Individual Performance Score for Incentive</th>
+                                            <th style="font-weight:900; background:linear-gradient(90deg,#0b3a85,#2968ccff); color:#fff;">Final Individual Performance Rating</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <field name="mapped_weighted_achievement_incentive_payout" style="font-weight:900;color:#000;"/>
+                                            </td>
+                                            <td>
+                                                <field name="mapped_weighted_achievement_incentive_payout_individuals" style="font-weight:900;color:#000;"/>
+                                            </td>
+                                            <td>
+                                                <field name="final_individual_performance_rating" readonly="1" style="font-weight:900;color:#000;"/>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <h4 class="additional_header">Development Plans - An indicative plan needs to be documented and detail will be captured &amp;
+                                                        linked with performance review during "Career Development Review (CDR)"</h4>
+                            <field name="development_plan_ids" nolabel="1" class="rounded shadow-sm p-3 border">
+                                <tree editable="bottom" string="Development Plans" class="kpi_common_style">
+                                    <field name="development_objectives"/>
+                                    <field name="development_initiatives"/>
+                                    <field name="development_initiative_description"/>
+                                    <field name="priority" widget="selection"/>
+                                    <field name="due_date"/>
+                                </tree>
+                            </field>
+                            <h4 class="additional_header">
+                                <span>Ambitions / Job Expectation / Career Aspiration</span>
+                            </h4>
+                            <div class="table-responsive" style="margin-top:24px; border-radius:12px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.08);">
+                                <table class="table table-bordered table-striped" style="width:100%; border-collapse:collapse; font-family:'Segoe UI',sans-serif; font-size:14px; color:#1e293b;">
+                                    <thead style="background:linear-gradient(90deg,#3b82f6,#0b3a85);">
+                                        <tr>
+                                            <th style="padding:14px 18px; text-align:left; font-weight:600; color:#ffffff; border:1px solid #2563eb; font-size:15px;">Action Item</th>
+                                            <th colspan="8" style="padding:14px 18px; text-align:center; font-weight:600; color:#ffffff; border:1px solid #2563eb; font-size:15px;">Appraise Feedback</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr style="background:#ffffff;">
+                                            <td style="padding:18px; vertical-align:top; border:1px solid #e5e7eb; font-weight:600; color:#0f172a; line-height:1.6;">
+                                                <span>5.a - Where would you like to be in a 1-3 years:</span>
+                                                <br style="display:block; margin-top:6px;"/>
+                                                <span style="color:#6b7280; font-weight:400;">(Maximum 300 characters) involving with broader scope of work</span>
+                                            </td>
+                                            <td colspan="8" style="padding:18px; border:1px solid #e5e7eb; background:#f9fafb;">
+                                                <field name="five_a_career_1_3yrs" placeholder="e.g. Senior Software Engineer, Team Lead, etc." style="background: #fff; width:100%; padding:10px 12px; border:1.5px solid #0b3a85; border-radius:8px; font-size:14px; outline:none;"/>
+                                            </td>
+                                        </tr>
+                                        <tr style="background:#fdfdfd;">
+                                            <td style="padding:18px; vertical-align:top; border:1px solid #e5e7eb; font-weight:600; color:#0f172a; line-height:1.6;">
+                                                <span>5.b - What support will you require from the organization</span>
+                                                <br style="display:block; margin-top:6px;"/>
+                                                <span style="color:#6b7280; font-weight:400;">to help you to fulfill your aspiration</span>
+                                            </td>
+                                            <td colspan="8" style="padding:18px; border:1px solid #e5e7eb; background:#f9fafb;">
+                                                <field name="five_b_org_support" placeholder="e.g. Training, Mentorship, Resources, etc." style="background: #fff; width:100%; padding:10px 12px; border:1.5px solid #0b3a85; border-radius:8px; font-size:14px; outline:none;"/>
+                                            </td>
+                                        </tr>
+                                        <tr style="background:#ffffff;">
+                                            <td style="padding:18px; vertical-align:top; border:1px solid #e5e7eb; font-weight:600; color:#0f172a;">
+                                                <span>5.c - Expected Job Position in 1-3 years (Mark option)</span>
+                                            </td>
+                                            <td colspan="8" style="padding:18px; border:1px solid #e5e7eb; background:#f9fafb;">
+                                                <field name="five_c_expected_job" widget="radio" options="{'horizontal': true}" style="margin-right:10px;"/>
+                                            </td>
+                                        </tr>
+                                        <tr style="background:#fdfdfd;">
+                                            <td style="padding:18px; border:1px solid #e5e7eb;">
+                                                <label for="five_c_expected_job_specify" string="Please specify" invisible="five_c_expected_job != 'other'" style="font-weight:600; color:#334155;"></label>
+                                            </td>
+                                            <td colspan="8" style="padding:18px; border:1px solid #e5e7eb; background:#f9fafb;">
+                                                <field name="five_c_expected_job_specify" placeholder="e.g. Senior Software Engineer, Team Lead, etc." invisible="five_c_expected_job != 'other'" style="background: #fff; width:100%; padding:10px 12px; border:1.5px solid #0b3a85; border-radius:8px; font-size:14px; outline:none;"/>
+                                            </td>
+                                        </tr>
+                                        <tr style="background:#ffffff;">
+                                            <td style="padding:18px; vertical-align:top; border:1px solid #e5e7eb; font-weight:600; color:#0f172a; line-height:1.6;">
+                                                <span>5.d - International Mobility:</span>
+                                                <br style="display:block; margin-top:6px;"/>
+                                                <span style="color:#475569;">Are you willing to be relocated to another country?</span>
+                                                <br style="display:block; margin-top:6px;"/>
+                                                <span style="color:#94a3b8;">Remarks (If any issues, challenges, concern that need attention)</span>
+                                            </td>
+                                            <td colspan="8" style="padding:18px; border:1px solid #e5e7eb; background:#f9fafb;">
+                                                <field name="five_d_international_mobility" widget="radio" options="{'horizontal': true}" style="margin-right:10px;"/>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_hr_kpi_ghl" model="ir.actions.act_window">
+        <field name="name">GHL KPIs</field>
+        <field name="res_model">hr.kpi</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_hr_kpi_tree_ghl"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create KPI records for employees using the GHL layout.
+            </p>
+        </field>
+    </record>
+
+
+    <!-- Menu -->
+    <record id="menu_hr_kpi_ghl" model="ir.ui.menu">
+        <field name="name">KPIs</field>
+        <field name="parent_id" ref="hr.menu_hr_root"/>
+        <field name="action" ref="action_hr_kpi_ghl"/>
+        <field name="sequence">10</field>
+    </record>
+</odoo>

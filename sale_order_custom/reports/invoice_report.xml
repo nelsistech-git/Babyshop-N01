@@ -1,0 +1,408 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Paperformat - Margin Top increased -->
+    <record id="paperformat_bluedream_invoice" model="report.paperformat">
+        <field name="name">Blue Dream Invoice A4</field>
+        <field name="default" eval="False"/>
+        <field name="format">A4</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">45</field>        <!-- 5 → 25 (Money Receipt er moto) -->
+        <field name="margin_bottom">5</field>
+        <field name="margin_left">10</field>
+        <field name="margin_right">10</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">0</field>
+        <field name="dpi">96</field>
+    </record>
+
+    <record id="action_report_bluedream_invoice" model="ir.actions.report">
+        <field name="name">Sale Invoice</field>
+        <field name="model">account.move</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">sale_order_custom.report_bluedream_invoice_document</field>
+        <field name="report_file">sale_order_custom.report_bluedream_invoice_document</field>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="paperformat_bluedream_invoice"/>
+    </record>
+
+    <template id="report_bluedream_invoice_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+
+                <style>
+                    body {
+                        margin: 0;
+                        padding: 0;
+                        font-family: Arial, sans-serif;
+                        font-size: 11pt;
+                        color: #333;
+                    }
+                    .page-wrap {
+                        padding: 5px 10px;
+                    }
+                    .inv-title {
+                        font-size: 36pt;
+                        font-weight: bold;
+                        color: #5a7a7a;
+                        margin: 0;
+                        padding: 0;
+                        line-height: 1;
+                    }
+                    .inv-info-tbl {
+                        border-collapse: collapse;
+                        width: 100%;
+                        border: 1px solid #ccc;
+                    }
+                    .inv-info-tbl td {
+                        padding: 5px 8px;
+                        font-size: 11pt;
+                        border: 1px solid #ccc;
+                    }
+                    .addr-box {
+                        border: 1px solid #ccc;
+                        border-collapse: collapse;
+                        width: 100%;
+                        margin-top: 8px;
+                    }
+                    .addr-box td {
+                        padding: 12px;
+                        font-size: 11pt;
+                        vertical-align: top;
+                    }
+                    .addr-head {
+                        font-weight: bold;
+                        color: #5a7a7a;
+                        margin-bottom: 5px;
+                        font-size: 12pt;
+                    }
+                    .prod-tbl {
+                        border-collapse: collapse;
+                        width: 100%;
+                        margin-top: 8px;
+                        font-size: 11pt;
+                    }
+                    .prod-tbl th {
+                        background: #5a7a7a;
+                        color: #fff;
+                        padding: 10px;
+                        border: 1px solid #5a7a7a;
+                        text-align: center;
+                        font-size: 11pt;
+                    }
+                    .prod-tbl td {
+                        border: 1px solid #ccc;
+                        padding: 8px;
+                        text-align: center;
+                    }
+                    .prod-tbl td.desc {
+                        text-align: left;
+                    }
+                    /* Totals */
+                    .tot-tbl {
+                        border-collapse: collapse;
+                        width: 100%;
+                        font-size: 11pt;
+                        border: 1px solid #ccc;
+                    }
+                    .tot-tbl td {
+                        padding: 6px 10px;
+                        border: 1px solid #ccc;
+                    }
+                    /* Light Teal Highlight */
+                    .tot-light {
+                        background: #e8f0f0;
+                        color: #5a7a7a;
+                        font-weight: bold;
+                    }
+                    .tot-light td {
+                        border-color: #5a7a7a;
+                    }
+                    /* Dark Teal Grand Total */
+                    .tot-grand {
+                        background: #5a7a7a;
+                        color: #fff;
+                        font-weight: bold;
+                        font-size: 12pt;
+                    }
+                    .tot-grand td {
+                        border-color: #5a7a7a;
+                    }
+                    /* Terms and Conditions */
+                    .terms-section {
+                        margin-top: 15px;
+                        font-size: 10pt;
+                    }
+                    .terms-head {
+                        font-weight: bold;
+                        color: #5a7a7a;
+                        margin-bottom: 8px;
+                        font-size: 11pt;
+                    }
+                    .terms-content {
+                        white-space: pre-line;
+                        line-height: 1.6;
+                    }
+                    /* Signature Section - 4 columns */
+                    .sig-section {
+                        width: 100%;
+                        margin-top: 60px;
+                        border-collapse: collapse;
+                    }
+                    .sig-section td {
+                        width: 25%;
+                        text-align: center;
+                        vertical-align: bottom;
+                        padding: 0 10px;
+                    }
+                    .sig-line {
+                        border-bottom: 1px solid #333;
+                        width: 90%;
+                        margin: 0 auto;
+                        padding-bottom: 30px;
+                    }
+                    .sig-label {
+                        margin-top: 8px;
+                        font-size: 10pt;
+                        font-weight: bold;
+                    }
+                </style>
+
+                <div class="page-wrap">
+
+                    <!-- INVOICE TITLE + INFO BOX -->
+                    <table width="100%" style="margin-bottom: 8px;">
+                        <tr>
+                            <td width="35%" style="vertical-align:top; padding-top: 0;">
+                                <div class="inv-title">INVOICE</div>
+                            </td>
+                            <td width="65%" style="vertical-align:top;">
+                                <table class="inv-info-tbl">
+                                    <tr>
+                                        <td style="font-weight:bold; width:30%;">Invoice No.</td>
+                                        <td style="width:5%;">:</td>
+                                        <td><t t-esc="doc.name"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-weight:bold;">Invoice Date</td>
+                                        <td>:</td>
+                                        <td><t t-esc="doc.invoice_date or ''"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-weight:bold;">Due Date</td>
+                                        <td>:</td>
+                                        <td><t t-esc="doc.invoice_date_due or ''"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-weight:bold;">Payment Terms</td>
+                                        <td>:</td>
+                                        <td><t t-esc="doc.invoice_payment_term_id.name or 'Immediate Payment'"/></td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <!-- BILL TO / SHIP TO -->
+                    <table class="addr-box">
+                        <tr>
+                            <td width="50%" style="border-right:1px solid #ccc;">
+                                <div class="addr-head">BILL TO :</div>
+                                <div style="font-weight:bold;"><t t-esc="doc.partner_id.name"/></div>
+                                <t t-if="doc.partner_id.street"><div><t t-esc="doc.partner_id.street"/></div></t>
+                                <t t-if="doc.partner_id.street2"><div><t t-esc="doc.partner_id.street2"/></div></t>
+                                <t t-if="doc.partner_id.city"><div><t t-esc="doc.partner_id.city"/></div></t>
+                                <t t-if="doc.partner_id.country_id"><div><t t-esc="doc.partner_id.country_id.name"/></div></t>
+                                <t t-if="doc.partner_id.phone"><div>Phone: <t t-esc="doc.partner_id.phone"/></div></t>
+                                <t t-if="doc.partner_id.email"><div>Email: <t t-esc="doc.partner_id.email"/></div></t>
+                                <t t-if="doc.partner_id.vat"><div>VAT Reg. No.: <t t-esc="doc.partner_id.vat"/></div></t>
+                            </td>
+                            <td width="50%">
+                                <div class="addr-head">SHIP TO :</div>
+                                <t t-set="ship" t-value="doc.partner_id.child_ids.filtered(lambda c: c.type == 'delivery')[:1] or doc.partner_id"/>
+                                <div style="font-weight:bold;"><t t-esc="ship.name"/></div>
+                                <t t-if="ship.street"><div><t t-esc="ship.street"/></div></t>
+                                <t t-if="ship.street2"><div><t t-esc="ship.street2"/></div></t>
+                                <t t-if="ship.city"><div><t t-esc="ship.city"/></div></t>
+                                <t t-if="ship.country_id"><div><t t-esc="ship.country_id.name"/></div></t>
+                                <t t-if="ship.phone"><div>Phone: <t t-esc="ship.phone"/></div></t>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <!-- PRODUCT TABLE -->
+                    <table class="prod-tbl">
+                        <thead>
+                            <tr>
+                                <th style="width:5%;">SL.</th>
+                                <th style="width:30%;">DESCRIPTION OF GOODS</th>
+                                <th style="width:10%;">TYPE</th>
+                                <th style="width:10%;">COLOR</th>
+                                <th style="width:8%;">UNIT</th>
+                                <th style="width:8%;">QTY</th>
+                                <th style="width:14%;">UNIT PRICE (BDT)</th>
+                                <th style="width:15%;">AMOUNT (BDT)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-set="sl" t-value="0"/>
+                            <t t-foreach="doc.invoice_line_ids" t-as="line">
+                                <t t-if="line.display_type == 'product'">
+                                    <t t-set="sl" t-value="sl + 1"/>
+                                    <tr>
+                                        <td><t t-esc="sl"/></td>
+                                        <td class="desc"><t t-esc="line.name or line.product_id.name"/></td>
+                                        <td><t t-esc="line.product_id.categ_id.name or ''"/></td>
+                                        <td>
+                                            <t t-esc="', '.join(line.product_id.product_template_attribute_value_ids.filtered(lambda v: v.attribute_id.name.lower() == 'color').mapped('name')) or ''"/>
+                                        </td>
+                                        <td><t t-esc="line.product_uom_id.name or ''"/></td>
+                                        <td><t t-esc="line.quantity"/></td>
+                                        <td><t t-esc="'%.2f' % line.price_unit"/></td>
+                                        <td><t t-esc="'%.2f' % line.price_subtotal"/></td>
+                                    </tr>
+                                </t>
+                            </t>
+                            <!-- Blank rows for padding -->
+                            <t t-set="product_lines" t-value="doc.invoice_line_ids.filtered(lambda l: l.display_type == 'product')"/>
+                            <t t-set="pad" t-value="5 - len(product_lines) if len(product_lines) &lt; 5 else 0"/>
+                            <t t-foreach="range(pad)" t-as="r">
+                                <tr>
+                                    <td style="padding:8px;"></td>
+                                    <td class="desc" style="padding:8px;"></td>
+                                    <td style="padding:8px;"></td>
+                                    <td style="padding:8px;"></td>
+                                    <td style="padding:8px;"></td>
+                                    <td style="padding:8px;"></td>
+                                    <td style="padding:8px;"></td>
+                                    <td style="padding:8px;"></td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+
+                    <!-- AMOUNT IN WORDS + MULTI-ROW TOTALS BOX -->
+                    <table width="100%" style="margin-top:8px;">
+                        <tr>
+                            <td width="50%" style="vertical-align:top; padding-right:10px;">
+                                <div style="font-weight:bold; margin-bottom:5px;">AMOUNT IN WORDS:</div>
+                                <div style="border-bottom:1px solid #333; padding-bottom:5px;">
+                                    <t t-esc="doc.currency_id.amount_to_text(doc.total_due_amount) if doc.currency_id else ''"/>
+                                </div>
+                            </td>
+                            <td width="50%">
+                                <table class="tot-tbl">
+                                    <!-- 1. SUB TOTAL (Light Teal) -->
+                                    <tr class="tot-light">
+                                        <td style="font-weight:bold;">SUB TOTAL</td>
+                                        <td style="text-align:right;">
+                                            <t t-esc="'%.2f' % (doc.sub_total or 0.0)"/>
+                                        </td>
+                                    </tr>
+
+                                    <!-- 2. VAT (5%) (Normal) -->
+                                    <tr>
+                                        <td style="font-weight:bold;">VAT</td>
+                                        <td style="text-align:right;"><t t-esc="'%.2f' % (doc.amount_tax or 0.0)"/></td>
+                                    </tr>
+
+                                    <!-- 3. Labor Charge (Normal) -->
+                                    <tr>
+                                        <td style="font-weight:bold;">Labor Charge</td>
+                                        <td style="text-align:right;"><t t-esc="'%.2f' % (doc.labor_charge or 0.0)"/></td>
+                                    </tr>
+
+                                    <!-- 4. Delivery Charge (Normal) -->
+                                    <tr>
+                                        <td style="font-weight:bold;">Delivery Charge</td>
+                                        <td style="text-align:right;"><t t-esc="'%.2f' % (doc.delivery_charge or 0.0)"/></td>
+                                    </tr>
+
+                                    <!-- 5. Lab Test (Normal) -->
+                                    <tr>
+                                        <td style="font-weight:bold;">Lab Test</td>
+                                        <td style="text-align:right;"><t t-esc="'%.2f' % (doc.lab_test_charge or 0.0)"/></td>
+                                    </tr>
+
+                                    <!-- 6. Total (Light Teal) -->
+                                    <tr class="tot-light">
+                                        <td style="font-weight:bold;">Total</td>
+                                        <td style="text-align:right;">
+                                            <t t-esc="'%.2f' % (doc.total_before_discount or 0.0)"/>
+                                        </td>
+                                    </tr>
+
+                                    <!-- 7. Discounts (Normal) -->
+                                    <tr>
+                                        <td style="font-weight:bold;">Discount on VAT</td>
+                                        <td style="text-align:right;"><t t-esc="'%.2f' % (doc.discount_vat or 0.0)"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-weight:bold;">Discount Lab Test</td>
+                                        <td style="text-align:right;"><t t-esc="'%.2f' % (doc.discount_lab_test or 0.0)"/></td>
+                                    </tr>
+
+                                    <!-- 8. After Discount (Light Teal) -->
+                                    <tr class="tot-light">
+                                        <td style="font-weight:bold;">After Discount</td>
+                                        <td style="text-align:right;">
+                                            <t t-esc="'%.2f' % (doc.total_after_discount or 0.0)"/>
+                                        </td>
+                                    </tr>
+
+                                    <!-- 9. Advance Paid (Normal) -->
+                                    <tr>
+                                        <td style="font-weight:bold;">Advance Paid</td>
+                                        <td style="text-align:right;"><t t-esc="'%.2f' % (doc.advance_paid or 0.0)"/></td>
+                                    </tr>
+
+                                    <!-- 10. Total Due Amount (Dark Teal) -->
+                                    <tr class="tot-grand">
+                                        <td style="font-weight:bold;">Total Due Amount</td>
+                                        <td style="text-align:right;">
+                                            <t t-esc="'%.2f' % (doc.total_due_amount or 0.0)"/>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <!-- TERMS & CONDITIONS -->
+                    <div class="terms-section">
+                        <div class="terms-head">TERMS &amp; CONDITIONS:</div>
+                        <div class="terms-content">
+                            <t t-esc="doc.terms_conditions or ''"/>
+                        </div>
+                    </div>
+
+                    <!-- SIGNATURE SECTION — ৪টি, একই row-এ -->
+                    <table class="sig-section">
+                        <tr>
+                            <td>
+                                <div class="sig-line"></div>
+                                <div class="sig-label">Accounts Department</div>
+                            </td>
+                            <td>
+                                <div class="sig-line"></div>
+                                <div class="sig-label">Sales Person</div>
+                            </td>
+                            <td>
+                                <div class="sig-line"></div>
+                                <div class="sig-label">Deputy Sales Officer</div>
+                            </td>
+                            <td>
+                                <div class="sig-line"></div>
+                                <div class="sig-label">Authorized By</div>
+                            </td>
+                        </tr>
+                    </table>
+
+                </div>
+
+            </t>
+        </t>
+    </template>
+
+</odoo>

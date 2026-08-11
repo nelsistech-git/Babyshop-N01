@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+
+        <!-- Employee Requisition View form-->
+        <record id="hr_emp_requisition_view_form" model="ir.ui.view">
+            <field name="name">hr.emp.requisition.form.view</field>
+            <field name="model">hr.employee.requisition</field>
+            <field name="arch" type="xml">
+                <form string="Employee Requisition">
+
+                    <header>
+                        <button name="action_requested" type="object"
+                                string="Request" class="oe_highlight" confirm="Are you sure you want to request?"
+                                invisible="state != 'draft'"/>
+
+                        <button name="action_authorized" type="object"
+                                string="HRBP" class="oe_highlight" confirm="Are you sure you want to authorize?"
+                                invisible="state != 'requested'"/>
+
+                        <button name="requested_draft" type="object"
+                                string="Send To Draft" confirm="Are you sure you want to send to draft?"
+                                invisible="state != 'requested'"/>
+
+                        <button name="action_recommended" type="object"
+                                string="Recommend" class="oe_highlight" confirm="Are you sure you want to recommend?"
+                                invisible="state != 'authorized'"/>
+
+                        <button name="authorized_requested" type="object"
+                                string="Send To Requested" confirm="Are you sure you want to send to draft?"
+                                invisible="state != 'authorized'"/>
+
+                        <button name="action_approved" type="object"
+                                string="Approve" class="oe_highlight" confirm="Are you sure you want to approve?"
+                                invisible="state != 'recommended'"/>
+
+                        <button name="recommended_authorized" type="object"
+                                string="Send To Authorized" confirm="Are you sure you want to send to draft?"
+                                invisible="state != 'recommended'"/>
+
+                        <button name="action_cancel" type="object"
+                                string="Cancel" confirm="Are you sure you want to cancel?"
+                                invisible="state != 'draft'"/>
+
+<!--                        <button name="action_print" string="Print" type="object"-->
+<!--                                class="oe_highlight"/>                        -->
+<!--                        -->
+                        <button name="action_print_requisition_report" string="Print" type="object"
+                                class="oe_highlight"/>
+
+                        <field name="state" widget="statusbar"
+                               statusbar_visible="draft,requested,authorized,recommended,approved,cancel"
+                               statusbar_colors='{"requested":"blue","authorized":"blue","recommended":"blue","approved":"blue","cancel":"red"}'/>
+                    </header>
+
+                    <sheet>
+                        <group name="requisition" String="REQUISITION:">
+                            <group>
+                                <field name="rec_no" required="1" help="Requisition Form No." readonly="state in ('requested', 'authorized', 'recommended', 'approved', 'cancel')"/>
+                                <field name="company_id" options="{'no_open': True, 'no_create': 1, 'no_create_edit': 1}" groups="base.group_multi_company"/>
+                                <field name="rec_dept" options="{'no_open': True, 'no_create': 1, 'no_create_edit': 1}" readonly="state in ('requested', 'authorized', 'recommended', 'approved', 'cancel')"/>
+                                <field name="rec_position" options="{'no_open': True, 'no_create': 1, 'no_create_edit': 1}"
+                                       domain="[('department_id','=', rec_dept)]" readonly="state in ('requested', 'authorized', 'recommended', 'approved', 'cancel')"/>
+                                <!--<field name="position_type" readonly="state in ('requested', 'authorized', 'recommended', 'approved', 'cancel')"/>-->
+                                 <field name="contract_type_id" options="{'no_open':True,'no_create':1,'no_create_edit':1}" readonly="state in ('requested', 'authorized', 'recommended', 'approved', 'cancel')"/>
+                                <field name="gender" readonly="state in ('requested', 'authorized', 'recommended', 'approved', 'cancel')"/>
+                            </group>
+                            <group>
+                                <field name="date" />
+                                <field name="approved_man" widget="char" readonly="1" force_save="1"/>
+                                <!--readonly="state in ('requested', 'authorized', 'recommended', 'approved', 'cancel')"-->
+
+                                <field name="actual_man" widget="char" readonly="1" force_save="1"/>
+                                <field name="required_man" widget="char" readonly="1" force_save="1"/>
+                                <field name="request_man" widget="char" required="1" readonly="state in ('requested', 'authorized', 'recommended', 'approved', 'cancel')"/>
+                                <field name="est_salary" widget="char" readonly="state in ('requested', 'authorized', 'recommended', 'approved', 'cancel')"/>
+                                <field name="act_salary" widget="char" readonly="state in ('requested', 'authorized', 'recommended', 'approved', 'cancel')" invisible="1"/>
+                            </group>
+                        </group>
+                        <group name="applicant_details" string="RECOMMENDED APPLICANT DETAILS:">
+                            <group>
+                                <field name="expertise" colspan="2" readonly="state in ('requested', 'authorized', 'recommended', 'approved', 'cancel')"/>
+                            </group>
+                            <group>
+                                <field name="exp_year" widget="char" colspan="2"
+                                       invisible="expertise != 'experienced'"
+                                       required="expertise == 'experienced'" readonly="state in ('requested', 'authorized', 'recommended', 'approved', 'cancel')"/>
+                            </group>
+                            <div colspan="4">
+                                <label for="edu_qual" style="width: 40%;font-weight: bold;vertical-align: top;"/>
+                                <field name="edu_qual" style="width:55%" readonly="state in ('requested', 'authorized', 'recommended', 'approved', 'cancel')"/>
+                            </div>
+                            <div colspan="4">
+                                <label for="requirements" style="width: 40%;font-weight: bold;vertical-align: top;"/>
+                                <field name="requirements" style="width:55%" readonly="state in ('requested', 'authorized', 'recommended', 'approved', 'cancel')"/>
+                            </div>
+                            <div colspan="4">
+                                <label for="is_parttime" style="width: 75%;font-weight: bold;vertical-align: top;"/>
+                                <field name="is_parttime" style="width:20%" readonly="state in ('requested', 'authorized', 'recommended', 'approved', 'cancel')"/>
+                            </div>
+                            <div colspan="4">
+                                <label for="is_desc_exist" style="width: 75%;font-weight: bold;vertical-align: top;"/>
+                                <field name="is_desc_exist" style="width:20%" readonly="state in ('requested', 'authorized', 'recommended', 'approved', 'cancel')"/>
+                            </div>
+                            <div colspan="4">
+                                <label for="is_reduce_mp" style="width: 75%;font-weight: bold;vertical-align: top;"/>
+                                <field name="is_reduce_mp" style="width:20%" readonly="state in ('requested', 'authorized', 'recommended', 'approved', 'cancel')"/>
+                            </div>
+                            <div colspan="4">
+                                <label for="is_fucn_effective" style="width: 75%;font-weight: bold;vertical-align: top;"/>
+                                <field name="is_fucn_effective" style="width:20%" readonly="state in ('requested', 'authorized', 'recommended', 'approved', 'cancel')"/>
+                            </div>
+                            <div colspan="4">
+                                <label for="is_cost_reduce" style="width: 75%;font-weight: bold;vertical-align: top;"/>
+                                <field name="is_cost_reduce" style="width:20%" readonly="state in ('requested', 'authorized', 'recommended', 'approved', 'cancel')"/>
+                            </div>
+                            <div colspan="4">
+                                <label for="is_internal" style="width: 75%;font-weight: bold;vertical-align: top;"/>
+                                <field name="is_internal" style="width:20%" readonly="state in ('requested', 'authorized', 'recommended', 'approved', 'cancel')"/>
+                            </div>
+                        </group>
+                        <group name="justification" String="JUSTIFICATION:">
+                            <div colspan="4">
+                                <label for="prospects" style="width: 40%;font-weight: bold;vertical-align: top;"/>
+                                <field name="prospects" style="width:55%" readonly="state in ('requested', 'authorized', 'recommended', 'approved', 'cancel')"/>
+                            </div>
+                            <div colspan="4">
+                                <label for="investigations" style="width: 40%;font-weight: bold;vertical-align: top;"/>
+                                <field name="investigations" style="width:55%" readonly="state in ('requested', 'authorized', 'recommended', 'approved', 'cancel')"/>
+                            </div>
+                        </group>
+                        <group name="proposal" String="PROPOSALS:">
+                            <group>
+                                <field name="commencement_date" readonly="state in ('requested', 'authorized', 'recommended', 'approved', 'cancel')" />
+                                <field name="have_mobile_allowance" readonly="state in ('requested', 'authorized', 'recommended', 'approved', 'cancel')" />
+                                <field name="need_computer" readonly="state in ('requested', 'authorized', 'recommended', 'approved', 'cancel')" />
+                            </group>
+                            <group>
+                                <field name="proposed_salary" widget="char" readonly="state in ('requested', 'authorized', 'recommended', 'approved', 'cancel')"/>
+                                <field name="have_travel_allowance" readonly="state in ('requested', 'authorized', 'recommended', 'approved', 'cancel')" />
+                                <field name="need_lunch"  readonly="state in ('requested', 'authorized', 'recommended', 'approved', 'cancel')"/>
+                            </group>
+                            <div colspan="4">
+                                <label for="other_benefits" style="width: 40%;font-weight: bold;vertical-align: top;"/>
+                                <field name="other_benefits" style="width:55%" readonly="state in ('requested', 'authorized', 'recommended', 'approved', 'cancel')"/>
+                            </div>
+                            <div colspan="4">
+                                <label for="probation_period_id" style="width: 75%;font-weight: bold;vertical-align: top;"/>
+                                <field name="probation_period_id" style="width:20%"
+                                       options="{'no_open': True, 'no_create': 1, 'no_create_edit': 1}" readonly="state in ('requested', 'authorized', 'recommended', 'approved', 'cancel')"/>
+                            </div>
+                            <div colspan="4">
+                                <label for="internal_transfer" style="width: 75%;font-weight: bold;vertical-align: top;"/>
+                                <field name="internal_transfer" style="width:20%" readonly="state in ('requested', 'authorized', 'recommended', 'approved', 'cancel')"/>
+                            </div>
+                            <div colspan="4">
+                                <label for="required_training" style="width: 75%;font-weight: bold;vertical-align: top;"/>
+                                <field name="required_training" style="width:20%" readonly="state in ('requested', 'authorized', 'recommended', 'approved', 'cancel')"/>
+                            </div>
+                            <div colspan="4">
+                                <label for="training_duration_id" style="width: 75%;font-weight: bold;vertical-align: top;"/>
+                                <field name="training_duration_id" style="width:20%"
+                                       options="{'no_open': True, 'no_create': 1, 'no_create_edit': 1}" readonly="state in ('requested', 'authorized', 'recommended', 'approved', 'cancel')"/>
+                            </div>
+                            <div colspan="4">
+                                <label for="training_details" style="width: 40%;font-weight: bold;vertical-align: top;"/>
+                                <field name="training_details" style="width:55%" readonly="state in ('requested', 'authorized', 'recommended', 'approved', 'cancel')"/>
+                            </div>
+                        </group>
+                        <group>
+                            <field name="comments" />
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Employee Requisition View Tree -->
+        <record id="hr_emp_requisition_view_tree" model="ir.ui.view">
+            <field name="name">hr.emp.requisition.tree.view</field>
+            <field name="model">hr.employee.requisition</field>
+            <field name="arch" type="xml">
+                <tree string="Particulars">
+                    <field name="rec_no"/>
+                    <field name="rec_position"/>
+                    <field name="company_id"/>
+                    <field name="rec_dept"/>
+                    <!--<field name="position_type"/>-->
+                    <field name="contract_type_id"/>
+                    <field name="gender"/>
+                    <field name="approved_man"/>
+                    <field name="actual_man"/>
+                    <field name="request_man"/>
+                    <field name="expertise"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <!--Employee Requisition Search View-->
+<!--        <record id="hr_emp_requisition_view_search" model="ir.ui.view">-->
+<!--            <field name="name">hr.emp.requisition.search.view</field>-->
+<!--            <field name="model">hr.employee.requisition</field>-->
+<!--            <field name="arch" type="xml">-->
+<!--                <search string="Search Employee Requisition">-->
+<!--                    <filter string="Draft" domain="[('state','=','draft')]" name="draft" />-->
+<!--                    <filter string="Requested" domain="[('state','=','requested')]" name="requested" />-->
+<!--                    <filter string="Authorized" domain="[('state','=','authorized')]" name="authorized" />-->
+<!--                    <filter string="Recommended" domain="[('state','=','recommended')]" name="recommended" />-->
+<!--                    <filter string="Approved" domain="[('state','=','approved')]" name="approved" />-->
+<!--                    <filter string="Cancelled" domain="[('state','=','cancel')]" name="cancel" />-->
+
+<!--                    <separator />-->
+<!--                    <filter string="Position Type" name="position_type" domain="[]" context="{'group_by':'position_type'}"/>-->
+<!--                    <filter string="Gender" name="gender" domain="[]" context="{'group_by':'gender'}"/>-->
+<!--                    <filter string="Expertise" name="expertise" domain="[]" context="{'group_by':'expertise'}"/>-->
+<!--                    <filter string="State" name="state" domain="[]" context="{'group_by':'state'}"/>-->
+
+<!--                </search>-->
+<!--            </field>-->
+<!--        </record>-->
+
+        <!--Action View-->
+        <record id="hr_emp_requisition_list_action" model="ir.actions.act_window">
+            <field name="name">Requisitions</field>
+            <field name="res_model">hr.employee.requisition</field>
+<!--            <field name="view_type">form</field>-->
+<!--            <field name="view_mode">tree,form</field>-->
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">Create the first Employee Requisition</p>
+            </field>
+        </record>
+
+        <!--Add Menu Item-->
+        <menuitem id="menu_hr_emp_requisition" name="Requisitions" parent="custom_hr_employee.menu_hr_employee_operations"
+                  sequence="5" action="hr_emp_requisition_list_action" groups="hr_group_recruiter,base.group_system"/>
+
+    </data>
+</odoo>

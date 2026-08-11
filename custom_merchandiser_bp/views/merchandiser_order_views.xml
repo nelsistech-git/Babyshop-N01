@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Tree View -->
+    <record id="view_merchandiser_order_tree" model="ir.ui.view">
+        <field name="name">merchandiser.order.tree</field>
+        <field name="model">merchandiser.order</field>
+        <field name="arch" type="xml">
+            <tree string="Orders"
+                decoration-success="state == 'confirmed'"
+                decoration-muted="state == 'cancel'">
+                <field name="order_no"/>
+                <field name="po_number"/>
+                <field name="buyer_id"/>
+                <field name="style_no"/>
+                <field name="order_date"/>
+                <field name="shipment_date"/>
+                <field name="order_qty"/>
+                <field name="total_amount" sum="Total"/>
+                <field name="currency_id" optional="hide"/>
+                <field name="state" widget="badge"
+                    decoration-success="state == 'confirmed'"
+                    decoration-warning="state == 'draft'"
+                    decoration-danger="state == 'cancel'"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_merchandiser_order_form" model="ir.ui.view">
+        <field name="name">merchandiser.order.form</field>
+        <field name="model">merchandiser.order</field>
+        <field name="arch" type="xml">
+            <form string="Order Information">
+                <header>
+                    <button name="action_confirm" string="Confirm Order"
+                        type="object" class="oe_highlight"
+                        invisible="state != 'draft'"/>
+                    <button name="action_create_production" string="Create Production"
+                        type="object" class="oe_highlight"
+                        invisible="state != 'confirmed' or production_count != 0"/>
+                    <button name="action_cancel" string="Cancel"
+                        type="object"
+                        groups="custom_merchandiser_bp.group_merchandiser_manager"
+                        invisible="state == 'cancel'"/>
+                    <button name="action_draft" string="Reset to Draft"
+                        type="object"
+                        groups="custom_merchandiser_bp.group_merchandiser_manager"
+                        invisible="state != 'cancel'"/>
+                    <field name="state" widget="statusbar"
+                        statusbar_visible="draft,confirmed"/>
+                </header>
+
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_purchase_orders" type="object"
+                            class="oe_stat_button" icon="fa-shopping-cart"
+                            invisible="purchase_count == 0">
+                            <div class="o_stat_info">
+                                <field name="purchase_count" class="o_stat_value"/>
+                                <span class="o_stat_text">Purchases</span>
+                            </div>
+                        </button>
+                        <button name="action_view_productions" type="object"
+                            class="oe_stat_button" icon="fa-industry"
+                            invisible="production_count == 0">
+                            <div class="o_stat_info">
+                                <field name="production_count" class="o_stat_value"/>
+                                <span class="o_stat_text">Production</span>
+                            </div>
+                        </button>
+                    </div>
+
+                    <div class="oe_title">
+                        <h1>
+                            <field name="order_no" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Basic Info">
+                            <field name="po_number"/>
+                            <field name="buyer_id"/>
+                            <field name="style_no"/>
+                            <field name="order_date"/>
+                            <field name="shipment_date"/>
+                            <field name="fabric_type"/>
+                            <field name="shipment_mode"/>
+                            <field name="port"/>
+                            <field name="destination"/>
+                            <field name="incoterm"/>
+                            <field name="payment_term"/>
+                            <field name="lc_no"/>
+                        </group>
+                        <group string="Order Details">
+                            <field name="color"/>
+                            <field name="size_range"/>
+                            <field name="order_qty"/>
+                            <field name="unit_price"/>
+                            <field name="currency_id" options="{'no_create': True}"/>
+                            <field name="total_amount" readonly="1"/>
+                            <field name="sample_id"/>
+                        </group>
+                    </group>
+
+                    <notebook invisible="state == 'draft'">
+                        <page string="Material Purchase">
+                            <div class="alert alert-info" role="alert"
+                                invisible="purchase_count != 0">
+                                <strong>Material Purchase:</strong>
+                                After confirming the order, link related Purchase Orders here.
+                            </div>
+                            <field name="purchase_order_ids" widget="many2many"
+                                options="{'no_create': True}">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="partner_id" string="Vendor"/>
+                                    <field name="date_order" string="Order Date"/>
+                                    <field name="amount_total" string="Total"/>
+                                    <field name="state" widget="badge"
+                                        decoration-success="state == 'purchase'"
+                                        decoration-warning="state == 'draft'"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_merchandiser_order_search" model="ir.ui.view">
+        <field name="name">merchandiser.order.search</field>
+        <field name="model">merchandiser.order</field>
+        <field name="arch" type="xml">
+            <search string="Search Orders">
+                <field name="order_no"/>
+                <field name="po_number"/>
+                <field name="buyer_id"/>
+                <field name="style_no"/>
+                <separator/>
+                <filter name="draft" string="Draft"
+                    domain="[('state', '=', 'draft')]"/>
+                <filter name="confirmed" string="Confirmed"
+                    domain="[('state', '=', 'confirmed')]"/>
+                <filter name="cancelled" string="Cancelled"
+                    domain="[('state', '=', 'cancel')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_buyer" string="Buyer"
+                        context="{'group_by': 'buyer_id'}"/>
+                    <filter name="group_state" string="Status"
+                        context="{'group_by': 'state'}"/>
+                    <filter name="group_shipment" string="Shipment Date"
+                        context="{'group_by': 'shipment_date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_merchandiser_order" model="ir.actions.act_window">
+        <field name="name">Orders</field>
+        <field name="res_model">merchandiser.order</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_merchandiser_order_search"/>
+    </record>
+
+    <!-- Menu -->
+    <menuitem id="menu_merchandiser_order" name="Orders"
+        parent="menu_merchandiser_root"
+        action="action_merchandiser_order" sequence="3"/>
+
+</odoo>

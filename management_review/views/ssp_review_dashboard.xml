@@ -1,0 +1,799 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="ssp_reveiw_kanban" model="ir.ui.view">
+        <field name="name">Dashboard</field>
+        <field name="model">ssp.review.dashboard</field>
+        <field name="type">kanban</field>
+        <field name="arch" type="xml">
+            <kanban create="false" class="oe_background_grey o_kanban_view o_kanban_record o_kanban_dashboard o_account_kanban ssp_review_dashboard_class">
+                <field name="name"/>
+                <field name="start_date"/>
+                <field name="end_date"/>
+                <field name="total_invoice_amount"/>
+                <field name="total_invoice_due_amount"/>
+                <field name="total_invoice_received_amount"/>
+                <field name="total_received_payment_amount"/>
+                <field name="total_due_collection_amount"/>
+                <field name="total_invoice_refund_amount"/>
+                <field name="total_bill_amount"/>
+                <field name="total_bill_due_amount"/>
+                <field name="total_bill_paid_amount"/>
+                <field name="total_payment_amount"/>
+                <field name="total_due_paid_amount"/>
+                <field name="total_bill_refund_amount"/>
+                <field name="cost_of_good_sold"/>
+                <field name="current_stock_value"/>
+                <field name="cash_at_bank"/>
+                <field name="cash_in_hand"/>
+                <field name="total_income"/>
+                <field name="total_expense"/>
+                <field name="total_revenue"/>
+                <field name="periodicity"/>
+                <field name="company_id"/>
+                <field name="balance"/>
+                <field name="total_investment"/>
+                <field name="total_asset"/>
+                <field name="latest_addition"/>
+                <field name="receivable"/>
+                <field name="payable"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div id="ssp_review_dashboard" class="p-3">
+                            <div class="row">
+                                <div class="col-md-6 col-lg-3">
+                                    <a t-attf-href="/ssp-review/#{record.company_id.raw_value}/income/#{record.start_date.raw_value}/#{record.end_date.raw_value}" target="_blank">
+                                        <div class="modern-card income-card">
+                                            <div class="iq-card-body">
+                                                <div class="d-flex align-items-center justify-content-between">
+                                                    <div class="modern-icon-box income-icon">
+                                                        <i class="fa fa-chart-line" aria-hidden="true"></i>
+                                                    </div>
+                                                    <div class="iq-text">
+                                                        <h6 class="text-white fw-bolder">Revenue
+                                                            Stream</h6>
+                                                        <h3 class="text-white text-end">
+                                                            <t t-esc="record.total_income.raw_value"/>
+                                                            ৳</h3>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="col-md-6 col-lg-3">
+                                    <a t-attf-href="/ssp-review/#{record.company_id.raw_value}/expense/#{record.start_date.raw_value}/#{record.end_date.raw_value}" target="_blank">
+                                        <div class="modern-card expense-card">
+                                            <div class="iq-card-body">
+                                                <div class="d-flex align-items-center justify-content-between">
+                                                    <div class="modern-icon-box expense-icon">
+                                                        <i class="fa fa-chart-pie" aria-hidden="true"></i>
+                                                    </div>
+                                                    <div class="iq-text">
+                                                        <h6 class="text-white fw-bolder">Operating
+                                                            Costs</h6>
+                                                        <h3 class="text-white text-end">
+                                                            <t t-esc="record.total_expense.raw_value"/>
+                                                            ৳</h3>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="col-md-6 col-lg-3">
+                                    <a t-attf-href="/ssp-review/#{record.company_id.raw_value}/receivable/#{record.start_date.raw_value}/#{record.end_date.raw_value}" target="_blank">
+                                        <div class="modern-card receivable-card">
+                                            <div class="iq-card-body">
+                                                <div class="d-flex align-items-center justify-content-between">
+                                                    <div class="modern-icon-box receivable-icon">
+                                                        <i class="fa fa-arrow-circle-down"></i>
+                                                    </div>
+                                                    <div class="iq-text">
+                                                        <h6 class="text-white fw-bolder">Pending
+                                                            Collections</h6>
+                                                        <h3 class="text-white text-end">
+                                                            <t t-esc="record.receivable.raw_value"/>
+                                                            ৳</h3>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="col-md-6 col-lg-3">
+                                    <a t-attf-href="/ssp-review/#{record.company_id.raw_value}/payable/#{record.start_date.raw_value}/#{record.end_date.raw_value}" target="_blank">
+                                        <div class="modern-card payable-card">
+                                            <div class="iq-card-body">
+                                                <div class="d-flex align-items-center justify-content-between">
+                                                    <div class="modern-icon-box payable-icon">
+                                                        <i class="fa fa-arrow-circle-up"></i>
+                                                    </div>
+                                                    <div class="iq-text">
+                                                        <h6 class="text-white fw-bolder">Outstanding
+                                                            Payments</h6>
+                                                        <h3 class="text-white text-end">
+                                                            <t t-esc="record.payable.raw_value"/>
+                                                            ৳</h3>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 col-12 mb-3">
+                                    <div class="modern-panel collection-panel">
+                                        <div class="panel-heading">
+                                            <div class="row">
+                                                <div class="col-md-12 text-right">
+                                                    <p class="panel-title">
+                                                        <i class="fa fa-wallet me-3 collection-icon" aria-hidden="true"></i>
+                                                        Revenue Analytics</p>
+                                                    <hr/>
+                                                    <div class="table-responsive">
+                                                        <table style="width: 100%;">
+                                                            <tr>
+                                                                <td style="border-collapse: collapse; margin: 0; display: block;">
+                                                                    <table style="width: 100%; border-spacing: 0;">
+                                                                        <tr>
+                                                                            <td style="width: 60%; padding-left: 20px; border-collapse: collapse; text-align: left;">
+                                                                                <span style="color: #3f414d; font-size: 15px; text-decoration: none; line-height: 36px;" class="fw-bolder">Total
+                                                                                    Invoiced Amount
+
+                                                                                </span>
+                                                                            </td>
+                                                                            <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                                                <span style="color: #3f414d; font-size: 15px; text-decoration: none; line-height: 36px;">
+                                                                                    <t t-esc="record.total_invoice_amount.raw_value"/>
+                                                                                    ৳</span>
+                                                                            </td>
+                                                                            <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                                                <div>
+                                                                                    <a t-attf-href="/ssp-review/#{record.company_id.raw_value}/total-invoiced-amount/#{record.start_date.raw_value}/#{record.end_date.raw_value}" target="_blank" class="btn btn-sm text-light" style="background-color:#1E3D73">
+                                                                                        REPORT</a>
+                                                                                </div>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </table>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td style="border-collapse: collapse; margin: 0; display: block;">
+                                                                    <table style="width: 100%; border-spacing: 0;">
+                                                                        <tr>
+                                                                            <td style="width: 60%; border-collapse: collapse; padding-left: 20px; text-align: left;">
+                                                                                <span style="color: #3f414d; font-size: 15px; text-decoration: none; line-height: 36px;" class="fw-bolder">Total
+                                                                                    Invoice Received
+                                                                                    Amount</span>
+                                                                            </td>
+                                                                            <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                                                <span style="color: #3f414d; font-size: 15px; text-decoration: none; line-height: 36px;">
+                                                                                    <t t-esc="record.total_invoice_received_amount.raw_value"/>
+                                                                                    ৳</span>
+                                                                            </td>
+                                                                            <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                                                <div>
+                                                                                    <a t-attf-href="/ssp-review/#{record.company_id.raw_value}/total-invoice-received-amount/#{record.start_date.raw_value}/#{record.end_date.raw_value}" target="_blank" class="btn btn-sm text-light" style="background-color:#1E3D73">
+                                                                                        REPORT</a>
+                                                                                </div>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </table>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td style="border-collapse: collapse; margin: 0;">
+                                                                    <table style="width: 100%; border-spacing: 0;">
+                                                                        <tr>
+                                                                            <td style="width: 60%; border-collapse: collapse; padding-left: 20px; text-align: left;">
+                                                                                <span style="color: #3f414d; font-size: 15px; text-decoration: none; line-height: 36px;" class="fw-bolder">Total
+                                                                                    Invoice Due
+                                                                                    Amount</span>
+                                                                            </td>
+                                                                            <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                                                <span style="color: #3f414d; font-size: 15px; text-decoration: none; line-height: 36px;">
+                                                                                    <t t-esc="record.total_invoice_due_amount.raw_value"/>
+                                                                                    ৳</span>
+                                                                            </td>
+                                                                            <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                                                <div>
+                                                                                    <a t-attf-href="/ssp-review/#{record.company_id.raw_value}/total-invoice-due-amount/#{record.start_date.raw_value}/#{record.end_date.raw_value}" target="_blank" class="btn btn-sm text-light" style="background-color:#1E3D73">
+                                                                                        REPORT</a>
+                                                                                </div>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </table>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td style="border-collapse: collapse; margin: 0;">
+                                                                    <table style="width: 100%; border-spacing: 0;">
+                                                                        <tr>
+                                                                            <td style="width: 60%; border-collapse: collapse; padding-left: 20px; text-align: left;">
+                                                                                <span style="color: #3f414d; font-size: 15px; text-decoration: none; line-height: 36px;" class="fw-bolder">Total
+                                                                                    Due Collection
+                                                                                    Amount</span>
+                                                                            </td>
+                                                                            <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                                                <span style="color: #3f414d; font-size: 15px; text-decoration: none; line-height: 36px;">
+                                                                                    <t t-esc="record.total_due_collection_amount.raw_value"/>
+                                                                                    ৳</span>
+                                                                            </td>
+                                                                            <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                                                <div>
+                                                                                    <a t-attf-href="/ssp-review/#{record.company_id.raw_value}/total-due-collection-amount/#{record.start_date.raw_value}/#{record.end_date.raw_value}" target="_blank" class="btn btn-sm text-light" style="background-color:#1E3D73">
+                                                                                        REPORT</a>
+                                                                                </div>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </table>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td style="border-collapse: collapse; margin: 0;">
+                                                                    <table style="width: 100%; border-spacing: 0;">
+                                                                        <tr>
+                                                                            <td style="width: 60%; border-collapse: collapse; padding-left: 20px; text-align: left;">
+                                                                                <span style="color: #3f414d; font-size: 15px; text-decoration: none; line-height: 36px;" class="fw-bolder">Total
+                                                                                    Invoice Refund
+                                                                                    Amount</span>
+                                                                            </td>
+                                                                            <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                                                <span style="color: #3f414d; font-size: 15px; text-decoration: none; line-height: 36px;">
+                                                                                    <t t-esc="record.total_invoice_refund_amount.raw_value"/>
+                                                                                    ৳</span>
+                                                                            </td>
+                                                                            <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                                                <div>
+                                                                                    <a t-attf-href="/ssp-review/#{record.company_id.raw_value}/total-invoice-refund-amount/#{record.start_date.raw_value}/#{record.end_date.raw_value}" target="_blank" class="btn btn-sm text-light" style="background-color:#1E3D73">
+                                                                                        REPORT</a>
+                                                                                </div>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </table>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td style="border-collapse: collapse; margin: 0;">
+                                                                    <table style="width: 100%; border-spacing: 0;">
+                                                                        <tr>
+                                                                            <td style="width: 60%; border-collapse: collapse; padding-left: 20px; text-align: left;">
+                                                                                <span style="color: #3f414d; font-size: 15px; text-decoration: none; line-height: 36px;" class="fw-bolder">Total
+                                                                                    Received Amount</span>
+                                                                            </td>
+                                                                            <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                                                <span style="color: #3f414d; font-size: 15px; text-decoration: none; line-height: 36px;">
+                                                                                    <t t-esc="record.total_received_payment_amount.raw_value"/>
+                                                                                    ৳</span>
+                                                                            </td>
+                                                                            <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                                                <div>
+                                                                                    <a t-attf-href="/ssp-review/#{record.company_id.raw_value}/total-received-amount/#{record.start_date.raw_value}/#{record.end_date.raw_value}" target="_blank" class="btn btn-sm text-light" style="background-color:#1E3D73">
+                                                                                        REPORT</a>
+                                                                                </div>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </table>
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-12 mb-3">
+                                    <div class="modern-panel supply-panel">
+                                        <div class="panel-heading">
+                                            <div class="row">
+                                                <div class="col-md-12 text-right">
+                                                    <p class="panel-title">
+                                                        <i class="fa fa-truck me-3 supply-icon" aria-hidden="true"></i>
+                                                        Procurement Insights</p>
+                                                    <hr/>
+                                                    <table style="width: 100%;">
+                                                        <tr>
+                                                            <td style="border-collapse: collapse; margin: 0; display: block;">
+                                                                <table style="width: 100%; border-spacing: 0;">
+                                                                    <tr>
+                                                                        <td style="width: 60%; padding-left: 20px; border-collapse: collapse; text-align: left;">
+                                                                            <span style="color: #3f414d; font-size: 15px; text-decoration: none; line-height: 36px;" class="fw-bolder">Total
+                                                                                Billed Amount</span>
+                                                                        </td>
+                                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                                            <span style="color: #3f414d; font-size: 15px; text-decoration: none; line-height: 36px;">
+                                                                                <t t-esc="record.total_bill_amount.raw_value"/>
+                                                                                ৳</span>
+                                                                        </td>
+                                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                                            <div>
+                                                                                <a t-attf-href="/ssp-review/#{record.company_id.raw_value}/total-bill-amount/#{record.start_date.raw_value}/#{record.end_date.raw_value}" target="_blank" class="btn btn-sm text-light" style="background-color:#1E3D73">
+                                                                                    REPORT</a>
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                </table>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="border-collapse: collapse; margin: 0; display: block;">
+                                                                <table style="width: 100%; border-spacing: 0;">
+                                                                    <tr>
+                                                                        <td style="width: 60%; border-collapse: collapse; padding-left: 20px; text-align: left;">
+                                                                            <span style="color: #3f414d; font-size: 15px; text-decoration: none; line-height: 36px;" class="fw-bolder">Total
+                                                                                Bill Paid Amount</span>
+                                                                        </td>
+                                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                                            <span style="color: #3f414d; font-size: 15px; text-decoration: none; line-height: 36px;">
+                                                                                <t t-esc="record.total_bill_paid_amount.raw_value"/>
+                                                                                ৳</span>
+                                                                        </td>
+                                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                                            <div>
+                                                                                <a t-attf-href="/ssp-review/#{record.company_id.raw_value}/total-bill-paid-amount/#{record.start_date.raw_value}/#{record.end_date.raw_value}" target="_blank" class="btn btn-sm text-light" style="background-color:#1E3D73">
+                                                                                    REPORT</a>
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                </table>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="border-collapse: collapse; margin: 0;">
+                                                                <table style="width: 100%; border-spacing: 0;">
+                                                                    <tr>
+                                                                        <td style="width: 60%; border-collapse: collapse; padding-left: 20px; text-align: left;">
+                                                                            <span style="color: #3f414d; font-size: 15px; text-decoration: none; line-height: 36px;" class="fw-bolder">Total
+                                                                                Bill Due Amount</span>
+                                                                        </td>
+                                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                                            <span style="color: #3f414d; font-size: 15px; text-decoration: none; line-height: 36px;">
+                                                                                <t t-esc="record.total_bill_due_amount.raw_value"/>
+                                                                                ৳</span>
+                                                                        </td>
+                                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                                            <div>
+                                                                                <a t-attf-href="/ssp-review/#{record.company_id.raw_value}/total-bill-due_amount/#{record.start_date.raw_value}/#{record.end_date.raw_value}" target="_blank" class="btn btn-sm text-light" style="background-color:#1E3D73">
+                                                                                    REPORT</a>
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                </table>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="border-collapse: collapse; margin: 0;">
+                                                                <table style="width: 100%; border-spacing: 0;">
+                                                                    <tr>
+                                                                        <td style="width: 60%; border-collapse: collapse; padding-left: 20px; text-align: left;">
+                                                                            <span style="color: #3f414d; font-size: 15px; text-decoration: none; line-height: 36px;" class="fw-bolder">Total
+                                                                                Due Paid Amount</span>
+                                                                        </td>
+                                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                                            <span style="color: #3f414d; font-size: 15px; text-decoration: none; line-height: 36px;">
+                                                                                <t t-esc="record.total_due_paid_amount.raw_value"/>
+                                                                                ৳</span>
+                                                                        </td>
+                                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                                            <div>
+                                                                                <a t-attf-href="/ssp-review/#{record.company_id.raw_value}/total-due-paid-amount/#{record.start_date.raw_value}/#{record.end_date.raw_value}" target="_blank" class="btn btn-sm text-light" style="background-color:#1E3D73">
+                                                                                    REPORT</a>
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                </table>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="border-collapse: collapse; margin: 0;">
+                                                                <table style="width: 100%; border-spacing: 0;">
+                                                                    <tr>
+                                                                        <td style="width: 60%; border-collapse: collapse; padding-left: 20px; text-align: left;">
+                                                                            <span style="color: #3f414d; font-size: 15px; text-decoration: none; line-height: 36px;" class="fw-bolder">Total
+                                                                                Bill Refund Amount</span>
+                                                                        </td>
+                                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                                            <span style="color: #3f414d; font-size: 15px; text-decoration: none; line-height: 36px;">
+                                                                                <t t-esc="record.total_bill_refund_amount.raw_value"/>
+                                                                                ৳</span>
+                                                                        </td>
+                                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                                            <div>
+                                                                                <a t-attf-href="/ssp-review/#{record.company_id.raw_value}/total-bill-refund-amount/#{record.start_date.raw_value}/#{record.end_date.raw_value}" target="_blank" class="btn btn-sm text-light" style="background-color:#1E3D73">
+                                                                                    REPORT</a>
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                </table>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="border-collapse: collapse; margin: 0;">
+                                                                <table style="width: 100%; border-spacing: 0;">
+                                                                    <tr>
+                                                                        <td style="width: 60%; border-collapse: collapse; padding-left: 20px; text-align: left;">
+                                                                            <span style="color: #3f414d; font-size: 15px; text-decoration: none; line-height: 36px;" class="fw-bolder">Total
+                                                                                Payment Amount</span>
+                                                                        </td>
+                                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                                            <span style="color: #3f414d; font-size: 15px; text-decoration: none; line-height: 36px;">
+                                                                                <t t-esc="record.total_payment_amount.raw_value"/>
+                                                                                ৳</span>
+                                                                        </td>
+                                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                                            <div>
+                                                                                <a t-attf-href="/ssp-review/#{record.company_id.raw_value}/total-payment-amount/#{record.start_date.raw_value}/#{record.end_date.raw_value}" target="_blank" class="btn btn-sm text-light" style="background-color:#1E3D73">
+                                                                                    REPORT</a>
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                </table>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-12 mb-3">
+                                    <div class="modern-panel financial-panel">
+                                        <div class="panel-heading">
+                                            <div class="row">
+                                                <div class="col-md-12 text-right">
+                                                    <p class="panel-title">
+                                                        <i class="fa fa-coins me-3 financial-icon" aria-hidden="true"></i>Financial Performance</p>
+                                                    <hr/>
+                                                    <table style="width: 100%;">
+                                                        <tr>
+                                                            <td style="border-collapse: collapse; margin: 0; display: block;">
+                                                                <table style="width: 100%; border-spacing: 0;">
+                                                                    <tr>
+                                                                        <td style="width: 60%; padding-left: 20px; border-collapse: collapse; text-align: left;">
+                                                                            <span style="color: #3f414d; font-size: 15px; text-decoration: none; line-height: 36px;" class="fw-bolder">Total
+                                                                                Collection</span>
+                                                                        </td>
+                                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                                            <span style="color: #3f414d; font-size: 15px; text-decoration: none; line-height: 36px;">
+                                                                                <t t-esc="record.total_income.raw_value"/>
+                                                                                ৳</span>
+                                                                        </td>
+                                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                                            <div>
+                                                                                <a t-attf-href="/ssp-review/#{record.company_id.raw_value}/income/#{record.start_date.raw_value}/#{record.end_date.raw_value}" target="_blank" class="btn btn-sm text-light" style="background-color:#1E3D73">
+                                                                                    REPORT</a>
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                </table>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="border-collapse: collapse; margin: 0; display: block;">
+                                                                <table style="width: 100%; border-spacing: 0;">
+                                                                    <tr>
+                                                                        <td style="width: 60%; border-collapse: collapse; padding-left: 20px; text-align: left;">
+                                                                            <span style="color: #3f414d; font-size: 15px; text-decoration: none; line-height: 36px;" class="fw-bolder">Operation
+                                                                                Expense</span>
+                                                                        </td>
+                                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                                            <span style="color: #3f414d; font-size: 15px; text-decoration: none; line-height: 36px;">
+                                                                                <t t-esc="record.total_expense.raw_value"/>
+                                                                                ৳</span>
+                                                                        </td>
+                                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                                            <div>
+                                                                                <a t-attf-href="/ssp-review/#{record.company_id.raw_value}/expense/#{record.start_date.raw_value}/#{record.end_date.raw_value}" target="_blank" class="btn btn-sm text-light" style="background-color:#1E3D73">
+                                                                                    REPORT</a>
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                </table>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="border-collapse: collapse; margin: 0;">
+                                                                <table style="width: 100%; border-spacing: 0;">
+                                                                    <tr>
+                                                                        <td style="width: 60%; border-collapse: collapse; padding-left: 20px; text-align: left;">
+                                                                            <span style="color: #3f414d; font-size: 15px; text-decoration: none; line-height: 36px;" class="fw-bolder">Total
+                                                                                Revenue Amount</span>
+                                                                        </td>
+                                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                                            <span style="color: #3f414d; font-size: 15px; text-decoration: none; line-height: 36px;">
+                                                                                <t t-esc="record.total_revenue.raw_value"/>
+                                                                                ৳</span>
+                                                                        </td>
+                                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                                            <div>
+                                                                                <a t-attf-href="/ssp-review/#{record.company_id.raw_value}/revenue/#{record.start_date.raw_value}/#{record.end_date.raw_value}" target="_blank" class="btn btn-sm text-light" style="background-color:#1E3D73">
+                                                                                    REPORT</a>
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                </table>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-12 mb-3">
+                                    <div class="modern-panel balance-panel">
+                                        <div class="panel-heading">
+                                            <div class="row">
+                                                <div class="col-md-12 text-right">
+                                                    <p class="panel-title">
+                                                        <i class="fa fa-balance-scale me-3 balance-icon" aria-hidden="true"></i>Asset Overview</p>
+                                                    <hr/>
+                                                    <table style="width: 100%;">
+                                                        <tr>
+                                                            <td style="border-collapse: collapse; margin: 0; display: block;">
+                                                                <table style="width: 100%; border-spacing: 0;">
+                                                                    <tr>
+                                                                        <td style="width: 60%; padding-left: 20px; border-collapse: collapse; text-align: left;">
+                                                                            <span style="color: #3f414d; font-size: 15px; text-decoration: none; line-height: 36px;" class="fw-bolder">Stock
+                                                                                Asset on hand</span>
+                                                                        </td>
+                                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                                            <span style="color:  #3f414d; font-size: 15px; text-decoration: none; line-height: 36px;">
+                                                                                <t t-esc="record.current_stock_value.raw_value"/>
+                                                                                ৳</span>
+                                                                        </td>
+                                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                                            <div>
+                                                                                <a t-attf-href="/ssp-review/#{record.company_id.raw_value}/current-stock-value/#{record.start_date.raw_value}/#{record.end_date.raw_value}" target="_blank" class="btn btn-sm text-light" style="background-color:#1E3D73">
+                                                                                    REPORT</a>
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                </table>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="border-collapse: collapse; margin: 0; display: block;">
+                                                                <table style="width: 100%; border-spacing: 0;">
+                                                                    <tr>
+                                                                        <td style="width: 60%; padding-left: 20px; border-collapse: collapse; text-align: left;">
+                                                                            <span style="color: #3f414d; font-size: 15px; text-decoration: none; line-height: 36px;" class="fw-bolder">Cash
+                                                                                In Hand Balance</span>
+                                                                        </td>
+                                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                                            <span style="color:  #3f414d; font-size: 15px; text-decoration: none; line-height: 36px;">
+                                                                                <t t-esc="record.cash_in_hand.raw_value"/>
+                                                                                ৳</span>
+                                                                        </td>
+                                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                                            <div>
+                                                                                <a t-attf-href="/ssp-review/#{record.company_id.raw_value}/cash-in-hand/#{record.start_date.raw_value}/#{record.end_date.raw_value}" target="_blank" class="btn btn-sm text-light" style="background-color:#1E3D73">
+                                                                                    REPORT</a>
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                </table>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="border-collapse: collapse; margin: 0; display: block;">
+                                                                <table style="width: 100%; border-spacing: 0;">
+                                                                    <tr>
+                                                                        <td style="width: 60%; border-collapse: collapse; padding-left: 20px; text-align: left;">
+                                                                            <span style="color: #3f414d; font-size: 15px; text-decoration: none; line-height: 36px;" class="fw-bolder">Cash
+                                                                                At Bank Balance</span>
+                                                                        </td>
+                                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                                            <span style="color:  #3f414d; font-size: 15px; text-decoration: none; line-height: 36px;">
+                                                                                <t t-esc="record.cash_at_bank.raw_value"/>
+                                                                                ৳</span>
+                                                                        </td>
+                                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                                            <div>
+                                                                                <a t-attf-href="/ssp-review/#{record.company_id.raw_value}/cash-at-bank/#{record.start_date.raw_value}/#{record.end_date.raw_value}" target="_blank" class="btn btn-sm text-light" style="background-color:#1E3D73">
+                                                                                    REPORT</a>
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                </table>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div><!-- Extra -->
+                            <div>
+                                <div t-attf-class="panel">
+                                    <div class="panel-heading">
+                                        <div class="row">
+                                            <div class="col-md-12 text-right">
+                                                <p class="chart-title">
+                                                    <i class="fa fa-trending-up me-3 chart-icon" aria-hidden="true"></i>Performance Metrics</p>
+                                                <hr/>
+                                                <div class="row growth_chart">
+                                                    <div class="col-md-3 col-12">
+                                                        <div class="iq-card iq-card-block iq-card-stretch iq-card-height">
+                                                            <div class="iq-card-body">
+                                                                <div class="text-center">
+                                                                    <h6 class="fw-bolder fs-5">Capital
+                                                                        Investment</h6>
+                                                                    <h2 class="mt-2">
+                                                                        <b>
+                                                                            <t t-esc="record.total_investment.raw_value"/> ৳</b>
+                                                                    </h2>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3 col-12">
+                                                        <div class="iq-card iq-card-block iq-card-stretch iq-card-height">
+                                                            <div class="iq-card-body">
+                                                                <div class="text-center">
+                                                                    <h6 class="fw-bolder fs-5">Enterprise Value</h6>
+                                                                    <h2 class="mt-2">
+                                                                        <b>
+                                                                            <t t-esc="record.total_asset.raw_value"/> ৳</b>
+                                                                    </h2>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3 col-12">
+                                                        <div class="iq-card iq-card-block iq-card-stretch iq-card-height">
+                                                            <div class="iq-card-body">
+                                                                <div class="text-center">
+                                                                    <h6 class="fw-bolder fs-5">Recent Activity</h6>
+                                                                    <h2 class="mt-2">
+                                                                        <b>
+                                                                            <t t-esc="record.latest_addition.raw_value"/> ৳</b>
+                                                                    </h2>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3 col-12">
+                                                        <div class="iq-card iq-card-block iq-card-stretch iq-card-height">
+                                                            <div class="iq-card-body">
+                                                                <div class="text-center">
+                                                                    <h6 class="fw-bolder fs-5">Trend Analysis</h6>
+                                                                    <h2 class="mt-2">
+                                                                        <b>
+                                                                            <t t-if="record.balance.raw_value &gt;= 0">
+                                                                                <img src="/management_review/static/src/img/green-up-arrow.png" style="display: inline-block; height: 35px;border-radius: 50%;padding-bottom:10px;"/>
+                                                                            </t>
+                                                                            <t t-if="record.balance.raw_value &lt; 0">
+                                                                                <img src="/management_review/static/src/img/red-down-arrow.png" style="display: inline-block; height: 35px;border-radius: 50%;padding-bottom:10px;"/>
+                                                                            </t>
+                                                                        </b>
+                                                                    </h2>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="card-body o_dashboard_graph">
+                                                    <t t-name="JournalBodyGraph">
+                                                        <field name="company_statistics" ylabel="Value in BDT" xlabel="Last Three Month (Day)" graph_type="line" widget="graph_widget" style="width: 100%;"/>
+                                                    </t>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+    <record id="ssp_review_dashboard_daily_action" model="ir.actions.act_window">
+        <field name="name"> Management Review</field>
+        <field name="res_model">ssp.review.dashboard</field>
+        <field name="view_mode">kanban,form</field>
+        <field name="view_id" ref="ssp_reveiw_kanban"/>
+        <field name="res_id" ref="ssp_review_dashboard_daily"/>
+        <field name="context">{&apos;periodicity&apos;: &apos;daily&apos;}</field>
+    </record>
+    <record id="ssp_review_dashboard_week_action" model="ir.actions.act_window">
+        <field name="name">Weekly Management Review</field>
+        <field name="res_model">ssp.review.dashboard</field>
+        <field name="view_mode">kanban,form</field>
+        <field name="view_id" ref="ssp_reveiw_kanban"/>
+        <field name="res_id" ref="ssp_review_dashboard_daily"/>
+        <field name="context">{&apos;periodicity&apos;: &apos;weekly&apos;}</field>
+    </record>
+    <record id="ssp_review_dashboard_monthly_action" model="ir.actions.act_window">
+        <field name="name">Monthly Management Review</field>
+        <field name="res_model">ssp.review.dashboard</field>
+        <field name="view_mode">kanban,form</field>
+        <field name="view_id" ref="ssp_reveiw_kanban"/>
+        <field name="res_id" ref="ssp_review_dashboard_daily"/>
+        <field name="context">{&apos;periodicity&apos;: &apos;monthly&apos;}</field>
+    </record>
+    <record id="ssp_reveiw_dashboard_custom_date" model="ir.ui.view">
+        <field name="name">ssp.review.dashboard.custom.date.form.view</field>
+        <field name="model">ssp.review.dashboard.custom.date</field>
+        <field name="priority">100</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="start_date"/>
+                        </group>
+                        <group>
+                            <field name="end_date"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button string="Confirm" name="calculate_custom_date_wise_data" type="object" class="oe_highlight"/>
+                        <button string="Cancel" class="btn btn-secondary" special="cancel"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="ssp_review_dashboard_custom_date_action" model="ir.actions.act_window">
+        <field name="name">Set Date Range</field>
+        <field name="res_model">ssp.review.dashboard.custom.date</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="ssp_reveiw_dashboard_custom_date"/>
+        <field name="target">new</field>
+    </record>
+    <menuitem id="ssp_reveiw_dashboard_menu" name="Management Review " sequence="10" web_icon="management_review,static/description/icon.png"/>
+    <menuitem id="ssp_reveiw_dashboard_main_menu" name="Dashboard" parent="ssp_reveiw_dashboard_menu" sequence="0"/>
+    <menuitem id="ssp_reveiw_daily_menu" name="Daily" parent="ssp_reveiw_dashboard_main_menu" action="ssp_review_dashboard_daily_action" sequence="0"/>
+    <menuitem id="ssp_reveiw_week_menu" name="Last 7 Day(s)" parent="ssp_reveiw_dashboard_main_menu" action="ssp_review_dashboard_week_action" sequence="0"/>
+    <menuitem id="ssp_reveiw_month_menu" name="Last 30 Day(s)" parent="ssp_reveiw_dashboard_main_menu" action="ssp_review_dashboard_monthly_action" sequence="0"/>
+    <menuitem id="ssp_reveiw_custom_menu" name="Custom Date(s)" parent="ssp_reveiw_dashboard_main_menu" action="ssp_review_dashboard_custom_date_action" sequence="0"/>
+    <menuitem id="ssp_reveiw_daily_config" name="Configuration" parent="ssp_reveiw_dashboard_menu" sequence="1" groups="management_review.group_ssp_review_dashboard_manager"/>
+    <record id="ssp_reveiw_dashboard_refresh" model="ir.ui.view">
+        <field name="name">ssp.review.dashboard.refresh.form.view</field>
+        <field name="model">ssp.review.dashboard.refresh</field>
+        <field name="priority">100</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <p>
+                    On Confirm all data on dashboard will be re-calculated. This action
+                            will take sometime.
+                    </p>
+                    <footer>
+                        <button string="Confirm" name="re_calculate_dashboard_data" type="object" class="oe_highlight"/>
+                        <button string="Cancel" class="btn btn-secondary" special="cancel"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="action_refresh_ssp_review_dashboard" model="ir.actions.server">
+        <field name="name">Management Review Dashboard Refresh</field>
+        <field name="type">ir.actions.server</field>
+        <field name="state">code</field>
+        <field name="model_id" ref="management_review.model_ssp_review_dashboard"/>
+        <field name="code">
+            action = model.generate_summary_data()
+        </field>
+    </record>
+    <record id="ssp_review_dashboard_refresh_action" model="ir.actions.act_window">
+        <field name="name">Management Review Dashboard Refresh</field>
+        <field name="res_model">ssp.review.dashboard.refresh</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="ssp_reveiw_dashboard_refresh"/>
+        <field name="target">new</field>
+    </record>
+    <menuitem id="ssp_reveiw_refresh_menu" name="Refresh" parent="ssp_reveiw_daily_config" action="ssp_review_dashboard_refresh_action" sequence="0" groups="management_review.group_ssp_review_dashboard_manager"/>
+    <record id="ssp_review_dashboard_scheduler_action" model="ir.actions.act_window">
+        <field name="name">Daily Report Mail Scheduler</field>
+        <field name="res_model">ir.cron</field>
+        <field name="view_mode">form</field>
+        <field name="res_id" ref="management_review.ir_cron_ssp_review_scheduler_action"/>
+    </record>
+    <menuitem id="ssp_reveiw_scheduler_menu" name="Report Mail Scheduler" parent="ssp_reveiw_daily_config" action="ssp_review_dashboard_scheduler_action" sequence="0" groups="management_review.group_ssp_review_dashboard_manager"/>
+</odoo>

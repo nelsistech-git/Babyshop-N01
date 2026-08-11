@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+	<data>
+<!--        <report id="voucher_report_id"-->
+<!--				string="Print Voucher"-->
+<!--				model="account.move"-->
+<!--				report_type="qweb-html"-->
+<!--                menu="False"-->
+<!--				file="custom_account_day_book.voucher_report_tmpl_id"-->
+<!--				name="custom_account_day_book.voucher_report_tmpl_id"/>-->
+
+        <record id="voucher_report_id" model="ir.actions.report">
+            <field name="name">Print Voucher</field>
+            <field name="model">account.move</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">custom_account_day_book.voucher_report_tmpl_id</field>
+            <field name="report_file">custom_account_day_book.voucher_report_tmpl_id</field>
+        </record>
+
+		<template id="voucher_report_tmpl_view">
+            <t t-call="web.external_layout">
+                <t t-set="o" t-value="o.with_context({'lang':o.partner_id.lang})"/>
+                <div class="page">
+                    <div class="oe_structure" style="margin: 0 auto !important;"/>
+                    <div>
+                        <h3 class="text-center">
+                            <strong><span t-field="o.journal_id.name"/> - <span t-field="o.name"/></strong>
+                        </h3>
+                    </div>
+<!--                    <br/>-->
+                    <div class="container-fluid">
+                        <div class="row" style="border: 1px solid black !important;">
+                            <div class="col-6">
+                                <t t-if="o.date">
+                                    <strong>Date: </strong> <span t-field="o.date"/>
+                                </t>
+                                <br/>
+                                <t t-if="o.amount_total">
+                                    <strong>Amount: </strong><span t-field="o.amount_total" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                </t>
+                                <t t-if="o.location_id">
+                                    <strong>Location: </strong><span t-field="o.location_id"/>
+                                </t>
+                            </div>
+                            <div class="col-6">
+                                <t t-if="o.partner_id">
+                                    <strong>Partner Name: </strong><span t-field="o.partner_id.name"/>
+                                    <br/>
+                                    <strong>Mobile: </strong><span t-field="o.partner_id.mobile"/>
+                                    <br/>
+                                    <strong>Address: </strong>
+                                    <t t-if="o.partner_id.street"><span t-field="o.partner_id.street"/>, </t>
+                                    <t t-if="o.partner_id.city"><span t-field="o.partner_id.city"/>, </t>
+                                    <t t-if="o.partner_id.state_id.name"><span t-field="o.partner_id.state_id.name"/>-</t>
+                                    <t t-if="o.partner_id.zip"><span t-field="o.partner_id.zip"/>, </t>
+                                    <t t-if="o.partner_id.country_id.name"><span t-field="o.partner_id.country_id.name"/></t>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                    <br/>
+
+                    <div class="tab_two">
+                        <t t-if="o.journal_id.report_format == '1'">
+                            <h5 class="text-center">Paid to <strong><em><span t-if="o.partner_id" t-field="o.partner_id.name"/></em></strong></h5>
+                        </t>
+                        <t t-if="o.journal_id.report_format == '2'">
+                            <h5 class="text-center">Received with thanks from <strong><em><span t-if="o.partner_id" t-field="o.partner_id.name"/></em></strong></h5>
+                        </t>
+                    </div>
+
+                    <div class="tab_one"></div>
+                    <br/>
+                    <table style="border-collapse: collapse;width: 100%;" class="table table-condensed">
+                        <thead>
+                            <tr>
+                                <th class="text-center">Sl.</th>
+                                <th class="text-center">Account</th>
+                                <th class="text-center">Partner</th>
+                                <th class="text-center">Narration</th>
+                                <th style="text-align:center" class="maturity_one">Maturity Date</th>
+                                <th class="text-right">Debit</th>
+                                <th class="text-right">Credit</th>
+                            </tr>
+                        </thead>
+                        <tbody class="consumed_tbody">
+                            <t t-set="total" t-value="0.0"/>
+                            <t t-set="total1" t-value="0.0"/>
+                            <t t-set="sl_no" t-value="1"/>
+                            <t t-foreach="o.line_ids" t-as="line">
+                            <tr>
+                                 <td class="text-center">
+                                     <t t-esc="sl_no" />
+                                 </td>
+                                <td>
+                                    <span t-field="line.account_id" />
+                                </td>
+                                <td>
+                                    <span t-field="line.partner_id" />
+                                </td>
+                                <td>
+                                    <span t-field="line.name" />
+                                </td>
+                                <td class="maturity_two">
+                                    <span t-field="line.date_maturity" />
+                                </td>
+                                <td class="text-right">
+                                    <t t-if="line.debit != 0">
+                                        <span t-field="line.debit" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                    </t>
+                                </td>
+
+                                <td class="text-right" style="background-color: white !important;">
+                                    <t t-if="line.credit != 0">
+                                        <span t-field="line.credit" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                    </t>
+                                </td>
+                                <t t-set="sl_no" t-value="sl_no+1"/>
+                            </tr>
+                            <t t-set="total" t-value="total + line.debit"/>
+                            <t t-set="total1" t-value="total1 + line.credit"/>
+                            </t>
+                        </tbody>
+                    </table>
+                    <table style="border-collapse: collapse;width: 100%; margin-bottom: 2em;" class="table table-condensed">
+                        <tbody>
+                            <tr>
+                                <td colspan="4" class="text-right"><strong>Total:</strong></td>
+                                <td width="10%" class="text-right">
+                                    <strong>
+                                        <span style="border-bottom: 4px double;"><t t-esc="'{0:,.2f}'.format(total)"/></span>
+                                    </strong>
+                                </td>
+                                <td class="text-right" width="10%" style="background-color: white !important;">
+                                    <strong>
+                                        <span style="border-bottom: 4px double;"><t t-esc="'{0:,.2f}'.format(total1)"/></span>
+                                    </strong>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="row">
+                        <div class="col-12">
+                            <p style="font-size: 18px;"><strong>In Words: </strong> <span t-field="o.amount_in_words"/></p>
+                        </div>
+                    </div>
+                    <br/>
+                    <t t-if="o.cheque_number_details_id">
+                    <div class="row">
+                        <div class="col-6">
+                            <strong>Cheque No.: </strong><span t-field="o.cheque_number_details_id.cheque_number"/>
+                        </div>
+                        <div class="col-6">
+                            <strong>Bank Name: </strong><span t-field="o.cheque_number_details_id.bank_id"/>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <strong>Cheque Date: </strong><span t-field="o.cheque_number_details_id.cheque_date"/>
+                        </div>
+                        <div class="col-6">
+                            <strong>Branch Name: </strong><span t-field="o.cheque_number_details_id.bank_branch_id"/>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <strong>Cheque Title: </strong><span t-field="o.cheque_number_details_id.account_no"/>
+                        </div>
+                    </div>
+                </t>
+                    <t t-if = "o.narration">
+                        <strong><h4 >Remarks</h4></strong>
+                        <div  class="row" style="border: 1px solid black; padding:10px 0 10px 5px;  width:100%; margin: 0 auto !important;" >
+                            <span t-field="o.narration"/>
+                        </div>
+                    </t>
+                    <span class="tab_one">
+                        <t t-if="o.journal_id.report_format == '1'">
+                        <table style="margin-top: 6em !important; width: 100%; border-style: none;">
+                            <tr>
+                                <td class="text-center" style="border-style: none !important; background-color: white !important;">
+                                    <strong style="padding-top: 120px;text-align:center;text-decoration: overline;">Prepared by</strong><br/>
+                                    <span t-field="o.create_uid"/>
+                                </td>
+                                <td class="text-center" style="border-style: none !important; background-color: white !important;">
+                                    <strong style="padding-top: 120px;text-align:center;text-decoration: overline;">Accounts/Finance</strong>
+                                </td>
+                                <td class="text-center" style="border-style: none !important; background-color: white !important;">
+                                    <strong style="padding-top: 120px;text-align:center;text-decoration: overline;">Audited by</strong>
+                                </td>
+                                <td class="text-center" style="border-style: none !important; background-color: white !important;">
+                                    <strong style="padding-top: 120px;text-align:center;text-decoration: overline;">CFO/ED</strong>
+                                </td>
+                                <td class="text-center" style="border-style: none !important; background-color: white !important;">
+                                    <strong style="padding-top: 120px;text-align:center;text-decoration: overline;">Board of Directors</strong>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="5" style="border-style: none !important; background-color: white !important;">&amp;nbsp;</td>
+                            </tr>
+                            <tr>
+                                <td colspan="5" style="border-style: none !important; background-color: white !important;">&amp;nbsp;</td>
+                            </tr>
+                            <tr>
+                                <td colspan="5" style="border-style: none !important; background-color: white !important;">&amp;nbsp;</td>
+                            </tr>
+                            <tr>
+                                <td colspan="5" style="border-style: none !important; background-color: white !important;">&amp;nbsp;</td>
+                            </tr>
+                            <tr>
+                                <td class="text-center" style="border-style: none !important; background-color: white !important;">
+                                    <strong style="padding-top: 120px;text-align:center;text-decoration: overline;">Received by</strong><br/>
+                                </td>
+                                <td colspan="4" style="border-style: none !important; background-color: white !important;">&amp;nbsp;</td>
+                            </tr>
+                        </table>
+                    </t>
+                        <t t-if="o.journal_id.report_format in ('2','3','4','5')">
+                            <table style="margin-top: 6em !important; width: 100%; border-style: none;">
+                                <tr>
+                                    <td class="text-center" style="border-style: none !important; background-color: white !important;">
+                                        <strong style="padding-top: 120px;text-align:center;text-decoration: overline;">Prepared by</strong><br/>
+                                    </td>
+                                    <td class="text-center" style="border-style: none !important; background-color: white !important;">
+                                        <strong style="padding-top: 120px;text-align:center;text-decoration: overline;">Accounts/Finance</strong>
+                                    </td>
+                                    <td class="text-center" style="border-style: none !important; background-color: white !important;">
+                                        <strong style="padding-top: 120px;text-align:center;text-decoration: overline;">Audited by</strong>
+                                    </td>
+                                    <td class="text-center" style="border-style: none !important; background-color: white !important;">
+                                        <strong style="padding-top: 120px;text-align:center;text-decoration: overline;">CFO/ED</strong>
+                                    </td>
+                                    <td class="text-center" style="border-style: none !important; background-color: white !important;">
+                                        <strong style="padding-top: 120px;text-align:center;text-decoration: overline;">Board of Directors</strong>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="5" style="border-style: none !important; background-color: white !important;">&amp;nbsp;</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="5" style="border-style: none !important; background-color: white !important;">&amp;nbsp;</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="5" style="border-style: none !important; background-color: white !important;">&amp;nbsp;</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="5" style="border-style: none !important; background-color: white !important;">&amp;nbsp;</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-center" style="border-style: none !important; background-color: white !important;">
+                                        <strong style="padding-top: 120px;text-align:center;text-decoration: overline;">Received by</strong><br/>
+                                        <span t-field="o.create_uid"/><br/>
+                                    </td>
+                                    <td colspan="4" style="border-style: none !important; background-color: white !important;">&amp;nbsp;</td>
+                                </tr>
+                            </table>
+                        </t>
+                    </span>
+
+                </div>
+                <div class="row" style="margin: 7.5em auto 0 auto !important;">
+                    <div class="col-12">
+                        <strong>[Created on: <span t-field="o.create_date"/> | Updated by: <span t-field="o.create_uid"/> on <span t-field="o.write_date"/>]</strong>
+                    </div>
+                </div>
+            </t>
+		</template>
+
+		<template id="voucher_report_tmpl_id">
+			<t t-call="web.html_container">
+				<t t-foreach="docs" t-as="o">
+					<t t-call="custom_account_day_book.voucher_report_tmpl_view"  t-lang="o.partner_id.lang"/>
+				</t>
+			</t>
+		</template>
+
+	</data>
+</odoo>

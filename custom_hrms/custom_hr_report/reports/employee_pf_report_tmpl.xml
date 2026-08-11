@@ -1,0 +1,461 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+	<data>
+        <record id="paperformat_employee_pf_report" model="report.paperformat">
+            <field name="name">Employee PF Report Paperformat</field>
+            <field name="default" eval="True"/>
+            <field name="format">Legal</field>
+            <field name="orientation">Landscape</field>
+            <field name="margin_top">30</field>
+            <field name="margin_bottom">20</field>
+            <field name="margin_left">5</field>
+            <field name="margin_right">5</field>
+            <field name="header_line" eval="False"/>
+            <field name="header_spacing">25</field>
+            <field name="dpi">120</field>
+        </record>
+
+
+        <record model="ir.actions.report" id="employee_pf_report_tmpl">
+            <field name="name">Employee PF Report</field>
+            <field name="model">employee.pf.report.wizard</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">custom_hr_report.employee_pf_report_view</field>
+            <field name="report_file">custom_hr_report.employee_pf_report_view</field>
+            <field name="paperformat_id" ref="custom_hr_report.paperformat_employee_pf_report"/>
+        </record>
+
+		<template id="employee_pf_report_view">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <style type="text/css">
+                            th, tr, td{
+                                background: white !important;
+                                border: 1px solid black !important;
+                            }
+                        </style>
+                        <div class="oe_structure"/>
+                        <div>
+                            <h3 class="text-center head_font_color">
+                                <strong>
+                                    <span t-esc="form['company_id'][1]"/><br/>
+                                    Employee PF Report
+                                </strong>
+                            </h3>
+                        </div>
+<!--                        <div class="row">
+                            <div class="col-6">
+                                <p style="color: #000; font-size: 15px;"><strong>Branch:</strong> <t t-esc="work_location_name"/></p>
+                            </div>
+                            <div class="col-6 text-right">
+                                <p style="color: #000; font-size: 15px;"><strong>Year:</strong>  <t t-esc="form['year']"/></p>
+                            </div>
+                        </div>-->
+
+                        <t t-set="sl_no" t-value="1"/>
+                        <t t-set="total_pf_amt" t-value="0"/>
+                        <t t-set="grand_jan_pf_amt" t-value="0"/>
+                        <t t-set="grand_feb_pf_amt" t-value="0"/>
+                        <t t-set="grand_mar_pf_amt" t-value="0"/>
+                        <t t-set="grand_apr_pf_amt" t-value="0"/>
+                        <t t-set="grand_may_pf_amt" t-value="0"/>
+                        <t t-set="grand_jun_pf_amt" t-value="0"/>
+                        <t t-set="grand_jul_pf_amt" t-value="0"/>
+                        <t t-set="grand_aug_pf_amt" t-value="0"/>
+                        <t t-set="grand_sep_pf_amt" t-value="0"/>
+                        <t t-set="grand_oct_pf_amt" t-value="0"/>
+                        <t t-set="grand_nov_pf_amt" t-value="0"/>
+                        <t t-set="grand_dec_pf_amt" t-value="0"/>
+                        <t t-set="grand_total_pf_amt" t-value="0"/>
+
+                        <t t-foreach="csr" t-as="line">
+                            <t t-foreach="line" t-as="line2">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <p style="color: #000; font-size: 20px;">
+                                            <strong>
+                                                Branch: <span t-esc="line[str(line2)][0]['loc_name']"/>
+                                            </strong>
+                                            <t t-if="buisness_unit">
+                                                <br/>
+                                                <strong>Office/business Unit:</strong>
+                                                <t t-esc="buisness_unit"/>
+                                            </t>
+                                        </p>
+                                    </div>
+                                    <div class="col-6 text-right">
+                                        <p style="color: #000; font-size: 20px;">
+                                            <strong>Year: <t t-esc="form['year']"/></strong>
+                                            <t t-if="tag_names_list">
+                                                <br/>
+                                                <strong>Tags:</strong>
+                                                <t t-esc="tag_names_list"/>
+                                            </t>
+                                        </p>
+                                    </div>
+                                </div>
+                                <table style="border-collapse: collapse;width: 100%; margin-bottom: 2em;" class="table table-condensed">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center align-middle bg_color font_color">Sl. No.</th>
+                                            <th class="text-left align-middle bg_color font_color">Employee Name</th>
+                                            <th class="text-left align-middle bg_color font_color">Employee ID</th>
+                                            <th class="text-left align-middle bg_color font_color">Work/Job Location</th>
+                                            <th class="text-left align-middle bg_color font_color">Department</th>
+                                            <th class="text-left align-middle bg_color font_color">Designation</th>
+                                            <t t-if="not form['month']">
+                                                <th class="text-center align-middle bg_color font_color">Jan</th>
+                                                <th class="text-center align-middle bg_color font_color">Feb</th>
+                                                <th class="text-center align-middle bg_color font_color">Mar</th>
+                                                <th class="text-center align-middle bg_color font_color">Apr</th>
+                                                <th class="text-center align-middle bg_color font_color">May</th>
+                                                <th class="text-center align-middle bg_color font_color">Jun</th>
+                                                <th class="text-center align-middle bg_color font_color">Jul</th>
+                                                <th class="text-center align-middle bg_color font_color">Aug</th>
+                                                <th class="text-center align-middle bg_color font_color">Sep</th>
+                                                <th class="text-center align-middle bg_color font_color">Oct</th>
+                                                <th class="text-center align-middle bg_color font_color">Nov</th>
+                                                <th class="text-center align-middle bg_color font_color">Dec</th>
+                                            </t>
+                                            <t t-else="">
+                                                <th class="text-right align-middle bg_color font_color">
+                                                    <t t-if="form['month']=='01'">
+                                                        Jan
+                                                    </t>
+                                                    <t t-elif="form['month']=='02'">
+                                                        Feb
+                                                    </t>
+                                                    <t t-elif="form['month']=='03'">
+                                                        Mar
+                                                    </t>
+                                                    <t t-elif="form['month']=='04'">
+                                                        Apr
+                                                    </t>
+                                                    <t t-elif="form['month']=='05'">
+                                                        May
+                                                    </t>
+                                                    <t t-elif="form['month']=='06'">
+                                                        Jun
+                                                    </t>
+                                                    <t t-elif="form['month']=='07'">
+                                                        Jul
+                                                    </t>
+                                                    <t t-elif="form['month']=='08'">
+                                                        Aug
+                                                    </t>
+                                                    <t t-elif="form['month']=='09'">
+                                                        Sep
+                                                    </t>
+                                                    <t t-elif="form['month']=='10'">
+                                                        Oct
+                                                    </t>
+                                                    <t t-elif="form['month']=='11'">
+                                                        Nov
+                                                    </t>
+                                                    <t t-else="">
+                                                        Dec
+                                                    </t>
+                                                </th>
+                                            </t>
+                                            <th class="text-right align-middle bg_color font_color">
+                                                Total
+                                            </th>
+                                            <th class="text-center align-middle bg_color font_color">Remarks</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="consumed_tbody">
+                                        <t t-foreach="line[str(line2)]" t-as="line3">
+                                            <tr>
+                                                <td class="text-center align-middle">
+                                                    <span t-esc="sl_no"/>
+                                                </td>
+                                                <td class="text-left align-middle">
+                                                    <span t-esc="line3['emp_name']"/>
+                                                </td>
+                                                <td class="text-left align-middle">
+                                                    <span t-esc="line3['old_emp_id']"/>
+                                                </td>
+                                                <td class="text-left align-middle">
+                                                    <span t-esc="line3['loc_name']"/>
+                                                </td>
+                                                <td class="text-left align-middle">
+                                                    <span t-esc="line3['dept_name']"/>
+                                                </td>
+                                                <td class="text-left align-middle">
+                                                    <span t-esc="line3['job_name']"/>
+                                                </td>
+                                                <t t-if="not form['month']">
+                                                    <t t-foreach="line3['month_list']" t-as="line4">
+                                                        <td class="text-right align-middle">
+                                                            <span t-esc="'{0:,.2f}'.format(line4['01'])"/>
+                                                            <t t-set="total_pf_amt" t-value="total_pf_amt + line4['01']"/>
+                                                            <t t-set="grand_jan_pf_amt" t-value="grand_jan_pf_amt + line4['01']"/>
+                                                            <t t-set="grand_total_pf_amt" t-value="grand_total_pf_amt + line4['01']"/>
+                                                        </td>
+                                                        <td class="text-right align-middle">
+                                                            <span t-esc="'{0:,.2f}'.format(line4['02'])"/>
+                                                            <t t-set="total_pf_amt" t-value="total_pf_amt + line4['02']"/>
+                                                            <t t-set="grand_feb_pf_amt" t-value="grand_feb_pf_amt + line4['02']"/>
+                                                            <t t-set="grand_total_pf_amt" t-value="grand_total_pf_amt + line4['02']"/>
+                                                        </td>
+                                                        <td class="text-right align-middle">
+                                                            <span t-esc="'{0:,.2f}'.format(line4['03'])"/>
+                                                            <t t-set="total_pf_amt" t-value="total_pf_amt + line4['03']"/>
+                                                            <t t-set="grand_mar_pf_amt" t-value="grand_mar_pf_amt + line4['03']"/>
+                                                            <t t-set="grand_total_pf_amt" t-value="grand_total_pf_amt + line4['03']"/>
+                                                        </td>
+                                                        <td class="text-right align-middle">
+                                                            <span t-esc="'{0:,.2f}'.format(line4['04'])"/>
+                                                            <t t-set="total_pf_amt" t-value="total_pf_amt + line4['04']"/>
+                                                            <t t-set="grand_apr_pf_amt" t-value="grand_apr_pf_amt + line4['04']"/>
+                                                            <t t-set="grand_total_pf_amt" t-value="grand_total_pf_amt + line4['04']"/>
+                                                        </td>
+                                                        <td class="text-right align-middle">
+                                                            <span t-esc="'{0:,.2f}'.format(line4['05'])"/>
+                                                            <t t-set="total_pf_amt" t-value="total_pf_amt + line4['05']"/>
+                                                            <t t-set="grand_may_pf_amt" t-value="grand_may_pf_amt + line4['05']"/>
+                                                            <t t-set="grand_total_pf_amt" t-value="grand_total_pf_amt + line4['05']"/>
+                                                        </td>
+                                                        <td class="text-right align-middle">
+                                                            <span t-esc="'{0:,.2f}'.format(line4['06'])"/>
+                                                            <t t-set="total_pf_amt" t-value="total_pf_amt + line4['06']"/>
+                                                            <t t-set="grand_jun_pf_amt" t-value="grand_jun_pf_amt + line4['06']"/>
+                                                            <t t-set="grand_total_pf_amt" t-value="grand_total_pf_amt + line4['06']"/>
+                                                        </td>
+                                                        <td class="text-right align-middle">
+                                                            <span t-esc="'{0:,.2f}'.format(line4['07'])"/>
+                                                            <t t-set="total_pf_amt" t-value="total_pf_amt + line4['07']"/>
+                                                            <t t-set="grand_jul_pf_amt" t-value="grand_jul_pf_amt + line4['07']"/>
+                                                            <t t-set="grand_total_pf_amt" t-value="grand_total_pf_amt + line4['07']"/>
+                                                        </td>
+                                                        <td class="text-right align-middle">
+                                                            <span t-esc="'{0:,.2f}'.format(line4['08'])"/>
+                                                            <t t-set="total_pf_amt" t-value="total_pf_amt + line4['08']"/>
+                                                            <t t-set="grand_aug_pf_amt" t-value="grand_aug_pf_amt + line4['08']"/>
+                                                            <t t-set="grand_total_pf_amt" t-value="grand_total_pf_amt + line4['08']"/>
+                                                        </td>
+                                                        <td class="text-right align-middle">
+                                                            <span t-esc="'{0:,.2f}'.format(line4['09'])"/>
+                                                            <t t-set="total_pf_amt" t-value="total_pf_amt + line4['09']"/>
+                                                            <t t-set="grand_sep_pf_amt" t-value="grand_sep_pf_amt + line4['09']"/>
+                                                            <t t-set="grand_total_pf_amt" t-value="grand_total_pf_amt + line4['09']"/>
+                                                        </td>
+                                                        <td class="text-right align-middle">
+                                                            <span t-esc="'{0:,.2f}'.format(line4['10'])"/>
+                                                            <t t-set="total_pf_amt" t-value="total_pf_amt + line4['10']"/>
+                                                            <t t-set="grand_oct_pf_amt" t-value="grand_oct_pf_amt + line4['10']"/>
+                                                            <t t-set="grand_total_pf_amt" t-value="grand_total_pf_amt + line4['10']"/>
+                                                        </td>
+                                                        <td class="text-right align-middle">
+                                                            <span t-esc="'{0:,.2f}'.format(line4['11'])"/>
+                                                            <t t-set="total_pf_amt" t-value="total_pf_amt + line4['11']"/>
+                                                            <t t-set="grand_nov_pf_amt" t-value="grand_nov_pf_amt + line4['11']"/>
+                                                            <t t-set="grand_total_pf_amt" t-value="grand_total_pf_amt + line4['11']"/>
+                                                        </td>
+                                                        <td class="text-right align-middle">
+                                                            <span t-esc="'{0:,.2f}'.format(line4['12'])"/>
+                                                            <t t-set="total_pf_amt" t-value="total_pf_amt + line4['12']"/>
+                                                            <t t-set="grand_dec_pf_amt" t-value="grand_dec_pf_amt + line4['12']"/>
+                                                            <t t-set="grand_total_pf_amt" t-value="grand_total_pf_amt + line4['12']"/>
+                                                        </td>
+                                                    </t>
+                                                </t>
+                                                <t t-else="">
+                                                    <t t-foreach="line3['month_list']" t-as="line4">
+                                                        <td class="text-right align-middle">
+                                                            <t t-if="form['month']=='01'">
+                                                                <span t-esc="'{0:,.2f}'.format(line4['01'])"/>
+                                                                <t t-set="total_pf_amt" t-value="total_pf_amt + line4['01']"/>
+                                                                <t t-set="grand_jan_pf_amt" t-value="grand_jan_pf_amt + line4['01']"/>
+                                                                <t t-set="grand_total_pf_amt" t-value="grand_total_pf_amt + line4['01']"/>
+                                                            </t>
+                                                            <t t-elif="form['month']=='02'">
+                                                                <span t-esc="'{0:,.2f}'.format(line4['02'])"/>
+                                                                <t t-set="total_pf_amt" t-value="total_pf_amt + line4['02']"/>
+                                                                <t t-set="grand_feb_pf_amt" t-value="grand_feb_pf_amt + line4['02']"/>
+                                                                <t t-set="grand_total_pf_amt" t-value="grand_total_pf_amt + line4['02']"/>
+                                                            </t>
+                                                            <t t-elif="form['month']=='03'">
+                                                                <span t-esc="'{0:,.2f}'.format(line4['03'])"/>
+                                                                <t t-set="total_pf_amt" t-value="total_pf_amt + line4['03']"/>
+                                                                <t t-set="grand_mar_pf_amt" t-value="grand_mar_pf_amt + line4['03']"/>
+                                                                <t t-set="grand_total_pf_amt" t-value="grand_total_pf_amt + line4['03']"/>
+                                                            </t>
+                                                            <t t-elif="form['month']=='04'">
+                                                                <span t-esc="'{0:,.2f}'.format(line4['04'])"/>
+                                                                <t t-set="total_pf_amt" t-value="total_pf_amt + line4['04']"/>
+                                                                <t t-set="grand_apr_pf_amt" t-value="grand_apr_pf_amt + line4['04']"/>
+                                                                <t t-set="grand_total_pf_amt" t-value="grand_total_pf_amt + line4['04']"/>
+                                                            </t>
+                                                            <t t-elif="form['month']=='05'">
+                                                                <span t-esc="'{0:,.2f}'.format(line4['05'])"/>
+                                                                <t t-set="total_pf_amt" t-value="total_pf_amt + line4['05']"/>
+                                                                <t t-set="grand_may_pf_amt" t-value="grand_may_pf_amt + line4['05']"/>
+                                                                <t t-set="grand_total_pf_amt" t-value="grand_total_pf_amt + line4['05']"/>
+                                                            </t>
+                                                            <t t-elif="form['month']=='06'">
+                                                                <span t-esc="'{0:,.2f}'.format(line4['06'])"/>
+                                                                <t t-set="total_pf_amt" t-value="total_pf_amt + line4['06']"/>
+                                                                <t t-set="grand_jun_pf_amt" t-value="grand_jun_pf_amt + line4['06']"/>
+                                                                <t t-set="grand_total_pf_amt" t-value="grand_total_pf_amt + line4['06']"/>
+                                                            </t>
+                                                            <t t-elif="form['month']=='07'">
+                                                                <span t-esc="'{0:,.2f}'.format(line4['07'])"/>
+                                                                <t t-set="total_pf_amt" t-value="total_pf_amt + line4['07']"/>
+                                                                <t t-set="grand_jul_pf_amt" t-value="grand_jul_pf_amt + line4['07']"/>
+                                                                <t t-set="grand_total_pf_amt" t-value="grand_total_pf_amt + line4['07']"/>
+                                                            </t>
+                                                            <t t-elif="form['month']=='08'">
+                                                                <span t-esc="'{0:,.2f}'.format(line4['08'])"/>
+                                                                <t t-set="total_pf_amt" t-value="total_pf_amt + line4['08']"/>
+                                                                <t t-set="grand_aug_pf_amt" t-value="grand_aug_pf_amt + line4['08']"/>
+                                                                <t t-set="grand_total_pf_amt" t-value="grand_total_pf_amt + line4['08']"/>
+                                                            </t>
+                                                            <t t-elif="form['month']=='09'">
+                                                                <span t-esc="'{0:,.2f}'.format(line4['09'])"/>
+                                                                <t t-set="total_pf_amt" t-value="total_pf_amt + line4['09']"/>
+                                                                <t t-set="grand_sep_pf_amt" t-value="grand_sep_pf_amt + line4['09']"/>
+                                                                <t t-set="grand_total_pf_amt" t-value="grand_total_pf_amt + line4['09']"/>
+                                                            </t>
+                                                            <t t-elif="form['month']=='10'">
+                                                                <span t-esc="'{0:,.2f}'.format(line4['10'])"/>
+                                                                <t t-set="total_pf_amt" t-value="total_pf_amt + line4['10']"/>
+                                                                <t t-set="grand_oct_pf_amt" t-value="grand_oct_pf_amt + line4['10']"/>
+                                                                <t t-set="grand_total_pf_amt" t-value="grand_total_pf_amt + line4['10']"/>
+                                                            </t>
+                                                            <t t-elif="form['month']=='11'">
+                                                                <span t-esc="'{0:,.2f}'.format(line4['11'])"/>
+                                                                <t t-set="total_pf_amt" t-value="total_pf_amt + line4['11']"/>
+                                                                <t t-set="grand_nov_pf_amt" t-value="grand_nov_pf_amt + line4['11']"/>
+                                                                <t t-set="grand_total_pf_amt" t-value="grand_total_pf_amt + line4['11']"/>
+                                                            </t>
+                                                            <t t-else="">
+                                                                <span t-esc="'{0:,.2f}'.format(line4['12'])"/>
+                                                                <t t-set="total_pf_amt" t-value="total_pf_amt + line4['12']"/>
+                                                                <t t-set="grand_dec_pf_amt" t-value="grand_dec_pf_amt + line4['12']"/>
+                                                                <t t-set="grand_total_pf_amt" t-value="grand_total_pf_amt + line4['12']"/>
+                                                            </t>
+                                                        </td>
+                                                    </t>
+                                                </t>
+                                                <td class="text-right align-middle">
+                                                    <span t-esc="'{0:,.2f}'.format(total_pf_amt)"/>
+                                                </td>
+                                                <td class="text-center align-middle"></td>
+                                            </tr>
+                                            <t t-set="sl_no" t-value="sl_no + 1"/>
+                                            <t t-set="total_pf_amt" t-value="0"/>
+                                        </t>
+                                        <tr style="border: 1px solid black;">
+                                            <td class="text-right" colspan="6"><strong>Total</strong></td>
+                                            <t t-if="not form['month']">
+                                                <td class="text-right">
+                                                    <strong><t t-esc="'{0:,.2f}'.format(grand_jan_pf_amt)"/></strong>
+                                                </td>
+                                                <td class="text-right">
+                                                    <strong><t t-esc="'{0:,.2f}'.format(grand_feb_pf_amt)"/></strong>
+                                                </td>
+                                                <td class="text-right">
+                                                    <strong><t t-esc="'{0:,.2f}'.format(grand_mar_pf_amt)"/></strong>
+                                                </td>
+                                                <td class="text-right">
+                                                    <strong><t t-esc="'{0:,.2f}'.format(grand_apr_pf_amt)"/></strong>
+                                                </td>
+                                                <td class="text-right">
+                                                    <strong><t t-esc="'{0:,.2f}'.format(grand_may_pf_amt)"/></strong>
+                                                </td>
+                                                <td class="text-right">
+                                                    <strong><t t-esc="'{0:,.2f}'.format(grand_jun_pf_amt)"/></strong>
+                                                </td>
+                                                <td class="text-right">
+                                                    <strong><t t-esc="'{0:,.2f}'.format(grand_jul_pf_amt)"/></strong>
+                                                </td>
+                                                <td class="text-right">
+                                                    <strong><t t-esc="'{0:,.2f}'.format(grand_aug_pf_amt)"/></strong>
+                                                </td>
+                                                <td class="text-right">
+                                                    <strong><t t-esc="'{0:,.2f}'.format(grand_sep_pf_amt)"/></strong>
+                                                </td>
+                                                <td class="text-right">
+                                                    <strong><t t-esc="'{0:,.2f}'.format(grand_oct_pf_amt)"/></strong>
+                                                </td>
+                                                <td class="text-right">
+                                                    <strong><t t-esc="'{0:,.2f}'.format(grand_nov_pf_amt)"/></strong>
+                                                </td>
+                                                <td class="text-right">
+                                                    <strong><t t-esc="'{0:,.2f}'.format(grand_dec_pf_amt)"/></strong>
+                                                </td>
+                                            </t>
+                                            <t t-else="">
+                                                <td class="text-right align-middle">
+                                                    <t t-if="form['month']=='01'">
+                                                        <span t-esc="'{0:,.2f}'.format(grand_jan_pf_amt)"/>
+                                                    </t>
+                                                    <t t-elif="form['month']=='02'">
+                                                        <span t-esc="'{0:,.2f}'.format(grand_feb_pf_amt)"/>
+                                                    </t>
+                                                    <t t-elif="form['month']=='03'">
+                                                        <span t-esc="'{0:,.2f}'.format(grand_mar_pf_amt)"/>
+                                                    </t>
+                                                    <t t-elif="form['month']=='04'">
+                                                        <span t-esc="'{0:,.2f}'.format(grand_apr_pf_amt)"/>
+                                                    </t>
+                                                    <t t-elif="form['month']=='05'">
+                                                        <span t-esc="'{0:,.2f}'.format(grand_may_pf_amt)"/>
+                                                    </t>
+                                                    <t t-elif="form['month']=='06'">
+                                                        <span t-esc="'{0:,.2f}'.format(grand_jun_pf_amt)"/>
+                                                    </t>
+                                                    <t t-elif="form['month']=='07'">
+                                                        <span t-esc="'{0:,.2f}'.format(grand_jul_pf_amt)"/>
+                                                    </t>
+                                                    <t t-elif="form['month']=='08'">
+                                                        <span t-esc="'{0:,.2f}'.format(grand_aug_pf_amt)"/>
+                                                    </t>
+                                                    <t t-elif="form['month']=='09'">
+                                                        <span t-esc="'{0:,.2f}'.format(grand_sep_pf_amt)"/>
+                                                    </t>
+                                                    <t t-elif="form['month']=='10'">
+                                                        <span t-esc="'{0:,.2f}'.format(grand_oct_pf_amt)"/>
+                                                    </t>
+                                                    <t t-elif="form['month']=='11'">
+                                                        <span t-esc="'{0:,.2f}'.format(grand_nov_pf_amt)"/>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <span t-esc="'{0:,.2f}'.format(grand_dec_pf_amt)"/>
+                                                    </t>
+                                                </td>
+                                            </t>
+                                            <td class="text-right align-middle">
+                                                <span t-esc="'{0:,.2f}'.format(grand_total_pf_amt)"/>
+                                            </td>
+                                            <td class="text-center align-middle"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <t t-set="sl_no" t-value="1"/>
+                                <t t-set="total_pf_amt" t-value="0"/>
+                                <t t-set="grand_jan_pf_amt" t-value="0"/>
+                                <t t-set="grand_feb_pf_amt" t-value="0"/>
+                                <t t-set="grand_mar_pf_amt" t-value="0"/>
+                                <t t-set="grand_apr_pf_amt" t-value="0"/>
+                                <t t-set="grand_may_pf_amt" t-value="0"/>
+                                <t t-set="grand_jun_pf_amt" t-value="0"/>
+                                <t t-set="grand_jul_pf_amt" t-value="0"/>
+                                <t t-set="grand_aug_pf_amt" t-value="0"/>
+                                <t t-set="grand_sep_pf_amt" t-value="0"/>
+                                <t t-set="grand_oct_pf_amt" t-value="0"/>
+                                <t t-set="grand_nov_pf_amt" t-value="0"/>
+                                <t t-set="grand_dec_pf_amt" t-value="0"/>
+                                <t t-set="grand_total_pf_amt" t-value="0"/>
+                                <p style="page-break-after: always;"/>
+                            </t>
+                        </t>
+                    </div>
+                </t>
+            </t>
+		</template>
+	</data>
+</odoo>

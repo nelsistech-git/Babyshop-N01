@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <report
+        string="Delivery Challan without Amount"
+        id="stock.action_report_delivery"
+        model="stock.picking"
+        report_type="qweb-pdf"
+        name="stock.report_deliveryslip"
+        file="stock.report_deliveryslip"
+        print_report_name="'Delivery Challan without Amount - %s - %s' % (object.partner_id.name or '', object.name)"
+    />
+    <template id="stock_delivery_report_inherit" inherit_id="stock.report_delivery_document">
+
+        <xpath expr="//t[@name='partner_header']" position="replace"></xpath>
+        <xpath expr="//div[@class='page']/h2" position="replace">
+            <h2 style="text-align:center">Delivery Challan: <span style="color:teal" t-field="o.name" /></h2>
+            <div style="margin-top:0" class="custom-address">
+                <div class="row" style="border: 1px solid black;padding:10px">
+                    <div class="col-6">
+                        <strong>From Location:</strong>
+                        <span t-if="o.location_id.name" t-field="o.location_id.name" />
+                        <t t-if="o.location_id.store_address"><div t-field="o.location_id.store_address" /></t>
+                        <div t-if="o.location_id.division_id"><strong> Division:</strong> <span t-field="o.location_id.division_id.name" /></div>
+                        <div t-if="o.location_id.district_id"><strong> District:</strong> <span t-field="o.location_id.district_id.name" /></div>
+                        <div t-if="o.location_id.email"><strong> Email:</strong> <span t-field="o.location_id.email" /></div>
+                        <div t-if="o.location_id.mobile">
+                            <strong>Mobile:</strong>
+                            <span t-esc="o.location_id.mobile" />
+                        </div>
+                        <div t-if="o.location_id.bin_no">
+                            <strong>BIN No.:</strong>
+                            <span t-field="o.location_id.bin_no" />
+                        </div>
+                        <div t-if="o.location_id.tin_no">
+                            <strong>TIN No.:</strong>
+                            <span t-field="o.location_id.tin_no" />
+                        </div>
+                        <t t-if="not o.sale_id">
+                            <div t-if="o.partner_id and o.picking_type_id.code != 'internal'">
+                                <strong>Partner:</strong>
+                                <span t-esc="o.partner_id.name" />
+                            </div>
+                            <div t-if="o.partner_id and o.picking_type_id.code != 'internal'">
+                                <strong>Address:</strong>
+                                <t t-if="o.partner_id.street"><span t-field="o.partner_id.street" /></t>
+                                <t t-if="o.partner_id.street2">, <span t-field="o.partner_id.street2" /></t>
+                                <t t-if="o.partner_id.city">, <span t-field="o.partner_id.city" /></t>
+                                <t t-if="o.partner_id.zip"><span t-field="o.partner_id.zip" /></t>
+                            </div>
+                            <div t-if="o.partner_id and o.picking_type_id.code != 'internal'">
+                                <strong>Mobile:</strong>
+                                <span t-esc="o.partner_id.mobile"/>
+                            </div>
+                        </t>
+                    </div>
+                    <div class="col-6">
+                        <strong>To Location:</strong>
+                        <span t-if="o.location_dest_id.name" t-field="o.location_dest_id.name" />
+                        <t t-if="o.location_dest_id.store_address"><div t-field="o.location_dest_id.store_address" /></t>
+                        <div t-if="o.location_dest_id.division_id"><strong> Division:</strong> <span t-field="o.location_dest_id.division_id.name" /></div>
+                        <div t-if="o.location_dest_id.district_id"><strong> District:</strong> <span t-field="o.location_dest_id.district_id.name" /></div>
+                        <div t-if="o.location_dest_id.email"><strong> Email:</strong> <span t-field="o.location_dest_id.email" /></div>
+                        <div t-if="o.location_dest_id.bin_no">
+                            <strong>BIN No.:</strong>
+                            <span t-field="o.location_dest_id.bin_no" />
+                        </div>
+                        <div t-if="o.location_dest_id.tin_no">
+                            <strong>TIN No.:</strong>
+                            <span t-field="o.location_dest_id.tin_no" />
+                        </div>
+                        <t t-if="o.sale_id">
+                            <div t-if="o.partner_id">
+                                <strong>Partner:</strong>
+                                <span t-esc="o.partner_id.name" />
+                            </div>
+                            <div t-if="o.partner_id">
+                                <strong>Address:</strong>
+                                <t t-if="o.partner_id.street"><span t-field="o.partner_id.street" /></t>
+                                <t t-if="o.partner_id.street2">, <span t-field="o.partner_id.street2" /></t>
+                                <t t-if="o.partner_id.city">, <span t-field="o.partner_id.city" /></t>
+                                <t t-if="o.partner_id.zip"><span t-field="o.partner_id.zip" /></t>
+                            </div>
+                            <div t-if="o.partner_id">
+                                <strong>Mobile:</strong>
+                                <span t-esc="o.partner_id.mobile"/>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+            </div>
+            <br/>
+        </xpath>
+
+        <xpath expr="//div[@class='row mt32 mb32']" position="inside">
+            <div t-if="o.sale_id" class="col-auto">
+                <strong>Work Order Reference:</strong>
+                <p t-field="o.sale_id.work_order_ref"/>
+            </div>
+        </xpath>
+
+<!--        &lt;!&ndash; serial no in table head &ndash;&gt;
+        <xpath expr="//th[@name='th_sm_product']" position="before">
+            <th style="text-align: center">Sl.</th>
+        </xpath>
+        <xpath expr="//th[@name='th_sml_product']" position="before">
+            <th style="text-align: center">Sl.</th>
+        </xpath>
+
+        &lt;!&ndash; remarks in table head &ndash;&gt;
+        <xpath expr="//th[@name='th_sm_quantity']" position="after">
+            <th class="text-left">Remarks</th>
+        </xpath>
+        <xpath expr="//th[@name='th_sml_quantity']" position="after">
+            <th class="text-left">Remarks</th>
+        </xpath>
+
+        &lt;!&ndash; serial no value set &ndash;&gt;
+        <xpath expr="//table[1]/tbody/tr" position="before">
+             <t t-set="sl_no" t-value="1"/>
+        </xpath>
+        <xpath expr="//table[2]/tbody/tr" position="before">
+             <t t-set="sl_no" t-value="1"/>
+        </xpath>
+
+        &lt;!&ndash; serial no in table body &ndash;&gt;
+        <xpath expr="//table[1]/tbody/tr/td[1]" position="before">
+            <td class="text-center">
+                <t t-esc="sl_no" />
+            </td>
+        </xpath>
+
+        <xpath expr="//table[2]/tbody/tr/td[1]" position="before">
+            <td class="text-center">
+                <t t-esc="sl_no" />
+            </td>
+        </xpath>
+
+        &lt;!&ndash; serial no increment &ndash;&gt;
+        <xpath expr="//table[1]/tbody/tr" position="inside">
+           <t t-set="sl_no" t-value="sl_no+1"/>
+        </xpath>
+        <xpath expr="//table[2]/tbody/tr" position="inside">
+           <t t-set="sl_no" t-value="sl_no+1"/>
+        </xpath>
+
+        <xpath expr="//table[1]/tbody/tr/td[2]" position="replace">
+            &lt;!&ndash; quantity with unit of measures &ndash;&gt;
+            <td class="text-right">
+                <span t-field="move.quantity_done"/>
+                <span t-field="move.product_uom"/>
+            </td>
+
+            &lt;!&ndash; remarks in table body &ndash;&gt;
+            <td class="text-left">
+                <span t-field="move.remarks"/>
+            </td>
+        </xpath>
+
+        <xpath expr="//table[2]/tbody/tr/td[4]" position="replace">
+            &lt;!&ndash; quantity with unit of measures &ndash;&gt;
+            <td class="text-right">
+                <span t-field="move_line.qty_done"/>
+                <span t-field="move_line.product_uom_id"/>
+            </td>
+
+            &lt;!&ndash; remarks in table body &ndash;&gt;
+            <td class="text-left">
+                <span t-field="move_line.remarks"/>
+            </td>
+        </xpath>-->
+
+
+        <xpath expr="//table[@name='stock_move_table']" position="replace">
+            <table class="table table-sm" t-if="o.state!='done'" name="stock_move_table">
+                <t t-set="has_barcode" t-value="any([move_ids_without_package.product_id and move_ids_without_package.product_id.sudo().barcode or move_ids_without_package.package_id for move_ids_without_package in o.move_line_ids])"/>
+                <thead>
+                    <tr>
+                        <th name="th_sm_sl" class="text-center">Sl.</th>
+                        <th name="th_barcode">
+                            <strong>Barcode</strong>
+                        </th>
+                        <th name="th_sm_product"><strong>Product</strong></th>
+                        <th name="th_sm_quantity" class="text-right"><strong>Quantity</strong></th>
+                        <th name="th_sm_remarks" class="text-left">Remarks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-set="lines" t-value="o.move_lines.filtered(lambda x: x.product_uom_qty)"/>
+                    <t t-set="sl_no" t-value="1"/>
+                    <t t-set="total_quantity_done" t-value="0"/>
+                    <tr t-foreach="lines" t-as="move">
+                        <td class="text-center">
+                            <t t-esc="sl_no" />
+                        </td>
+<!--                        <td t-if="has_barcode">-->
+                        <td>
+                            <span t-field="move.product_id.barcode"/>
+                        </td>
+                        <td>
+                            <span t-field="move.product_id"/>
+                            <p t-if="move.description_picking != move.product_id.name">
+                                <span t-field="move.description_picking"/>
+                            </p>
+                        </td>
+                        <td class="text-right">
+<!--                            <span t-field="move.quantity_done"/>-->
+<!--                            <span t-field="move.product_uom"/>-->
+<!--                            <t t-set="total_quantity_done" t-value="total_quantity_done + move.quantity_done"/>-->
+<!--                            -->
+                            <span t-if="o.state != 'done'" t-field="move.product_uom_qty"/>
+                            <span t-if="o.state == 'done'" t-field="move.quantity_done"/>
+                            <span t-field="move.product_uom"/>
+                            <t t-if="o.state != 'done'" t-set="total_quantity_done" t-value="total_quantity_done + move.product_uom_qty"/>
+                            <t t-if="o.state == 'done'" t-set="total_quantity_done" t-value="total_quantity_done + move.quantity_done"/>
+
+                        </td>
+                        <td class="text-left">
+                            <span t-field="move.remarks"/>
+                        </td>
+                        <t t-set="sl_no" t-value="sl_no+1"/>
+                    </tr>
+                    <tr>
+                        <td colspan="3"  style="border-top: 1px solid black;"></td>
+                        <td class="text-right" style="border-top: 1px solid black;">
+                            <strong><span t-esc="'{0:,.3f}'.format(total_quantity_done)"/></strong>
+                        </td>
+                        <td class="text-left" style="border-top: 1px solid black;"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </xpath>
+
+        <xpath expr="//table[@name='stock_move_line_table']" position="replace">
+            <table class="table table-sm mt48" t-if="o.move_line_ids and o.state=='done'" name="stock_move_line_table">
+                <t t-set="has_barcode" t-value="any([move_ids_without_package.product_id and move_ids_without_package.product_id.sudo().barcode or move_ids_without_package.package_id for move_ids_without_package in o.move_line_ids])"/>
+                <t t-set="has_serial_number" t-value="o.move_line_ids.mapped('lot_id')" />
+                <thead>
+                    <tr>
+                        <th name="th_sml_sl" class="text-center">Sl.</th>
+                        <th name="th_barcode" t-if="has_barcode">
+                            <strong>Barcode</strong>
+                        </th>
+                        <th name="th_sml_product"><strong>Product</strong></th>
+                        <th name="lot_serial" t-if="has_serial_number" groups="stock.group_lot_on_delivery_slip">
+                            Lot/Serial Number
+                        </th>
+                        <th name="th_sml_quantity" class="text-right"><strong>Quantity</strong></th>
+                        <th name="th_sml_remarks" class="text-left">Remarks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-set="sl_no" t-value="1"/>
+                    <t t-set="total_quantity_done" t-value="0"/>
+                    <tr t-foreach="o.move_line_ids" t-as="move_line">
+                        <td class="text-center">
+                            <t t-esc="sl_no" />
+                        </td>
+                        <td t-if="has_barcode">
+                            <span t-field="move_line.product_id.barcode"/>
+                        </td>
+                        <td>
+                            <span t-field="move_line.product_id"/>
+                            <p t-if="move_line.move_id.description_picking != move_line.product_id.name">
+                                <span t-field="move_line.move_id.description_picking"/>
+                            </p>
+                        </td>
+                        <td t-if="has_serial_number and move_line.lot_id.name" groups="stock.group_lot_on_delivery_slip">
+                            <span t-field="move_line.lot_id.name"/>
+                        </td>
+                        <td t-elif="has_serial_number" groups="stock.group_lot_on_delivery_slip">
+                            <span t-field="move_line.lot_name"/>
+                        </td>
+                        <td class="text-right">
+                            <span t-field="move_line.qty_done"/>
+                            <t t-set="total_quantity_done" t-value="total_quantity_done + move_line.qty_done"/>
+                            <span t-field="move_line.product_uom_id"/>
+                        </td>
+                        <td class="text-left">
+                            <span t-field="move_line.remarks"/>
+                        </td>
+                        <t t-set="sl_no" t-value="sl_no+1"/>
+                    </tr>
+                    <tr>
+                        <t t-set="colspan" t-value="2"/>
+                        <t t-set="colspan" t-if="has_barcode" t-value="colspan + 1"/>
+                        <t t-set="colspan" t-if="has_serial_number" t-value="colspan + 1"/>
+                        <td t-att-colspan="colspan" style="border-top: 1px solid black;background:transparent !important"></td>
+                        <td class="text-right" style="border-top: 1px solid black;">
+                            <strong><span t-esc="'{0:,.3f}'.format(total_quantity_done)"/></strong>
+                        </td>
+                        <td class="text-left" style="border-top: 1px solid black;"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </xpath>
+
+        <xpath expr="//table[@class='table table-sm mt48']" position="after">
+            <br/>
+            <p t-field="o.note"/>
+            <br></br><br></br><br></br><br></br><br></br>
+            <div class="row">
+                <div style="text-align:center" class="col-4">
+                    <p style="margin:0 auto; border-top:1px solid #000; width:150px; font-wight:bold">Store Incharge</p>
+                </div>
+                <div style="text-align:center" class="col-4">
+                    <p style="margin:0 auto; border-top:1px solid #000; width:150px; font-wight:bold">Delivered By</p>
+                </div>
+                <div style="text-align:center" class="col-4">
+                    <p style="margin:0 auto; border-top:1px solid #000; width:150px; font-wight:bold">Received By</p>
+                </div>
+            </div>
+
+        </xpath>
+
+    </template>
+</odoo>

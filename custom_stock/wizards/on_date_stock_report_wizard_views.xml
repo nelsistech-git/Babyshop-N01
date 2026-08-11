@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <data>
+        <record id="on_date_stock_report_wizard_form" model="ir.ui.view">
+            <field name="name">on.date.stock.report.wizard.form</field>
+            <field name="model">on.date.stock.report.wizard</field>
+            <field name="arch" type="xml">
+                <form string="On Date Stock Report">
+                    <group>
+                        <group>
+                            <field name="year" required="1"/>
+                            <field name="month" required="1"/>
+                            <field name="current_stock_history_id" required="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="report_type" widget="radio"/>
+                        </group>
+                        <group>
+                            <field name="location_type" required="1" attrs="{'invisible': [('report_type', '=', '03')]}"/>
+                            <field name="location_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" attrs="{'invisible': [('report_type', '=', '03'), ('location_type', '=', False)]}"/>
+                            <field name="category_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="product_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" attrs="{'invisible': [('report_type', '=', '02')]}"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="on_date_stock_report_pdf" string="Download (PDF)" type="object" class="btn-primary"/>
+                        <button name="on_date_stock_report_excel" string="Download (Excel)" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="on_date_stock_report_action" model="ir.actions.act_window">
+            <field name="name">On Date Stock Report</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">on.date.stock.report.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="on_date_stock_report_wizard_form"/>
+            <field name="target">new</field>
+        </record>
+
+        <report id="on_date_stock_report"
+                model="on.date.stock.report.wizard"
+			    string="On Date Stock Report"
+                name="custom_stock.on_date_stock_report_qweb"
+			    file="custom_stock.on_date_stock_report_qweb"
+                report_type="qweb-pdf"
+                groups="stock.group_stock_manager"/>
+        <menuitem id="menu_on_date_stock_report_wizard"
+              name="On Date Stock Report"
+              sequence="153"
+              action="on_date_stock_report_action"
+              parent="stock.menu_warehouse_report"
+              groups="stock.group_stock_manager"
+        />
+        <menuitem id="menu_on_date_stock_report_wizard_acc_module"
+              name="On Date Stock Report"
+              sequence="1"
+              action="on_date_stock_report_action"
+              parent="base_accounting_kit.submenu_inventory_reporting"
+              groups="stock.group_stock_manager"
+        />
+    </data>
+</odoo>

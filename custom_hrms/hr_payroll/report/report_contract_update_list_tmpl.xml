@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="report_contract_update_list_tmpl" model="ir.actions.report">
+            <field name="name">Increment/Decrement Form</field>
+            <field name="model">hr.contract.update</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">hr_payroll.report_contract_update_list_qweb</field>
+            <field name="report_file">hr_payroll.report_contract_update_list_qweb</field>
+            <field name="paperformat_id" ref="custom_common_settings.paperformat_custom_a4_bd" />
+        </record>
+
+        <template id="report_contract_update_list_qweb">
+            <t t-call="web.html_container" >
+                <t t-call="web.external_layout" >
+                    <div class="page" style="margin-top:0px;">
+                        <style type="text/css">
+                            <!--th, tr, td{
+                            background: white !important;
+                            padding: 0px!important;
+                            border: 1px!important;
+                            }-->
+
+                            .header_table td{
+                                padding:5px;
+                                font-size:13px;
+                                border: 0px!important;
+                            }
+                            .line_table th{
+                                background:#ebeced;
+                                padding:5px;
+                                font-size:12px;
+                                padding: 0px!important;
+                            }
+                            .line_table tr, td{
+                                padding:5px;
+                                font-size:12px;
+                                border: 1px!important;
+                                padding: 0px!important;
+                            }
+
+                        </style>
+
+                        <div>
+                            <h3 class="text-center head_font_color">
+                                <strong>
+                                    <span t-esc="type" style="text-transform: capitalize"/> Details
+                                    <br/>
+                                </strong>
+                            </h3>
+                        </div>
+
+                    <t t-foreach="request.env['hr.contract.update'].search([('id', '=', id)], limit=1)" t-as="doc">
+                        <div class="row">
+                            <div class="col-6">
+                                <table width="100%" class="header_table">
+                                    <tr>
+                                        <td width="30%"> <b>Effective Date</b> </td>
+                                        <td width="5%"> : </td>
+                                        <td width="65%"> <span t-field="doc.effective_date" t-options ='{"format": "dd-MM-yyyy"}' /> </td>
+                                    </tr>
+                                    <tr>
+                                        <td width="30%"> <b>Ref.</b> </td>
+                                        <td width="5%"> : </td>
+                                        <td width="65%"> <span t-field="doc.name"/> </td>
+                                    </tr>
+                                    <tr>
+                                        <td width="30%"> <b>Total Current Gross</b> </td>
+                                        <td width="5%"> : </td>
+                                        <td width="65%"> <span t-field="doc.total_gross_salary"/> </td>
+                                    </tr>
+                                    <tr>
+                                        <td width="30%"> <b><span t-esc="type" style="text-transform: capitalize"/>Amount</b> </td>
+                                        <td width="5%"> : </td>
+                                        <td width="65%"> <span t-field="doc.total_amount"/> </td>
+                                    </tr>
+                                    <tr>
+                                        <td width="30%"> <b>Total New Gross</b> </td>
+                                        <td width="5%"> : </td>
+                                        <td width="65%"> <span t-field="doc.total_new_gross_salary"/> </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="row mt16 mb16">
+                            <div class="col-12">
+                                <h3 class="head_font_color">Employee Details</h3>
+                            </div>
+                        </div>
+
+                        <div class="row mt16 mb16">
+                            <div class="col-12">
+                                <table width="100%" class="line_table">
+                                    <thead>
+                                        <tr>
+                                            <th width="15%" style="text-align:left;">Name</th>
+                                            <th width="5%" style="text-align:left;">EMP.ID</th>
+                                            <th width="15%" style="text-align:left;">Department</th>
+                                            <th width="15%" style="text-align:left;">Designation</th>
+                                            <th width="10%" style="text-align:left;">Work/Job Location</th>
+                                            <th width="10%" style="text-align:right;">Current Gross</th>
+                                            <th width="10%" style="text-align:right;"><span t-esc="type" style="text-transform: capitalize"/></th>
+                                            <th width="10%" style="text-align:right;">Amount</th>
+                                            <th width="10%" style="text-align:right;">New Gross</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="line_table">
+                                        <tr t-foreach="doc.hr_contract_update_line_ids" t-as="line"  style="border: 1px!important; page-break-inside: avoid">
+                                            <td style="text-align:left;border: 1px!important;"><span t-field="line.employee_id"/></td>
+                                            <td  style="text-align:left;border: 1px!important;"><span t-field="line.id_card_no"/></td>
+                                            <td  style="text-align:left;border: 1px!important;"><span t-field="line.department_id"/></td>
+                                            <td  style="text-align:left;border: 1px!important;"><span t-field="line.job_id"/></td>
+                                            <td  style="text-align:left;border: 1px!important;"><span t-field="line.user_work_location_id"/></td>
+                                            <td  style="text-align:right;border: 1px!important;"><span t-field="line.gross_salary"/></td>
+                                            <td  style="text-align:right;border: 1px!important;">
+                                                <span t-field="line.percentage"/>
+                                                <t t-if="line.type=='percentage'">%</t><t t-else="">Tk</t>
+                                            </td>
+                                            <td  style="text-align:right;border: 1px!important;"><span t-field="line.amount"/></td>
+                                            <td  style="text-align:right;border: 1px!important;"><span t-field="line.new_gross_salary"/></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+
+                    <br/><br/><br/><br/>
+                        <!--<div class="row">
+                            <table style="width: 100%; border: none !important;">
+                                <tr>
+                                    <td style="width: 25%;text-align:center;border: none !important;">
+                                        <img t-if="doc.manager_id.signature" t-att-src="image_data_uri(doc.manager_id.signature)"
+                                     style="max-height:30pt;max-width:90%;" alt="-"/>
+                                    </td>
+                                    <td style="width: 25%;text-align:center;border: none !important;">
+                                        <img t-if="doc.hr_manager_id.signature" t-att-src="image_data_uri(doc.hr_manager_id.signature)"
+                                     style="max-height:30pt;max-width:90%;" alt="-"/>
+                                    </td>
+                                    <td style="width: 25%;text-align:center;border: none !important;">
+                                        <img t-if="doc.acc_manager_id.signature" t-att-src="image_data_uri(doc.acc_manager_id.signature)"
+                                     style="max-height:30pt;max-width:90%;" alt="-"/>
+                                    </td>
+                                    <td style="width: 25%;text-align:center;border: none !important;">
+                                        <img t-if="doc.trusty_manager_id.signature" t-att-src="image_data_uri(doc.trusty_manager_id.signature)"
+                                     style="max-height:30pt;max-width:90%;" alt="-"/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>-->
+
+                        <div class="row">
+                            <table style="width: 100%; border: none !important;">
+                                <tr >
+                                    <td style="width: 25%; text-align:center;border: none !important;">
+                                        <p style="color: #000; font-size: 20px;">
+                                            Department
+                                        </p>
+                                    </td>
+                                    <td style="width: 25%;text-align:center;border: none !important;">
+                                        <p style="color: #000; font-size: 20px;">
+                                            HR
+                                        </p>
+                                    </td>
+                                    <td style="width: 25%;text-align:center;border: none !important;">
+                                        <p style="color: #000; font-size: 20px; ">
+                                            Accounts
+                                        </p>
+                                    </td>
+
+                                </tr>
+                            </table>
+                        </div>
+
+                        </t>
+
+
+                    </div>
+                </t>
+            </t>
+		</template>
+</odoo>

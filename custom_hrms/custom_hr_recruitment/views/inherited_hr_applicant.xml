@@ -1,0 +1,434 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <!--Employee Form View-->
+        <record id="inherited_hr_applicant_view_form_job_applicant_view_form" model="ir.ui.view">
+            <field name="name">hr.applicant.inherit.recruit.form</field>
+            <field name="model">hr.applicant</field>
+            <field name="inherit_id" ref="hr_recruitment.hr_applicant_view_form"/>
+<!--            <field name="mode">primary</field>-->
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='categ_ids']" position="replace"></xpath>
+                
+<!--                <xpath expr="//button[@name='reset_applicant']" position="after">-->
+<!--                    <button name="action_applicant_print" string="Print" type="object" class="oe_highlight"/>-->
+<!--                </xpath>-->
+                
+                <xpath expr="/form/sheet/div" position="after">
+                    <field name="image" widget="image" class="oe_avatar"/>
+                </xpath>
+
+                <xpath expr="//field[@name='partner_id']" position="before">
+                    <field name="fam_father"/>
+                    <field name="fam_mother"/>
+                    <separator string="Permanent Address" colspan="2"/>
+                    <field name="p_address_id"/>
+<!--                    <field name="address_home_id"/>-->
+                    <field name="p_address_id_contact_no" string="Contact No."/>
+                    <field name="p_address_id_email" string="E-mail"/>
+
+                    <separator string="Applicant Contact" colspan="2"/>
+                </xpath>
+
+                <xpath expr="//field[@name='partner_id']" position="replace">
+                    <field name="contact_no"/>
+                </xpath>
+                <xpath expr="//field[@name='email_from']" position="replace">
+                    <field name="email_personal" widget="email"/>
+                </xpath>
+
+                <xpath expr="//field[@name='user_id']" position="attributes">
+                    <attribute name = "options" >{'no_open':True,'no_create':1,'no_create_edit':1}</attribute>
+                </xpath>
+
+                <!--Degree Field-->
+                <xpath expr="//field[@name='type_id']" position="attributes">
+                    <attribute name = "options" >{'no_open':True,'no_create':1,'no_create_edit':1}</attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='user_id']" position="before">
+                    <field name="fam_father_occupation"/>
+                    <field name="fam_mother_occupation"/>
+                    <separator string="Present Address" colspan="2"/>
+                    <field name="present_address"/>
+                    <field name="present_address_contact_no" string="Contact No."/>
+                    <field name="present_address_email" string="E-mail"/>
+
+                    <separator string="Official Use" colspan="2"/>
+                </xpath>
+
+                <xpath expr="/form/sheet/group//group[2]" position="after">
+                    <separator string="Personal Details" colspan="2"/>
+<!--                    <group name="peronal_details">-->
+                        <group name="pers_details_left">
+                            <field name="birthday"/>
+                            <field name="age"/>
+                            <field name="e_contact_no"/>
+                            <field name="r_e_contact_no"/>
+                            <field name="religion"/>
+                            <field name="nid"/>
+                            <field name="blood_group"/>
+                            <field name="height"/>
+                            <field name="marriage_date"/>
+                            <field name="fam_spouse"/>
+                            <field name="fam_spouse_organization"/>
+                            <field name="fam_spouse_designation"/>
+                        </group>
+                        <group name="pers_details_right">
+                            <field name="place_of_birth"/>
+                            <field name="country_id" options="{'no_open':True,'no_create':1,'no_create_edit':1}"/>
+                            <field name="passport_id"/>
+                            <field name="driving_license"/>
+                            <field name="weight"/>
+                            <field name="gender"/>
+                            <field name="marital"/>
+                            <field name="fam_spouse_occupation"/>
+                            <field name="fam_spouse_qualification"/>
+                            <field name="no_of_male_children"/>
+                            <field name="no_of_female_children"/>
+                            <field name="medical_info"/>
+                        </group>
+<!--                    </group>-->
+                </xpath>
+
+                <xpath expr="/form/sheet/group//group[5]" position="before">
+                    <!--Dependents-->
+                    <separator string="Dependents" colspan="2"/>
+                    <group name="dependents" colspan="2">
+                        <field name="dependent_ids" context="{'default_employee_id': active_id}" nolabel="1">
+                            <tree string="Dependents">
+                                <field name="dependent_name" string="Name"/>
+                                <field name="dependent_age" string="Age"/>
+                                <field name="dependent_rel" string="Relationship"/>
+                            </tree>
+                            <form string="Dependents">
+                                <group name="dependents_info">
+<!--                                    <group>-->
+<!--                                    <label for="dependent_name" class="oe_edit_only"/>-->
+                                    <field name="dependent_name" colspan="2"/>
+<!--                                    </group>-->
+                                    <group>
+                                        <field name="dependent_age" string="Age"/>
+                                        <field name="dependent_rel" string="Relationship"/>
+                                    </group>
+                                </group>
+                            </form>
+                        </field>
+                    </group>
+
+                    <!--Siblings Details-->
+                    <separator string="Name of brothers &amp; sisters with their personal details" colspan="2"/>
+                    <group name="siblings" colspan="2">
+                        <field name="sibling_ids" context="{'default_employee_id': active_id}" nolabel="1">
+                            <tree string="Name of brothers &amp; sisters with their personal details">
+                                <field name="sibling_name"/>
+                                <field name="sibling_age"/>
+                                <field name="sibling_occupation"/>
+                                <field name="sibling_organization"/>
+                                <field name="sibling_contact"/>
+                            </tree>
+                            <form string="Name of brothers &amp; sisters with their personal details">
+                                <group name="siblings_info">
+<!--                                    <group>-->
+<!--                                    <label for="dependent_name" class="oe_edit_only"/>-->
+                                    <field name="sibling_name" colspan="2"/>
+<!--                                    </group>-->
+                                    <group>
+                                        <field name="sibling_age"/>
+                                        <field name="sibling_contact"/>
+                                    </group>
+                                    <group>
+                                        <field name="sibling_occupation"/>
+                                        <field name="sibling_organization"/>
+                                    </group>
+                                </group>
+                            </form>
+                        </field>
+                    </group>
+
+                    <!--Education-->
+                    <separator string="Education (Please start with the most recent)" colspan="2"/>
+                    <group name="education" colspan="2">
+                        <field name="academic_ids" context="{'default_employee_id': active_id}" nolabel="1">
+                            <tree string="Education (Please start with the most recent)">
+                                <field name="exam_name"/>
+                                <field name="start_date"/>
+                                <field name="end_date"/>
+                                <field name="passing_year"/>
+                                <field name="exam_held_year"/>
+                                <field name="institute_id"/>
+                                <field name="result"/>
+                                <field name="study_field"/>
+                                <field name="board_id"/>
+                                <field name="scholarship_info"/>
+                            </tree>
+                            <form string="Education details">
+                                <group name="education_info">
+<!--                                    <group>-->
+<!--                                    <label for="dependent_name" class="oe_edit_only"/>-->
+                                    <field name="exam_name" colspan="2"/>
+<!--                                    </group>-->
+                                    <group>
+                                        <field name="start_date"/>
+                                        <field name="end_date"/>
+                                        <field name="passing_year"/>
+                                        <field name="exam_held_year"/>
+                                    </group>
+                                    <group>
+                                        <field name="institute_id"/>
+                                        <field name="result"/>
+                                        <field name="study_field"/>
+                                        <field name="board_id"/>
+                                        <field name="scholarship_info"/>
+                                    </group>
+                                </group>
+                            </form>
+                        </field>
+                    </group>
+
+                    <!--Trainings-->
+                    <separator string="Technical, Professional or Occupational Training" colspan="2"/>
+                    <group name="training" colspan="2">
+                        <field name="professional_ids" context="{'default_employee_id': active_id}" nolabel="1">
+                            <tree string="Technical, Professional or Occupational Training (Please start with the most recent)">
+                                <field name="start_date"/>
+                                <field name="end_date"/>
+                                <field name="certification"/>
+                                <field name="institute_id"/>
+                                <field name="country"/>
+                                <field name="training_result"/>
+                            </tree>
+                            <form string="Technical, Professional or Occupational Training (Please start with the most recent)">
+                                <field name="category" string='Training Category'/>
+                                <group name="training_qualification_info">
+                                    <group>
+                                        <field name="certification" invisible="not category"/>
+                                        <field name="type_cer" invisible="category == '1' or not category"/>
+                                    </group>
+                                    <group>
+                                        <field name="expire" string="Completed" invisible="not category"/>
+                                        <field name="start_date" invisible="not category"/>
+                                        <field name="end_date" invisible="category == '1' or not category"/>
+                                        <field name="passing_year" invisible="category == '2' or not category"/>
+                                    </group>
+                                    <separator string="Institute" colspan="2" invisible="not category"/>
+                                    <group>
+                                        <field name="institute_id" invisible="not category"/>
+                                    </group>
+                                    <group>
+                                        <field name="location" invisible="not category"/>
+                                        <field name="country"
+                                               options="{'no_open':True,'no_create':1,'no_create_edit':1}"
+                                               invisible="not category"/>
+                                    </group>
+                                    <group>
+                                        <field name="attachment_ids" widget="many2many_binary"
+                                               invisible="not category"/>
+                                    </group>
+                                    <group>
+                                        <field name="training_result" invisible="not category"/>
+                                    </group>
+                                </group>
+                            </form>
+                        </field>
+                    </group>
+
+                    <!--Languages-->
+                    <separator string="Knowledge of Language" colspan="2"/>
+                    <group name="language" colspan="2">
+                        <field name="language_ids" context="{'default_employee_id': active_id}" nolabel="1">
+                            <tree string="Knowledge of Language">
+                                <field name="language"/>
+                                <field name="reading_skill"/>
+                                <field name="writing_skill"/>
+                                <field name="speaking_skill"/>
+                            </tree>
+                            <form string="Knowledge of Language">
+                                <group name="language_info">
+
+                                    <field name="language" colspan="2"/>
+
+                                    <group>
+                                        <field name="reading_skill"/>
+                                    </group>
+                                    <group>
+                                        <field name="writing_skill"/>
+                                    </group>
+                                    <group>
+                                        <field name="speaking_skill"/>
+                                    </group>
+                                </group>
+                            </form>
+                        </field>
+                    </group>
+
+                    <!--Professional Experience-->
+                    <separator string="Professional Experience" colspan="2"/>
+                    <group name="professional_exp" colspan="2">
+                        <field name="experience_ids" context="{'default_employee_id': active_id}" nolabel="1">
+                            <tree string="Professional Experiences">
+                                <field name="start_date"/>
+                                <field name="end_date"/>
+                                <field name="institute_id"/>
+                                <field name="name"/>
+                                <field name="salary_starting"/>
+                                <field name="salary_present"/>
+                                <field name="salary_leaving"/>
+                                <field name="supervisor_details"/>
+                                <field name="achievements"/>
+                                <field name="job_leave_reason"/>
+                                <field name="serv_leng"/>
+                            </tree>
+                            <form string="Professional Experience">
+                                <group name="professional_info">
+                                    <group>
+                                        <field name="name" string="Designation"/>
+                                        <field name="expire" string="Currently Working?"/>
+                                        <field name="start_date"/>
+                                        <field name="end_date" invisible="expire"/>
+                                        <field name="serv_leng" invisible="expire"/>
+                                    </group>
+                                    <group>
+                                        <field name="attachment_ids" string="Attachments" widget="many2many_binary"/>
+                                    </group>
+                                </group>
+                                <group name="company_info" string="Company">
+                                    <group>
+                                        <field name="institute_id" string="Name"/>
+                                        <field name="salary_starting"/>
+                                        <field name="salary_present"/>
+                                        <field name="salary_leaving"/>
+                                        <field name="supervisor_details"/>
+                                    </group>
+                                    <group>
+                                        <field name="location" string="Address"/>
+                                        <field name="achievements"/>
+                                        <field name="job_leave_reason"/>
+                                    </group>
+                                </group>
+                            </form>
+                        </field>
+                    </group>
+
+                    <!--Extra Curricular Activities-->
+                    <separator string="Extra Curricular Activities &amp; Interests" colspan="2"/>
+                    <group name="extra_curricular" colspan="2">
+                        <field name="extra_curri_ids" context="{'default_employee_id': active_id}" nolabel="1">
+                            <tree string="Extra Curricular Activities &amp; Interests">
+                                <field name="activity_name"/>
+                                <field name="award"/>
+                            </tree>
+                            <form string="Extra Curricular Activities &amp; Interests">
+                                <group name="extra_curricular_info">
+                                    <group>
+                                        <field name="activity_name"/>
+                                    </group>
+                                    <group>
+                                        <field name="award"/>
+                                    </group>
+                                </group>
+                            </form>
+                        </field>
+                    </group>
+
+                    <!--Housing & Previous applications-->
+                    <group name="housing">
+                        <field name="housing_status"/>
+                    </group>
+                    <group name="prev_application">
+                        <field name="is_previous_applicant"/>
+                    </group>
+                    <group>
+                        <field name="previous_applied_post" invisible="not is_previous_applicant"/>
+                    </group>
+                    <group>
+                        <field name="previous_applied_year" invisible="not is_previous_applicant"/>
+                    </group>
+
+                    <!--Relatives, friends & known persons-->
+                    <separator string="Relatives, friends &amp; known persons" colspan="2"/>
+                    <group name="known_people" colspan="2" string="Relatives, friends &amp; known persons in the company">
+                        <field name="known_people_ids" context="{'default_employee_id': active_id}" nolabel="1">
+                            <tree string="Relatives, friends &amp; known persons in the company">
+                                <field name="name"/>
+                                <field name="designation"/>
+                                <field name="department"/>
+                                <field name="organization"/>
+                                <field name="relation"/>
+                            </tree>
+                            <form string="Relatives, friends &amp; known persons in the company">
+                                <group name="known_people_info">
+                                    <field name="name"/>
+                                    <group>
+                                        <field name="designation"/>
+                                        <field name="department"/>
+                                    </group>
+                                    <group>
+                                        <field name="organization"/>
+                                        <field name="relation"/>
+                                    </group>
+                                </group>
+                            </form>
+                        </field>
+                    </group>
+                    <!--Outside the company-->
+                    <group name="known_people_outside" colspan="2" string="Relatives, friends &amp; known persons other than the company">
+                        <field name="known_people_outside_ids" context="{'default_employee_id': active_id}" nolabel="1">
+                            <tree string="Relatives, friends &amp; known persons other than the company">
+                                <field name="name"/>
+                                <field name="designation_department"/>
+                                <field name="organization"/>
+                                <field name="org_contact"/>
+                                <field name="relation"/>
+                            </tree>
+                            <form string="Relatives, friends &amp; known persons other than the company">
+                                <group name="known_people_outside_info">
+                                    <field name="name"/>
+                                    <group>
+                                        <field name="designation_department"/>
+                                        <field name="organization"/>
+                                    </group>
+                                    <group>
+                                        <field name="org_contact"/>
+                                    </group>
+                                    <group>
+                                        <field name="relation"/>
+                                    </group>
+                                </group>
+                            </form>
+                        </field>
+                    </group>
+
+                    <!--References-->
+                    <group name="reference_1">
+                        <field name="reference_1"/>
+                    </group>
+                    <group name="reference_2">
+                        <field name="reference_2"/>
+                    </group>
+                    <group colspan="2">
+                        <field name="additional_info"/>
+                    </group>
+
+                    <separator string="Declaration" colspan="2"/>
+                    <group colspan="2">
+                        <label for="signature" string="I declare that the information given by me in this application form is true and complete in all respects to the best of my knowledge. I fully understand that suppression of facts or false information will lead to rejection of my application at any stage of the selection process or termination of service during my employment." nolabel="1"/>
+                    </group>
+                    <group>
+                        <field name="signature" widget="image"/>
+                    </group>
+                    <group>
+                        <field name="application_date"/>
+                    </group>
+
+                    <!--Edit before this-->
+                    <separator string="Job Application" colspan="2"/>
+                </xpath>
+<!--                <xpath expr="/form/sheet/group" position="inside">-->
+<!--                    <page string='My new tab'></page>-->
+<!--                </xpath>-->
+            </field>
+        </record>
+    </data>
+</odoo>

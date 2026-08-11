@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_month_wise_account_summary_report_wizard_form" model="ir.ui.view">
+            <field name="name">month.wise.account.summary.report.wizard.form</field>
+            <field name="model">month.wise.account.summary.report.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Month wise Account Summary Report">
+                    <group>
+                        <group>
+                            <field name="year" required="1"/>
+                            <field name="is_multi_currency"/>
+                            <field name="currency_id" required="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="currency" invisible="1"/>
+                            <field name="rate" required="1" invisible="currency == False or currency == 'BDT'"/>
+                        </group>
+                        <group string="Other Currency" invisible="is_multi_currency == False">
+                            <field name="other_currency_id" required="is_multi_currency != False" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="other_currency" invisible="1"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="month_wise_account_summary_report_excel" string="Download (Excel)" type="object" class="btn-primary"/>
+                        <button name="%(month_wise_account_summary_report_list_srv_action)d" string="Download (View)" type="action" class="btn-primary" context="{'is_list_view':True, 'year': year, 'is_multi_currency': is_multi_currency, 'currency_id': currency_id, 'rate': rate, 'other_currency_id': other_currency_id}"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_month_wise_account_summary_report_wizard" model="ir.actions.act_window">
+            <field name="name">Month wise Account Summary Report</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">month.wise.account.summary.report.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_month_wise_account_summary_report_wizard_form"/>
+            <field name="target">new</field>
+        </record>
+
+        <!-- Month wise Account Summary Report Menu: Reporting > Month wise Account Summary Report -->
+        <menuitem id="menu_month_wise_account_summary_report_wizard"
+              name="Month wise Account Summary Report"
+              sequence="42"
+              action="action_month_wise_account_summary_report_wizard"
+              parent="base_accounting_kit.submenu_accounting_reporting" groups="account.group_account_manager"
+        />
+    </data>
+</odoo>

@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="report_advance_expense" model="ir.actions.report">
+          <field name="name">Print Advance Expense</field>
+          <field name="model">employee.advance.expense</field>
+          <field name="report_type">qweb-pdf</field>
+          <field name="report_name">employee_expense_advance.report_expense_show</field>
+          <field name="report_file">employee_expense_advance.report_expense_show</field>
+           <field name="binding_model_id" ref="model_employee_advance_expense"/>
+            <field name="binding_type">report</field>
+        </record>
+        
+        <template id="report_expense_show">
+               <t t-foreach="docs" t-as="doc">
+                    <t t-call="web.internal_layout">
+                      <t t-call="web.html_container">
+                         <div class="page">
+                            <div class="text-center">
+                            <h3>
+                                Advance Expense -
+                                 <span t-field="doc.name"/>
+                            </h3>
+                            </div>
+                             <div class="text-left">
+                                 <h3>
+                                     <span t-field="doc.employee_id.name"/> - <span t-field="doc.state"/>
+                                 </h3>
+                             </div>
+                            <table class="table col-md-12">
+                               <tr style="border: 2px solid black;">
+                                   <td><strong>Department</strong></td><td> <span t-field="doc.department_id.name"/></td>
+                                   <td><strong>Job Title</strong></td><td> <span t-field="doc.job_id.name"/></td>
+                               </tr>
+                               <tr style="border: 2px solid black;">
+                                   <td><strong>Request Date</strong> </td><td> <span t-field="doc.request_date"/></td>
+                                   <td><strong>Request User</strong> </td><td> <span t-field="doc.user_id.name"/></td>
+                               </tr>
+                               <tr style="border: 2px solid black;">
+                                   <td><strong>Requested Amount</strong> </td><!-- <td> <span t-field="doc.total_amount_expense"
+                                                                t-field-options='{"widget": "monetary", "display_currency": "doc.currency_id"}'/></td>
+                                                                <td></td>
+                                                                 <td></td> -->
+                                    <td><span t-esc="doc.total_amount_expense" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                                    <td></td>
+                                    <td></td>
+                               </tr>
+                            </table>
+                            <h3>General Information</h3>
+                            <table class="table col-md-12">
+                               <tr style="border: 2px solid black;">
+                                   <td><strong>Confirmed Date</strong></td><td> <span t-field="doc.confirm_date"/></td>
+                                   <td><strong>Confirmed By</strong> </td><td> <span t-field="doc.confirm_by_id"/></td>
+                               </tr>
+                               <tr style="border: 2px solid black;">
+                                   <td><strong>Approved Date</strong></td><td> <span t-field="doc.hr_validate_date"/></td>
+                                   <td><strong>Approved By</strong> </td><td> <span t-field="doc.hr_manager_by_id"/></td>
+                               </tr>
+                               <tr style="border: 2px solid black;">
+                                   <td><strong>Paid Date</strong></td>
+                                   <td><span t-field="doc.account_validate_date"/></td>
+                                   <td><strong>Paid By</strong></td>
+                                   <td> <span t-field="doc.account_by_id"/></td>
+                               </tr>
+                            </table>
+                            <h3>Advance Expense Lines</h3>
+                            <table class=" table col-md-12">
+                                <thead style="border: 2px solid black;">
+                                     <th>Expense</th>
+                                     <th>Description</th>
+                                     <th>Unit Price</th>
+                                     <th>Quantity</th>
+                                     <th>Unit of Measure</th>
+                                     <th>Subtotal</th>
+                                </thead>
+                                <tr t-foreach="doc.advance_expense_line_ids" t-as="line" style="border: 2px solid #000;">
+                                   <td><span t-field="line.product_id.name"/></td>
+                                   <td><span t-field="line.description"/></td>
+                                   <td><span t-field="line.unit_amount" t-field-options='{"widget": "monetary", "display_currency": "doc.currency_id"}'/></td>
+                                   <td><span t-field="line.quantity"/><span t-field="line.product_uom_id.name" groups="uom.group_uom"/></td>
+                                   <td><span t-field="line.product_uom_id"/></td>
+                                   <!-- <td><span t-field="line.total_amount" t-field-options='{"widget": "monetary", "display_currency": "doc.currency_id"}'/></td> -->
+                                   <td><span t-esc="line.total_amount" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                               </tr>
+                            </table>
+                            <h3>Accounting Information</h3>
+                            <table class="table col-md-12">
+                               <tr style="border: 2px solid black;">
+                                   <td><strong>Employee Account</strong> </td><td> <span t-field="doc.partner_id.name"/></td>
+                                   <td><strong>Payment Method</strong></td><td> <span t-field="doc.journal_id.name"/></td>
+                               </tr>
+                               <tr style="border: 2px solid black;">
+                                   <td><strong>Asset Account</strong> </td><td><span t-field="doc.account_id.name"/></td>
+                                   <!-- <td><strong>Paid Amount</strong></td><td><span t-field="doc.paid_amount" t-field-options='{"widget": "monetary", "display_currency": "doc.paid_in_currency"}'/></td> -->
+
+                                  <td><strong>Paid Amount</strong></td> <td><span t-esc="doc.paid_amount" t-options='{"widget": "monetary", "display_currency": doc.paid_in_currency}'/></td>
+                               </tr>
+                            </table>
+                            <div>
+                                 <strong>Reason For Advance :</strong><br/><span t-field="doc.reason_for_advance"/>
+                            </div>
+                            <div>
+                                 <strong>Comment :</strong><br/><span t-field="doc.comment"/>
+                            </div>
+                            <div class="row col-md-12">
+                             <div class="col-xs-6 text-left">
+                                <strong>Requester Signature:____________________</strong>
+                             </div>
+                             <div class="col-6 text-right">
+                                <strong>Approver Signature:____________________</strong>
+                             </div>
+                         </div>
+                        </div>
+                    </t>
+               </t>
+             </t>
+        </template>
+        
+  </data>
+</odoo>

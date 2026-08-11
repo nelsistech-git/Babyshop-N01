@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_budget_head_add_wizard_master_form" model="ir.ui.view">
+            <field name="name">budget.head.add.wizard.master.form</field>
+            <field name="model">budget.head.add.wizard.master</field>
+            <field name="arch" type="xml">
+                <form string="Budget Head Add Master">
+                    <group>
+                        <group>
+                            <field name="budget_id" readonly="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="fiscal_year" readonly="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="sub_parent_id" required="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                        </group>
+                        <group></group>
+                    </group>
+                    <group string="Budget">
+                        <field name="line_ids">
+                            <tree string="Budget Head Add Master Line" editable="bottom" delete="1">
+                                <field name="budget_parti_child_id" required="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="account_id" required="1" readonly="1" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="budget_amount" required="1"/>
+                            </tree>
+                            <form>
+                                <field name="budget_parti_child_id" readonly="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="account_id" readonly="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="budget_amount" readonly="1"/>
+                            </form>
+                        </field>
+                    </group>
+                    <footer>
+                        <button name="action_submit" string="Add" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Loyalty Card -->
+    <record id="view_express_loyalty_card_tree" model="ir.ui.view">
+        <field name="name">express.loyalty.card.tree</field>
+        <field name="model">express.loyalty.card</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="card_code"/>
+                <field name="partner_id"/>
+                <field name="brand_id"/>
+                <field name="points"/>
+                <field name="mobile_verified"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_express_loyalty_card_form" model="ir.ui.view">
+        <field name="name">express.loyalty.card.form</field>
+        <field name="model">express.loyalty.card</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <field name="qr_image" widget="image" class="oe_avatar"/>
+                    <div class="oe_title">
+                        <h1><field name="card_code" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="brand_id"/>
+                            <field name="mobile"/>
+                            <field name="mobile_verified"/>
+                        </group>
+                        <group>
+                            <field name="points"/>
+                            <field name="issue_date"/>
+                            <field name="otp_code" readonly="1"/>
+                            <field name="otp_expiry" readonly="1"/>
+                        </group>
+                    </group>
+                    <p class="text-muted">
+                        On the customer's first purchase a card is created automatically and this QR
+                        code is printed on the receipt. Scanning it lets the customer view their
+                        points; redeeming points requires OTP verification of their registered mobile.
+                    </p>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_express_loyalty_card" model="ir.actions.act_window">
+        <field name="name">Loyalty Cards</field>
+        <field name="res_model">express.loyalty.card</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Loyalty / Discount Rule -->
+    <record id="view_express_loyalty_rule_tree" model="ir.ui.view">
+        <field name="name">express.loyalty.rule.tree</field>
+        <field name="model">express.loyalty.rule</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="rule_type"/>
+                <field name="brand_id"/>
+                <field name="branch_id"/>
+                <field name="style_number"/>
+                <field name="min_amount"/>
+                <field name="discount_percent"/>
+                <field name="buy_qty"/>
+                <field name="get_qty"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_express_loyalty_rule" model="ir.actions.act_window">
+        <field name="name">Discount / Offer Rules</field>
+        <field name="res_model">express.loyalty.rule</field>
+        <field name="view_mode">list,form</field>
+        <field name="help">
+            Define Style Number-wise, Showroom-wise, Total Bill-wise tier, and Buy-X-Get-Y offers.
+            The checkout console applies the best matching rules automatically via "Apply Offers".
+        </field>
+    </record>
+
+    <!-- Gift Card -->
+    <record id="view_express_gift_card_tree" model="ir.ui.view">
+        <field name="name">express.gift.card.tree</field>
+        <field name="model">express.gift.card</field>
+        <field name="arch" type="xml">
+            <tree decoration-muted="state in ('used','expired','cancelled')">
+                <field name="code"/>
+                <field name="partner_id"/>
+                <field name="brand_id"/>
+                <field name="initial_amount"/>
+                <field name="balance"/>
+                <field name="expiry_date"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_express_gift_card_form" model="ir.ui.view">
+        <field name="name">express.gift.card.form</field>
+        <field name="model">express.gift.card</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="code" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="brand_id"/>
+                            <field name="partner_id"/>
+                            <field name="issue_date"/>
+                            <field name="expiry_date"/>
+                        </group>
+                        <group>
+                            <field name="initial_amount"/>
+                            <field name="balance"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_express_gift_card" model="ir.actions.act_window">
+        <field name="name">Gift Cards</field>
+        <field name="res_model">express.gift.card</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

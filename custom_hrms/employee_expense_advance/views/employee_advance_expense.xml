@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <data>
+        <record id="employee_advance_expense_form_view" model="ir.ui.view">
+            <field name="name">employee.advance.expense.form.view</field>
+            <field name="model">employee.advance.expense</field>
+            <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button string="Confirm" name="get_confirm"  invisible="state in ['confirm','approved_hr_manager','paid','done','cancel','reject']" type="object" class="oe_highlight" groups="base.group_user"/>
+                    <button string="Approve" name="get_apprv_hr_manager"  invisible="state in ['draft','approved_hr_manager','paid','done','cancel','reject']"  type="object" groups="hr_expense.group_hr_expense_user" class="oe_highlight"/>
+                    <button string="Pay" name="action_sheet_move_advance"   invisible="state in ['draft','confirm','paid','done','cancel','reject']"  type="object" groups="account.group_account_user" class="oe_highlight o_expense_sheet_approve"/>
+                    <button string="Done" class="oe_highlight" name="get_done"   invisible="state in ['draft','confirm','action_sheet_move_advance','done','cancel','reject']" type="object" groups="hr_expense.group_hr_expense_user,account.group_account_user"/>
+                    <button string="Reject" name="get_reject" invisible="state in ['draft','approved_hr_manager','paid','done','cancel','reject']" type="object" groups="hr_expense.group_hr_expense_user"/>
+                    <button string="Cancel" name="exit_cancel" invisible="state in ['confirm','approved_hr_manager','paid','done','cancel','reject']" type="object" groups="hr_expense.group_hr_expense_user"/>
+                    <button string="Set to Draft" name="request_set" invisible="state in ['draft','confirm','approved_hr_manager','paid','done','cancel']" type="object"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirm,approved_hr_manager,paid,done" colspan="2"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <field name="is_paid" invisible="1"/>
+                        <button class="btn-primary" type="object" name="show_journal" string="Journal" icon="fa-bars"
+                           invisible="is_paid ==  False" >
+                        </button>
+
+                    </div>
+                    <div class="oe_title">
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" readonly="1"/>
+                            </h1>
+                        </div>
+                             <group>    
+                                <field name="employee_id"/>
+                             </group>
+                     </div>
+                    <group>
+                        <group>
+                            <field name="department_id" />
+                            <field name="request_date"/>
+                            <field name="total_amount_expense" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="currency_id" />
+                        </group>
+                        <group>
+                            <field name="job_id" />
+                            <field name="user_id" />
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <notebook>
+                    
+                        <page name="advance" string="Advance Expense Lines">
+                            <field name="advance_expense_line_ids" readonly="state not in ['draft']">
+                                <tree editable='bottom'>
+                                    <field name="product_id"/>
+                                    <field name="description"/>
+                                    <field name="unit_amount" required="1" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    <field name="quantity"/>
+                                    <field name="product_uom_id" string="Unit of Measure" groups="uom.group_uom" readonly="1"/>
+                                    <field name="currency_id"/>
+                                    <field name="total_amount" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    <field name="state"/>
+                                </tree>
+                            </field>
+                            <group string="Reason for Advance">
+                                    <field name="reason_for_advance" readonly="state  in ['done','paid','confirm','approved_hr_manager']" nolabel="1" placeholder="Reason for Advance............."/>
+                            </group>
+                            <group string="Comment">
+                                 <field name="comment" readonly="state in ['done','paid']" nolabel="1" placeholder="Add Comment"/>
+                            </group>
+                        </page>
+                        <page name="general" string="General Information">
+                            <group>
+                        <group>
+                            <field name="confirm_date" />
+                            <field name="hr_validate_date" />
+                            <field name="account_validate_date" />
+                        </group>
+                        <group>
+                            <field name="confirm_by_id" />
+                            <field name="hr_manager_by_id" />
+                            <field name="account_by_id" />
+                        </group>
+                     </group>
+                        </page>
+                        <page name="accounting" string="Accounting Information" groups="account.group_account_user">
+                            <group>
+                                <group>
+                                     <field name="partner_id" readonly=" (state == 'done') or (state == 'paid')" groups="account.group_account_user"/>
+                                     <field name="journal_id"  readonly=" (state == 'done') or (state == 'paid')" groups="account.group_account_user"/>
+                                     <field name="account_id" groups="account.group_account_user" readonly=" (state == 'done') or (state == 'paid')" />
+                                     <field name="paid_in_currency" groups="account.group_account_user"/>
+                                     <field name="paid_amount" widget="monetary" options="{'currency_field': 'paid_in_currency'}"  groups="account.group_account_user"/>
+                                     <field name="move_id"/>
+                                    
+                                </group>
+                                <group/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers" groups="base.group_user" />
+                    <field name="message_ids" widget="mail_thread" />
+                </div>
+            </form>
+            </field>
+        </record>
+       
+        <record id="employee_advance_expense_tree_view" model="ir.ui.view">
+            <field name="name">employee.advance.expense.tree.view</field>
+            <field name="model">employee.advance.expense</field>
+            <field name="arch" type="xml">
+                 <tree>
+                        <field name="name" />
+                        <field name="employee_id" />
+                        <field name="request_date" />
+                        <field name="total_amount_expense" />
+                        <field name="currency_id" />
+                        <field name="company_id" groups="base.group_multi_company"/>
+                        <field name="state" />
+                 </tree>
+            </field>
+        </record>
+        
+        <record id="employee_advance_expense_search_view" model="ir.ui.view">
+            <field name="name">employee.advance.expense.search.view</field>
+            <field name="model">employee.advance.expense</field>
+            <field name="arch" type="xml">
+                <search string="Employee Advance Expense" >
+                    <field name="employee_id" />
+                    <field name="name"/>
+                    <field name="currency_id"/>
+                    <field name="state"/>
+                    <field name="company_id" groups="base.group_multi_company"/>
+                    <field name="request_date"/>
+                    <field name="confirm_date"/>
+                    <field name="hr_validate_date"/>
+                    <field name="account_validate_date"/>
+                    <field name="confirm_by_id"/>
+                    <field name="hr_manager_by_id"/>
+                    <field name="account_by_id"/>
+                    <group expand="0" string="Group By">
+                        <filter name="Employee" context="{'group_by':'employee_id'}"/>
+                        <filter name="State" context="{'group_by':'state'}"/>
+                        <filter name="Company" context="{'group_by':'company_id'}" groups="base.group_multi_company"/>
+                        <filter name="Name" context="{'group_by':'name'}"/>
+                        <filter name="Request Date" context="{'group_by':'request_date'}"/>
+                        <filter name="Confirm Date" context="{'group_by':'confirm_date'}"/>
+                        <filter name="Approved Date" context="{'group_by':'hr_validate_date'}"/>
+                        <filter name="Paid Date" context="{'group_by':'account_validate_date'}"/>
+                        <filter name="Confirm By" context="{'group_by':'confirm_by_id'}"/>
+                        <filter name="Approved By" context="{'group_by':'hr_manager_by_id'}"/>
+                        <filter name="Paid By" context="{'group_by':'account_by_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+        
+        <record model="ir.actions.act_window" id="action_employee_advance_expense">
+            <field name="name">Expense Advance Requests</field>
+            <field name="res_model">employee.advance.expense</field>
+            <field name="view_mode">tree,form</field>
+            <!-- <field name="view_type">form</field> -->
+        </record>
+        
+        <record model="ir.actions.act_window" id="action_employee_advance_expense_approve">
+            <field name="name">Expense Advance Requests to Approve</field>
+            <field name="res_model">employee.advance.expense</field>
+            <field name="view_mode">tree,form</field>
+            <!-- <field name="view_type">form</field> -->
+            <field name="domain">[('state', '=', 'confirm')]</field>
+        </record>
+        
+        <record model="ir.actions.act_window" id="action_employee_advance_expense_paid">
+            <field name="name">Expense Advance Requests to Pay</field>
+            <field name="res_model">employee.advance.expense</field>
+            <field name="view_mode">tree,form</field>
+            <!-- <field name="view_type">form</field> -->
+            <field name="domain">[('state', '=', 'approved_hr_manager')]</field>
+        </record>
+        
+        <menuitem name="Expense Advances" id="custom_menu_advance_expense_employee" 
+                  parent="hr_expense.menu_hr_expense_root" sequence="5" groups="base.group_user"/>
+        <menuitem name="Expense Advance Requests" id="custom_menu_advance_expense_request" 
+                  action="action_employee_advance_expense" parent="custom_menu_advance_expense_employee" sequence="12" />
+        <menuitem name="Advance to Approve" id="custom_menu_advance_expense_approved" 
+                  action="action_employee_advance_expense_approve" parent="custom_menu_advance_expense_employee" sequence="13" 
+                  groups="hr_expense.group_hr_expense_user"/>
+        <menuitem name="Advance to Pay" id="custom_menu_advance_expense_paid" action="action_employee_advance_expense_paid"
+                  parent="custom_menu_advance_expense_employee" sequence="14"  groups="account.group_account_user"/>
+        
+    </data>
+</odoo>

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_product_price_label_document">
+        <t t-call="web.basic_layout">
+            <style>
+                @page {
+                size: 38.1mm 25.4mm;
+                margin: 0;
+                }
+                * { box-sizing: border-box; }
+                html, body { margin: 0; padding: 0; width: 38.1mm; height: 25.4mm; }
+                body.container, .container {
+                width: auto !important;
+                max-width: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                }
+                .label_page {
+                width: 38.1mm;
+                height: 25.4mm;
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+                }
+                .label_box {
+                width: 37.5mm;
+                height: 24.8mm;
+                margin: 0.3mm;
+                padding: 0.6mm;
+                border: 0.4mm solid #000000;
+                text-align: center;
+                font-family: Arial, Helvetica, sans-serif;
+                overflow: hidden;
+                }
+                .label_title {
+                font-weight: bold;
+                font-size: 6.5pt;
+                line-height: 1.1;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                }
+                .label_attr {
+                font-size: 6pt;
+                line-height: 1.1;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                }
+                .label_barcode {
+                margin: 0.3mm 0;
+                }
+                .label_barcode img {
+                width: 33mm;
+                height: 7mm;
+                }
+                .label_nobarcode {
+                font-size: 6pt;
+                padding: 2mm 0;
+                }
+                .label_price {
+                font-size: 8pt;
+                font-weight: bold;
+                line-height: 1.1;
+                }
+                .label_vat {
+                font-size: 5.5pt;
+                line-height: 1.1;
+                }
+            </style>
+            <t t-foreach="docs" t-as="o">
+                <div class="label_page" t-attf-style="page-break-after: #{'always' if not o_last else 'avoid'};">
+                    <div class="label_box">
+                        <div class="label_title">
+                            <t t-esc="o.product_tmpl_id.name"/>
+                            <t t-if="o.default_code">[<t t-esc="o.default_code"/>]
+                            </t>
+                        </div>
+                        <div class="label_attr">
+                            <t t-if="o.product_template_attribute_value_ids">
+                                <t t-foreach="o.product_template_attribute_value_ids" t-as="ptav">
+                                    <t t-esc="ptav.product_attribute_value_id.name"/>
+                                    <t t-if="not ptav_last">,</t>
+                                </t>
+                            </t>
+                        </div>
+                        <div class="label_barcode">
+                            <img t-if="o.barcode"
+                                 t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s&amp;humanreadable=0' % ('Code128', o.barcode, 600, 130)"
+                                 alt="Barcode"/>
+                            <div t-else="" class="label_nobarcode">No Barcode</div>
+                        </div>
+                        <div class="label_price">
+                            BDT
+                            <b>
+                                <t t-esc="'%.2f' % o.lst_price"/>
+                            </b>
+                            ৳ TK
+                        </div>
+                        <div class="label_vat">Inclusive VAT</div>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>

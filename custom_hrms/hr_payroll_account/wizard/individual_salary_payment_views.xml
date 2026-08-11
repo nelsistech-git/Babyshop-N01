@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_single_salary_payment_wizard" model="ir.ui.view">
+        <field name="name">single.salary.payment.wizard.form</field>
+        <field name="model">single.salary.payment.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Salary Payment">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="payslip_id" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" required="1" style="font-weight:bold;"/>
+                            <field name="employee_id" force_save="1" readonly="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="emp_private_address_id" force_save="1" readonly="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="number" force_save="1" readonly="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="struct_id" force_save="1" readonly="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" style="font-weight:bold;"/>
+                            <field name="user_work_location_id" force_save="1" readonly="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="department_id" force_save="1" readonly="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="payment_date" force_save="1" required="1" style="font-weight:bold;"/>
+                        </group>
+                        <group>
+                            <field name="disbursement_type" force_save="1" readonly="1" style="font-weight:bold;"/>
+                            <field name="s_bank_name" force_save="1" readonly="1" invisible="disbursement_type == 'cash'" style="font-weight:bold;" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="bank_amount" force_save="1" readonly="1" invisible="disbursement_type == 'cash'" style="font-weight:bold;" />
+                            <field name="cash_amount" force_save="1" readonly="1" invisible="disbursement_type == 'bank'" style="font-weight:bold;"/>
+                            <field name="bank_journal_id" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" invisible="disbursement_type == 'cash'" required="disbursement_type in ('bank','bank_cash')"/>
+                            <field name="bank_credit_account_id" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" invisible="disbursement_type == 'cash'" required="disbursement_type in ('bank','bank_cash')"/>
+                            <field name="cash_journal_id" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" invisible="disbursement_type == 'bank'" required="disbursement_type in ('cash','bank_cash')"/>
+                            <field name="cash_credit_account_id" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" invisible="disbursement_type == 'bank'" required="disbursement_type in ('cash','bank_cash')"/>
+                            <field name="debit_account_id" force_save="1" required="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                        </group>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_confirm" type="object" string="Confirm" class="oe_highlight"/>
+                    <button special="cancel" string="Cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="action_single_salary_payment_wizard" model="ir.actions.act_window">
+        <field name="name">Salary Payment</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">single.salary.payment.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_single_salary_payment_wizard"/>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+
+        <record id="employee_resignation_form" model="ir.ui.view">
+            <field name="name">hr.resignation.form</field>
+            <field name="model">hr.resignation</field>
+            <field name="priority" eval="8" />
+            <field name="arch" type="xml">
+                <form string="Employee Separation">
+                    <header>
+                        <button string="Confirm" type="object" name="confirm_resignation" invisible="state != 'draft'" class="oe_highlight"/>
+                        <button string="Cancel" type="object" name="cancel_resignation" invisible="state != 'draft'"/>
+                        <button string="Approve" type="object" groups="hr.group_hr_user" name="approve_resignation" invisible="state != 'confirm'"/>
+                        <button string="Reject" type="object" confirm="Are you sure you want to Reject?" invisible="state not in ['confirm','approved']" groups="hr.group_hr_user" name="reject_resignation"/>
+                        <button string="Set to Draft" type="object" groups="hr.group_hr_manager" name="reset_to_draft"  invisible="state != 'cancel'"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,confirm,approved,cancel"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" required='1' readonly="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group string="Employee Details">
+                                 <!--<field name="read_only" invisible="1"/> -->
+                                <field name="employee_id" required="1" readonly="state in ('confirm','approved')" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="id_card_no" readonly="1" force_save="1"/>
+                                <field name="department_id" readonly="1" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="job_id" readonly="1" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="user_work_location_id" readonly="1" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="joined_date" readonly="1" force_save="1"/>
+                                <field name="employee_contract" readonly="1" force_save="1"/>
+                            </group>
+                            <group string="Dates">
+                                <field name="submit_date" required="1" force_save="1" readonly="state in ('confirm','approved')"/>
+
+                                <field name="expected_revealing_date" required='1' force_save="1" readonly="state in ('confirm','approved')" style="font-weight:bold;"/>
+                                <field name="resign_confirm_date"
+                                       readonly="1"/>
+                                <field name="resign_approve_date"
+                                       readonly="1"/>
+                                <field name="expected_notice_period"
+                                        groups="hr.group_hr_user" readonly="1" force_save="1"/>
+                                <field name="approved_revealing_date"
+                                        groups="hr.group_hr_user" readonly="1" force_save="1" />
+
+
+                                <field name="notice_period" force_save="1" readonly="1"/>
+                                <field name="deduction" force_save="1" readonly="1"/>
+                                <field name="gross_salary" readonly="1" force_save="1" />
+                                <field name="deduction_of_gross" force_save="1" readonly="1"/>
+                                <field name="attachment_ids" widget="many2many_binary"/>
+
+
+                            </group>
+                            <group string="Separation Details">
+                                <field name="resignation_type_id" required="1" string="Type" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" groups="hr.group_hr_user" readonly="state in ('confirm','approved')"/>
+                                <field name="reason" force_save="1" required="1" readonly="state in ('confirm','approved')"/>
+                            </group>
+                        </group>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record id="employee_resignation_tree" model="ir.ui.view">
+            <field name="name">hr.resignation.tree</field>
+            <field name="model">hr.resignation</field>
+            <field name="priority" eval="8" />
+            <field name="arch" type="xml">
+                <tree string="Employee Separation" decoration-muted="state=='cancel'"
+					decoration-info="state=='confirm'"
+					decoration-success="state=='approved'">
+                    <field name="name"/>
+                    <field name="employee_id"/>
+                    <field name="department_id"/>
+                    <field name="employee_contract"/>
+                    <field name="joined_date" readonly="1"/>
+                    <field name="expected_revealing_date" />
+                    <field name="approved_revealing_date"/>
+                    <field name="resign_confirm_date"/>
+                    <field name="resignation_type" string="Separation Type"/>
+                    <field name="notice_period"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+        <record id="employee_resignation_search" model="ir.ui.view">
+            <field name="name">hr.resignation.search</field>
+            <field name="model">hr.resignation</field>
+            <field name="priority" eval="8" />
+            <field name="arch" type="xml">
+                <search string="Employee Separation search" >
+                    <field name="name"/>
+                    <field name="employee_id"/>
+                    <field name="expected_revealing_date" />
+                    <field name="approved_revealing_date"/>
+                    <field name="resign_confirm_date"/>
+                    <field name="resignation_type" string="Separation Type"/>
+                    <field name="state"/>
+                </search>
+            </field>
+        </record>
+        <record model="ir.actions.act_window" id="view_employee_resignation">
+            <field name="name">Employee Separation</field>
+            <field name="res_model">hr.resignation</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('state', 'in', ('draft', 'confirm','cancel'))]</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">Employee Separation Form
+                </p>
+            </field>
+        </record>
+
+        <menuitem id="employee_resignation" name="Employee Exit"
+                  groups="custom_common_settings.group_hr_separation_root_menu"
+                  web_icon="hr_resignation,static/description/icon.png"
+                  sequence="35"
+        />
+        <menuitem id="employee_resignation_request" parent="employee_resignation" name="Separation Request"
+                  action="view_employee_resignation" groups="hr.group_hr_manager,hr.group_hr_user" sequence="4"/>
+    </data>
+</odoo>
+
+

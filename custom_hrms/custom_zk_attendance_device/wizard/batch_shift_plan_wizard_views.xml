@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+	<data>
+		<record id="batch_shift_plan_view_form" model="ir.ui.view">
+			<field name="name">batch.shift.plan.wizard.form</field>
+			<field name="model">batch.shift.plan.wizard</field>
+			<field name="arch" type="xml">
+				<form string="Batch shift plan">
+						<group>
+							<label for="date_from" string="Period"/>
+							<div>
+								<field name="date_from" class="oe_inline"/>
+								-
+								<field name="date_to" class="oe_inline"/>
+							</div>
+							<field name="resource_calendar_id" options="{'no_open':True,'no_create':1,'no_create_edit':1}" />
+							<field name="short_name" />
+
+						</group>
+
+						<group>
+							<label for="type_select" string="Apply On"/>
+							<field name="type_select" widget="radio"
+								   nolabel="1"/>
+							<field name="set_dept" string="All Departments" invisible="type_select in ('emp','tag', 'workloc')"/>
+							<field name="set_dept" string="All Work Locations" invisible="type_select in ('emp','tag', 'dep')"/>
+							<field name="set_dept" string="All Tags" invisible="type_select in ('emp','workloc', 'dep')"/>
+							<field name="set_dept" string="All Employee" invisible="type_select in ('tag','workloc', 'dep')"/>
+
+							<field name="dep_ids" widget="many2many_tags"
+								   invisible="type_select != 'dep'" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+							<field name="workloc_ids" widget="many2many_tags"
+								   invisible="type_select != 'workloc'" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+							<field name="cat_ids" widget="many2many_tags"
+								   invisible="type_select != 'tag'" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+							<field name="emp_ids" widget="many2many_tags" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+							<!--invisible="type_select != 'emp'" -->
+
+						</group>
+						<field name="note" placeholder="Notes"/>
+					<footer>
+						<button name="action_submit_shift_plan" string="Submit" type="object"
+							class="btn-primary" />
+
+						or
+						<button name="action_cancel_shift_plan" string="Shift Plan Cancel" type="object"
+							class="btn-primary" help="Cancel Shift Plan, During this Period, Working Schedule and Employee Combination"/>
+
+						or
+						<button string="Cancel" class="btn-danger" special="cancel" />
+					</footer>
+				</form>
+			</field>
+		</record>
+
+		<record id="batch_shift_plan_action" model="ir.actions.act_window">
+			<field name="name">Batch Shift Plan</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="res_model">batch.shift.plan.wizard</field>
+			<field name="view_mode">form</field>
+			<field name="view_id" ref="batch_shift_plan_view_form" />
+			<field name="target">new</field>
+		</record>
+
+		<menuitem id="menu_batch_shift_plan"
+			name="Batch Shift Plan" parent="root_menu_shift_management"
+			sequence="9" groups="hr_attendance.group_hr_attendance_officer"
+			action="batch_shift_plan_action" />
+	</data>
+</odoo>

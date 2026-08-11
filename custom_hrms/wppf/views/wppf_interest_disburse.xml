@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="view_wppf_interest_disburse_form" model="ir.ui.view">
+        <field name="name">wppf.interest.disburse.form</field>
+        <field name="model">wppf.interest.disburse</field>
+        <field name="arch" type="xml">
+            <form string="WPPF Profit Disbursement">
+                <header>
+                    <button name="action_draft" string="Send to Draft" type="object" class="btn-primary"
+                            invisible="state != 'confirm'"/>
+                    <button name="confirm" string="Confirm" type="object" class="btn-primary"
+                            invisible="state != 'draft'"
+                            confirm="Are you sure to Confirm?"/>
+                    <button name="disburse_interest" string="Disburse Profit" type="object" class="btn-primary"
+                            invisible="state != 'confirm'"
+                            confirm="Are you sure to Disburse Profit?"/>
+                    <button name="action_disbursed_paid" string="Payment" type="object" class="btn-primary"
+                            invisible="state != 'disbursed'"
+                            confirm="Are you sure to Payment of disbursement?"/>
+                    <button name="action_print_excel" type="object" string="Print" invisible="state == 'cancel'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirm,disbursed,paid"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h3 col="4">
+                            <field name="name" force_save="1"/>
+                        </h3>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="fiscalyear_id" readonly="state != 'draft'"
+                                   options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="date_from" string="Date From" readonly="state != 'draft'"/> <!--readonly="1" force_save="1"-->
+                            <field name="date_to" string="Date To" readonly="state != 'draft'"/>
+                            <field name="month_count" readonly="1" force_save="1"/>
+                            <field name="notes" readonly="state != 'draft'"/>
+                        </group>
+                        <group>
+                            <field name="pf_board_id" readonly="state != 'draft'"/>
+                            <label for="month" string="Month-Year of Profit"/>
+                            <div>
+                                <field name="month" class="oe_inline" readonly="state != 'draft'"/>-
+                                <field name="year" class="oe_inline" readonly="state != 'draft'"/>
+                            </div>
+                            <field name="date_disburse"/>
+                            <field name="total_employee" style="font-weight:bold;"/>
+                            <field name="amount_interest" style="font-weight:bold;" readonly="state != 'draft'"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Journal Entry">
+                            <field name="disburse_journal_id"
+                                   options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"
+                                   required="state == 'confirm'" invisible="state == 'draft'"
+                                   readonly="state not in ['confirm']"/>
+                            <field name="disburse_debit_acc_id"
+                                   options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"
+                                   required="state == 'confirm'" invisible="state == 'draft'"
+                                   readonly="state not in ['confirm']"/>
+                            <field name="disburse_fund_credit_acc_id"
+                                   options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"
+                                   required="state == 'confirm'" invisible="state == 'draft'"
+                                   readonly="state not in ['confirm']"/>
+                            <field name="disburse_disb_credit_acc_id"
+                                   options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"
+                                   required="state == 'confirm'" invisible="state == 'draft'"
+                                   readonly="state not in ['confirm']"/>
+                            <field name="disburse_tds_credit_acc_id"
+                                   options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"
+                                   required="state == 'confirm'" invisible="state == 'draft'"
+                                   readonly="state not in ['confirm']"/>
+                            <field name="disburse_move_id"
+                                   readonly="1"/>
+                            <br/>
+                            <field name="payment_journal_id"
+                                   options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"
+                                   required="state == 'disbursed'" invisible="state in ['draft','confirm']"
+                                   readonly="state  not in ['disbursed']"/>
+                            <field name="payment_debit_acc_id"
+                                   options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"
+                                   required="state == 'disbursed'" invisible="state in ['draft','confirm']"
+                                   readonly="state  not in ['disbursed']"/>
+                            <field name="payment_credit_acc_id"
+                                   options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"
+                                   required="state == 'disbursed'" invisible="state in ['draft','confirm']"
+                                   readonly="state  not in ['disbursed']"/>
+                            <field name="payment_move_id"
+                                   readonly="1"/> <!--attrs="{'invisible': [('state', 'in', ['draft','confirm'])]}"-->
+                            <field name="date_payment" invisible="state in ['draft','confirm']"/>
+                        </group>
+
+                        <group>
+                            <field name="wppf_amt" style="font-weight:bold;"/>
+                            <field name="disburse_amt" style="font-weight:bold;"/>
+                            <field name="total_interest" style="font-weight:bold;"/>
+                            <field name="diff_interest"
+                                   decoration-danger="(diff_interest &gt; 0) or (diff_interest  &lt; 0)"
+                                   invisible="diff_interest == 0"/>
+
+                            <field name="tds_amt" style="font-weight:bold;"/>
+                            <field name="net_disburse" style="font-weight:bold;"/>
+
+                        </group>
+                    </group>
+
+                    <group>
+                        <group>
+                            <field name="is_profit_distribution" invisible="1"/>
+                            <button name="get_employee" string="Get Employee" type="object" icon="fa-bolt"
+                                    style="font-weight:bold;"
+                                    confirm="Are you sure to Get Employee?"
+                                    class="btn-primary" invisible="state != 'draft'"/>
+                        </group>
+                        <group>
+                            <button name="set_profit_distribution" string="Set Profit" type="object" icon="fa-list"
+                                    style="font-weight:bold;"
+                                    confirm="Are you sure to Set Profit?"
+                                    class="btn-primary"
+                                    invisible="state != 'draft'"/>
+
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Yearly WPPF Distribution">
+                            <field name="interest_disburse_line_yearly" readonly="state != 'draft'">
+                                <tree string="Yearly Distribution Line" editable="bottom">
+                                    <field name="employee_id"
+                                           options="{'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                    <field name="address_home_id"
+                                           options="{'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                    <field name="emp_payment"/>
+                                    <field name="is_tds_applicable"/>
+
+                                    <field name="total_profit" sum="total_profit total" widget="monetary"/>
+                                    <field name="wppf_amt" sum="wppf_amt total" widget="monetary"/>
+                                    <field name="disburse_amt" sum="disburse_amt total" widget="monetary"/>
+
+                                    <field name="tds_amt" sum="tds_amt total" widget="monetary"/>
+                                    <field name="net_disburse" sum="net_disburse total" widget="monetary"/>
+                                </tree>
+                            </field>
+                        </page>
+
+
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_wppf_interest_disburse_tree" model="ir.ui.view">
+        <field name="name">wppf.interest.disburse.tree</field>
+        <field name="model">wppf.interest.disburse</field>
+        <field name="arch" type="xml">
+            <tree string="PF Profit Disburse">
+                <field name="name"/>
+                <field name="pf_board_id"/>
+                <field name="year"/>
+                <field name="month"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="total_employee"/>
+                <field name="amount_interest"/>
+                <field name="state" string="Stage"/>
+            </tree>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="wppf_interest_disburse_action">
+        <field name="name">WPPF Disburse</field>
+        <field name="res_model">wppf.interest.disburse</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+
+
+
+    <menuitem id="menu_bs_wppf_interest_disburse"
+              name="Profit Disburse"
+              parent="menu_hr_employee_wppf_root"
+              action="wppf_interest_disburse_action"
+              sequence="3"/>
+</odoo>

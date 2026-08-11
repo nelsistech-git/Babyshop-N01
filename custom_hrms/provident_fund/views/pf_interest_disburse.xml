@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="view_pf_interest_disburse_form" model="ir.ui.view">
+        <field name="name">pf.interest.disburse.form</field>
+        <field name="model">pf.interest.disburse</field>
+        <field name="arch" type="xml">
+            <form string="PF Profit Disbursement">
+                <header>
+                    <button name="action_draft" string="Send to Draft" type="object" class="btn-primary"
+                            invisible="state != 'confirm'"/> <!--attrs="{'invisible':[('state','!=','confirm')]}"-->
+                    <button name="confirm" string="Confirm" type="object" class="btn-primary"
+                            invisible="state != 'draft'"
+                            confirm="Are you sure to Confirm?"/> <!--attrs="{'invisible':[('state','!=','draft')]}"-->
+                    <button name="disburse_interest" string="Disburse Profit" type="object" class="btn-primary"
+                            invisible="state != 'confirm'"
+                            confirm="Are you sure to Disburse Profit?"/> <!--attrs="{'invisible':[('state','!=','draft')]}"-->
+                    <button name="action_print_excel" type="object" string="Print" invisible="state in ['cancel']"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirm,disbursed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h3 col="4">
+                            <field name="name" force_save="1"/>
+                        </h3>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="fiscalyear_id" readonly="state != 'draft'"
+                                   options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="date_from" string="Date From"
+                                   readonly="state != 'draft'"/> <!--readonly="1" force_save="1"-->
+                            <field name="date_to" string="Date To" readonly="state != 'draft'"/>
+                            <field name="month_count" readonly="1" force_save="1"/>
+                            <field name="notes" readonly="state != 'draft'"/>
+                        </group>
+                        <group>
+                            <field name="pf_board_id" readonly="state != 'draft'"/>
+                            <label for="month" string="Month-Year of Profit"/>
+                            <div>
+                                <field name="month" class="oe_inline" readonly="state != 'draft'"/>-
+                                <field name="year" class="oe_inline" readonly="state != 'draft'"/>
+                            </div>
+                            <field name="date_disburse"/>
+                            <field name="amount_interest" readonly="state != 'draft'" style="font-weight:bold;"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="pf_contribution" style="font-weight:bold;"/>
+                            <field name="cpf_contribution" style="font-weight:bold;"/>
+                            <field name="total_contribution" style="font-weight:bold;"/>
+                        </group>
+                        <group>
+                            <field name="pf_interest" style="font-weight:bold;"/>
+                            <field name="cpf_interest" style="font-weight:bold;"/>
+                            <field name="total_interest" style="font-weight:bold;"/>
+                            <field name="diff_interest"
+                                   decoration-danger="(diff_interest &gt; 0) or (diff_interest  &lt; 0)"
+                                   invisible="diff_interest == 0"/>
+
+                        </group>
+                    </group>
+
+                    <group string="Journal Entry" invisible="state == 'draft'">
+                        <field name="journal_id_disbursement"
+                               options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"
+                               required="state == 'confirm'" invisible="state == 'draft'"
+                               readonly="state not in ['confirm']"/>
+                        <field name="payable_acc_id"
+                               options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"
+                               required="state == 'confirm'" invisible="state == 'draft'"
+                               readonly="state not in ['confirm']"/>
+                        <field name="expense_acc_id"
+                               options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"
+                               required="state == 'confirm'" invisible="state == 'draft'"
+                               readonly="state not in ['confirm']"/>
+                        <field name="disburse_move_id"
+                               readonly="1"/> <!--attrs="{'invisible': [('state', '=', 'draft')]}"-->
+                    </group>
+
+                    <group>
+                        <group>
+                            <field name="is_profit_distribution" invisible="1"/>
+                            <button name="get_contribution" string="Get Contribution" type="object" icon="fa-bolt"
+                                    style="font-weight:bold;"
+                                    confirm="Are you sure to Get Contribution?"
+                                    class="btn-primary" invisible="state != 'draft'"/>
+                        </group>
+                        <group>
+                            <button name="set_profit_distribution" string="Set Profit" type="object" icon="fa-list"
+                                    style="font-weight:bold;"
+                                    confirm="Are you sure to Set Profit?"
+                                    class="btn-primary"
+                                    invisible="state != 'draft'"/> <!--attrs="{'invisible':[('is_profit_distribution','=', True)]}"-->
+
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Yearly Average Contribution and Profit Distribution">
+                            <field name="interest_disburse_line_yearly">
+                                <tree string="Yearly Average Contribution Line" editable="bottom" create="false"
+                                      delete="false" edit="false">
+                                    <field name="employee_id"/>
+
+                                    <field name="balance_net_pf_amt" sum="balance_net_pf_amt total" widget="monetary"/>
+                                    <field name="balance_net_cpf_amt" sum="balance_net_cpf_amt total"
+                                           widget="monetary"/>
+                                    <field name="balance_total_contribution" sum="balance_total_contribution total"
+                                           widget="monetary"/>
+
+                                    <field name="interest_pf" sum="interest_pf total" widget="monetary"/>
+                                    <field name="interest_cpf" sum="interest_cpf total" widget="monetary"/>
+                                    <field name="interest_total" sum="interest_total total" widget="monetary"/>
+                                </tree>
+                            </field>
+                        </page>
+
+                        <page string="Monthly Contribution">
+                            <field name="interest_disburse_line_monthly">
+                                <tree string="Monthly Contribution Line" editable="bottom" create="false" delete="false"
+                                      edit="false">
+                                    <field name="employee_id"/>
+                                    <field name="year"/>
+                                    <field name="month"/>
+
+                                    <field name="op_pf_amt" sum="op_pf_amt total" widget="monetary" optional="hide"/>
+                                    <field name="pf_amt" sum="pf_amt total" widget="monetary" optional="hide"/>
+                                    <field name="op_cpf_amt" sum="op_cpf_amt total" widget="monetary" optional="hide"/>
+                                    <field name="cpf_amt" sum="cpf_amt total" widget="monetary" optional="hide"/>
+                                    <field name="op_loan_amt_pf" sum="op_loan_amt_pf total" widget="monetary"
+                                           optional="hide"/>
+                                    <field name="loan_amt_pf" sum="loan_amt_pf total" widget="monetary"
+                                           optional="hide"/>
+                                    <field name="op_loan_amt_cpf" sum="op_loan_amt_cpf total" widget="monetary"
+                                           optional="hide"/>
+                                    <field name="loan_amt_cpf" sum="loan_amt_cpf total" widget="monetary"
+                                           optional="hide"/>
+
+                                    <field name="opening_net_pf_amt" sum="opening_net_pf_amt total" widget="monetary"
+                                           optional="hide"/>
+                                    <field name="net_pf_amt" sum="net_pf_amt total" widget="monetary" optional="hide"/>
+                                    <field name="balance_net_pf_amt" sum="balance_net_pf_amt total" widget="monetary"/>
+
+                                    <field name="opening_net_cpf_amt" sum="opening_net_cpf_amt total" widget="monetary"
+                                           optional="hide"/>
+                                    <field name="net_cpf_amt" sum="net_cpf_amt total" widget="monetary"
+                                           optional="hide"/>
+                                    <field name="balance_net_cpf_amt" sum="balance_net_cpf_amt total"
+                                           widget="monetary"/>
+
+                                    <field name="opening_total_contribution" sum="opening_total_contribution total"
+                                           widget="monetary" optional="hide"/>
+                                    <field name="total_contribution" sum="total_contribution total" widget="monetary"
+                                           optional="hide"/>
+                                    <field name="balance_total_contribution" sum="balance_total_contribution total"
+                                           widget="monetary"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Yearly Profit Disburse">
+                            <field name="interest_disburse_line">
+                                <tree string="Profit Disburse Line" editable="bottom" create="false" delete="false"
+                                      edit="false">
+                                    <field name="employee_id"/>
+                                    <field name="pf_profile_id"/>
+                                    <field name="balance_opening"/>
+                                    <field name="interest_emp"/>
+                                    <field name="interest_company"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_pf_interest_disburse_tree" model="ir.ui.view">
+        <field name="name">pf.interest.disburse.tree</field>
+        <field name="model">pf.interest.disburse</field>
+        <field name="arch" type="xml">
+            <tree string="PF Profit Disburse">
+                <field name="name"/>
+                <field name="pf_board_id"/>
+                <field name="year"/>
+                <field name="month"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="amount_interest"/>
+                <field name="state" string="Stage"/>
+            </tree>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="pf_interest_disburse_action">
+        <field name="name">Profit Disburse</field>
+        <field name="res_model">pf.interest.disburse</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_bs_pf_disbursement"
+              name="Disbursement"
+              parent="base.menu_hr_employee_pf_root"
+              groups="provident_fund.group_provident_fund_officer"
+              sequence="9"/>
+
+    <menuitem id="menu_bs_pf_interest_disburse"
+              name="Profit Disburse"
+              parent="menu_bs_pf_disbursement"
+              action="pf_interest_disburse_action"
+              groups="provident_fund.group_provident_fund_officer"
+              sequence="15"/>
+</odoo>

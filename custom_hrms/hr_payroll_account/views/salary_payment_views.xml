@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Salary Payment Form -->
+    <record id="view_salary_payment" model="ir.ui.view">
+        <field name="name">salary.payment.form</field>
+        <field name="model">salary.payment</field>
+        <field name="arch" type="xml">
+            <form string="Salary Payment">
+                <header>
+                    <field name="payslip_count" invisible="1"/>
+
+                    <button name="%(action_salary_payment_wizard)d" type="action" string="Generate" class="oe_highlight" invisible="state == 'done' or payslip_count &gt; 0"/>
+                    <button string="Cancel" type="object" name="action_cancel" invisible="state !='draft'"/>
+                    <button string="Set to Draft" type="object" name="action_draft" invisible="state !='cancel'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,done,cancel"/>
+
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_payslips" class="oe_stat_button" icon="fa-book" type="object" help="Generated Sheets" invisible="payslip_count == 0">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_value"><field name="payslip_count"/></span>
+                                <span class="o_stat_text">Payslips</span>
+                             </div>
+                        </button>
+                    </div>
+
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1" required="1" force_save="1" invisible="not name"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group>
+                            <field name="struct_id" required="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" readonly="state == 'done' or  payslip_count &gt; 0" style="font-weight:bold;"/>
+                            <field name="user_work_location_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" readonly="state == 'done' or  payslip_count &gt; 0"/>
+                            <field name="department_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" readonly="state == 'done' or  payslip_count &gt; 0"/>
+                            <label for="date_from" string="Payslip Period"/>
+                            <div>
+                                <field name="date_from" class="oe_inline" style="font-weight:bold;" readonly="state == 'done' or payslip_count &gt;  0"/>
+                                - <field name="date_to" class="oe_inline" style="font-weight:bold;" readonly="state == 'done' or payslip_count &gt;  0"/>
+                            </div>
+                            <field name="payment_date" required='1' readonly="state == 'done' or payslip_count &gt;  0" style="font-weight:bold;"/>
+                        </group>
+                        <group>
+                            <field name="disbursement_type" required="1" readonly="state == 'done' or payslip_count &gt;  0" style="font-weight:bold;"/>
+                            <field name="bank_journal_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" readonly="state == 'done' or payslip_count &gt; 0" invisible="disbursement_type == 'cash'" required="disbursement_type in  ('bank','bank_cash')"/>
+                            <field name="bank_credit_account_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" readonly="state == 'done' or payslip_count &gt; 0" invisible="disbursement_type == 'cash'" required="disbursement_type in  ('bank','bank_cash')"/>
+                            <field name="cash_journal_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" readonly="state == 'done' or payslip_count &gt; 0" invisible="disbursement_type == 'bank'" required="disbursement_type in ('cash','bank_cash')"/>
+                            <field name="cash_credit_account_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" readonly="state == 'done' or payslip_count &gt; 0" invisible="disbursement_type == 'bank'" required="disbursement_type in ('cash','bank_cash')"/>
+                            <field name="debit_account_id" required="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" readonly="state == 'done' or payslip_count &gt;  0"/>
+                            <field name="bank_payment_move_id" readonly="1" />
+                            <field name="cash_payment_move_id" readonly="1" />
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Salary Payment Tree -->
+    <record id="view_salary_payment_tree" model="ir.ui.view">
+        <field name="name">salary.payment.tree</field>
+        <field name="model">salary.payment</field>
+        <field name="arch" type="xml">
+            <tree string="Salary Payment">
+                <field name="name" />
+                <field name="struct_id"  string="Structure Type"/>
+                <field name="user_work_location_id" />
+                <field name="department_id" />
+                <field name="date_from" />
+                <field name="date_to" />
+                <field name="payment_date" />
+                <field name="disbursement_type" />
+                <field name="bank_journal_id" />
+                <field name="bank_credit_account_id" />
+                <field name="cash_journal_id" />
+                <field name="cash_credit_account_id" />
+                <field name="debit_account_id" />
+                <field name="state" />
+            </tree>
+        </field>
+    </record>
+
+    <!-- Salary Payment Filter -->
+    <record id="view_salary_payment_search" model="ir.ui.view">
+        <field name="name">salary.payment.search</field>
+        <field name="model">salary.payment</field>
+        <field name="arch" type="xml">
+            <search string="Search Batch Salary Payment">
+                <field name="name" string="Name"/>
+                <field name="user_work_location_id" string="Work/Job Location"/>
+                <field name="department_id" string="Department"/>
+                <field name="payment_method" string="Payment Method"/>
+                <field name="journal_id" string="Journal"/>
+                <field name="debit_account_id" string="Debit Account"/>
+                <field name="credit_account_id" string="Credit Account"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Salary Payment Action -->
+    <record id="action_salary_payment" model="ir.actions.act_window">
+        <field name="name">Batch Salary Payment</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">salary.payment</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_salary_payment_tree"/>
+        <field name="search_view_id" ref="view_salary_payment_search"/>
+    </record>
+
+    <!-- Salary Details Action -->
+
+
+    <record id="view_hr_payslip_salary_details_tree" model="ir.ui.view">
+        <field name="name">hr.payslip.tree</field>
+        <field name="model">hr.payslip</field>
+        <field name="arch" type="xml">
+            <tree create="false" delete="0" decoration-info="state in ('confirm','verify')" decoration-muted="state == 'cancel'" js_class="hr_payroll_payslip_tree" string="Payslips" >
+                <field name="currency_id" invisible="1"/>
+                <field name="number" readonly="1" string="Salary Slip No."/>
+                <field name="employee_id" readonly="1"/>
+                <field name="user_work_location_id" readonly="1"/>
+                <field name="department_id" readonly="1"/>
+                <field name="struct_id" readonly="1" string="Structure Type"/>
+                <field name="date_from" readonly="1"/>
+                <field name="date_to" readonly="1"/>
+                <field name="net_wage" widget="monetary" options="{'currency_field': 'currency_id'}" sum="net_wage"/>
+                <field name="disbursement_type" readonly="1"/>
+                <field name="bank_amount" widget="monetary" options="{'currency_field': 'currency_id'}" sum="bank_amount"/>
+                <field name="cash_amount" widget="monetary" options="{'currency_field': 'currency_id'}" sum="cash_amount"/>
+                <field name="payment_date" readonly="1"/>
+                <field name="state" readonly="1"/>
+                <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
+            </tree>
+        </field>
+    </record>
+    <record id="action_salary_payment_details" model="ir.actions.act_window">
+        <field name="name">Payment Details</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">hr.payslip</field>
+        <field name="domain">[('is_paid', '=',True)]</field>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="hr_payroll_account.view_hr_payslip_salary_details_tree"/>
+        <field name="search_view_id" ref="hr_payroll.view_hr_payslip_filter"/>
+    </record>
+
+    <!-- Salary Payment Menu -->
+    <menuitem id="menu_salary_payment_root"
+          name="Salary Payment"
+          sequence="2"
+          parent="hr_payroll.menu_hr_payroll_root"
+          groups="hr.group_hr_manager"
+    />
+
+    <menuitem id="menu_salary_payment_sub"
+          name="Batch Salary Payment"
+          sequence="1"
+          action="action_salary_payment"
+          parent="hr_payroll_account.menu_salary_payment_root"
+          groups="hr.group_hr_manager"
+    />
+
+    <menuitem id="menu_single_employee_salary_payment"
+          name="Single Employee Salary Payment"
+          sequence="3"
+          action="hr_payroll_account.action_single_salary_payment_wizard"
+          parent="hr_payroll_account.menu_salary_payment_root"
+          groups="hr.group_hr_manager"
+    />
+    <menuitem id="menu_salary_payment_details"
+          name="Payment Details"
+          sequence="5"
+          action="hr_payroll_account.action_salary_payment_details"
+          parent="hr_payroll_account.menu_salary_payment_root"
+          groups="hr.group_hr_manager"
+    />
+
+    <menuitem id="hr_batch_salary_payment_expenses" name="Batch Salary Payment" parent="hr_payroll.menu_root_hr_payroll_expenses" action="hr_payroll_account.action_salary_payment" sequence="2" groups="account.group_account_manager"/>
+    <menuitem id="hr_single_salary_payment_expenses" name="Single Employee Salary Payment" parent="hr_payroll.menu_root_hr_payroll_expenses" action="hr_payroll_account.action_single_salary_payment_wizard" sequence="3" groups="account.group_account_manager"/>
+    <menuitem id="hr_payment_details_expenses" name="Payment Details" parent="hr_payroll.menu_root_hr_payroll_expenses" action="hr_payroll_account.action_salary_payment_details" sequence="4" groups="account.group_account_manager"/>
+
+
+
+</odoo>

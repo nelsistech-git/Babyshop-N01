@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- Form view -->
+        <record id="view_aam_comparison_report_category_tree" model="ir.ui.view">
+            <field name="name">comparison.report.category.tree</field>
+            <field name="model">comparison.report.category</field>
+            <field name="priority" eval="8" />
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="sequence" />
+                    <field name="name" />
+                    <field name="calculation" />
+                    <field name="account_type" />
+                </tree>
+            </field>
+        </record>
+
+        <!-- Form view -->
+        <record id="view_aam_comparison_report_category_form" model="ir.ui.view">
+            <field name="name">comparison.report.category.form</field>
+            <field name="model">comparison.report.category</field>
+            <field name="priority" eval="8" />
+            <field name="arch" type="xml">
+                <form string="Comparision Report Category">
+                    <group>
+                        <group>
+                            <field name="name" />
+                            <field name="config_type" />
+                            <field name="user_type_id" widget="many2many_tags" invisible="config_type == 'account'" />
+                            <field name="account_ids" widget="many2many_tags" invisible="config_type == 'type'" />
+                        </group>
+                        <group>
+                            <field name="sequence" />
+                            <field name="calculation" />
+                            <field name="entry_type" />
+                            <field name="account_type" />
+                        </group>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <!-- This action window for configuration -->
+
+        <record model="ir.actions.act_window" id="action_view_aam_comparison_report_category">
+            <field name="name">Comparison Category</field>
+            <field name="res_model">comparison.report.category</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[]</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">Create new Configuration
+                </p>
+            </field>
+        </record>
+
+
+        <menuitem id="menu_aam_comparison_report_category" name="Comparison Category" parent="account.menu_finance_configuration" action="action_view_aam_comparison_report_category" />
+        
+    </data>
+</odoo>

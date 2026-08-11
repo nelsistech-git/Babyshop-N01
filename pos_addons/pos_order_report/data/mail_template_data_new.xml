@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!--Email template -->
+        <record id="email_template_edi_pos_orders" model="mail.template">
+            <field name="name">Point of Sale Order - Send by Email</field>
+            <field name="email_from">{{(object.user_id.email and '%s &lt;%s&gt;' % (object.user_id.name, object.user_id.email) or '')}}</field>
+            <field name="subject">{{object.company_id.name}} Point of Sale Orders - {{object.state}} (Ref {{object.name or 'n/a' }})</field>
+            <field name="partner_to">{{object.partner_id.id}}</field>
+            <field name="model_id" ref="point_of_sale.model_pos_order"/>
+            <field name="auto_delete" eval="True"/>
+            <!-- <field name="report_template" ref="pos_order_id"/> -->
+            <!-- <field name="report_name">{{(object.name or '').replace('/','_')}} {{object.state == 'draft' and '_draft' or ''}}</field> -->
+            <field name="report_template_ids" eval="[(4, ref('pos_order_id'))]"/>
+            <field name="lang">{{object.partner_id.lang}}</field>
+            <field name="body_html" type="html"><!-- <![CDATA[ -->
+                <div style="margin: 0px; padding: 0px;">
+                <p>Dear <t t-out="object.partner_id.name"/> ,</p>
+
+<!-- <t t-set="access_action" t-value="object.with_context(force_website=True).get_access_action()"/>
+
+<t t-set="is_online" t-value="access_action and access_action['type'] == 'ir.actions.act_url'"/>
+<t t-set="access_name" t-value="'Accept and pay %s online' % doc_name or 'View %s' % doc_name"/>
+
+<t t-set="access_url" t-value="is_online and access_action['url'] or None"/> -->
+<!-- <t t-set="doc_name" t-value="'order' if object.state in ('new','paid', 'done', 'invoiced') else 'order confirmation'"/> -->
+<!-- <t t-set="doc_name" t-value="'order' if object.state in ('new','paid', 'done', 'invoiced') else 'order confirmation'"/> -->
+
+<t t-if="object.partner_id.parent_id">
+    (<i><t t-out="object.partner_id.parent_id.name"/></i>)
+</t>
+<t t-else="">
+<br/>
+</t>
+<p>
+Here is your <strong><t t-out="object.name"/></strong>
+
+amounting in <strong t-out="format_amount(object.amount_total, object.pricelist_id.currency_id)"></strong>
+from <t t-out="object.company_id.name"/>.<br/>
+<br/>
+</p>
+<p>You can reply to this email if you have any questions.</p><br/>
+<p>Thank you,</p>
+<p style="color:#eeeeee;">
+<t t-if="object.user_id and object.user_id.signature">
+    <t t-out="object.user_id.signature"/>
+</t>
+</p>
+                <!-- ]]> -->
+            
+        </div>
+            </field>
+        </record>
+
+    </data>
+</odoo>

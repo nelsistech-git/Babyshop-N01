@@ -1,0 +1,424 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="custom_hr_employee.paperformat_attendance" model="report.paperformat">
+        <field name="name">CNY LS Paper Format</field>
+        <field name="default" eval="True" />
+        <field name="format">A4</field>
+        <!-- <field name="page_height">0</field> -->
+        <!-- <field name="page_width">0</field> -->
+        <field name="orientation">Landscape</field>
+        <field name="margin_top">30</field>
+        <field name="margin_bottom">15</field>
+        <field name="margin_left">2</field>
+        <field name="margin_right">2</field>
+        <field name="header_line" eval="False" />
+        <field name="header_spacing">25</field>
+        <field name="dpi">90</field>        
+    </record>
+
+
+	<report id="attendance_preview"            
+            string="Print Attendance Report" 
+            model="hr.employee" 
+            report_type="qweb-html" 
+            name="custom_hr_employee.report_attendance"
+            file="custom_hr_employee.report_attendance"
+            paperformat="custom_hr_employee.paperformat_attendance"
+            />
+
+	<report id="report_attendance_list"            
+            string="Print Attendance Report" 
+            model="hr.employee" 
+            report_type="qweb-pdf" 
+            name="custom_hr_employee.report_attendance"
+            file="custom_hr_employee.report_attendance"
+            paperformat="custom_hr_employee.paperformat_attendance"
+            />
+
+			<!-- <t t-call="web.internal_layout"> -->
+            <!-- <t t-call="custom_hr_employee.internal_layout_attendance_modified"> -->
+            <!-- <t t-call="custom_hr_employee.external_layout_standard_extend"> -->
+
+
+
+    <!--  -->
+	<template id="report_attendance">
+		<t t-call="web.html_container">
+            <!-- <t t-call="web.external_layout"> -->
+            <t t-call="custom_hr_employee.external_layout_modified">
+
+                <style>
+                    h1, h2, h3 {
+                        display: inline;
+                    }
+               </style> 
+                    <b><center>ATTENDANCE REPORT</center> </b>
+                        <div >
+                            <t t-foreach="pages" t-as="pg">    
+                                <table style="font-size: 9px;" class="table table-sm o_main_table" >
+                                    <thead>                                        
+                                        
+                                        <t t-if="headers['month'] != False or headers['year'] != False">
+                                            <tr style="font-size: 9px;">
+                                                <td t-att-colspan="footers['lon']"  class="text-left">                                
+                                                        <t t-if="not headers['month'] == False"><b>Report Month:</b>  
+                                                            <t t-esc="headers['month']" />  
+                                                        </t>                                    
+                                                        <t t-if="not headers['year'] == False">                                        
+                                                            , <t t-esc="headers['year']" />  
+                                                        </t>                                                       
+                                                </td>
+                                            </tr>    
+                                        </t>   
+
+                                        <tr>
+                                            <th name="th_quantity" rowspan="2">Name</th>
+                                            <th name="th_quantity" rowspan="2">ID</th>                                
+                                            <t t-foreach="header" t-as="hd"> 
+                                                <th name="th_description" class="text-left"><t t-esc="hd"/></th>
+                                            </t>
+                                            <th name="th_quantity" class="text-left">Normal</th>
+                                            <th name="th_quantity" class="text-left">Actual</th>
+                                            <th name="th_quantity" class="text-left">Absent</th>
+                                            <th name="th_quantity" class="text-left">Late</th>
+                                            <th name="th_quantity" class="text-left">Early</th>
+                                            <th name="th_quantity" class="text-left">Late</th>
+                                            <th name="th_quantity" class="text-left">Early</th>                                    
+                                            <th name="th_quantity" class="text-left">OT</th>
+                                            <th name="th_quantity" class="text-left">Wknd</th>
+                                        </tr>
+                                        <tr>                                
+                                            <t t-foreach="heads2_r" t-as="hd"> 
+                                                <th name="th_description" class="text-left"><t t-esc="hd[0]" /></th>
+                                            </t>
+                                            <th name="th_quantity" class="text-left">WDay</th>
+                                            <th name="th_quantity" class="text-left">WDay</th>
+                                            <th name="th_quantity" class="text-left">WDay</th>
+                                            <th name="th_quantity" class="text-left">Day</th>
+                                            <th name="th_quantity" class="text-left">Day</th>
+                                            <th name="th_quantity" class="text-left">Min</th>
+                                            <th name="th_quantity" class="text-left">Min</th>                                            
+                                            <th name="th_quantity" class="text-left">Hour</th>
+                                            <th name="th_quantity" class="text-left">OT</th>
+                                        </tr>                                 
+                                    </thead>
+
+
+                                    <tbody class="att_tbody">       
+                                        <t t-set="companies" t-value="['TESTCOMPANY']"/> 
+                                        <t t-set="branches" t-value="['BRANCH']"/> 
+                                        <t t-set="sections" t-value="['SECTIONS']"/> 
+                                        <t t-foreach="coms" t-as="coms"> 
+                                            <t t-if="not len(coms['row_lines']) == 0">     
+                                                <td name="th_description" class="text-left" t-att-colspan="footers['lon']"> 
+                                                    <t t-if="not coms['company_name'] == False">    
+                                                        <t t-if="coms['company_name'] in companies">                                                        
+                                                            <b style="font-size: 9px;">Company Name:</b>  
+                                                            <t t-esc="coms['company_name']" />                                                                
+                                                            </t> 
+
+                                                        <t t-else="">     
+                                                            <t t-set="companies" t-value="companies + [coms['company_name']]"/>
+                                                            <b style="font-size: 9px;">Company Name:</b>  
+                                                            <h1 style="font-size: 9px;">  
+                                                                    <t t-esc="coms['company_name']" /> 
+                                                            </h1>,  
+                                                        </t>
+                                                    </t>
+
+                                                    <t t-if="not coms['br_name'] == False">
+                                                        <t t-if="coms['br_name'] in branches">                                                        
+                                                            <b style="font-size: 9px;"> Branch Name:</b>  
+                                                            <t t-esc="coms['br_name']" />                                                                
+                                                            </t> 
+
+                                                        <t t-else="">     
+                                                            <t t-set="branches" t-value="branches + [coms['br_name']]"/>
+                                                                 
+                                                                <b style="font-size: 9px;"> Branch Name:</b> 
+                                                            <h2 style="font-size: 9px;">     
+                                                                    <t t-esc="coms['br_name']" /> 
+                                                            </h2>,  
+                                                        </t>
+                                                    </t>
+                                                    <t t-if="not coms['sec_name'] == False">   
+                                                        <t t-if="coms['sec_name'] in sections">                                                        
+                                                            <b style="font-size: 9px;"> Section Name:</b>  
+                                                            <t t-esc="coms['sec_name']" />                                                                
+                                                            </t> 
+
+                                                        <t t-else="">     
+                                                            <t t-set="sections" t-value="sections + [coms['sec_name']]"/>
+                                                               
+                                                                <b style="font-size: 9px;"> Section Name:</b>   
+                                                            <h3 style="font-size: 9px;">    
+                                                                    <t t-esc="coms['sec_name']" /> 
+                                                            </h3>,  
+                                                        </t>
+                                                    </t>
+                                                </td> 
+
+                                                        
+                                                <t t-foreach="coms['row_lines']" t-as="body">                                                    
+                                                    <tr>
+                                                        <td name="td_name"><t t-esc="body['name']" /></td>
+                                                        <td name="td_name"><t t-esc="body['emp_id']"/></td>
+                                                        <t t-foreach="body['day_data']" t-as="items">
+                                                            <t t-if="items_value == 'P'"> 
+                                                                <td name="td_name" style="background-color:#9EFC54">
+                                                                    <t t-esc="items_value"/>                                                                                                         
+                                                                </td>
+                                                            </t>
+
+                                                            <t t-elif="items_value == 'A'">
+                                                                <td name="td_name" style="background-color:#FC5454">
+                                                                    <t t-esc="items_value"/>                                                                                                         
+                                                                </td>
+                                                            </t>
+
+                                                            <t t-elif="items_value == 'U'">
+                                                                <td name="td_name" style="background-color:#6280FC">
+                                                                    <t t-esc="items_value"/>                                                                                                         
+                                                                </td>
+                                                            </t>
+
+                                                            <t t-elif="items_value == 'V'">
+                                                                <td name="td_name" style="background-color:#75E6FC">
+                                                                    <t t-esc="items_value"/>                                                                                                         
+                                                                </td>
+                                                            </t>
+
+                                                            <t t-elif="items_value == 'M'">
+                                                                <td name="td_name" style="background-color:#C777FF">
+                                                                    <t t-esc="items_value"/>                                                                                                         
+                                                                </td>
+                                                            </t>
+
+                                                            <t t-elif="items_value == 'K'">
+                                                                <td name="td_name" style="background-color:#B8FDF8">
+                                                                    <t t-esc="items_value"/>                                                                                                         
+                                                                </td>
+                                                            </t>
+
+                                                            <t t-elif="items_value == 'X'">
+                                                                <td name="td_name" style="background-color:#FAA4F4">
+                                                                    <t t-esc="items_value"/>                                                                                                         
+                                                                </td>
+                                                            </t>
+
+                                                            <t t-elif="items_value == 'O'">
+                                                                <td name="td_name" style="background-color:#C1B4EC">
+                                                                    <t t-esc="items_value"/>                                                                                                         
+                                                                </td>
+                                                            </t>
+
+                                                            <t t-elif="items_value == 'E'">
+                                                                <td name="td_name" style="background-color:#CC9D93">
+                                                                    <t t-esc="items_value"/>                                                                                                         
+                                                                </td>
+                                                            </t>
+
+                                                            <t t-elif="items_value == 'S'">
+                                                                <td name="td_name" style="background-color:#CBCD66">
+                                                                    <t t-esc="items_value"/>                                                                                                         
+                                                                </td>
+                                                            </t>
+
+                                                            <t t-elif="items_value == 'C'">
+                                                                <td name="td_name" style="background-color:#F0DDEE">
+                                                                    <t t-esc="items_value"/>                                                                                                         
+                                                                </td>
+                                                            </t>
+
+                                                            <t t-else="">
+                                                                <td name="td_name" style="background-color:#F8FE84">
+                                                                    <t t-esc="items_value"/>                                                                                                         
+                                                                </td>
+                                                            </t>
+
+                                                            <!-- new values
+                                                            <t t-if="items_value == 'L'"> 
+                                                                <td name="td_name" style="background-color:# #d4745f">
+                                                                    <t t-esc="items_value"/>                                                                                                         
+                                                                </td>
+                                                            </t>
+
+                                                            <t t-if="items_value == 'E'"> 
+                                                                <td name="td_name" style="background-color:#cc9d93">
+                                                                    <t t-esc="items_value"/>                                                                                                         
+                                                                </td>
+                                                            </t>
+
+                                                            <t t-if="items_value == 'SL'"> 
+                                                                <td name="td_name" style="background-color:#cbcd66">
+                                                                    <t t-esc="items_value"/>                                                                                                         
+                                                                </td>
+                                                            </t>
+
+                                                            <t t-if="items_value == 'LWP'"> 
+                                                                <td name="td_name" style="background-color:#99df5e">
+                                                                    <t t-esc="items_value"/>                                                                                                         
+                                                                </td>
+                                                            </t>
+
+                                                            <t t-if="items_value == 'LWA'"> 
+                                                                <td name="td_name" style="background-color:#71d3ca">
+                                                                    <t t-esc="items_value"/>                                                                                                         
+                                                                </td>
+                                                            </t>
+
+                                                            <t t-if="items_value == 'H'"> 
+                                                                <td name="td_name" style="background-color:#7eb6f2 ">
+                                                                    <t t-esc="items_value"/>                                                                                                         
+                                                                </td>
+                                                            </t>
+
+                                                            <t t-if="items_value == 'OT'"> 
+                                                                <td name="td_name" style="background-color:#c1b4ec">
+                                                                    <t t-esc="items_value"/>                                                                                                         
+                                                                </td>
+                                                            </t>
+
+                                                            <t t-if="items_value == 'W'"> 
+                                                                <td name="td_name" style="background-color:#bfb2ca">
+                                                                    <t t-esc="items_value"/>                                                                                                         
+                                                                </td>
+                                                            </t>
+
+                                                            <t t-if="items_value == 'EL'"> 
+                                                                <td name="td_name" style="background-color:#dba1d6">
+                                                                    <t t-esc="items_value"/>                                                                                                         
+                                                                </td>
+                                                            </t>
+
+                                                            <t t-if="items_value == 'CL'"> 
+                                                                <td name="td_name" style="background-color:#f0ddee">
+                                                                    <t t-esc="items_value"/>                                                                                                         
+                                                                </td>
+                                                            </t>
+
+                                                            <t t-if="items_value == 'OD'"> 
+                                                                <td name="td_name" style="background-color:#d3c1ca">
+                                                                    <t t-esc="items_value"/>                                                                                                         
+                                                                </td>
+                                                            </t>
+
+                                                            <t t-if="items_value == 'DO'"> 
+                                                                <td name="td_name" style="background-color:#f1c6cf">
+                                                                    <t t-esc="items_value"/>                                                                                                         
+                                                                </td>
+                                                            </t>
+
+                                                             <t t-if="items_value == 'MA'"> 
+                                                                <td name="td_name" style="background-color:#c6daf1">
+                                                                    <t t-esc="items_value"/>                                                                                                         
+                                                                </td>
+                                                            </t>
+
+                                                             <t t-if="items_value == 'FA'"> 
+                                                                <td name="td_name" style="background-color:#c1f5f1">
+                                                                    <t t-esc="items_value"/>                                                                                                         
+                                                                </td>
+                                                            </t> -->
+
+                                                            <!-- <t t-else="">
+                                                                <td name="td_name" style="background-color:#F8FE84">
+                                                                    <t t-esc="items_value"/>                                                                                                         
+                                                                </td>
+                                                            </t> -->
+
+                                                        </t>    
+                                                        <td name="td_name"><t t-esc="body['n_wday']" /></td>
+                                                        <td name="td_name"><t t-esc="body['ac_wday']" /></td>
+                                                        <td name="td_name"><t t-esc="body['ab_wday']" /></td>
+                                                        <td name="td_name"><t t-esc="body['late_day']" /></td>
+                                                        <td name="td_name"><t t-esc="body['early_day']" /></td>
+                                                        <td name="td_name"><t t-esc="body['late_min']" /></td>
+                                                        <td name="td_name"><t t-esc="body['early_min']" /></td>
+                                                        <td name="td_name"><t t-esc="body['ot_hour']" /></td>
+                                                        <td name="td_name"><t t-esc="body['week_ot']" /></td>
+                                                    </tr>
+                                                </t>
+                                            </t>
+                                        </t> 
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                        <td t-att-colspan="footers['lon']">  
+                                            Present = "P", Late = "L", Leave with Pay = "V", Early Leave = "E", Sick Leave = "S", Leave Without pay = "WP", Govt/Global/Company Holiday = "H" , Overtime  = "OT", Wekened  = "W", Earned Leave = "EL", Casual Leave = "C", 
+                                            Manual Attendence = "MP", Manual Attendence,Late = "ML", Manual Attendence,Early = "ME", Manual Attendence,Late,Early = "Z", Force Fully Absent = "F", Holiday,Attendance = "O", Attendance,Movement = "K", Suspend = "U"
+                                        </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </t>
+                        </div>
+                </t>
+            </t>
+        </template>
+
+
+
+
+  <template id="external_layout_modified">
+
+        <div class="header">
+            <center>
+                <div class="row" style="text-align: left;">
+                    <div class="col-12" t-if="test_company['logo']">
+                        <img t-if="test_company['logo']" t-att-src="image_data_uri(test_company['logo'].encode())" class="float-left" style="max-height: 60px;" alt="Logo"/>
+                    </div>      
+                </div>
+            </center>
+
+
+                <div class="row" style="text-align: left;">
+                    <div class="col-12" name="name">
+                        <t t-esc="test_company['name']" />
+                    </div>
+                </div>
+
+                <div class="row" style="text-align: left;">
+                    <div class="col-12" name="street">
+                    <t t-esc="test_company['street']" /> 
+                    </div>
+                </div>   
+            
+
+            <div t-if="test_company['name'] or test_company['street']" class="row zero_min_height">
+                <div class="col-12">
+                    <div style="border-bottom: 1px solid black;"/>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="article o_report_layout_standard"  t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id" t-att-data-oe-lang="o and o.env.context.get('lang')">
+            <t t-call="web.address_layout"/>
+            <t t-raw="0"/>
+        </div>
+
+        <div class="footer o_standard_footer">
+            <div class="text-center" style="border-top: 1px solid black;">
+
+                <div style="font-size: 9px;">
+                    <div style="font-size: 9px;text-align: left;" col="3">
+                            <t t-if="not footers['date_time'] == False"><b>Report Time:</b>  
+                                <t t-esc="footers['date_time']" />  
+                            </t>   
+                    </div>          
+
+                    <div t-if="report_type == 'pdf'" class="text-muted" col="6" style="font-size: 9px;text-align: right;">
+                        Page: <span class="page"/> / <span class="topage"/>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </template>
+
+ 
+
+
+</odoo>

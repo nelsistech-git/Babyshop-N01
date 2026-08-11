@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <!-- Add Facilities in additional_info page of pims form -->
+        <record id="inherited_hr_employee_inherit_hr_facilities_form_view" model="ir.ui.view">
+            <field name="name">inherited.hr.employee.form.inherit.hr_facilities</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="////group[@name='OfficialBankInfo']" position="after">
+                    <separator string="Fringe Benefits"></separator>
+                     <!--<group name="facilities" string="Fringe Benefits" colspan="12">-->
+                         <field name="facility_ids" context="{'default_employee_id': active_id}">
+                             <tree editable="bottom">
+                                 <field name="dept_name" required="1"/>
+                                 <field name="particular_id" required="1" options="{'no_open':True,'no_create':1,'no_create_edit':1}"/>
+                                 <field name="date" />
+                                 <field name="value" required="1"/>
+                                 <field name="qty" required="1"/>
+                             </tree>
+                         </field>
+                     <!--</group>-->
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <!--form View-->
+        <record id="inherited_resume_line_view_form" model="ir.ui.view">
+            <field name="name">hr.resume.line.view.form.inherit.hr.employee</field>
+            <field name="model">hr.resume.line</field>
+            <field name="inherit_id" ref="hr_skills.resume_line_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='date_end']" position="after">
+                    <field name="duration"/>
+<!--                    <field name="passing_year" attrs="{'invisible': [('line_type_id','=',1)]}"/>-->
+                    <field name="line_type_name" invisible="1"/>
+                    <field name="passing_year" invisible="'experience'.lower() in line_type_name.lower()"/>
+
+                    <field name="exam_year" attrs="{'invisible': ['!',('line_type_name','=ilike','education')]}"/>
+                    <field name="subject_group" attrs="{'invisible': ['!',('line_type_name','=ilike','education')]}"/>
+                    <field name="scholarship" attrs="{'invisible': ['!',('line_type_name','=ilike','education')]}"/>
+
+<!--                    Technical Qualifications-->
+                         <field name="country_name" attrs="{'invisible': ['|',('line_type_name','=ilike','education'),('line_type_name','=ilike','experience')]}"/>
+                         <field name="qualification_gained" attrs="{'invisible': ['|',('line_type_name','=ilike','education'),('line_type_name','=ilike','experience')]}"/>
+
+<!--                    Job experience-->
+                    <field name="designation" attrs="{'invisible': ['!',('line_type_name','=ilike','experience')]}"/>
+                    <field name="salary_starting" attrs="{'invisible': ['!',('line_type_name','=ilike','experience')]}"/>
+                    <field name="salary_present" attrs="{'invisible': ['!',('line_type_name','=ilike','experience')]}"/>
+                    <field name="salary_leaving" attrs="{'invisible': ['!',('line_type_name','=ilike','experience')]}"/>
+                    <field name="supervisor_details" attrs="{'invisible': ['!',('line_type_name','=ilike','experience')]}"/>
+                    <field name="achievements" attrs="{'invisible': ['!',('line_type_name','=ilike','experience')]}"/>
+                    <field name="job_leave_reason" attrs="{'invisible': ['!',('line_type_name','=ilike','experience')]}"/>
+
+<!--                    attrs="{'invisible': [('line_type_id','=','Experience')]}"-->
+                </xpath>
+
+                <xpath expr="//field[@name='line_type_id']" position="before">
+                    <field name="institute_id"/>
+<!--                    attrs="{'invisible': [('line_type_id','=','1')]}"-->
+<!--                    <field name="parent_id" options="{'no_open': True, 'no_create': 1, 'no_create_edit': 1}"/>-->
+                </xpath>
+                <xpath expr="//field[@name='display_type']" position="after">
+                    <field name="result" invisible="'experience'.lower() in line_type_name.lower()"/>
+                </xpath>
+
+            </field>
+        </record>
+
+        <!--resume View-->
+        <record id="inherited_hr_employee_view_form_hr_resume_tree_form" model="ir.ui.view">
+            <field name="name">hr.resume.line.view.tree.inherit.hr.employee.view.tree</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr_skills.hr_employee_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='resume_line_ids']" position="inside">
+                    <field name="duration"/>
+                    <field name="passing_year" attrs="{'invisible': [('line_type_id','=',1)]}"/>
+                    <field name="institute_id"/>
+                    <field name="result" attrs="{'invisible': [('line_type_id','=',1)]}"/>
+                    <field name="designation"/>
+<!--                    attrs="{'invisible': [('line_type_id','=','Experience')]}"-->
+                </xpath>
+
+                <xpath expr="//field[@name='line_type_id']" position="after">
+                    <field name="institute_id"/>
+                    <field name="result" attrs="{'invisible': [('line_type_id','=',1)]}"/>
+<!--                    attrs="{'invisible': [('line_type_id','=','1')]}"-->
+<!--                    <field name="parent_id" options="{'no_open': True, 'no_create': 1, 'no_create_edit': 1}"/>-->
+                </xpath>
+<!--                <xpath expr="//field[@name='display_type']" position="after">-->
+<!--                    <field name="result" attrs="{'invisible': [('line_type_id','=',1)]}"/>-->
+<!--                </xpath>-->
+
+            </field>
+        </record>
+
+        <record id="employee_skill_level_view_form_inherit" model="ir.ui.view">
+            <field name="name">hr.skill.level.form.inherit</field>
+            <field name="model">hr.skill.level</field>
+            <field name="inherit_id" ref="hr_skills.employee_skill_level_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='level_progress']" position="after">
+                    <field name="level_progress_range"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="employee_skill_view_form_inherit" model="ir.ui.view">
+            <field name="name">hr.employees.skill.form.inherit</field>
+            <field name="model">hr.employee.skill</field>
+            <field name="inherit_id" ref="hr_skills.employee_skill_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='level_progress']" position="after">
+                    <field name="level_progress_range"/>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>

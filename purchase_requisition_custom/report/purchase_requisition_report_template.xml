@@ -1,0 +1,153 @@
+<odoo>
+    <template id="report_purchase_requisition_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <div class="page">
+
+                        <!-- ══════════ TITLE ══════════ -->
+                        <div style="text-align: center; margin-bottom: 20px;">
+                            <h2 style="font-weight: bold;">PURCHASE REQUISITION</h2>
+                        </div>
+
+                        <!-- ══════════ HEADER INFO ══════════ -->
+                        <table style="margin-bottom: 20px; border-collapse: collapse;">
+                            <tr>
+                                <td style="font-weight: bold; padding: 2px 0px; white-space: nowrap;">Requested By</td>
+                                <td style="padding: 2px 6px; white-space: nowrap;">:</td>
+                                <td style="padding: 2px 0px;"><t t-esc="doc.requester_id.name"/></td>
+                            </tr>
+                            <tr>
+                                <td style="font-weight: bold; padding: 2px 0px; white-space: nowrap;">Designation</td>
+                                <td style="padding: 2px 6px; white-space: nowrap;">:</td>
+                                <td style="padding: 2px 0px;"><t t-esc="doc.designation or ''"/></td>
+                            </tr>
+                            <tr>
+                                <td style="font-weight: bold; padding: 2px 0px; white-space: nowrap;">Date</td>
+                                <td style="padding: 2px 6px; white-space: nowrap;">:</td>
+                                <td style="padding: 2px 0px;"><t t-esc="doc.date" t-options='{"widget": "date"}'/></td>
+                            </tr>
+                            <tr>
+                                <td style="font-weight: bold; padding: 2px 0px; white-space: nowrap;">PR Number</td>
+                                <td style="padding: 2px 6px; white-space: nowrap;">:</td>
+                                <td style="padding: 2px 0px;"><t t-esc="doc.name"/></td>
+                            </tr>
+                        </table>
+
+                        <!-- ══════════ PRODUCT LINES TABLE ══════════ -->
+                        <table style="width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 11px;">
+                            <thead>
+                                <tr>
+                                    <th style="border: 1px solid #000; padding: 5px; text-align: center;">SL</th>
+                                    <th style="border: 1px solid #000; padding: 5px; text-align: left;">Product Name</th>
+                                    <th style="border: 1px solid #000; padding: 5px; text-align: center;">Unit</th>
+                                    <th style="border: 1px solid #000; padding: 5px; text-align: left;">Vendor</th>
+                                    <th style="border: 1px solid #000; padding: 5px; text-align: center;">Product Code</th>
+                                    <th style="border: 1px solid #000; padding: 5px; text-align: right;">Product Stock</th>
+                                    <th style="border: 1px solid #000; padding: 5px; text-align: right;">Last Product Price</th>
+                                    <th style="border: 1px solid #000; padding: 5px; text-align: right;">Last Purchase Qty</th>
+                                    <th style="border: 1px solid #000; padding: 5px; text-align: center;">Last Purchase Date</th>
+                                    <th style="border: 1px solid #000; padding: 5px; text-align: right;">Request Qty</th>
+                                    <th style="border: 1px solid #000; padding: 5px; text-align: right;">Rate</th>
+                                    <th style="border: 1px solid #000; padding: 5px; text-align: right;">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-set="sl" t-value="0"/>
+                                <t t-foreach="doc.line_ids" t-as="line">
+                                    <t t-set="sl" t-value="sl + 1"/>
+                                    <tr>
+                                        <td style="border: 1px solid #000; padding: 5px; text-align: center;">
+                                            <t t-esc="sl"/>
+                                        </td>
+                                        <td style="border: 1px solid #000; padding: 5px;">
+                                            <t t-esc="line.product_id.display_name"/>
+                                        </td>
+                                        <td style="border: 1px solid #000; padding: 5px; text-align: center;">
+                                            <t t-esc="line.uom_id.name or ''"/>
+                                        </td>
+                                        <td style="border: 1px solid #000; padding: 5px;">
+                                            <t t-esc="line.vendor_id.name or ''"/>
+                                        </td>
+                                        <td style="border: 1px solid #000; padding: 5px; text-align: center;">
+                                            <t t-esc="line.product_code or ''"/>
+                                        </td>
+                                        <td style="border: 1px solid #000; padding: 5px; text-align: right;">
+                                            <t t-esc="'%.2f' % line.present_stock"/>
+                                        </td>
+                                        <td style="border: 1px solid #000; padding: 5px; text-align: right;">
+                                            <t t-esc="'%.2f' % line.last_purchase_price"/>
+                                        </td>
+                                        <td style="border: 1px solid #000; padding: 5px; text-align: right;">
+                                            <t t-esc="'%.2f' % line.last_purchase_qty"/>
+                                        </td>
+                                        <td style="border: 1px solid #000; padding: 5px; text-align: center;">
+                                            <t t-if="line.last_receive_date">
+                                                <t t-esc="line.last_receive_date" t-options='{"widget": "date"}'/>
+                                            </t>
+                                            <t t-else="">N/A</t>
+                                        </td>
+                                        <td style="border: 1px solid #000; padding: 5px; text-align: right;">
+                                            <t t-esc="'%.2f' % line.quantity"/>
+                                        </td>
+                                        <td style="border: 1px solid #000; padding: 5px; text-align: right;">
+                                            <t t-esc="'%.2f' % line.rate"/>
+                                        </td>
+                                        <td style="border: 1px solid #000; padding: 5px; text-align: right;">
+                                            <t t-esc="'%.2f' % line.amount"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+
+                        <!-- ══════════ TOTAL ══════════ -->
+                        <table style="width: 100%; margin-bottom: 30px;">
+                            <tr>
+                                <td style="text-align: right; font-weight: bold; padding: 5px; border-top: 1px solid #000;">
+                                    Total Amount :
+                                    <t t-esc="'%.2f' % doc.total_amount"/>
+                                    <t t-esc="doc.currency_id.symbol"/>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- ══════════ SIGNATURE SECTION ══════════ -->
+                        <div style="margin-top: 60px;">
+                            <table style="width: 100%; text-align: center;">
+                                <tr>
+                                    <td style="width: 25%; padding-top: 40px;">
+                                        <div style="border-top: 1px solid #000; width: 70%; margin: 0 auto; padding-top: 5px;">
+                                            <strong>Prepared By</strong>
+                                        </div>
+                                    </td>
+                                    <td style="width: 25%; padding-top: 40px;">
+                                        <div style="border-top: 1px solid #000; width: 70%; margin: 0 auto; padding-top: 5px;">
+                                            <strong>Stock Incharge</strong>
+                                        </div>
+                                    </td>
+                                    <td style="width: 25%; padding-top: 40px;">
+                                        <div style="border-top: 1px solid #000; width: 70%; margin: 0 auto; padding-top: 5px;">
+                                            <strong>GM (OPE)</strong>
+                                        </div>
+                                    </td>
+                                    <td style="width: 25%; padding-top: 40px;">
+                                        <div style="border-top: 1px solid #000; width: 70%; margin: 0 auto; padding-top: 5px;">
+                                            <strong>MD</strong>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <!-- ══════════ FOOTER ══════════ -->
+                        <div style="text-align: center; margin-top: 30px; font-size: 10px; color: #888;">
+                            System generated document — <t t-esc="doc.env.company.name"/>
+                        </div>
+
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

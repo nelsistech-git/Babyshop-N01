@@ -1,0 +1,423 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+    	<!-- Resource calendar -->
+        <record id="resource.resource_calendar_std" model="resource.calendar">
+            <field name="full_time_required_hours">40</field>
+        </record>
+		
+        <!--<record id="resource.resource_calendar_std_35h" model="resource.calendar">
+            <field name="full_time_required_hours">35</field>
+        </record>-->
+
+        <!--<record id="resource.resource_calendar_std_38h" model="resource.calendar">
+            <field name="full_time_required_hours">38</field>
+        </record>-->
+
+		<record id="resource.resource_calendar_std" model="resource.calendar">
+			<field name="company_id" ref="base.main_company"/>
+		</record>
+		
+		<!-- <record id="resource_calendar_std_48h" model="resource.calendar">
+	        <field name="name">Sat-Thu: 48 hours/week</field>
+	        <field name="company_id" ref="base.main_company"/>
+	        <field name="hours_per_day">8</field>
+	        <field name="full_time_required_hours">48</field>
+	        <field name="attendance_ids"
+	            eval="[
+	            	(0, 0, {'name': 'Saturday Morning', 'dayofweek': '5', 'hour_from': 8, 'hour_to': 12, 'day_period': 'morning'}),
+	                (0, 0, {'name': 'Saturday Afternoon', 'dayofweek': '5', 'hour_from': 13, 'hour_to': 17, 'day_period': 'afternoon'})
+	                (0, 0, {'name': 'Sunday Morning', 'dayofweek': '6', 'hour_from': 8, 'hour_to': 12, 'day_period': 'morning'}),
+	                (0, 0, {'name': 'Sunday Afternoon', 'dayofweek': '6', 'hour_from': 13, 'hour_to': 17, 'day_period': 'afternoon'}),
+	                (0, 0, {'name': 'Monday Morning', 'dayofweek': '0', 'hour_from': 8, 'hour_to': 12, 'day_period': 'morning'}),
+	                (0, 0, {'name': 'Monday Afternoon', 'dayofweek': '0', 'hour_from': 13, 'hour_to': 17, 'day_period': 'afternoon'}),
+	                (0, 0, {'name': 'Tuesday Morning', 'dayofweek': '1', 'hour_from': 8, 'hour_to': 12, 'day_period': 'morning'}),
+	                (0, 0, {'name': 'Tuesday Afternoon', 'dayofweek': '1', 'hour_from': 13, 'hour_to': 17, 'day_period': 'afternoon'}),
+	                (0, 0, {'name': 'Wednesday Morning', 'dayofweek': '2', 'hour_from': 8, 'hour_to': 12, 'day_period': 'morning'}),
+	                (0, 0, {'name': 'Wednesday Afternoon', 'dayofweek': '2', 'hour_from': 13, 'hour_to': 17, 'day_period': 'afternoon'}),
+	                (0, 0, {'name': 'Thursday Morning', 'dayofweek': '3', 'hour_from': 8, 'hour_to': 12, 'day_period': 'morning'}),
+	                (0, 0, {'name': 'Thursday Afternoon', 'dayofweek': '3', 'hour_from': 13, 'hour_to': 17, 'day_period': 'afternoon'})                
+	            ]"
+	        />
+	    </record> -->
+    
+		<!-- Structure Type -->
+        <record id="structure_type_employee" model="hr.payroll.structure.type">
+            <field name="name">Regular Pay</field>
+            <field name="country_id" eval="False"/>
+        </record>
+
+        <record id="structure_type_worker" model="hr.payroll.structure.type">
+            <field name="name">Worker</field>
+            <field name="country_id" eval="False"/>
+            <field name="wage_type">hourly</field>
+        </record>
+        
+        <!-- rules category -->
+        <record id="BASIC" model="hr.salary.rule.category">
+            <field name="name">Basic</field>
+            <field name="code">BASIC</field>
+        </record>
+
+        <record id="ALW" model="hr.salary.rule.category">
+            <field name="name">Allowance</field>
+            <field name="code">ALW</field>
+        </record>		
+		
+        <record id="GROSS" model="hr.salary.rule.category">
+            <field name="name">Gross</field>
+            <field name="code">GROSS</field>
+        </record>
+
+        <record id="DED" model="hr.salary.rule.category">
+            <field name="name">Deduction</field>
+            <field name="code">DED</field>
+        </record>
+
+        <record id="NET" model="hr.salary.rule.category">
+            <field name="name">Net</field>
+            <field name="code">NET</field>
+        </record>
+
+        <record id="COMP" model="hr.salary.rule.category">
+            <field name="name">Company Contribution</field>
+            <field name="code">COMP</field>
+        </record>
+
+        <!-- Decimal Precision -->
+        <record forcecreate="True" id="decimal_payroll" model="decimal.precision">
+            <field name="name">Payroll</field>
+            <field name="digits">2</field>
+        </record>
+
+        <record forcecreate="True" id="decimal_payroll_rate" model="decimal.precision">
+            <field name="name">Payroll Rate</field>
+            <field name="digits">4</field>
+        </record>
+
+        <!-- Work Entry Type -->
+         <record id="work_entry_type_leave" model="hr.work.entry.type">
+            <field name="name">Generic Time Off</field>
+            <field name="code">LEAVE100</field>
+            <field name="color">3</field>
+            <field name="is_leave">True</field>
+            <field name="round_days">HALF</field>
+            <field name="round_days_type">DOWN</field>
+        </record>
+
+        <record id="work_entry_type_compensatory" model="hr.work.entry.type">
+            <field name="name">Compensatory Time Off</field>
+            <field name="code">LEAVE105</field>
+            <field name="color">3</field>
+            <field name="is_leave">True</field>
+            <field name="round_days">HALF</field>
+            <field name="round_days_type">DOWN</field>
+        </record>
+        <record id="hr_holidays.holiday_status_comp" model="hr.leave.type">
+            <field name="work_entry_type_id" ref="work_entry_type_compensatory"></field>
+        </record>
+
+        <record id="work_entry_type_home_working" model="hr.work.entry.type">
+            <field name="name">Home Working</field>
+            <field name="code">WORK110</field>
+            <field name="color">2</field>
+            <field name="is_leave">True</field>
+            <field name="round_days">HALF</field>
+            <field name="round_days_type">DOWN</field>
+        </record>
+
+        <record id="work_entry_type_unpaid_leave" model="hr.work.entry.type">
+            <field name="name">Unpaid</field>
+            <field name="color">5</field>
+            <field name="code">LEAVE90</field>
+            <field name="is_leave">True</field>
+            <field name="round_days">HALF</field>
+            <field name="round_days_type">DOWN</field>
+        </record>
+        <record id="hr_holidays.holiday_status_unpaid" model="hr.leave.type">
+            <field name="work_entry_type_id" ref="work_entry_type_unpaid_leave"></field>
+        </record>
+
+        <record id="work_entry_type_sick_leave" model="hr.work.entry.type">
+            <field name="name">Sick Time Off</field>
+            <field name="code">LEAVE110</field>
+            <field name="is_leave">True</field>
+            <field name="color">5</field>
+            <field name="round_days">HALF</field>
+            <field name="round_days_type">DOWN</field>
+        </record>
+        <record id="hr_holidays.holiday_status_sl" model="hr.leave.type">
+            <field name="work_entry_type_id" ref="work_entry_type_sick_leave"></field>
+        </record>
+
+         <record id="work_entry_type_legal_leave" model="hr.work.entry.type">
+            <field name="name" eval="'Legal Leaves '+time.strftime('%Y')"/>
+            <field name="code">LEAVE120</field>
+            <field name="is_leave">True</field>
+            <field name="color">5</field>
+            <field name="round_days">HALF</field>
+            <field name="round_days_type">DOWN</field>
+        </record>
+        <record id="hr_holidays.holiday_status_cl" model="hr.leave.type">
+            <field name="work_entry_type_id" ref="work_entry_type_legal_leave"></field>
+        </record>
+
+        <record id="hr_work_entry.work_entry_type_attendance" model="hr.work.entry.type">
+            <field name="is_leave">False</field>
+        </record>
+		
+		<!-- sales rules -->
+		<record id="hr_rule_basic" model="hr.salary.rule">
+            <field name="name">Basic Salary</field>
+            <field name="sequence" eval="1"/>
+            <field name="code">BASIC</field>
+            <field name="category_id" ref="hr_payroll.BASIC"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = contract.wage</field>
+        </record>
+		
+		<record id="hr_rule_hra" model="hr.salary.rule">
+            <field name="name">House Rent Allowance</field>
+            <field name="sequence" eval="3"/>
+            <field name="code">HRA</field>
+            <field name="category_id" ref="hr_payroll.ALW"/>
+            <field name="condition_select">none</field>
+			<field name="amount_select">code</field>
+			<field name="amount_python_compute">result = contract.hra</field>            
+        </record>
+
+		<record id="hr_rule_da" model="hr.salary.rule">
+            <field name="name">Dearness Allowance</field>
+            <field name="sequence" eval="5"/>
+            <field name="code">DA</field>
+            <field name="category_id" ref="hr_payroll.ALW"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = contract.da</field>
+        </record>
+
+        <record id="hr_rule_da" model="hr.salary.rule">
+            <field name="name">Daily Allowance</field>
+            <field name="sequence" eval="7"/>
+            <field name="code">DLA</field>
+            <field name="category_id" ref="hr_payroll.ALW"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = (worked_days.ATTSHDLA and worked_days.ATTSHDLA.amount > 0 ) or False</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = worked_days.ATTSHDLA.amount</field>
+        </record>
+        
+        <record id="hr_rule_travel" model="hr.salary.rule">
+            <field name="name">Conveyance Allowance</field>
+            <field name="sequence" eval="9"/>
+            <field name="code">TA</field>
+            <field name="category_id" ref="hr_payroll.ALW"/>
+			<field name="amount_select">code</field>
+			<field name="amount_python_compute">result = contract.travel_allowance</field>
+        </record>
+        
+        <record id="hr_rule_meal" model="hr.salary.rule">
+            <field name="name">Meal Allowance</field>
+            <field name="sequence" eval="11"/>
+            <field name="code">MEAL</field>
+            <field name="category_id" ref="hr_payroll.ALW"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = contract.meal_allowance</field>
+        </record>
+
+        <record id="hr_rule_medical" model="hr.salary.rule">
+            <field name="name">Medical Allowance</field>
+            <field name="sequence" eval="13"/>
+            <field name="code">MEDICAL</field>
+            <field name="category_id" ref="hr_payroll.ALW"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = contract.medical_allowance</field>
+        </record>
+
+        <record id="hr_rule_mobile" model="hr.salary.rule">
+            <field name="name">Mobile Allowance</field>
+            <field name="sequence" eval="15"/>
+            <field name="code">MOBILE</field>
+            <field name="category_id" ref="hr_payroll.ALW"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = contract.mobile_allowance</field>
+        </record>
+
+        <record id="hr_rule_car" model="hr.salary.rule">
+            <field name="name">Car Allowance</field>
+            <field name="sequence" eval="17"/>
+            <field name="code">CARA</field>
+            <field name="category_id" ref="hr_payroll.ALW"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = contract.car_allowance</field>
+        </record>
+        <record id="hr_rule_lfa" model="hr.salary.rule">
+            <field name="name">LFA Allowance</field>
+            <field name="sequence" eval="19"/>
+            <field name="code">LFA</field>
+            <field name="category_id" ref="hr_payroll.ALW"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = contract.lfa_allowance</field>
+        </record>
+        <record id="hr_rule_salary_bonus" model="hr.salary.rule">
+            <field name="name">Salary Bonus Allowance</field>
+            <field name="sequence" eval="21"/>
+            <field name="code">SALBA</field>
+            <field name="category_id" ref="hr_payroll.ALW"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = contract.salary_bonus_allowance</field>
+        </record>
+
+        <record id="hr_rule_shr" model="hr.salary.rule">
+            <field name="name">Special House Rent</field>
+            <field name="sequence" eval="23"/>
+            <field name="code">SPHRA</field>
+            <field name="category_id" ref="hr_payroll.ALW"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = contract.special_house_rent</field>
+        </record>
+
+        <record id="hr_rule_si" model="hr.salary.rule">
+            <field name="name">Special Incentive</field>
+            <field name="sequence" eval="25"/>
+            <field name="code">SPINC</field>
+            <field name="category_id" ref="hr_payroll.ALW"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = contract.special_incentive</field>
+        </record>
+
+
+        <record id="hr_rule_ps" model="hr.salary.rule">
+            <field name="name">Profit Sharing</field>
+            <field name="sequence" eval="27"/>
+            <field name="code">PROFSHA</field>
+            <field name="category_id" ref="hr_payroll.ALW"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = contract.profit_sharing</field>
+        </record>
+
+
+        <record id="hr_rule_festival_bonus" model="hr.salary.rule">
+            <field name="name">Festival Bonus</field>
+            <field name="sequence" eval="28"/>
+            <field name="code">FESTBONUS</field>
+            <field name="category_id" ref="hr_payroll.ALW"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = contract.festival_bonus</field>
+        </record>
+
+        <record id="hr_rule_special_bonus" model="hr.salary.rule">
+            <field name="name">Special Bonus</field>
+            <field name="sequence" eval="29"/>
+            <field name="code">SPBONUS</field>
+            <field name="category_id" ref="hr_payroll.ALW"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = contract.special_bonus</field>
+        </record>
+
+        <record id="hr_rule_other" model="hr.salary.rule">
+            <field name="name">Other Allowance</field>
+            <field name="sequence" eval="30"/>
+            <field name="code">OTHER</field>
+            <field name="category_id" ref="hr_payroll.ALW"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = contract.other_allowance</field>
+        </record>
+        
+        <record id="hr_rule_taxable" model="hr.salary.rule">
+            <field name="name">Gross</field>
+            <field name="sequence" eval="50"/>
+            <field name="code">GROSS</field>
+            <field name="category_id" ref="hr_payroll.GROSS"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = categories.BASIC + categories.ALW</field> <!-- + categories.HRA + categories.Travel -->
+        </record>
+		
+		<record id="hr_rule_pf" model="hr.salary.rule">
+            <field name="name">Provident Fund</field>
+            <field name="sequence" eval="51"/>
+            <field name="code">PF</field>
+            <field name="category_id" ref="hr_payroll.DED"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = (contract.pf_deduction*-1 or 0)</field>
+        </record>
+		<record id="hr_rule_tds" model="hr.salary.rule">
+            <field name="name">TDS Deduction</field>
+            <field name="sequence" eval="53"/>
+            <field name="code">TDS</field>
+            <field name="category_id" ref="hr_payroll.DED"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = (contract.tds_deduction*-1 or 0)</field>
+        </record>
+
+        <record id="hr_rule_stamp_fee" model="hr.salary.rule">
+            <field name="name">Stamp Fee</field>
+            <field name="sequence" eval="55"/>
+            <field name="code">STMP</field>
+            <field name="category_id" ref="hr_payroll.DED"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = (contract.stamp_deduction*-1 or 0)</field>
+        </record>
+        
+        <record id="hr_rule_net" model="hr.salary.rule">
+            <field name="name">Net Salary</field>
+            <field name="sequence" eval="100"/>
+            <field name="code">NET</field>
+            <field name="category_id" ref="hr_payroll.NET"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = categories.BASIC + categories.ALW + categories.DED</field> <!-- + categories.HRA + categories.Travel + categories.GROSS + categories.Medical -->
+        </record>
+        
+        <record id="hr_rule_ec" model="hr.salary.rule">
+            <field name="name">Employee Contribution</field>
+            <field name="sequence" eval="99"/>
+            <field name="code">EC</field>
+            <field name="category_id" ref="hr_payroll.DED"/>
+            <field name="condition_select">none</field>
+<!--            <field name="amount_select">code</field>-->
+<!--            <field name="amount_python_compute">result = contract.wage</field>-->
+            <field name="amount_select">fix</field>
+            <field name="amount_fix">0</field>
+        </record>
+        
+        <!-- Salary Structure -->
+         <record id="structure_base" model="hr.payroll.structure">
+            <field name="code">BASE</field>
+            <field name="name">Base Structure</field>
+            <field name="rule_ids" eval="[(6, 0, [ref('hr_rule_basic'),ref('hr_rule_hra'),ref('hr_rule_da'),ref('hr_rule_travel'),
+            ref('hr_rule_meal'),ref('hr_rule_medical'),ref('hr_rule_other'),ref('hr_rule_taxable'),ref('hr_rule_pf'),ref('hr_rule_tds'),ref('hr_rule_net'),
+            ref('hr_rule_mobile'),ref('hr_rule_car'),ref('hr_rule_lfa'),ref('hr_rule_salary_bonus'),ref('hr_rule_shr'),ref('hr_rule_si'),ref('hr_rule_ps'),ref('hr_rule_festival_bonus'),ref('hr_rule_special_bonus')])]" />
+            <field name="type_id" ref="hr_payroll.structure_type_employee"/>
+            
+            <!-- <field name="company_id" ref="base.main_company"/> -->
+        </record> 
+		
+         <!-- <record id="structure_regular_pay" model="hr.payroll.structure">
+            <field name="code">REGULAR</field>
+            <field name="name">Regular Pay</field>
+            <field eval="[(6, 0, [ref('hr_rule_basic'), ref('hr_rule_hra'),
+            ref('hr_rule_travel'),ref('hr_rule_taxable'),ref('hr_salary_rule_providentfund1'),
+            ref('hr_rule_ec'),ref('hr_rule_net')])]" name="rule_ids"/>
+            <field name="company_id" ref="base.main_company"/>
+        </record> -->
+		
+    </data>
+</odoo>

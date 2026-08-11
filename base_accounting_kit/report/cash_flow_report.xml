@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_cash_flow">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+<!--                        <h2 t-esc="data['account_report_id'][1]"/>-->
+                        <div class="text-center">
+                            <!--<h5>Green Dot Limited</h5>-->
+                            <h6 t-esc="data['account_report_id'][1]"/>
+                        </div>
+                        <div class="row mt32 mb32">
+                            <div class="col-4">
+                                <strong>Target Moves:</strong>
+                                <p>
+                                    <span t-if="data['target_move'] == 'all'">All Entries</span>
+                                    <span t-if="data['target_move'] == 'posted'">All Posted Entries</span>
+                                </p>
+                            </div>
+                            <div class="col-4">
+                                <p>
+                                    <strong>Date from :</strong>
+                                    <span t-esc="data['date_from']"/>
+                                    <br/>
+                                    <strong>Date to :</strong>
+                                    <span t-esc="data['date_to']"/>
+                                </p>
+                            </div>
+                        </div>
+                        <table class="table table-sm table-reports">
+                            <thead>
+                                <tr>
+                                    <th class="text-center align-middle" style="border: 2px solid black !important;"><strong>Particulars</strong></th>
+
+                                    <th class="text-right" t-if="data['debit_credit']" style=""><strong>Debit</strong></th>
+                                    <th class="text-right" t-if="not data['debit_credit']" style="border-top-style:none;">&amp;nbsp;</th>
+                                    <th class="text-right" t-if="data['debit_credit']" style=""><strong>Credit</strong></th>
+                                    <th class="text-right" t-if="not data['debit_credit']" style="border-top-style:none;">&amp;nbsp;</th>
+                                    <t t-if="data['date_from'] and data['date_to']">
+                                        <th class="text-center" style="border: 2px solid black !important;"><strong><span t-esc="time.strftime('%d %B %Y', time.strptime(data['date_to'],'%Y-%m-%d'))" /><br></br>(BDT)</strong></th>
+                                    </t>
+                                    <t t-else="">
+                                        <th class="text-center" style="border: 2px solid black !important;"><strong>Balance<br></br>(BDT)</strong></th>
+                                    </t>
+
+                                    <th class="text-center" t-if="data['enable_filter']" style="border-top-style:none;">&amp;nbsp;</th>
+                                    <th class="text-center" style="border: 2px solid black !important;" t-if="data['enable_filter']"><strong t-esc="data['label_filter']"/><br></br>(BDT)</th>
+                                    <!--
+                                    <th class="text-right" t-if="not data['enable_filter']" style="border-top-style:none;">&amp;nbsp;</th>
+                                    -->
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="get_account_lines" t-as="a">
+                                    <t t-if="a['level'] != 0">
+                                        <t t-if="a.get('level') &gt; 3">
+                                            <t t-set="style" t-value="'font-weight: normal;'"/>
+                                        </t>
+                                        <t t-if="not a.get('level') &gt; 3">
+                                            <t t-set="style" t-value="'font-weight: bold;'"/>
+                                        </t>
+                                        <td class="top-header">
+                                            <span style="color: white;" t-esc="'..' * a.get('level', 0)"/>
+                                            <span t-att-style="style" t-esc="a.get('name')"/>
+                                        </td>
+
+                                        <td class="text-right top-header" style="white-space: text-nowrap;">
+                                            <span t-att-style="style" t-esc="a.get('debit')" t-if="data['debit_credit']"/>
+                                        </td>
+
+                                        <td class="text-right top-header" style="white-space: text-nowrap;">
+                                            <span t-att-style="style" t-esc="a.get('credit')" t-if="data['debit_credit']"/>
+                                        </td>
+
+                                        <t t-if="a.get('border_top') and a.get('border_right') and a.get('border_left')">
+                                            <td class="text-center" style="border-top: 1px solid black;border-right: 1px solid black;border-left: 1px solid black;white-space: text-nowrap;">
+                                                <span t-att-style="style" t-esc="a.get('balance')"/>
+                                            </td>
+                                        </t>
+                                        <t t-elif="a.get('border_bottom') and a.get('border_right') and a.get('border_left')">
+                                            <td class="text-center" style="border-bottom: 1px solid black;border-right: 1px solid black;border-left: 1px solid black;white-space: text-nowrap;">
+                                                <span t-att-style="style" t-esc="a.get('balance')"/>
+                                            </td>
+                                        </t>
+                                        <t t-elif="a.get('border_right') and a.get('border_left')">
+                                            <td class="text-center" style="border-right: 1px solid black;border-left: 1px solid black;white-space: text-nowrap;">
+                                                <span t-att-style="style" t-esc="a.get('balance')"/>
+                                            </td>
+                                        </t>
+                                        <t t-elif="a.get('border_bottom')">
+                                            <td class="text-center" style="border-bottom: 1px solid black;white-space: text-nowrap;">
+                                                <span t-att-style="style" t-esc="a.get('balance')"/>
+                                            </td>
+                                        </t>
+                                        <t t-else="">
+                                            <td class="text-center top-header" style="white-space: text-nowrap;">
+                                                <span t-att-style="style" t-esc="a.get('balance')"/>
+                                            </td>
+                                        </t>
+
+                                        <!-- -->
+                                        <t t-if="data['enable_filter']">
+                                            <td class="text-right" style="border-top-style:none;">&amp;nbsp;</td>
+                                            <t t-if="a.get('border_top') and a.get('border_right') and a.get('border_left')">
+                                                <td class="text-center" style="border-top: 1px solid black;border-right: 1px solid black;border-left: 1px solid black;white-space: text-nowrap;">
+                                                    <span t-att-style="style" t-esc="a.get('balance_cmp')" />
+                                                </td>
+
+                                            </t>
+                                            <t t-elif="a.get('border_bottom') and a.get('border_right') and a.get('border_left')">
+                                                <td class="text-center" style="border-bottom: 1px solid black;border-right: 1px solid black;border-left: 1px solid black;white-space: text-nowrap;">
+                                                    <span t-att-style="style" t-esc="a.get('balance_cmp')" />
+                                                </td>
+                                            </t>
+                                            <t t-elif="a.get('border_right') and a.get('border_left')">
+                                                <td class="text-center" style="border-right: 1px solid black;border-left: 1px solid black;white-space: text-nowrap;">
+                                                    <span t-att-style="style" t-esc="a.get('balance_cmp')" />
+                                                </td>
+                                            </t>
+                                            <t t-elif="a.get('border_bottom')">
+                                                <td class="text-center" style="border-bottom: 1px solid black;white-space: text-nowrap;">
+                                                    <span t-att-style="style" t-esc="a.get('balance_cmp')" />
+                                                </td>
+                                            </t>
+                                            <t t-else="">
+                                                <td class="text-center top-header" style="white-space: text-nowrap;">
+                                                    <span t-att-style="style" t-esc="a.get('balance_cmp')" />
+                                                </td>
+                                            </t>
+                                        </t>
+
+                                        <!--
+                                        <td class="text-right top-header">
+                                            <span t-att-style="style" t-esc="a.get('balance_cmp')" t-if="data['enable_filter']"/>
+                                        </td>
+                                        -->
+                                        <td class="text-right" t-if="not data['enable_filter']" style="border-top-style:none;">&amp;nbsp;</td>
+                                    </t>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div>
+                            <br></br><br></br><br></br><br></br>
+                            <div class="row">
+
+                                <div class="col-6">
+                                    <strong>Chief Financial Officer (CFO)</strong>
+                                </div>
+                                <div class="col-6 text-right">
+                                    <strong>Board of Director     </strong>
+                                </div>
+                            </div>
+                            <br></br><br></br>
+                            <div class="row">
+
+                                <div class="col-12 text-left">
+                                    Dated, Dhaka<br></br>
+                                    <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d %B %Y')"/>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                    <style type="text/css">
+                        table{
+                            border-collapse: separate !important;
+                            /*border-collapse: collapse;*/
+                        }
+                        /*
+                        th{
+                            border-bottom: 5xp solid black !important;
+                        }
+
+                        #table-border {
+                          border-collapse: separate !important;
+                          border-spacing: 15px !important;
+                        }
+
+                        td:nth-child(1){
+                            border-top-color: black !important;
+                        }
+                        */
+                        td.top-header {
+                            border-top-style: none !important;
+                        }
+
+                    </style>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

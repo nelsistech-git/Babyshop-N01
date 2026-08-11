@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <report
+        id="custom_hr_employee.hr_employee_print_badge_custom"
+        string="Print Badge Custom"
+        model="hr.employee"
+        report_type="qweb-html"
+        name="custom_hr_employee.print_employee_badge_custom"
+        file="custom_hr_employee.print_employee_badge_custom"
+        print_report_name="'Print Badge - %s' % (object.name).replace('/', '')"
+    />
+    <record id="paperformat_print_employee_badge_custom"
+        model="report.paperformat">
+        <field name="name">Employee Badge Format</field>
+        <field name="default" eval="True" />
+        <field name="format">custom</field>
+        <field name="page_height">310 </field>
+        <field name="page_width">220</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">1</field>
+        <field name="margin_bottom">0</field>
+        <field name="margin_left">1</field>
+        <field name="margin_right">1</field>
+        <field name="header_line" eval="False" />
+        <field name="header_spacing">0</field>
+        <field name="dpi">90</field>
+    </record>
+    <record id="custom_hr_employee.hr_employee_print_badge_custom" model="ir.actions.report">
+        <field name="paperformat_id"
+            ref="custom_hr_employee.paperformat_print_employee_badge_custom" />
+    </record>
+
+
+    <template id="print_employee_badge_custom">
+        <t t-call="web.basic_layout">
+            <div class="page">
+
+                <t t-foreach="docs" t-as="employee" t-limit="4">
+
+                    <!--ID Card start-->
+                    <div class="row">
+                        <!--front part-->
+                        <div style="-webkit-transform: rotate(90deg);width: 60mm; height: 90mm; float:left; margin-top:0px; margin-left:100px;">
+                                <table style="width: 60mm; height: 90mm; border: 1pt solid black;" >
+                                    <tr><td style=" padding-left: 5pt; padding-top: 0pt; padding-bottom: 0pt; font-size:9pt; color:black; text-align: left; font-weight:bold;">Ishwardi Matsuoka Bangladesh Limited</td></tr>
+                                    <tr><td style=" padding-left: 35pt;"><img t-if="employee.company_id.logo" t-att-src="image_data_uri(employee.company_id.logo)" style="max-height:30pt;max-width:90%;" alt="Company Logo"/></td></tr>
+                                    <tr><td style="padding-left: 50pt;"><img t-if="employee.image_1920" t-att-src="image_data_uri(employee.image_1920)" style="max-height:70pt;max-width:90%;" alt="Employee Image"/></td></tr>
+                                    <tr><td style="padding-left: 5pt; padding-top: 0pt; padding-bottom: 0pt; font-size:8pt; color:black; text-align: left; font-weight:bold;">Name: <t t-esc="employee.name"/></td></tr>
+                                    <tr><td style="padding-left: 5pt; padding-top: 0pt; padding-bottom: 0pt; font-size:8pt; color:black; text-align: left; font-weight:bold;">ID No: <t t-esc="employee.id_card_no"/></td></tr>
+                                    <tr><td style="padding-left: 5pt; padding-top: 0pt; padding-bottom: 0pt; font-size:8pt; color:black; text-align: left; font-weight:bold;">Issue:<t t-esc="datetime.datetime.now().strftime('%d-%m-%Y')"/></td></tr>
+                                    <tr><td style="padding-left: 5pt; padding-top: 0pt; padding-bottom: 0pt; font-size:8pt; color:black; text-align: left; font-weight:bold;">Designation:<t t-esc="employee.job_id.name"/></td></tr>
+                                    <tr><td style="padding-left: 5pt; padding-top: 0pt; padding-bottom: 0pt; font-size:8pt; color:black; text-align: left; font-weight:bold;">Section:<t t-esc="employee.section_id.name"/></td></tr>
+                                    <tr><td style="padding-left: 5pt; padding-top: 0pt; padding-bottom: 0pt; font-size:8pt; color:black; text-align: left; font-weight:bold;">Joining Date:<t t-esc="employee.initial_employment_date"/></td></tr>
+                                    <tr><td style=" padding-left: 15pt;"><img t-if="employee.signature" t-att-src="image_data_uri(employee.signature)" style="max-height:30pt;max-width:90%;top: 290px; left: 0px; position: absolute;" alt="Signature"/></td></tr>
+                                    <tr><td style=" padding-left: 15pt;"><img t-if="employee.company_id.authority_signature" t-att-src="image_data_uri(employee.company_id.authority_signature)" style="max-height:30pt;max-width:90%;top: 290px; left: 120px; position: absolute;" alt="Authority"/></td></tr>
+                                    <tr><td style="padding-left: 10pt;padding-top: 15pt; font-size:8pt; color:black; text-align: left; font-weight:bold; text-decoration: overline; ">CardHolder</td></tr>
+                                    <tr><td style="padding-left: 10pt;padding-top: 10pt; font-size:8pt; color:black; text-align: left; font-weight:bold; text-decoration: overline; top: 305px; left: 130px; position: absolute;">Authority</td></tr>
+                                </table>
+                        </div>
+                        <!--end front part-->
+                        <!--back part-->
+                        <div style="-webkit-transform: rotate(-90deg);width: 60mm; height: 90mm; float:right;margin-top:0px; margin-left:140px;">
+                            <table style="width: 60mm; height: 90mm; border: 1pt solid black;" >
+                                <tr><td style=" padding-left: 10pt; max-width: 90mm; max-height: 60mm; font-size:12pt; color:black; text-align: left; font-weight:bold;">Address</td></tr>
+                                <tr><td style="padding-left: 10pt;max-width: 90mm; max-height: 60mm; font-size:10pt; color:black; text-align: left; font-weight:bold;">Village: <t t-esc="employee.village"/></td></tr>
+                                <tr><td style="padding-left: 10pt;max-width: 90mm; max-height: 60mm; font-size:10pt; color:black; text-align: left; font-weight:bold;">Post Office: <t t-esc="employee.post_office"/></td></tr>
+                                <tr><td style="padding-left: 10pt;max-width: 90mm; max-height: 60mm; font-size:10pt; color:black; text-align: left; font-weight:bold;">Police Station: <t t-esc="employee.thana"/></td></tr>
+                                <tr><td style="padding-left: 10pt;max-width: 90mm; max-height: 60mm; font-size:10pt; color:black; text-align: left; font-weight:bold;">District: <t t-esc="employee.home_town_id.name"/></td></tr>
+                                <tr><td style="padding-left: 10pt;max-width: 90mm; max-height: 60mm; font-size:10pt; color:black; text-align: left; font-weight:bold;">Blood Group: <t t-esc="blood_group"/></td></tr>
+                                <tr><td style="padding-left: 10pt;max-width: 90mm; max-height: 60mm; font-size:10pt; color:black; text-align: left; font-weight:bold;">NID NO: <t t-esc="employee.nid"/></td></tr>
+                                <tr><td style="font-family: Times New Roman, serif !important;padding-left: 10pt;max-width: 90mm; max-height: 60mm; font-size:8pt; color:black; text-align: left; ">Tenure up to the end of Service.</td></tr>
+                                <tr><td style="font-family: Times New Roman, serif !important;padding-left: 10pt;max-width: 90mm; max-height: 60mm; font-size:8pt; color:black; text-align: left; ">Hung the card during duty.</td></tr>
+                                <tr><td style="font-family: Times New Roman, serif !important; padding-left: 10pt;max-width: 90mm; max-height: 60mm; font-size:8pt; color:red; text-align: left; font-weight:bold;">Please sent back the card to the <br/>address given below if otherwise found.</td></tr>
+                                <tr><td style="font-family: Times New Roman, serif !important; padding-left: 10pt;max-width: 90mm; max-height: 60mm; font-size:8pt; color:black; text-align: left; font-weight:bold;">Ishwardi Matsuoka Bangladesh Ltd. <br/> Ishwardi EPZ Paksey, Pabna. <br/> Plot: 34-41,51-53.</td></tr>
+                                <tr><td style="font-family: Times New Roman, serif !important; padding-left: 10pt;max-width: 90mm; max-height: 60mm; font-size:8pt; color:black; text-align: left; ">Emergency Contact No: 01738-915897</td></tr>
+                            </table>
+                        </div>
+                        <!-- end back part-->
+
+                    </div>
+                <!-- end ID Card -->
+
+                </t>
+
+            </div>
+
+        </t>
+    </template>
+
+</odoo>

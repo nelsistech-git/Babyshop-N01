@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<!--        comment-for-upgrade-->
+<!--    <record id="hr_contract_notice_period" model="ir.ui.view">-->
+<!--        <field name="name">hr.contract.notice.period</field>-->
+<!--        <field name="model">hr.contract</field>-->
+<!--        <field name="inherit_id" ref="hr_contract.hr_contract_view_form"/>-->
+<!--        <field name="arch" type="xml">-->
+<!--            <xpath expr="//field[@name='trial_date_end']" position="after">-->
+<!--                <label for="notice_days"/>-->
+<!--                <div class="o_row">-->
+<!--                    <field name="notice_days"/>-->
+<!--                    <span> days</span>-->
+<!--                </div>-->
+<!--            </xpath>-->
+<!--        </field>-->
+<!--    </record>-->
+
+    <record id="inherited_hr_contract_search_inherit_cus_hr_emp_view" model="ir.ui.view">
+        <field name="name">inherited.hr.contract.search.inherit.cus.hr.emp.view</field>
+        <field name="model">hr.contract</field>
+        <field name="inherit_id" ref="hr_contract.hr_contract_view_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="id_card_no" filter_domain="[('id_card_no', '=', self)]"/>
+                <field name="device_user_id" filter_domain="[('device_user_id', '=', self)]"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

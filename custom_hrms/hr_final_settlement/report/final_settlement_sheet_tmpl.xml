@@ -1,0 +1,456 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+	<data>
+
+
+        <record id="final_settlement_sheet_tmpl" model="ir.actions.report">
+            <field name="name">Final Settlement Sheet</field>
+            <field name="model">employee.contract.clearance</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">hr_final_settlement.final_settlement_sheet_view</field>
+            <field name="report_file">hr_final_settlement.final_settlement_sheet_view</field>
+        </record>
+
+
+		<template id="final_settlement_sheet_view">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-call="web.external_layout">
+                        <div class="page">
+                            <style type="text/css">
+                                table, th, tr, td{
+                                    background: white !important;
+                                    border: 1px solid black;
+                                    padding: 5px !important;
+                                }
+                            </style>
+                            <div class="oe_structure"/>
+                            <div>
+                                <h3 class="text-center head_font_color">
+                                    <strong>
+                                        <span t-field="o.company_id"/>
+                                    </strong>
+                                </h3>
+                            </div>
+                            <div class="row">
+                            <div class="col-6">
+                                <p style="color: #000; font-size: 15px;"><strong>Ref:</strong> <t t-esc="o.doc_ref"/></p>
+                            </div>
+                            <div class="col-6 text-right">
+                                <p style="color: #000; font-size: 15px;"><strong>Date:</strong>  <t t-esc="o.date_requested" t-options='{"widget": "date"}'/></p>
+                            </div>
+                            </div>
+                            <div>
+                            <h3 class="text-center head_font_color">
+                                <strong>
+                                    FINAL SETTLEMENT SHEET
+                                </strong>
+                            </h3>
+                            </div>
+                            <table style="border-collapse: collapse;width: 100%; margin-bottom: 2em;" class="table-condensed">
+                                <t t-set="net_amt" t-value="round(o.total_attendance_salary + o.lunch_allowance,2)"/>
+                                <t t-set="total_amt" t-value="net_amt - o.total_deduct"/>
+                                <tbody class="consumed_tbody">
+                                    <t t-set="sl_no" t-value="1"/>
+                                        <tr>
+                                            <td class="text-center align-middle" style="width: 5%;">
+                                                <span t-esc="'1'"/>
+                                            </td>
+                                            <td class="text-left align-middle" colspan="2">
+                                                <strong>Employee Name:</strong>
+                                            </td>
+                                            <td class="text-left align-middle" colspan="3">
+                                                <span t-field="o.employee_id.name"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center align-middle" style="width: 5%;">
+                                                <span t-esc="'2'"/>
+                                            </td>
+                                            <td class="text-left align-middle" colspan="2">
+                                                <strong>Designation:</strong>
+                                            </td>
+                                            <td class="text-left align-middle" colspan="3">
+                                                <span t-field="o.job_position"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center align-middle" style="width: 5%;">
+                                                <span t-esc="'3'"/>
+                                            </td>
+                                            <td class="text-left align-middle" colspan="2">
+                                                <strong>Employee ID:</strong>
+                                            </td>
+                                            <td class="text-left align-middle" colspan="3">
+                                                <span t-field="o.old_empid"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center align-middle" style="width: 5%;">
+                                                <span t-esc="'4'"/>
+                                            </td>
+                                            <td class="text-left align-middle" colspan="2">
+                                                <strong>Name of the Unit:</strong>
+                                            </td>
+                                            <td class="text-left align-middle" colspan="3">
+                                                <span t-field="o.user_work_location_id"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center align-middle" style="width: 5%;">
+                                                <span t-esc="'5'"/>
+                                            </td>
+                                            <td class="text-left align-middle" colspan="2">
+                                                <strong>Department/ Section:</strong>
+                                            </td>
+                                            <td class="text-left align-middle" colspan="3">
+                                                <span t-field="o.department_id"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center align-middle" style="width: 5%;">
+                                                <span t-esc="'6'"/>
+                                            </td>
+                                            <td class="text-left align-middle" colspan="2">
+                                                <strong>Date of Joining:</strong>
+                                            </td>
+                                            <td class="text-left align-middle">
+                                                <span t-field="o.initial_employment_date"/>
+                                            </td>
+                                            <td class="text-left align-middle">
+                                                <strong>Date of Separation:</strong>
+                                            </td>
+                                            <td class="text-left align-middle">
+                                                <span t-field="o.date_of_separation"/>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td class="text-center align-middle" style="width: 5%;">
+                                                <span t-esc="'7'"/>
+                                            </td>
+                                            <td class="text-left align-middle" colspan="2">
+                                                <strong>Length of Service:</strong>
+                                            </td>
+                                            <td class="text-left align-middle" >
+                                                <span t-field="o.length_of_service"/>
+                                            </td>
+                                            <td class="text-left align-middle">
+                                                <strong>Deduction(%):</strong>
+                                            </td>
+                                            <td class="text-center align-middle">
+                                                <span t-field="o.deduction_value"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center align-middle" style="width: 5%;">
+                                                <span t-esc="'8'"/>
+                                            </td>
+                                            <td class="text-left align-middle" colspan="2">
+                                                <strong>Separation Type:</strong>
+                                            </td>
+                                            <td class="text-left align-middle" colspan="3">
+                                                <span t-field="o.resignation_type_id"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td rowspan="3" class="text-center align-middle" style="width: 5%;">
+                                                <span t-esc="'9'"/>
+                                            </td>
+                                            <td rowspan="3" colspan="2" class="text-center align-middle">
+                                                <strong>Salary Details</strong>
+                                            </td>
+                                            <td class="text-left align-middle">
+                                                <strong>Gross/Consolidated Wage/Salary</strong>
+                                            </td>
+                                            <td class="text-center align-middle"  style="width: 5%;">
+                                                <strong>TK.</strong>
+                                            </td>
+                                            <td class="text-right align-middle">
+                                                <strong>
+                                                    <span t-if="o.gross_salary != 0" t-field="o.gross_salary"/>
+                                                    <span t-else="" t-esc="'-'"/>
+                                                </strong>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left align-middle">
+                                                <strong>Per Day Salary</strong>
+                                            </td>
+                                            <td class="text-center align-middle"  style="width: 5%;">
+                                                <strong>TK.</strong>
+                                            </td>
+                                            <td class="text-right align-middle">
+                                                <strong>
+                                                    <span t-if="o.per_day_salary != 0" t-field="o.per_day_salary"/>
+                                                    <span t-else="" t-esc="'-'"/>
+                                                </strong>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left align-middle">
+                                                <strong>No of Present Day</strong>
+                                            </td>
+                                            <td class="text-center align-middle"  style="width: 5%;">
+                                                <strong>TK.</strong>
+                                            </td>
+                                            <td class="text-right align-middle">
+                                                <strong>
+                                                    <span t-if="o.no_of_present_day != 0" t-field="o.no_of_present_day"/>
+                                                    <span t-else="" t-esc="'-'"/>
+                                                </strong>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center align-middle">
+                                            </td>
+                                            <td class="text-right align-middle" colspan="3">
+                                                <strong>Total Attendance Salary</strong>
+                                            </td>
+                                            <td class="text-center align-middle" style="width: 5%;">
+                                                <strong>TK.</strong>
+                                            </td>
+                                            <td class="text-right align-middle">
+                                                <strong>
+                                                    <span t-if="o.total_attendance_salary != 0" t-field="o.total_attendance_salary"/>
+                                                    <span t-else="" t-esc="'-'"/>
+                                                </strong>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td rowspan="5" class="text-center align-middle" style="width: 5%;">
+                                                <span t-esc="'10'"/>
+                                            </td>
+                                            <td rowspan="5" colspan="2" class="text-center align-middle">
+                                                <strong>Additional</strong>
+                                            </td>
+                                            <td class="text-left align-middle">
+                                                <strong>Lunch Allowance</strong>
+                                            </td>
+                                            <td class="text-center align-middle" style="width: 5%;">
+                                                <strong>TK.</strong>
+                                            </td>
+                                            <td class="text-right align-middle">
+                                                <strong>
+                                                    <span t-if="o.lunch_allowance != 0" t-field="o.lunch_allowance"/>
+                                                    <span t-else="" t-esc="'-'"/>
+                                                </strong>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td class="text-left align-middle">
+                                                <strong>Leave Encashment</strong>
+                                            </td>
+                                            <td class="text-center align-middle" style="width: 5%;">
+                                                <strong>TK.</strong>
+                                            </td>
+                                            <td class="text-right align-middle">
+                                                <strong>
+                                                    <span t-if="o.leave_encashment != 0" t-field="o.leave_encashment"/>
+                                                    <span t-else="" t-esc="'-'"/>
+                                                </strong>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left align-middle">
+                                                <strong>Daily Allowance</strong>
+                                            </td>
+                                            <td class="text-center align-middle" style="width: 5%;">
+                                                <strong>TK.</strong>
+                                            </td>
+                                            <td class="text-right align-middle">
+                                                <strong>
+                                                    <span t-if="o.total_daily_allowance != 0" t-field="o.total_daily_allowance"/>
+                                                    <span t-else="" t-esc="'-'"/>
+                                                </strong>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-right align-middle" colspan="3">
+                                                <strong>
+                                                    <span t-if="net_amt != 0" t-esc="net_amt"/>
+                                                    <span t-else="" t-esc="'-'"/>
+                                                </strong>
+<!--                                                <span t-esc="net_amt"/>-->
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td class="text-center align-middle" colspan="5">
+                                                <strong>Entitlement</strong>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td rowspan="7" class="text-center align-middle" style="width: 5%;">
+                                                <span t-esc="'11'"/>
+                                            </td>
+                                            <td rowspan="7" colspan="2" class="text-center align-middle">
+                                                <strong>Less</strong>
+                                            </td>
+                                            <td class="text-left align-middle">
+                                                <strong>(a) Advance Against Wages/Salary </strong>
+                                            </td>
+                                            <td class="text-center align-middle" style="width: 5%;">
+                                                <strong>TK.</strong>
+                                            </td>
+                                            <td class="text-right align-middle">
+                                                <strong>
+                                                    <strong>
+                                                        <span t-if="o.advance_salary != 0" t-field="o.advance_salary"/>
+                                                        <span t-else="" t-esc="'-'"/>
+                                                    </strong>
+                                                </strong>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left align-middle">
+                                                <strong>(b) Loan</strong>
+                                            </td>
+                                            <td class="text-center align-middle" style="width: 5%;">
+                                                <strong>TK.</strong>
+                                            </td>
+                                            <td class="text-right align-middle">
+                                                <strong>
+                                                    <span t-if="o.loan != 0" t-field="o.loan"/>
+                                                    <span t-else="" t-esc="'-'"/>
+                                                </strong>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left align-middle">
+                                                <strong>(c) Lunch Bill</strong>
+                                            </td>
+                                            <td class="text-center align-middle" style="width: 5%;">
+                                                <strong>TK.</strong>
+                                            </td>
+                                            <td class="text-right align-middle">
+                                                <strong>
+                                                    <span t-if="o.lunch_bill != 0" t-field="o.lunch_bill"/>
+                                                    <span t-else="" t-esc="'-'"/>
+                                                </strong>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left align-middle">
+                                                <strong>(d) Penalty</strong>
+                                            </td>
+                                            <td class="text-center align-middle" style="width: 5%;">
+                                                <strong>TK.</strong>
+                                            </td>
+                                            <td class="text-right align-middle">
+                                                <strong>
+                                                    <span t-if="o.penalty != 0" t-field="o.penalty"/>
+                                                    <span t-else="" t-esc="'-'"/>
+                                                </strong>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left align-middle">
+                                                <strong>(e) Excess Leave</strong>
+                                            </td>
+                                            <td class="text-center align-middle" style="width: 5%;">
+                                                <strong>TK.</strong>
+                                            </td>
+                                            <td class="text-right align-middle">
+                                                <strong>
+                                                    <span t-if="o.excess_leave != 0" t-field="o.excess_leave"/>
+                                                    <span t-else="" t-esc="'-'"/>
+                                                </strong>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left align-middle">
+                                                <strong>(f) Other Dues</strong>
+                                            </td>
+                                            <td class="text-center align-middle" style="width: 5%;">
+                                                <strong>TK.</strong>
+                                            </td>
+                                            <td class="text-right align-middle">
+                                                <strong>
+                                                    <span t-if="o.other_dues != 0" t-field="o.other_dues"/>
+                                                    <span t-else="" t-esc="'-'"/>
+                                                </strong>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left align-middle">
+                                                <strong>(g) Notice Period</strong>
+                                            </td>
+                                            <td class="text-center align-middle" style="width: 5%;">
+                                                <strong>TK.</strong>
+                                            </td>
+                                            <td class="text-right align-middle">
+                                                <strong>
+                                                    <span t-if="o.deduction_of_gross != 0" t-field="o.deduction_of_gross"/>
+                                                    <span t-else="" t-esc="'-'"/>
+                                                </strong>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-right align-middle" colspan="4">
+                                                <strong>Deduct Total</strong>
+                                            </td>
+                                            <td class="text-center align-middle" style="width: 5%;">
+                                                <strong>TK.</strong>
+                                            </td>
+                                            <td class="text-right align-middle">
+                                                <strong>
+                                                    <span t-if="o.total_deduct != 0" t-field="o.total_deduct"/>
+                                                    <span t-else="" t-esc="'-'"/>
+                                                </strong>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-right align-middle" colspan="4">
+                                                <strong>PAYABLE FINAL SETTLEMENT TAKA</strong>
+                                            </td>
+                                            <td class="text-right align-middle" colspan="3">
+                                                <strong>
+                                                    <span t-if="total_amt != 0" t-esc="round(total_amt,2)"/>
+                                                    <span t-else="" t-esc="'-'"/>
+<!--                                                    <span t-esc="total_amt"/>-->
+                                                </strong>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td  class="text-center align-middle" colspan="6">
+                                                <strong>In Words: <span t-esc="o.amount_in_words(round(float(total_amt),2))"/></strong>
+                                            </td>
+                                        </tr>
+                                </tbody>
+                            </table>
+                            <br/>
+                            <div class="row" style="color: #374151 ;">
+                                <div class="col-3 text-center">
+                                    <div>
+                                        <p style="text-align:center;text-decoration: overline;"><strong>Prepared By</strong></p>
+                                    </div>
+                                    <div>
+                                        <span t-esc="create_uid"/>
+                                    </div>
+                                </div>
+                                <div class="col-3 text-center">
+                                    <div>
+                                        <p style="text-align:center;text-decoration: overline;"><strong>Checked By</strong></p>
+                                    </div>
+                                </div>
+                                <div class="col-3 text-center">
+                                    <div>
+                                        <p style="text-align:center;text-decoration: overline;"><strong>Accounts</strong></p>
+                                    </div>
+                                </div>
+                                <div class="col-3 text-center">
+                                    <div>
+                                        <p style="text-align:center;text-decoration: overline;"><strong>Management</strong></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </t>
+            </t>
+		</template>
+	</data>
+</odoo>

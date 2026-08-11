@@ -1,0 +1,454 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+	<data>
+
+        <record id="paperformat_employee_salary_sheet_report_tmpl"
+                model="report.paperformat">
+                <field name="name">Employee Salary Sheet Format</field>
+                <field name="default" eval="True" />
+                <field name="format">custom</field>
+                <field name="orientation">Portrait</field>
+                <field name="page_height">297 </field>
+                <field name="page_width">210</field>
+                <field name="margin_top">30</field>
+                <field name="margin_bottom">15</field>
+                <field name="margin_left">1</field>
+                <field name="margin_right">1</field>
+                <!--<field name="header_line" eval="False" />-->
+                <field name="header_spacing">25</field>
+                <field name="dpi">90</field>
+            </record>
+
+            <record id="employee_salary_sheet_report_tmpl" model="ir.actions.report">
+                <field name="name">Employee Salary Sheet Report</field>
+                <field name="model">employee.salary.sheet.wizard</field>
+                <field name="report_type">qweb-pdf</field>
+                <field name="report_name">custom_hr_report.employee_salary_sheet_report_view</field>
+                <field name="report_file">custom_hr_report.employee_salary_sheet_report_view</field>
+                <field name="paperformat_id" ref="custom_hr_report.paperformat_employee_salary_sheet_report_tmpl"/>
+            </record>
+
+		<template id="employee_salary_sheet_report_view">
+            <t t-call="web.html_container">
+                <t t-call="custom_hr_report.custom_external_layout_salary_sheet">
+                    <div class="page">
+                        <style type="text/css">
+                            table, th, tr, td{
+                                background: white !important;
+                                border: 1px solid black;
+                            }
+                        </style>
+                        <!--<t t-set="data" t-value="request.env['employee.salary.sheet.wizard'].search([('id', '=', ftr_id)], limit=1).employee_salary_sheet_report_sql()"/>
+                        <t t-set="model" t-value="data['model']"/>
+                        <t t-set="form" t-value="data['form']"/>
+                        <t t-set="csr" t-value="data['csr']"/>
+                        <t t-set="month" t-value="data['month']"/>
+                        <t t-set="color1" t-value="data['color1']"/>
+                        <t t-set="color2" t-value="data['color2']"/>
+                        <t t-set="color3" t-value="data['color3']"/>
+                        <t t-set="dept_name" t-value="data['dept_name']"/>
+                        <t t-set="emp_name" t-value="data['emp_name']"/>
+                        <t t-set="year" t-value="data['year']"/>-->
+
+                        <div class="oe_structure"/>
+                        <div>
+                            <h3 class="text-center head_font_color">
+                                <strong>
+                                    <span t-esc="form['company_id'][1]"/><br/>
+                                    Employee Salary Sheet
+                                    <span t-esc="month"/>-<span t-esc="year"/>
+                                    <br/>
+                                    <t t-if="form['location_id']">
+                                        Branch: <span t-esc="form['location_id'][1]"/>
+                                    </t>
+                                    <t t-else="">
+                                        Branch: All Branches
+                                    </t>
+                                </strong>
+                            </h3>
+                        </div>
+                        <br/>
+                        <t t-set="sl_no" t-value="1"/>
+                        <!-- Branch wise Total Variables -->
+                        <t t-set="total_gross" t-value="0"/>
+                        <t t-set="total_absent" t-value="0"/>
+                        <t t-set="total_leave" t-value="0"/>
+                        <t t-set="total_ab_ded" t-value="0"/>
+                        <t t-set="total_att_sal" t-value="0"/>
+                        <t t-set="total_advance" t-value="0"/>
+                        <t t-set="total_loan" t-value="0"/>
+                        <t t-set="total_tpf" t-value="0"/>
+                        <t t-set="total_other_alw" t-value="0"/>
+                        <t t-set="total_ota" t-value="0"/>
+                        <t t-set="total_dla" t-value="0"/>
+                        <t t-set="total_other_ded" t-value="0"/>
+                        <t t-set="total_other_pay" t-value="0"/>
+                        <t t-set="total_no_overtime" t-value="0"/>
+                        <t t-set="total_actual_late" t-value="0"/>
+                        <t t-set="total_late_ded" t-value="0"/>
+
+                        <!-- Grand Total Variables -->
+<!--                        <t t-set="gtotal_gross" t-value="0"/>
+                        <t t-set="gtotal_absent" t-value="0"/>
+                        <t t-set="gtotal_leave" t-value="0"/>
+                        <t t-set="gtotal_ab_ded" t-value="0"/>
+                        <t t-set="gtotal_att_sal" t-value="0"/>
+                        <t t-set="gtotal_advance" t-value="0"/>
+                        <t t-set="gtotal_loan" t-value="0"/>
+                        <t t-set="gtotal_tpf" t-value="0"/>
+                        <t t-set="gtotal_other_alw" t-value="0"/>
+                        <t t-set="gtotal_ota" t-value="0"/>
+                        <t t-set="gtotal_dla" t-value="0"/>
+                        <t t-set="gtotal_other_ded" t-value="0"/>
+                        <t t-set="gtotal_other_pay" t-value="0"/>-->
+
+                        <t t-foreach="csr" t-as="line">
+                            <t t-foreach="line" t-as="line2">
+                                <div>
+                                    <h6 class="text-left">
+                                        <strong>
+                                            Branch: <span t-esc="line[str(line2)][0]['loc_name']"/>
+                                        </strong>
+                                        <t t-if="buisness_unit">
+                                            <br/>
+                                            <strong>Office/business Unit:</strong>
+                                            <t t-esc="buisness_unit"/>
+                                        </t>
+                                        <t t-if="tag_names_list">
+                                            <br/>
+                                            <strong>Tags:</strong>
+                                            <t t-esc="tag_names_list"/>
+                                        </t>
+                                    </h6>
+                                </div>
+                                <table style="border-collapse: collapse;width: 100%; margin-bottom: 2em;" class="table table-condensed">
+                                    <thead>
+<!--                                        t-attf-style="background-color:{{color1}}!important;"-->
+                                        <tr style="color: black !important;">
+                                            <th class="text-center align-middle bg_color font_color">Sl. No.</th>
+                                            <th class="text-center align-middle bg_color font_color">Emp. ID</th>
+                                            <th class="text-left align-middle bg_color font_color">Name</th>
+        <!--                                    <th class="text-center">Designation on</th>-->
+        <!--                                    <th class="text-center align-middle">Joining Date</th>-->
+                                            <th class="text-right align-middle bg_color font_color">Gross Salary</th>
+                                            <th class="text-center align-middle bg_color font_color">Absent</th>
+                                            <th class="text-center align-middle bg_color font_color">Leave</th>
+                                            <th class="text-right align-middle bg_color font_color">Absent Deduct</th>
+                                            <th class="text-right align-middle bg_color font_color">Att. Salary</th>
+                                            <th class="text-right align-middle bg_color font_color">Advance</th>
+                                            <th class="text-right align-middle bg_color font_color">Loan</th>
+                                            <th class="text-right align-middle bg_color font_color">PF</th>
+                                            <th class="text-right align-middle bg_color font_color">Add. Allow.</th>
+                                            <th class="text-right align-middle bg_color font_color">OT Days</th>
+                                            <th class="text-right align-middle bg_color font_color">OT Amt.</th>
+                                            <th class="text-right align-middle bg_color font_color">Daily Allow.</th>
+                                            <th class="text-right align-middle bg_color font_color">Late In</th>
+                                            <th class="text-right align-middle bg_color font_color">Late Deduct.</th>
+                                            <th class="text-right align-middle bg_color font_color">Other Deduct.</th>
+                                            <th class="text-right align-middle bg_color font_color">Payable Salary</th>
+                                            <th class="text-center align-middle bg_color font_color">Signature</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="consumed_tbody">
+                                        <t t-foreach="line[str(line2)]" t-as="line3">
+                                            <tr>
+                                                <td class="text-center">
+                                                    <t t-esc="sl_no"/>
+                                                </td>
+                                                <td class="text-center">
+                                                    <span t-esc="line3['id_card']"/>
+                                                </td>
+                                                <td class="text-left body_col_bg_color">
+                                                    <span t-esc="line3['employee_name']"/>
+                                                    <t t-if="line3['des_name']">(<span t-esc="line3['des_name']"/>)</t>
+                                                </td>
+        <!--                                        <td t-if="line3['joining_date']" class="text-center">
+                                                    <span t-esc="datetime.datetime.strptime(str(line3['joining_date']), '%Y-%m-%d').strftime('%d-%b-%Y')"/>
+                                                    <span t-esc="line3['joining_date']"/>
+                                                </td>-->
+                                                <td class="text-right">
+                                                    <span t-esc="'{0:,.2f}'.format(line3['gross_salary'])"/>
+                                                    <t t-set="total_gross" t-value="total_gross + line3['gross_salary']"/>
+<!--                                                    <t t-set="gtotal_gross" t-value="gtotal_gross + line3['gross_salary']"/>-->
+                                                </td>
+                                                <td class="text-center">
+                                                    <span t-esc="'{0:,.0f}'.format(line3['no_abs'])"/>
+                                                    <t t-set="total_absent" t-value="total_absent + line3['no_abs']"/>
+<!--                                                    <t t-set="gtotal_absent" t-value="gtotal_absent + line3['no_abs']"/>-->
+                                                </td>
+                                                <td class="text-center">
+                                                    <span t-esc="'{0:,.0f}'.format(line3['no_leave'])"/>
+                                                    <t t-set="total_leave" t-value="total_leave + line3['no_leave']"/>
+<!--                                                    <t t-set="gtotal_leave" t-value="gtotal_leave + line3['no_leave']"/>-->
+                                                </td>
+                                                <td class="text-right">
+                                                    <span t-esc="'{0:,.2f}'.format(line3['ab_amt'])"/>
+                                                    <t t-set="total_ab_ded" t-value="total_ab_ded + line3['ab_amt']"/>
+<!--                                                    <t t-set="gtotal_ab_ded" t-value="gtotal_ab_ded + line3['ab_amt']"/>-->
+                                                </td>
+                                                <td class="text-right">
+                                                    <span t-esc="'{0:,.2f}'.format(line3['gross_salary'] - line3['ab_amt'])"/>
+                                                    <t t-set="total_att_sal" t-value="total_att_sal + line3['gross_salary'] - line3['ab_amt']"/>
+<!--                                                    <t t-set="gtotal_att_sal" t-value="gtotal_att_sal + line3['gross_salary'] - line3['ab_amt']"/>-->
+                                                </td>
+                                                <td class="text-right">
+                                                    <span t-esc="'{0:,.2f}'.format(line3['adv_salary'])"/>
+                                                    <t t-set="total_advance" t-value="total_advance + line3['adv_salary']"/>
+<!--                                                    <t t-set="gtotal_advance" t-value="gtotal_advance + line3['adv_salary']"/>-->
+                                                </td>
+                                                <td class="text-right">
+                                                    <span t-esc="'{0:,.2f}'.format(line3['loan'])"/>
+                                                    <t t-set="total_loan" t-value="total_loan + line3['loan']"/>
+<!--                                                    <t t-set="gtotal_loan" t-value="gtotal_loan + line3['loan']"/>-->
+                                                </td>
+                                                <td class="text-right">
+                                                    <span t-esc="'{0:,.2f}'.format(line3['tpf'])"/>
+                                                    <t t-set="total_tpf" t-value="total_tpf + line3['tpf']"/>
+<!--                                                    <t t-set="gtotal_tpf" t-value="gtotal_tpf + line3['tpf']"/>-->
+                                                </td>
+                                                <td class="text-right">
+                                                    <span t-esc="'{0:,.2f}'.format(line3['other_alw'])"/>
+                                                    <t t-set="total_other_alw" t-value="total_other_alw + line3['other_alw']"/>
+<!--                                                    <t t-set="gtotal_other_alw" t-value="gtotal_other_alw + line3['other_alw']"/>-->
+                                                </td>
+                                                <td class="text-right">
+                                                    <span t-esc="'{0:,.0f}'.format(line3['no_overtime'])"/>
+                                                    <t t-set="total_no_overtime" t-value="total_no_overtime + line3['no_overtime']"/>
+                                                </td>
+                                                <td class="text-right">
+                                                    <span t-esc="'{0:,.2f}'.format(line3['ota'])"/>
+                                                    <t t-set="total_ota" t-value="total_ota + line3['ota']"/>
+<!--                                                    <t t-set="gtotal_ota" t-value="gtotal_ota + line3['ota']"/>-->
+                                                </td>
+                                                <td class="text-right">
+                                                    <span t-esc="'{0:,.2f}'.format(line3['dla'])"/>
+                                                    <t t-set="total_dla" t-value="total_dla + line3['dla']"/>
+<!--                                                    <t t-set="gtotal_dla" t-value="gtotal_dla + line3['dla']"/>-->
+                                                </td>
+
+                                                <td class="text-right">
+                                                    <span t-esc="'{0:,.0f}'.format(line3['actual_late'])"/>
+                                                    <t t-set="total_actual_late" t-value="total_actual_late + line3['actual_late']"/>
+                                                </td>
+                                                <td class="text-right">
+                                                    <span t-esc="'{0:,.2f}'.format(line3['late_ded'])"/>
+                                                    <t t-set="total_late_ded" t-value="total_late_ded + line3['late_ded']"/>
+                                                </td>
+                                                <td class="text-right">
+                                                    <span t-esc="'{0:,.2f}'.format(line3['other_ded'])"/>
+                                                    <t t-set="total_other_ded" t-value="total_other_ded + line3['other_ded']"/>
+<!--                                                    <t t-set="gtotal_other_ded" t-value="gtotal_other_ded + line3['other_ded']"/>-->
+                                                </td>
+                                                <td class="text-right body_col_bg_color">
+                                                    <span t-esc="'{0:,.2f}'.format(line3['total_payable_sal'])"/>
+                                                    <t t-set="total_other_pay" t-value="total_other_pay + line3['total_payable_sal']"/>
+<!--                                                    <t t-set="gtotal_other_pay" t-value="gtotal_other_pay + line3['total_payable_sal']"/>-->
+                                                </td>
+                                                <td class="text-center">
+        <!--                                            &nbsp;-->
+                                                </td>
+                                            </tr>
+                                            <t t-set="sl_no" t-value="sl_no + 1"/>
+                                        </t>
+                                        <tr style="border: 1px solid black;">
+                                            <td class="text-right" colspan="3"><strong>TOTAL</strong></td>
+                                            <td class="text-right">
+                                                <strong><t t-esc="'{0:,.2f}'.format(total_gross)"/></strong>
+                                            </td>
+                                            <td class="text-center">
+                                                <strong><t t-esc="'{0:,.0f}'.format(total_absent)"/></strong>
+                                            </td>
+                                            <td class="text-center">
+                                                <strong><t t-esc="'{0:,.0f}'.format(total_leave)"/></strong>
+                                            </td>
+                                            <td class="text-right">
+                                                <strong><t t-esc="'{0:,.2f}'.format(total_ab_ded)"/></strong>
+                                            </td>
+                                            <td class="text-right">
+                                                <strong><t t-esc="'{0:,.2f}'.format(total_att_sal)"/></strong>
+                                            </td>
+                                            <td class="text-right">
+                                                <strong><t t-esc="'{0:,.2f}'.format(total_advance)"/></strong>
+                                            </td>
+                                            <td class="text-right">
+                                                <strong><t t-esc="'{0:,.2f}'.format(total_loan)"/></strong>
+                                            </td>
+                                            <td class="text-right">
+                                                <strong><t t-esc="'{0:,.2f}'.format(total_tpf)"/></strong>
+                                            </td>
+                                            <td class="text-right">
+                                                <strong><t t-esc="'{0:,.2f}'.format(total_other_alw)"/></strong>
+                                            </td>
+                                            <td class="text-right">
+                                                <strong><t t-esc="'{0:,.0f}'.format(total_no_overtime)"/></strong>
+                                            </td>
+                                            <td class="text-right">
+                                                <strong><t t-esc="'{0:,.2f}'.format(total_ota)"/></strong>
+                                            </td>
+                                            <td class="text-right">
+                                                <strong><t t-esc="'{0:,.2f}'.format(total_dla)"/></strong>
+                                            </td>
+
+                                            <td class="text-right">
+                                                <strong><t t-esc="'{0:,.0f}'.format(total_actual_late)"/></strong>
+                                            </td>
+                                            <td class="text-right">
+                                                <strong><t t-esc="'{0:,.2f}'.format(total_late_ded)"/></strong>
+                                            </td>
+                                            <td class="text-right">
+                                                <strong><t t-esc="'{0:,.2f}'.format(total_other_ded)"/></strong>
+                                            </td>
+                                            <td class="text-right body_col_bg_color">
+                                                <strong><t t-esc="'{0:,.2f}'.format(total_other_pay)"/></strong>
+                                            </td>
+                                            <td class="text-right">
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <t t-set="sl_no" t-value="1"/>
+                                <t t-set="total_gross" t-value="0"/>
+                                <t t-set="total_absent" t-value="0"/>
+                                <t t-set="total_leave" t-value="0"/>
+                                <t t-set="total_ab_ded" t-value="0"/>
+                                <t t-set="total_att_sal" t-value="0"/>
+                                <t t-set="total_advance" t-value="0"/>
+                                <t t-set="total_loan" t-value="0"/>
+                                <t t-set="total_tpf" t-value="0"/>
+                                <t t-set="total_other_alw" t-value="0"/>
+                                <t t-set="total_ota" t-value="0"/>
+                                <t t-set="total_dla" t-value="0"/>
+                                <t t-set="total_other_ded" t-value="0"/>
+                                <t t-set="total_other_pay" t-value="0"/>
+                                <t t-set="total_no_overtime" t-value="0"/>
+                                <t t-set="total_actual_late" t-value="0"/>
+                                <t t-set="total_late_ded" t-value="0"/>
+
+                                <p style="page-break-after: always;"/>
+                            </t>
+                        </t>
+                        <!-- Grand Total -->
+<!--                        <table style="border-collapse: collapse;width: 100%; margin-bottom: 2em;" class="table table-condensed">-->
+<!--                            <tbody class="consumed_tbody">-->
+<!--                                <tr style="border: 1px solid black;">-->
+<!--                                    <td class="text-right" colspan="3"><strong>GRAND TOTAL</strong></td>-->
+<!--                                    <td class="text-right">-->
+<!--                                        <strong><t t-esc="'{0:,.2f}'.format(gtotal_gross)"/></strong>-->
+<!--                                    </td>-->
+<!--                                    <td class="text-center">-->
+<!--                                        <strong><t t-esc="'{0:,.2f}'.format(gtotal_absent)"/></strong>-->
+<!--                                    </td>-->
+<!--                                    <td class="text-center">-->
+<!--                                        <strong><t t-esc="'{0:,.2f}'.format(gtotal_leave)"/></strong>-->
+<!--                                    </td>-->
+<!--                                    <td class="text-right">-->
+<!--                                        <strong><t t-esc="'{0:,.2f}'.format(gtotal_ab_ded)"/></strong>-->
+<!--                                    </td>-->
+<!--                                    <td class="text-right">-->
+<!--                                        <strong><t t-esc="'{0:,.2f}'.format(gtotal_att_sal)"/></strong>-->
+<!--                                    </td>-->
+<!--                                    <td class="text-right">-->
+<!--                                        <strong><t t-esc="'{0:,.2f}'.format(gtotal_advance)"/></strong>-->
+<!--                                    </td>-->
+<!--                                    <td class="text-right">-->
+<!--                                        <strong><t t-esc="'{0:,.2f}'.format(gtotal_loan)"/></strong>-->
+<!--                                    </td>-->
+<!--                                    <td class="text-right">-->
+<!--                                        <strong><t t-esc="'{0:,.2f}'.format(gtotal_tpf)"/></strong>-->
+<!--                                    </td>-->
+<!--                                    <td class="text-right">-->
+<!--                                        <strong><t t-esc="'{0:,.2f}'.format(gtotal_other_alw)"/></strong>-->
+<!--                                    </td>-->
+<!--                                    <td class="text-right">-->
+<!--                                        <strong><t t-esc="'{0:,.2f}'.format(gtotal_ota)"/></strong>-->
+<!--                                    </td>-->
+<!--                                    <td class="text-right">-->
+<!--                                        <strong><t t-esc="'{0:,.2f}'.format(gtotal_dla)"/></strong>-->
+<!--                                    </td>-->
+<!--                                    <td class="text-right">-->
+<!--                                        <strong><t t-esc="'{0:,.2f}'.format(gtotal_other_ded)"/></strong>-->
+<!--                                    </td>-->
+<!--                                    <td class="text-right">-->
+<!--                                        <strong><t t-esc="'{0:,.2f}'.format(gtotal_other_pay)"/></strong>-->
+<!--                                    </td>-->
+<!--                                </tr>-->
+<!--                            </tbody>-->
+<!--                        </table>-->
+                    </div>
+                </t>
+            </t>
+		</template>
+
+
+        <template id="custom_external_layout_salary_sheet">
+            <t t-if="not o" t-set="o" t-value="doc"/>
+
+            <t t-if="not company">
+                <!-- Multicompany -->
+                <t t-if="company_id">
+                    <t t-set="company" t-value="company_id"/>
+                </t>
+                <t t-elif="o and 'company_id' in o and o.company_id.sudo()">
+                    <t t-set="company" t-value="o.company_id.sudo()"/>
+                </t>
+                <t t-else="else">
+                    <t t-set="company" t-value="res_company"/>
+                </t>
+            </t>
+
+            <t t-call="{{company.external_report_layout_id.key}}">
+                <t t-raw="0" />
+                <t t-call="custom_hr_report.custom_footer_employee_salary_sheet" />
+            </t>
+
+<!--        <t t-if="company.external_report_layout_id" t-call="{{company.external_report_layout_id.key}}"><t t-raw="0"/></t>
+        <t t-else="else" t-call="web.external_layout_standard"><t t-raw="0"/></t>-->
+        </template>
+
+
+        <template id="custom_footer_employee_salary_sheet">
+
+            <div t-attf-class="footer">
+                <div class="row" style="color: #374151; padding-top:15px;">
+                    <div class="col-3 text-center">
+                        <div>
+                            <p style="text-align:center;text-decoration: overline;"><strong>Prepared By</strong></p>
+                        </div>
+                        <div>
+                            <span t-esc="create_uid"/>
+                        </div>
+                    </div>
+                    <div class="col-3 text-center">
+                        <div>
+                            <p style="text-align:center;text-decoration: overline;"><strong>Checked By</strong></p>
+                        </div>
+                    </div>
+                    <div class="col-3 text-center">
+                        <div>
+                            <p style="text-align:center;text-decoration: overline;"><strong>Paid By</strong></p>
+                        </div>
+                    </div>
+                    <div class="col-3 text-center">
+                        <div>
+                            <p style="text-align:center;text-decoration: overline;"><strong>Approved By</strong></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center" style="border-top: 3px solid #374151;">
+<!--                    <ul class="list-inline" style="color: #374151 !important; margin-top : 10px; margin-bottom : 0;">
+                        <li t-if="company.phone" class="list-inline-item">Mobile: <span class="o_force_ltr" t-field="company.phone"/></li>
+                        <li t-if="company.email" class="list-inline-item">Email: <span t-field="company.email"/></li>
+                        <li t-if="company.website" class="list-inline-item">Website: <span t-esc="(company.website).replace('http://', '').replace('https://', '')"/></li>
+                        <li t-if="company.vat" class="list-inline-item"><t t-esc="company.country_id.vat_label or 'Tax ID'"/>: <span t-field="company.vat"/></li>
+                    </ul>-->
+                    <div t-field="company.report_footer"/>
+                    <div style="color: #374151 !important; margin-top: 0px; margin-bottom: 0px;" t-if="report_type == 'pdf'">
+                        Page: <span class="page"/> / <span class="topage"/>
+                    </div>
+                </div>
+            </div>
+		</template>
+
+	</data>
+</odoo>

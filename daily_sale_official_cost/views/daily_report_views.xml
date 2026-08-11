@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- LIST VIEW -->
+    <record id="view_daily_report_tree" model="ir.ui.view">
+        <field name="name">daily.sale.official.cost.report.tree</field>
+        <field name="model">daily.sale.official.cost.report</field>
+        <field name="arch" type="xml">
+            <tree string="Daily Sale &amp; Official Cost">
+                <field name="report_date"/>
+                <field name="total_amount_tk"/>
+                <field name="total_official_cost"/>
+                <field name="total_supplier_paid"/>
+                <field name="current_office_cash"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'locked'"
+                       decoration-info="state == 'draft'"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- SEARCH VIEW: date filter -->
+    <record id="view_daily_report_search" model="ir.ui.view">
+        <field name="name">daily.sale.official.cost.report.search</field>
+        <field name="model">daily.sale.official.cost.report</field>
+        <field name="arch" type="xml">
+            <search string="Search Daily Report">
+                <field name="report_date"/>
+                <filter string="Today" name="today"
+                        domain="[('report_date', '=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter string="This Month" name="this_month"
+                        domain="[('report_date', '&gt;=', context_today().strftime('%Y-%m-01'))]"/>
+                <separator/>
+                <filter string="Draft (Live)" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Locked" name="locked" domain="[('state', '=', 'locked')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Date" name="group_date" context="{'group_by': 'report_date'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- FORM VIEW: mirrors the layout of the sample sheet -->
+    <record id="view_daily_report_form" model="ir.ui.view">
+        <field name="name">daily.sale.official.cost.report.form</field>
+        <field name="model">daily.sale.official.cost.report</field>
+        <field name="arch" type="xml">
+            <form string="Daily Sale &amp; Official Cost">
+                <header>
+                    <button name="action_refresh" type="object" string="Refresh from Ledger"
+                            class="btn-primary" invisible="state == 'locked'"/>
+                    <button name="action_lock" type="object" string="Lock Report"
+                            class="btn-secondary" invisible="state == 'locked'"
+                            confirm="Locking freezes today's figures. Continue?"/>
+                    <button name="action_unlock" type="object" string="Unlock"
+                            class="btn-secondary" invisible="state == 'draft'"
+                            groups="account.group_account_manager"
+                            confirm="Unlocking allows this report to be recalculated from the ledger again. Continue?"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="report_date"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="management_partner_ids" widget="many2many_tags"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Showroom Sale of Head Office">
+                            <field name="showroom_sale_line_ids" readonly="1">
+                                <tree editable="bottom" create="0" delete="0">
+                                    <field name="partner_id"/>
+                                    <field name="paid_advance"/>
+                                    <field name="invoice_total"/>
+                                    <field name="due_amount"/>
+                                </tree>
+                            </field>
+                        </page>
+
+                        <page string="Official Cost">
+                            <field name="official_cost_line_ids" readonly="1">
+                                <tree create="0" delete="0">
+                                    <field name="cost_detail"/>
+                                    <field name="payee"/>
+                                    <field name="amount"/>
+                                </tree>
+                            </field>
+                        </page>
+
+                        <page string="Supplier Transaction">
+                            <field name="supplier_line_ids" readonly="1">
+                                <tree create="0" delete="0">
+                                    <field name="partner_id"/>
+                                    <field name="payment_method"/>
+                                    <field name="amount"/>
+                                </tree>
+                            </field>
+                        </page>
+
+                        <page string="Mobile &amp; Bank Transaction">
+                            <field name="collection_line_ids" readonly="1">
+                                <tree create="0" delete="0">
+                                    <field name="partner_id"/>
+                                    <field name="channel"/>
+                                    <field name="journal_id"/>
+                                    <field name="payment_ref"/>
+                                    <field name="amount"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+
+                    <separator string="Automated Reconciliation Summary"/>
+                    <group>
+                        <group>
+                            <field name="net_office_cash_adjustment"/>
+                            <field name="total_amount_tk"/>
+                        </group>
+                        <group>
+                            <field name="md_sir_cash_paid"/>
+                            <field name="total_official_cost"/>
+                            <field name="total_supplier_paid"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="current_office_cash" class="oe_inline"
+                               style="font-weight:bold;font-size:1.3em;"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_daily_report" model="ir.actions.act_window">
+        <field name="name">Daily Sale &amp; Official Cost</field>
+        <field name="res_model">daily.sale.official.cost.report</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_daily_report_search"/>
+        <field name="context">{'search_default_today': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create today's Daily Sale &amp; Official Cost report.
+            </p>
+            <p>Pick a date - every figure is pulled automatically from posted
+               accounting entries.</p>
+        </field>
+    </record>
+
+</odoo>

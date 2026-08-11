@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+	<data>
+<!--        <report id="budget_particular_summary_report_tmpl"-->
+<!--				string="Budget Summary Report"-->
+<!--				model="budget.particular.report.wizard"-->
+<!--				report_type="qweb-pdf"-->
+<!--				file="custom_account_day_book.budget_particular_summary_report_view"-->
+<!--				name="custom_account_day_book.budget_particular_summary_report_view"/>-->
+
+        <record id="budget_particular_summary_report_tmpl" model="ir.actions.report">
+            <field name="name">Budget Summary Report</field>
+            <field name="model">budget.particular.report.wizard</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">custom_account_day_book.budget_particular_summary_report_view</field>
+            <field name="report_file">custom_account_day_book.budget_particular_summary_report_view</field>
+        </record>
+
+		<template id="budget_particular_summary_report_view">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <style type="text/css">
+                            th, tr, td{
+                                background: white !important;
+                                border: 1px solid black;
+                            }
+                        </style>
+                        <div class="oe_structure"/>
+                        <div>
+                            <h3 class="text-center head_font_color">
+                                <strong>Budget Summary Report</strong>
+                            </h3>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <div><strong>Fiscal Year:</strong> <t t-esc="form['fiscal_year'][1]"/></div>
+                                <div t-if="report_type"><strong>Report Type:</strong> <t t-esc="report_type"/></div>
+                            </div>
+                            <div class="col-6 text-right">
+                                <div t-if="form['budget_head_id']"><strong>Budget Head:</strong> <t t-esc="form['budget_head_id'][1]"/></div>
+                            </div>
+                        </div>
+                        <table style="border-collapse: collapse;width: 100%; margin-bottom: 2em;" class="table table-condensed">
+                            <thead>
+                                <tr>
+                                    <th class="text-center align-middle bg_color font_color">Sl. No.</th>
+                                    <th class="text-center align-middle bg_color font_color">Budget Head</th>
+                                    <th class="text-right align-middle bg_color font_color">Budgeted Amount</th>
+                                    <th class="text-right align-middle bg_color font_color">This Month</th>
+                                    <th class="text-right align-middle bg_color font_color">Till Now</th>
+                                    <th class="text-right align-middle bg_color font_color">Variance</th>
+                                    <th class="text-right align-middle bg_color font_color">Achieve Percentage</th>
+                                </tr>
+                            </thead>
+                            <tbody class="consumed_tbody">
+                                <t t-set="sl_no" t-value="1"/>
+                                <t t-set="variance_amt" t-value="0"/>
+                                <t t-set="total_budget_amt" t-value="0"/>
+                                <t t-set="total_current_amt" t-value="0"/>
+                                <t t-set="total_upto_amt" t-value="0"/>
+                                <t t-set="total_variance_amt" t-value="0"/>
+                                <t t-set="total_variance_perc" t-value="0"/>
+                                <t t-foreach="csr" t-as="line">
+                                    <tr>
+                                        <td class="text-center align-middle text-nowrap">
+                                            <span t-esc="sl_no"/>
+                                        </td>
+                                        <td class="text-left align-middle text-nowrap">
+                                            <span t-esc="line['budget_head']"/>
+                                        </td>
+                                        <td class="text-right align-middle text-nowrap">
+                                            <span t-if="line['budget_amt'] &lt; 0" t-set="budget_amt" t-value="((-1) * line['budget_amt'])"/>
+                                            <span t-else="" t-set="budget_amt" t-value="line['budget_amt']"/>
+                                            <span t-esc="'{0:,.2f}'.format(budget_amt)"/>
+                                            <t t-set="total_budget_amt" t-value="total_budget_amt + budget_amt"/>
+                                        </td>
+                                        <td class="text-right align-middle text-nowrap">
+                                            <span t-if="line['current_amt'] &lt; 0" t-set="current_amt" t-value="((-1) * line['current_amt'])"/>
+                                            <span t-else="" t-set="current_amt" t-value="line['current_amt']"/>
+                                            <span t-esc="'{0:,.2f}'.format(current_amt)"/>
+                                            <t t-set="total_current_amt" t-value="total_current_amt + current_amt"/>
+                                        </td>
+                                        <td class="text-right align-middle text-nowrap">
+                                            <span t-if="line['upto_amt'] &lt; 0" t-set="upto_amt" t-value="((-1) * line['upto_amt'])"/>
+                                            <span t-else="" t-set="upto_amt" t-value="line['upto_amt']"/>
+                                            <span t-esc="'{0:,.2f}'.format(upto_amt)"/>
+                                            <t t-set="total_upto_amt" t-value="total_upto_amt + upto_amt"/>
+                                        </td>
+                                        <td class="text-right text-nowrap">
+                                            <t t-set="variance_amt" t-value="budget_amt - upto_amt"/>
+                                            <span t-esc="'{0:,.2f}'.format(variance_amt)"/>
+                                            <t t-set="total_variance_amt" t-value="total_variance_amt + variance_amt"/>
+                                        </td>
+                                        <td class="text-right text-nowrap">
+                                            <t t-if="budget_amt &gt; 0" t-set="variance_perc" t-value="upto_amt/budget_amt"/>
+                                            <t t-else="" t-set="variance_perc" t-value="0"/>
+                                            <span t-esc="'{0:,.2f}'.format(variance_perc*100)"/> %
+                                            <t t-set="total_variance_perc" t-value="total_variance_perc + (variance_perc*100)"/>
+                                        </td>
+                                    </tr>
+                                    <t t-set="sl_no" t-value="sl_no + 1"/>
+                                </t>
+                                <tr style="border: 1px solid black;">
+                                    <td class="text-right text-nowrap" colspan="2"><strong>TOTAL</strong></td>
+                                    <td class="text-right text-nowrap">
+                                        <strong><t t-esc="'{0:,.2f}'.format(total_budget_amt)"/></strong>
+                                    </td>
+                                    <td class="text-right text-nowrap">
+                                        <strong><t t-esc="'{0:,.2f}'.format(total_current_amt)"/></strong>
+                                    </td>
+                                    <td class="text-right text-nowrap">
+                                        <strong><t t-esc="'{0:,.2f}'.format(total_upto_amt)"/></strong>
+                                    </td>
+                                    <td class="text-right text-nowrap">
+                                        <strong><t t-esc="'{0:,.2f}'.format(total_variance_amt)"/></strong>
+                                    </td>
+                                    <td class="text-right text-nowrap">
+                                        <strong><t t-esc="'{0:,.2f}'.format(total_variance_perc)"/> %</strong>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+		</template>
+	</data>
+</odoo>

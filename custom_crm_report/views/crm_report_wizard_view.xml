@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_crm_report_wizard_form" model="ir.ui.view">
+        <field name="name">crm.report.wizard.form</field>
+        <field name="model">crm.report.wizard</field>
+        <field name="arch" type="xml">
+            <form string="CRM Report">
+                <group>
+                    <group string="Date Filter">
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                    </group>
+                    <group string="Other Filter">
+                        <field name="salesperson_id"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="action_print_report"
+                            string="Print"
+                            type="object"
+                            class="btn-primary"
+                            icon="fa-print"/>
+                    <button string="Cancel"
+                            class="btn-secondary"
+                            special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Menu Action to open wizard -->
+    <record id="action_crm_report_wizard" model="ir.actions.act_window">
+        <field name="name">CRM Report</field>
+        <field name="res_model">crm.report.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- Add under CRM > Reporting menu -->
+    <menuitem id="menu_crm_report"
+              name="CRM Report"
+              parent="crm.crm_menu_report"
+              action="action_crm_report_wizard"
+              sequence="20"/>
+
+</odoo>

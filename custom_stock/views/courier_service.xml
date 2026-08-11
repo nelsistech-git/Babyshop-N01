@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="act_courier_service" model="ir.actions.act_window">
+            <field name="name">Invoice</field>
+            <field name="res_model">account.move</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[]</field>
+            <field name="context">{'search_default_courier_id': active_id, 'default_courier_id': active_id}</field>
+    </record>
+
+    <!-- courier service Form View -->
+	<record id="courier_service_view_form" model="ir.ui.view">
+        <field name="name">courier.service.form</field>
+        <field name="model">courier.service</field>
+        <field name="arch" type="xml">
+            <form  string="Courier Service">
+                 <header>
+                    <button name="action_confirm" id="action_confirm" class="btn-primary" type="object" string="Confirm"
+                            attrs="{'invisible': [('state', 'in', ['confirm','approve'])]}"/>
+                    <button name="action_approve" id="action_approve" class="btn-primary" type="object" string="Approve"
+                            attrs="{'invisible': [('state', 'in', ['draft','approve'])]}" confirm="Are you sure you want to Approve?"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirm,approve"/>
+                </header>
+                <sheet>
+                    <div attrs="{'invisible': [('state', 'not in', ['approve'])]}"  class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" name="%(act_courier_service)d" type="action"
+                            icon="fa-money" help="courier" >
+                              <div attrs="{'invisible': [('type', 'in', ['bill'])]}" class="o_form_field o_stat_info">
+                                 <span class="o_stat_text">Invoice</span>
+                             </div>
+                              <div attrs="{'invisible': [('type', 'in', ['invoice'])]}" class="o_form_field o_stat_info">
+                                 <span class="o_stat_text">Bill</span>
+                             </div>
+                        </button>
+                    </div>
+                    <group>
+                        <field name="picking_id" readonly="1" options="{'no_create': True}"/>
+                        <field name="vendor_id" required="1" options="{'no_create': True,'no_open': True}" attrs="{'readonly': [('state',  '=', 'approve')]}"/>
+                        <field name="product_id" invisible="1" options="{'no_create': True,'no_open': True}" attrs="{'readonly': [('state',  '=', 'approve')]}"/>
+                        <field name="courier_product_id" required="1" domain="[('courier_id.vendor_id', '=', vendor_id)]" options="{'no_create': True,'no_open': True}"
+                               attrs="{'readonly': [('state',  '=', 'approve')]}"/>
+                        <field name="amount" required="1" attrs="{'readonly': [('state',  '=', 'approve')]}"/>
+                        <field name="type" required="1" attrs="{'readonly': [('state',  '=', 'approve')]}"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Courier Service Tree View -->
+	<record id="courier_service_view_tree" model="ir.ui.view">
+         <field name="name">courier.service.tree</field>
+         <field name="model">courier.service</field>
+         <field name="arch" type="xml">
+             <tree create="false" delete="false" string="Courier Service List">
+                 <field name="picking_id"/>
+                 <field name="vendor_id"/>
+                 <field name="courier_product_id"/>
+                 <field name="amount"/>
+                 <field name="type"/>
+             </tree>
+         </field>
+     </record>
+
+    <!-- Courier Service search View -->
+    <record id="courier_service_view_search" model="ir.ui.view">
+         <field name="name">courier.service.search</field>
+         <field name="model">courier.service</field>
+        <field name="arch" type="xml">
+            <search string="Search Courier Service">
+                <field name="picking_id"/>
+                <field name="courier_product_id"/>
+                <field name="vendor_id"/>
+           </search>
+        </field>
+    </record>
+
+    <!-- Courier Service action window -->
+	<record id="courier_service_action" model="ir.actions.act_window">
+        <field name="name">Courier Service</field>
+        <field name="res_model">courier.service</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Please Create Courier Service
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_courier_history" name="Courier History" parent="sale.sale_order_menu" groups="sales_team.group_sale_salesman,sales_team.group_sale_salesman_all_leads"
+                  action="courier_service_action" sequence="5"/>
+
+</odoo>

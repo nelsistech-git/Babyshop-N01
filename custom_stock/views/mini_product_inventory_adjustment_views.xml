@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_mini_product_inventory_adjustment_form" model="ir.ui.view">
+        <field name="name">mini.product.inventory.adjustment.form</field>
+        <field name="model">mini.product.inventory.adjustment</field>
+        <field name="arch" type="xml">
+            <form string="Inventory Adjustment">
+                <header>
+                    <button name="action_confirm" id="action_confirm" class="btn-primary"
+                            type="object" string="Confirm" invisible="state != 'draft'"/>
+
+                    <button name="action_draft" id="action_draft" class="btn-secondary"
+                            type="object" string="Set to Draft" invisible="state not in ['confirm','cancel']"/>
+
+                    <button name="adjustment_action_done" id="adjustment_action_done" class="btn-primary"
+                            type="object" confirm="Are you sure you want to Done?" string="Validate" invisible="state not in ['confirm']"/>
+
+                    <button name="action_cancel" confirm="Are you sure you want to Cancel?" type="object" string="Cancel"
+                            invisible="state not in ['draft']"/>
+                   <field name="state" widget="statusbar" statusbar_visible="draft,confirm,approve"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field required="1" name="product_id" options="{'no_open': True,'no_create': True}"/>
+                            <field required="1" name="qty"/>
+                            <field required="1" name="location_id" options="{'no_open': True,'no_create': True}"/>
+                            <field required="1" name="approved_by_id" options="{'no_open': True,'no_create': True}"/>
+                        </group>
+                        <group>
+                            <field name="create_uid" readonly="1" force_save="1" options="{'no_open': True,'no_create': True}"/>
+                            <field name="create_date" readonly="1" force_save="1"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers" />
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_mini_product_inventory_adjustment_tree" model="ir.ui.view">
+       <field name="name">mini.product.inventory.adjustment.tree</field>
+       <field name="model">mini.product.inventory.adjustment</field>
+       <field name="arch" type="xml">
+           <tree decoration-success="state=='done'" delete="false" string="Inventory Adjustment List">
+               <field name="product_id" string="Product Name"/>
+               <field name="qty" string="Quantity"/>
+               <field name="location_id"/>
+               <field name="approved_by_id" string="Approved By"/>
+               <field name="create_uid" string="Created By"/>
+               <field name="create_date" string="Created Date"/>
+               <field name="state"/>
+           </tree>
+       </field>
+    </record>
+
+    <record id="view_mini_product_inventory_adjustment_filter" model="ir.ui.view">
+       <field name="name">mini.product.inventory.adjustment.filter</field>
+       <field name="model">mini.product.inventory.adjustment</field>
+       <field name="arch" type="xml">
+           <search string="Search Name List">
+               <field name="product_id"  filter_domain="[('product_id', 'ilike', self)]"/>
+               <field name="approved_by_id"  filter_domain="[('approved_by_id', 'ilike', self)]"/>
+          </search>
+       </field>
+    </record>
+
+    <record id="mini_product_inventory_adjustment_action" model="ir.actions.act_window">
+       <field name="name">Inventory Adjustment (Qty .1 - Qty .99)</field>
+       <field name="res_model">mini.product.inventory.adjustment</field>
+       <field name="view_mode">tree,form</field>
+       <field name="help" type="html">
+           <p class="o_view_nocontent_smiling_face">
+               Create a New Share Expense Type
+           </p>
+       </field>
+    </record>
+
+    <menuitem id="menu_mini_product_inventory_adjustment_id"
+         name="Mini Inventory Adjustment"
+         sequence="37"
+         groups="custom_stock.group_pos_inventory_adjustment"
+         action="mini_product_inventory_adjustment_action"
+         parent="stock.menu_stock_warehouse_mgmt"/>
+</odoo>

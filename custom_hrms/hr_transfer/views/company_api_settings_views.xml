@@ -1,0 +1,121 @@
+<odoo>
+    <data>
+        <record id="company_api_settings_view_form" model="ir.ui.view">
+            <field name="name">company.api.settings.view.form</field>
+            <field name="model">company.api.settings</field>
+            <field name="arch" type="xml">
+                <form string="Company API Settings">
+                	<header>
+                        <button name="action_sync_company_data" type="object" string="Sync Data"/>
+                        <button name="action_sync_company_customer_data" type="object" string="Sync Customer Data"/>
+                    </header>
+                    
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" required="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <field name="company_code" required="1" groups="base.group_system"/>
+                            <field name="url" required="1" groups="base.group_system"/>
+                            <field name="db_name" required="1" groups="base.group_system"/>
+                        </group>
+                        <group>
+                            <field name="user_id" required="1" groups="base.group_system"/>
+                            <field name="password" required="1" groups="base.group_system"/>
+                            <field name="access_token" required="1" groups="base.group_system"/>
+                            <field name="my_company" groups="base.group_system"/>
+                            <field name="last_sync_date" readonly="1"/>             
+                            <field name="last_sync_customer_date" readonly="1"/>
+                        </group>
+                        
+                        <notebook>
+	                        <page string="Locations">
+	                            <field name="other_location_ids">
+	                                <tree editable="top">
+	                                    <field name="name"/>        
+	                                    <field name="rec_id" />                            
+	                                </tree>	                                
+	                            </field>
+	                        </page>
+	                        <page string="Departments">
+	                            <field name="other_department_ids">
+	                                <tree editable="top">	                                    
+	                                    <field name="name"/>  
+	                                    <field name="rec_id" />                                  
+	                                </tree>
+	                            </field>
+	                        </page>
+	                        <page string="Designations">
+	                            <field name="other_designation_ids">
+	                                <tree editable="top">
+	                                    <field name="name"/>
+	                                    <field name="dept_id"/>  
+	                                    <field name="rec_id"/>                                
+	                                </tree>
+	                            </field>
+	                        </page>
+	                        <page string="Work Schedule">
+	                            <field name="other_work_schedule_ids">
+	                                <tree editable="top">
+	                                    <field name="name"/>
+	                                    <field name="rec_id"/>                                
+	                                </tree>
+	                            </field>
+	                        </page>
+	                        <page string="Attendance Policy">
+	                            <field name="other_att_policy_ids">
+	                                <tree editable="top">
+	                                    <field name="name"/>
+	                                    <field name="rec_id"/>                                
+	                                </tree>
+	                            </field>
+	                        </page>
+                    </notebook>
+                    
+                    </sheet>
+                </form>
+            </field>
+        </record>
+		
+        <record id="company_api_settings_view_tree" model="ir.ui.view">
+            <field name="name">company.api.settings.view.tree</field>
+            <field name="model">company.api.settings</field>
+            <field name="arch" type="xml">
+                <tree string="Inter Company API Settings">
+                    <field name="name" string="Company Name"/>
+                    <field name="company_code" string="Company Code"/>
+                    <field name="url" string="URL"/>
+                    <field name="db_name" string="Database Name"/>
+                    <field name="my_company"/>
+                </tree>
+            </field>
+        </record>
+		
+        <record id="view_company_api_settings_filter" model="ir.ui.view">
+            <field name="name">view.company.api.settings.filter</field>
+            <field name="model">company.api.settings</field>
+            <field name="arch" type="xml">
+                <search string="Search Inter Company API Settings">
+                    <field name="name" string="Company Name" filter_domain="[('name', 'ilike', self)]"/>
+                    <field name="company_code" string="Company Code" filter_domain="[('company_code', 'ilike', self)]"/>
+               </search>
+            </field>
+        </record>
+
+        <record id="company_api_settings_action" model="ir.actions.act_window">
+            <field name="name">Company API Settings</field>
+            <field name="res_model">company.api.settings</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create a Company API Settings
+                </p>
+            </field>
+        </record>
+
+        <menuitem id="menu_company_api_action" name="Company API Settings" parent="base.menu_users"
+                  action="hr_transfer.company_api_settings_action" sequence="16" />
+    </data>
+</odoo>

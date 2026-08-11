@@ -1,0 +1,37 @@
+<odoo>
+    <data>
+        <record id="view_print_badge_wizard_form" model="ir.ui.view">
+            <field name="name">print.badge.wizard.form</field>
+            <field name="model">print.badge.wizard</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Print Employee Badges">
+                    <sheet>
+                        <group>
+                            <field name="employee_ids"/>
+                        </group>
+                        <footer>
+                            <button string="Print Badges" type="object" name="print_badges"/>
+                            <button string="Cancel" special="cancel"/>
+                        </footer>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="print_badge_wizard_action" model="ir.actions.act_window">
+            <field name="name">Print Employee Badges</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">print.badge.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_print_badge_wizard_form"/>
+            <field name="target">new</field>
+        </record>
+
+        <menuitem id="menu_print_badge_wizard"
+              name="Print Employee Badges"
+              sequence="200"
+              action="print_badge_wizard_action"
+              parent="custom_hr_report.menu_employee_info_report_root"
+        />
+    </data>
+</odoo>

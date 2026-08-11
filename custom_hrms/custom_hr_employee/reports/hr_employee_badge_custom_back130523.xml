@@ -1,0 +1,490 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <report
+        id="custom_hr_employee.hr_employee_print_badge_custom"
+        string="Print Badge Custom"
+        model="hr.employee"
+        report_type="qweb-html"
+        name="custom_hr_employee.print_employee_badge_custom"
+        file="custom_hr_employee.print_employee_badge_custom"
+        print_report_name="'Print Badge - %s' % (object.name).replace('/', '')"
+    />
+    <record id="paperformat_print_employee_badge_custom"
+        model="report.paperformat">
+        <field name="name">Employee Badge Format</field>
+        <field name="default" eval="True" />
+        <field name="format">custom</field>
+        <field name="page_height">310 </field>
+        <field name="page_width">220</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">1</field>
+        <field name="margin_bottom">0</field>
+        <field name="margin_left">1</field>
+        <field name="margin_right">1</field>
+        <field name="header_line" eval="False" />
+        <field name="header_spacing">0</field>
+        <field name="dpi">90</field>
+    </record>
+    <record id="custom_hr_employee.hr_employee_print_badge_custom" model="ir.actions.report">
+        <field name="paperformat_id"
+            ref="custom_hr_employee.paperformat_print_employee_badge_custom" />
+    </record>
+
+<!--    <template id="employee_badge_print_format_line_qweb">-->
+
+    <template id="print_employee_badge_custom">
+        <t t-call="web.basic_layout">
+            <div class="page">
+<!--                <t t-set="docs_cycle" t-value="itertools.cycle(docs)" />-->
+<!--                <t t-for="i" t-range="4">-->
+<!--                  <t t-set="employee" t-value="next(docs_cycle)" />-->
+<!--                <t t-foreach="range(4)" t-as="i">-->
+<!--                    <t t-set="employee" t-value="docs[i]" />-->
+  <!-- Code to be executed for each iteration of the loop goes here -->
+<!--</t>-->
+                <t t-foreach="docs" t-as="employee" t-limit="4">
+                    <div class="row">
+                        <div style="-webkit-transform: rotate(90deg);width: 60mm; height: 90mm; float:left; margin-top:0px; margin-left:100px;">
+<!--                            <table style="background-color: white; border: 1pt solid black; margin:5pt;">-->
+<!--                                <tr>-->
+<!--                                    <td>-->
+<!--<<<<<<< HEAD-->
+<!--                                        <div style="-webkit-transform: rotate(90deg);width: 60mm; height: 90mm;border: 1pt solid red;">-->
+                                            <table style="width: 60mm; height: 90mm; border: 1pt solid black;" >
+                                                <tr><td style=" padding-left: 5pt; padding-top: 0pt; padding-bottom: 0pt; font-size:9pt; color:black; text-align: left; font-weight:bold;">Ishwardi Matsuoka Bangladesh Limited</td></tr>
+                                                <tr><td style=" padding-left: 35pt;"><img t-if="employee.company_id.logo" t-att-src="image_data_uri(employee.company_id.logo)" style="max-height:30pt;max-width:90%;" alt="Company Logo"/></td></tr>
+<!--                                                <tr><td style=" padding-left: 15pt;"><img t-if="employee.signature" t-att-src="image_data_uri(employee.signature)" style="max-height:30pt;max-width:90%;margin:3pt;" alt="Signature"/></td></tr>-->
+                                                <tr><td style="padding-left: 50pt;"><img t-if="employee.image_1920" t-att-src="image_data_uri(employee.image_1920)" style="max-height:70pt;max-width:90%;" alt="Employee Image"/></td></tr>
+                                                <tr><td style="padding-left: 5pt; padding-top: 0pt; padding-bottom: 0pt; font-size:8pt; color:black; text-align: left; font-weight:bold;">Name: <t t-esc="employee.name"/></td></tr>
+                                                <tr><td style="padding-left: 5pt; padding-top: 0pt; padding-bottom: 0pt; font-size:8pt; color:black; text-align: left; font-weight:bold;">ID No: <t t-esc="employee.id_card_no"/></td></tr>
+                                                <tr><td style="padding-left: 5pt; padding-top: 0pt; padding-bottom: 0pt; font-size:8pt; color:black; text-align: left; font-weight:bold;">Issue:<t t-esc="datetime.datetime.now().strftime('%d-%m-%Y')"/></td></tr>
+                                                <tr><td style="padding-left: 5pt; padding-top: 0pt; padding-bottom: 0pt; font-size:8pt; color:black; text-align: left; font-weight:bold;">Designation:<t t-esc="employee.job_id.name"/></td></tr>
+                                                <tr><td style="padding-left: 5pt; padding-top: 0pt; padding-bottom: 0pt; font-size:8pt; color:black; text-align: left; font-weight:bold;">Section:<t t-esc="employee.section_id.name"/></td></tr>
+                                                <tr><td style="padding-left: 5pt; padding-top: 0pt; padding-bottom: 0pt; font-size:8pt; color:black; text-align: left; font-weight:bold;">Joining Date:<t t-esc="employee.initial_employment_date"/></td></tr>
+                                                <tr><td style=" padding-left: 15pt;"><img t-if="employee.signature" t-att-src="image_data_uri(employee.signature)" style="max-height:30pt;max-width:90%;top: 290px; left: 0px; position: absolute;" alt="Signature"/></td></tr>
+                                                <tr><td style=" padding-left: 15pt;"><img t-if="employee.company_id.authority_signature" t-att-src="image_data_uri(employee.company_id.authority_signature)" style="max-height:30pt;max-width:90%;top: 290px; left: 120px; position: absolute;" alt="Authority"/></td></tr>
+                                                <tr><td style="padding-left: 10pt;padding-top: 15pt; font-size:8pt; color:black; text-align: left; font-weight:bold; text-decoration: overline; ">CardHolder</td></tr>
+                                                <tr><td style="padding-left: 10pt;padding-top: 10pt; font-size:8pt; color:black; text-align: left; font-weight:bold; text-decoration: overline; top: 305px; left: 130px; position: absolute;">Authority </td></tr>
+<!--=======
+                                        <div style="-webkit-transform: rotate(-90deg);">
+                                            <table style="width: 90mm; height: 60mm; margin:5pt" >
+                                                <tr><td style=" padding-left: 10pt; max-width: 90mm; max-height: 60mm; font-size:10pt; color:black; text-align: left; font-weight:bold;">Ishwardi Matsuoka Bangladesh Limited</td></tr>
+                                                <tr><td style=" padding-left: 30pt; max-width: 90mm; max-height: 60mm; "><img t-if="employee.company_id.logo" t-att-src="image_data_uri(employee.company_id.logo)" style="max-height:45pt;max-width:90%;margin:3pt;" alt="Company Logo"/></td></tr>
+                                                <tr><td style="padding-left: 50pt; max-width: 90mm; max-height: 60mm; "><img t-if="employee.image_1920" t-att-src="image_data_uri(employee.image_1920)" style="max-height:85pt;max-width:90%;margin:3pt;" alt="Employee Image"/></td></tr>
+                                                <tr><td style="padding-left: 10pt;max-width: 90mm; max-height: 60mm; font-size:8pt; color:black; text-align: left; font-weight:bold;">Name: <t t-esc="employee.name"/></td></tr>
+                                                <tr><td style="padding-left: 10pt;max-width: 90mm; max-height: 60mm; font-size:8pt; color:black; text-align: left; font-weight:bold;">ID No: <t t-esc="employee.id_card_no"/></td></tr>
+                                                <tr><td style="padding-left: 10pt;max-width: 90mm; max-height: 60mm; font-size:8pt; color:black; text-align: left; font-weight:bold;">Issue:<t t-esc="datetime.datetime.now().strftime('%d-%m-%Y')"/></td></tr>
+                                                <tr><td style="padding-left: 10pt;max-width: 90mm; max-height: 60mm; font-size:8pt; color:black; text-align: left; font-weight:bold;">Designation:<t t-esc="employee.job_id.name"/></td></tr>
+                                                <tr><td style="padding-left: 10pt;max-width: 90mm; max-height: 60mm; font-size:8pt; color:black; text-align: left; font-weight:bold;">Section:<t t-esc="employee.section_id.name"/></td></tr>
+                                                <tr><td style="padding-left: 10pt;max-width: 90mm; max-height: 60mm; font-size:8pt; color:black; text-align: left; font-weight:bold;">Joining Date:<t t-esc="employee.initial_employment_date.strftime('%d-%m-%Y')"/></td></tr>
+                                                <tr><td style="padding-left: 10pt;padding-top: 10pt;max-width: 90mm; max-height: 60mm; font-size:8pt; color:black; text-align: left; font-weight:bold; word-spacing: 20pt;">CardHolder             Authority </td></tr>
+>>>>>>> b60cef45736e5a3150b608a50e7919ebc6f09ebe-->
+                                            </table>
+<!--                                        </div>-->
+<!--                                    </td>-->
+
+<!--                                </tr>-->
+<!--                            </table>-->
+                        </div>
+
+                        <div style="-webkit-transform: rotate(-90deg);width: 60mm; height: 90mm; float:right;margin-top:0px; margin-left:140px;">
+<!--                            <div style="-webkit-transform: rotate(-90deg);">-->
+                                            <table style="width: 60mm; height: 90mm; border: 1pt solid black;" >
+                                                <tr><td style=" padding-left: 10pt; max-width: 90mm; max-height: 60mm; font-size:12pt; color:black; text-align: left; font-weight:bold;">Address</td></tr>
+                                                <tr><td style="padding-left: 10pt;max-width: 90mm; max-height: 60mm; font-size:10pt; color:black; text-align: left; font-weight:bold;">Village: <t t-esc="employee.village"/></td></tr>
+                                                <tr><td style="padding-left: 10pt;max-width: 90mm; max-height: 60mm; font-size:10pt; color:black; text-align: left; font-weight:bold;">Post Office: <t t-esc="employee.post_office"/></td></tr>
+                                                <tr><td style="padding-left: 10pt;max-width: 90mm; max-height: 60mm; font-size:10pt; color:black; text-align: left; font-weight:bold;">Police Station: <t t-esc="employee.thana"/></td></tr>
+                                                <tr><td style="padding-left: 10pt;max-width: 90mm; max-height: 60mm; font-size:10pt; color:black; text-align: left; font-weight:bold;">District: <t t-esc="employee.home_town_id.name"/></td></tr>
+                                                <tr><td style="padding-left: 10pt;max-width: 90mm; max-height: 60mm; font-size:10pt; color:black; text-align: left; font-weight:bold;">Blood Group: <t t-esc="blood_group"/></td></tr>
+                                                <tr><td style="padding-left: 10pt;max-width: 90mm; max-height: 60mm; font-size:10pt; color:black; text-align: left; font-weight:bold;">NID NO: <t t-esc="employee.nid"/></td></tr>
+                                                <tr><td style="font-family: Times New Roman, serif !important;padding-left: 10pt;max-width: 90mm; max-height: 60mm; font-size:8pt; color:black; text-align: left; ">Tenure up to the end of Service.</td></tr>
+                                                <tr><td style="font-family: Times New Roman, serif !important;padding-left: 10pt;max-width: 90mm; max-height: 60mm; font-size:8pt; color:black; text-align: left; ">Hung the card during duty.</td></tr>
+                                                <tr><td style="font-family: Times New Roman, serif !important; padding-left: 10pt;max-width: 90mm; max-height: 60mm; font-size:8pt; color:red; text-align: left; font-weight:bold;">Please sent back the card to the <br/>address given below if otherwise found.</td></tr>
+                                                <tr><td style="font-family: Times New Roman, serif !important; padding-left: 10pt;max-width: 90mm; max-height: 60mm; font-size:8pt; color:black; text-align: left; font-weight:bold;">Ishwardi Matsuoka Bangladesh Ltd. <br/> Ishwardi EPZ Paksey, Pabna. <br/> Plot: 34-41,51-53.</td></tr>
+                                                <tr><td style="font-family: Times New Roman, serif !important; padding-left: 10pt;max-width: 90mm; max-height: 60mm; font-size:8pt; color:black; text-align: left; ">Emergency Contact No: 01738-915897</td></tr>
+                                            </table>
+<!--                                        </div>-->
+
+                        </div>
+                    </div>
+
+<!--                    <table style="width: 95mm; height: 65mm; background-color: white; border: 1pt solid black; margin:5pt">-->
+<!--                        <tr>-->
+<!--                            <td>-->
+<!--                            <div style="writing-mode: vertical-rl !important;">-->
+<!--                                <table style="rotate: 270deg !important;">-->
+<!--                                    <tr><td style="transform: rotate(90deg) !important;">text1</td></tr>-->
+<!--                                    <tr><td style="transform: rotate(90deg) !important;">text2</td></tr>-->
+<!--                                    <tr><td>text3</td></tr>-->
+<!--                                    <tr><td>text4</td></tr>-->
+<!--                                    <tr><td>text5</td></tr>-->
+<!--                                    <tr><td>text6</td></tr>-->
+<!--                                    <tr><td>text7</td></tr>-->
+<!--                                </table>-->
+<!--                            </div>-->
+<!--                            </td>-->
+
+
+<!--                            <td>-->
+<!--                            <div style="rotate: 90deg !important;">-->
+<!--                                <table>-->
+<!--                                    <tr><td>text8</td></tr>-->
+<!--                                    <tr><td>text9</td></tr>-->
+<!--                                    <tr><td>text10</td></tr>-->
+<!--                                    <tr><td>text11</td></tr>-->
+<!--                                    <tr><td>text12</td></tr>-->
+<!--                                    <tr><td>text13</td></tr>-->
+<!--                                    <tr><td>text14</td></tr>-->
+<!--                                </table>-->
+<!--                            </div>-->
+<!--                            </td>-->
+
+<!--                        </tr>-->
+<!--                    </table>-->
+<!--                    <div style="float:left;">-->
+<!--                        <table style="width:243pt; height:153pt; table-layout: fixed; border: 1pt solid black; border-collapse:separate; border-radius:8pt; margin:5pt">-->
+<!--                            <td style="width:20%; height:100%; background-color: #0e499d;border-radius:8pt 0pt 0pt 8pt;" >-->
+<!--                                <div class="row rotate" style="font-size:14pt; color:white; font-weight:bold;transform: rotate(270deg); -webkit-transform: rotate(270deg); -ms-transform: rotate(90deg); top: 160px; right: 160px; position: absolute;"> Ishwardi Matsuoka Bangladesh Limited </div>-->
+<!--&lt;!&ndash;                                <table style="width:33pt; height:100%; border: 1pt solid black;">&ndash;&gt;-->
+
+<!--&lt;!&ndash;                                    <tr style="height:30%">&ndash;&gt;-->
+<!--&lt;!&ndash;                                        <td align="center" valign="center">&ndash;&gt;-->
+<!--&lt;!&ndash;                                            <img t-if="employee.company_id.logo" t-att-src="image_data_uri(employee.company_id.logo)" style="max-height:45pt;max-width:90%" alt="Company Logo"/>&ndash;&gt;-->
+<!--&lt;!&ndash;                                        </td>&ndash;&gt;-->
+<!--&lt;!&ndash;                                    </tr>&ndash;&gt;-->
+<!--&lt;!&ndash;                                    <tr style="height:100%;border: 1pt solid black;">&ndash;&gt;-->
+<!--&lt;!&ndash;                                        <td align="left" valign="left">&ndash;&gt;-->
+<!--&lt;!&ndash;                                            <div class="row rotate" style="font-weight:bold;transform: rotate(270deg); -webkit-transform: rotate(270deg); -ms-transform: rotate(90deg);"> Ishwardi Matsuoka Bangladesh Limited </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                                        </td>&ndash;&gt;-->
+<!--&lt;!&ndash;&lt;!&ndash;                                        <td align="center" valign="center">&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;&lt;!&ndash;                                            <img t-if="employee.image_1920" t-att-src="image_data_uri(employee.image_1920)" style="max-height:85pt;max-width:90%" alt="Employee Image"/>&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;&lt;!&ndash;                                        </td>&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;                                    </tr>&ndash;&gt;-->
+
+<!--&lt;!&ndash;                                </table>&ndash;&gt;-->
+<!--                            </td>-->
+<!--                            <td style="width:75%;border: 1pt solid black;border-radius:0pt 8pt 8pt 0pt;" valign="center">-->
+<!--                                <table style="width:155pt; height:85pt">-->
+<!--                                    <tr style="height:30%">-->
+<!--                                        <td align="center" valign="center">-->
+<!--                                            <img t-if="employee.company_id.logo" t-att-src="image_data_uri(employee.company_id.logo)" style="max-height:45pt;max-width:90%;margin:3pt;" alt="Company Logo"/>-->
+<!--                                        </td>-->
+<!--                                    </tr>-->
+<!--                                    <tr style="height:70%;">-->
+<!--                                        <td align="center" valign="center">-->
+<!--                                            <img t-if="employee.image_1920" t-att-src="image_data_uri(employee.image_1920)" style="max-height:85pt;max-width:90%;margin:3pt;" alt="Employee Image"/>-->
+<!--                                        </td>-->
+<!--                                    </tr>-->
+<!--                                    <tr><th><div style="font-size:12pt; font-family: Times New Roman, serif; margin-bottom:0pt;margin-left:3pt;margin-top:0pt;" align="center"><t t-esc="employee.name"/></div></th></tr>-->
+<!--                                    <tr><th><div style="font-size:10pt; font-family: Times New Roman, serif; margin-bottom:0pt;margin-left:3pt;margin-top:0pt;" align="center">ID: <t t-esc="employee.id_card_no"/></div></th></tr>-->
+<!--                                    <tr><th><div style="font-size:10pt; font-family: Times New Roman, serif; margin-bottom:0pt;margin-left:3pt;margin-top:0pt;" align="center">Designation: <t t-esc="employee.job_id.name"/></div></th></tr>-->
+<!--                                    <tr><th><div style="font-size:10pt; font-family: Times New Roman, serif; margin-bottom:0pt;margin-left:3pt;margin-top:0pt;" align="center">Section: <t t-esc="employee.section_id.name"/></div></th></tr>-->
+<!--                                    <tr><th><div style="font-size:8pt; font-family: Times New Roman, serif; margin-bottom:0pt;margin-left:3pt;margin-top:0pt;text-wrap;" align="center">Doj: <t t-esc="employee.initial_employment_date.strftime('%d-%m-%Y')"/>, Issue:<t t-esc="datetime.datetime.now().strftime('%d-%m-%Y')"/> </div></th></tr>-->
+
+<!--                                    <tr><th><div style="font-size:10pt; font-family: Times New Roman, serif; margin-bottom:0pt;margin-left:3pt;margin-top:0pt;" align="center"><img t-if="employee.signature" t-att-src="image_data_uri(employee.signature)" style="max-height:30pt;max-width:90%;margin:3pt;" alt="Signature"/></div></th></tr>-->
+<!--                                    <tr><th><div style="font-size:10pt; font-family: Times New Roman, serif; margin-bottom:0pt;margin-left:3pt;margin-top:0pt;" align="center">Authorized Signature</div></th></tr>-->
+
+<!--&lt;!&ndash;                                    <tr><td><img alt="barcode" t-if="employee.barcode" t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('Code128', employee.barcode, 600, 120)" style="max-height:50pt;max-width:100%;margin:10px;" align="center"/></td></tr>&ndash;&gt;-->
+<!--                                </table>-->
+<!--                            </td>-->
+<!--                        </table>-->
+<!--                    </div>-->
+<!--                    <div style="float:right;">-->
+<!--                        <table style="width:243pt; height:153pt; table-layout: fixed; border: 1pt solid black; border-collapse:separate; border-radius:8pt; margin:5pt">-->
+<!--                            <td style="width:20%; height:100%; background-color: #0e499d;border-radius:8pt 0pt 0pt 8pt;" >-->
+<!--                                <div class="row rotate" style="font-size:14pt; color:white; font-weight:bold;transform: rotate(270deg); -webkit-transform: rotate(270deg); -ms-transform: rotate(90deg); top: 160px; left: -100px; position: absolute;"> Ishwardi Matsuoka Bangladesh Limited </div>-->
+<!--&lt;!&ndash;                                <table style="width:33pt; height:100%; border: 1pt solid black;">&ndash;&gt;-->
+
+<!--&lt;!&ndash;                                    <tr style="height:30%">&ndash;&gt;-->
+<!--&lt;!&ndash;                                        <td align="center" valign="center">&ndash;&gt;-->
+<!--&lt;!&ndash;                                            <img t-if="employee.company_id.logo" t-att-src="image_data_uri(employee.company_id.logo)" style="max-height:45pt;max-width:90%" alt="Company Logo"/>&ndash;&gt;-->
+<!--&lt;!&ndash;                                        </td>&ndash;&gt;-->
+<!--&lt;!&ndash;                                    </tr>&ndash;&gt;-->
+<!--&lt;!&ndash;                                    <tr style="height:100%;border: 1pt solid black;">&ndash;&gt;-->
+<!--&lt;!&ndash;                                        <td align="left" valign="left">&ndash;&gt;-->
+<!--&lt;!&ndash;                                            <div class="row rotate" style="font-weight:bold;transform: rotate(270deg); -webkit-transform: rotate(270deg); -ms-transform: rotate(90deg);"> Ishwardi Matsuoka Bangladesh Limited </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                                        </td>&ndash;&gt;-->
+<!--&lt;!&ndash;&lt;!&ndash;                                        <td align="center" valign="center">&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;&lt;!&ndash;                                            <img t-if="employee.image_1920" t-att-src="image_data_uri(employee.image_1920)" style="max-height:85pt;max-width:90%" alt="Employee Image"/>&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;&lt;!&ndash;                                        </td>&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;                                    </tr>&ndash;&gt;-->
+
+<!--&lt;!&ndash;                                </table>&ndash;&gt;-->
+<!--                            </td>-->
+<!--                            <td style="width:75%;border: 1pt solid black;border-radius:0pt 8pt 8pt 0pt;" valign="center">-->
+<!--                                <table style="width:155pt; height:85pt">-->
+<!--                                    <tr style="height:30%">-->
+<!--                                        <td align="center" valign="center">-->
+<!--                                            <img t-if="employee.company_id.logo" t-att-src="image_data_uri(employee.company_id.logo)" style="max-height:45pt;max-width:90%;margin:3pt;" alt="Company Logo"/>-->
+<!--                                        </td>-->
+<!--                                    </tr>-->
+<!--&lt;!&ndash;                                    <tr style="height:70%;">&ndash;&gt;-->
+<!--&lt;!&ndash;                                        <td align="center" valign="center">&ndash;&gt;-->
+<!--&lt;!&ndash;                                            <img t-if="employee.image_1920" t-att-src="image_data_uri(employee.image_1920)" style="max-height:85pt;max-width:90%" alt="Employee Image"/>&ndash;&gt;-->
+<!--&lt;!&ndash;                                        </td>&ndash;&gt;-->
+<!--&lt;!&ndash;                                    </tr>&ndash;&gt;-->
+<!--                                    <tr><th><div style="font-size:15pt; font-family: Times New Roman, serif; margin-bottom:0pt;margin-left:3pt;margin-top:0pt;" align="left">Permanent Address</div></th></tr>-->
+<!--                                    <tr><th><div style="font-size:10pt; font-family: Times New Roman, serif; margin-bottom:0pt;margin-left:3pt;margin-top:0pt;" align="left">Village: <t t-esc="employee.village"/></div></th></tr>-->
+<!--                                    <tr><th><div style="font-size:10pt; font-family: Times New Roman, serif; margin-bottom:0pt;margin-left:3pt;margin-top:0pt;" align="left">Post office: <t t-esc="employee.post_office"/></div></th></tr>-->
+<!--                                    <tr><th><div style="font-size:10pt; font-family: Times New Roman, serif; margin-bottom:0pt;margin-left:3pt;margin-top:0pt;" align="left">Thana: <t t-esc="employee.thana"/></div></th></tr>-->
+<!--                                    <tr><th><div style="font-size:10pt; font-family: Times New Roman, serif; margin-bottom:0pt;margin-left:3pt;margin-top:0pt;" align="left">District: <t t-esc="employee.home_town_id.name"/></div></th></tr>-->
+<!--                                    <tr><th><div style="font-size:10pt; font-family: Times New Roman, serif; margin-bottom:0pt;margin-left:3pt;margin-top:0pt;" align="left">Blood Group: <t t-esc="blood_group"/></div></th></tr>-->
+<!--                                    <tr><th><div style="font-size:10pt; font-family: Times New Roman, serif; margin-bottom:0pt;margin-left:3pt;margin-top:0pt;" align="left">NID No: <t t-esc="employee.nid"/></div></th></tr>-->
+<!--                                    <tr><th><div style="font-size:10pt; font-family: Times New Roman, serif; margin-bottom:0pt;margin-left:3pt;margin-top:0pt;" align="left"> </div></th></tr>-->
+<!--                                    <separator/>-->
+<!--                                    <tr><th><div style="font-size:10pt; font-family: Times New Roman, serif; color:#FE284E; margin-bottom:3pt;margin-left:3pt;margin-top:0pt;" align="center">Please sent back the card to the address given below if otherwise found.</div></th></tr>-->
+<!--                                    <tr><th><div style="font-size:10pt; font-family: Times New Roman, serif; color:#1CFB84; margin-bottom:0pt;margin-left:3pt;margin-top:0pt;" align="center">Ishwardi Matsuoka Bangladesh Limited</div></th></tr>-->
+<!--                                    <tr><th><div style="font-size:10pt; font-family: Times New Roman, serif; color:#1CFB84; margin-bottom:0pt;margin-left:0pt;margin-top:0pt;" align="center">Ishwardi EPZ Paksey, Pabna</div></th></tr>-->
+<!--                                    <tr><th><div style="font-size:10pt; font-family: Times New Roman, serif; color:#1CFB84; margin-bottom:0pt;margin-left:3pt;margin-top:0pt;" align="center">Plot: 37-41</div></th></tr>-->
+<!--                                    <tr><th><div style="font-size:10pt; font-family: Times New Roman, serif; margin-bottom:0pt;margin-left:3pt;margin-top:0pt;" align="left">Office Contact No: 01318320732</div></th></tr>-->
+<!--&lt;!&ndash;                                    <tr><th><div style="font-size:15pt; margin-bottom:0pt;margin-top:0pt;" align="left">Ishwardi Matsuoka Bangladesh Limited</div></th></tr>&ndash;&gt;-->
+<!--&lt;!&ndash;                                    <tr><th><div style="font-size:15pt; margin-bottom:0pt;margin-top:0pt;" align="left">Blood Group: <t t-esc="employee.blood_group"/></div></th></tr>&ndash;&gt;-->
+<!--&lt;!&ndash;                                    <tr><td><div align="center" style="font-size:10pt;margin-bottom:5pt;"><t t-esc="employee.job_id.name"/></div></td></tr>&ndash;&gt;-->
+<!--&lt;!&ndash;                                    <tr><td><img alt="barcode" t-if="employee.barcode" t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('Code128', employee.barcode, 600, 100)" style="max-height:40pt;max-width:100%;margin:10px;" align="center"/></td></tr>&ndash;&gt;-->
+<!--                                </table>-->
+<!--                            </td>-->
+<!--                        </table>-->
+<!--                    </div>-->
+<!--                    <div style="height: 65mm; width: 95mm;">-->
+<!--                                    <table style="width: 100%; height: 100%; ">-->
+<!--                                      <tr>-->
+<!--                                        <td style="width: 20%; vertical-align: top; background-color: #0e499d;">-->
+<!--                                          &lt;!&ndash; First column content here &ndash;&gt;-->
+<!--                                        </td>-->
+<!--                                        <td style="width: 80%; vertical-align: top; background-color: black;">-->
+<!--                                          &lt;!&ndash; Second column content here &ndash;&gt;-->
+<!--                                        </td>-->
+<!--                                      </tr>-->
+<!--                                      <tr>-->
+<!--                                        <td colspan="2" style="height: 5pt;"></td>-->
+<!--                                      </tr>-->
+<!--                                      <tr>-->
+<!--                                        <td style="width: 20%; vertical-align: top; background-color: #0e499d;">-->
+<!--                                          &lt;!&ndash; Third column content here &ndash;&gt;-->
+<!--                                        </td>-->
+<!--                                        <td style="width: 80%; vertical-align: top; background-color: black;">-->
+<!--                                          &lt;!&ndash; Fourth column content here &ndash;&gt;-->
+<!--                                        </td>-->
+<!--                                      </tr>-->
+<!--                                    </table>-->
+<!--                                </div>-->
+<!--                    <div class="row">-->
+<!--&lt;!&ndash;                        <div class="col-xs-6">&ndash;&gt;-->
+<!--&lt;!&ndash;                            <table style="width: 95mm; height: 65mm; background-color: white; border: 1pt solid black; margin:5pt">&ndash;&gt;-->
+<!--&lt;!&ndash;                                <div style="rotate: 90deg !important;">&ndash;&gt;-->
+<!--&lt;!&ndash;                                    <tr style="width: 100%; height: 100%;">&ndash;&gt;-->
+
+<!--&lt;!&ndash;                                            <td style="width: 100%; height: 100%; vertical-align: top; background-color: white">&ndash;&gt;-->
+
+<!--&lt;!&ndash;                                              &lt;!&ndash; First column content here &ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;&lt;!&ndash;                                                <div class="row rotate" style="font-size:12pt; color:white; font-weight:bold;transform: rotate(270deg); -webkit-transform: rotate(90deg); -ms-transform: rotate(90deg); top: 120px; left: 50px; position: absolute;">new Ishwardi Matsuoka Bangladesh Limited </div>&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;&lt;!&ndash;                                                <div class="row rotate" style="font-size:10pt; color:white; font-weight:bold;transform: rotate(270deg); -webkit-transform: rotate(90deg); -ms-transform: rotate(90deg); top: 160px; left: 60px; position: absolute;"> Ishwardi Matsuoka Bangladesh Limited </div>&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;&lt;!&ndash;                                                <div class="row rotate" style="font-size:10pt; color:white; font-weight:bold;transform: rotate(270deg); -webkit-transform: rotate(90deg); -ms-transform: rotate(90deg); top: 160px; left: 70px; position: absolute;"> Ishwardi Matsuoka Bangladesh Limited </div>&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;                                                <div style="font-size:10pt; color:black; font-weight:bold;"> Ishwardi Matsuoka Bangladesh Limited </div>&ndash;&gt;-->
+<!--&lt;!&ndash;&lt;!&ndash;                                                <div class="row rotate" style="font-size:10pt; color:black; font-weight:bold;transform: rotate(270deg); -webkit-transform: rotate(90deg); -ms-transform: rotate(90deg); top: 110px; left: 250px; position: absolute;"> Ishwardi Matsuoka Bangladesh Limited </div>&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;                                                <div style="font-size:10pt; color:black; font-weight:bold;"> <img t-if="employee.company_id.logo" t-att-src="image_data_uri(employee.company_id.logo)" style="max-height:45pt;max-width:90%;margin:3pt;" alt="Company Logo"/> </div>&ndash;&gt;-->
+<!--&lt;!&ndash;&lt;!&ndash;                                                <div class="row rotate" style="font-size:10pt; color:black; font-weight:bold;transform: rotate(270deg); -webkit-transform: rotate(90deg); -ms-transform: rotate(90deg); top: 90px; left: 230px; position: absolute;"> <img t-if="employee.company_id.logo" t-att-src="image_data_uri(employee.company_id.logo)" style="max-height:45pt;max-width:90%;margin:3pt;" alt="Company Logo"/> </div>&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;                                                <div class="row rotate" style="font-size:10pt; color:black; font-weight:bold;transform: rotate(270deg); -webkit-transform: rotate(90deg); -ms-transform: rotate(90deg); top: 70px; left: 190px; position: absolute;"> <img t-if="employee.image_1920" t-att-src="image_data_uri(employee.image_1920)" style="max-height:85pt;max-width:90%;margin:3pt;" alt="Employee Image"/> </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                                                <div class="row rotate" style="font-size:10pt; color:black; font-weight:bold;transform: rotate(270deg); -webkit-transform: rotate(90deg); -ms-transform: rotate(90deg); top: 90px; left: 80px; position: absolute;"> Name: <t t-esc="employee.name"/> </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                                                <div class="row rotate" style="font-size:10pt; color:black; font-weight:bold;transform: rotate(270deg); -webkit-transform: rotate(90deg); -ms-transform: rotate(90deg); top: 40px; left: 110px; position: absolute;"> ID No: <t t-esc="employee.id_card_no"/> </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                                                <div class="row rotate" style="font-size:10pt; color:black; text-align: left; font-weight:bold;transform: rotate(270deg); -webkit-transform: rotate(90deg); -ms-transform: rotate(90deg); top: 55px; left: 75px; position: absolute;"> Issue:<t t-esc="datetime.datetime.now().strftime('%d-%m-%Y')"/> </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                                                <div class="row rotate" style="font-size:10pt; color:black; text-align: left; font-weight:bold;transform: rotate(270deg); -webkit-transform: rotate(90deg); -ms-transform: rotate(90deg); top: 73px; left: 40px; position: absolute;"> Designation:<t t-esc="employee.job_id.name"/> </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                                                <div class="row rotate" style="font-size:10pt; color:black; text-align: left; font-weight:bold;transform: rotate(270deg); -webkit-transform: rotate(90deg); -ms-transform: rotate(90deg); top: 43px; left: 55px; position: absolute;"> Section:<t t-esc="employee.section_id.name"/> </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                                                <div class="row rotate" style="font-size:10pt; color:black; font-weight:bold;transform: rotate(270deg); -webkit-transform: rotate(90deg); -ms-transform: rotate(90deg); top: 78px; left: 5px; position: absolute;"> Joining Date:<t t-esc="employee.initial_employment_date.strftime('%d-%m-%Y')"/> </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                                                <div class="row rotate" style="font-size:10pt; color:black; font-weight:bold;transform: rotate(270deg); -webkit-transform: rotate(90deg); -ms-transform: rotate(90deg); top: 40px; left: 5px; position: absolute;"> Card Holder</div>&ndash;&gt;-->
+<!--&lt;!&ndash;                                                <div class="row rotate" style="font-size:10pt; color:black; font-weight:bold;transform: rotate(270deg); -webkit-transform: rotate(90deg); -ms-transform: rotate(90deg); top: 180px; left: 10px; position: absolute;"> Authority </div>&ndash;&gt;-->
+<!--&lt;!&ndash;&lt;!&ndash;                                                <div class="row rotate" style="font-size:10pt; color:white; font-weight:bold;transform: rotate(270deg); -webkit-transform: rotate(90deg); -ms-transform: rotate(90deg); top: 120px; left: 120px; position: absolute;"> Ishwardi Matsuoka Bangladesh Limited </div>&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;&lt;!&ndash;                                                <div class="row rotate" style="font-size:10pt; color:white; font-weight:bold;transform: rotate(270deg); -webkit-transform: rotate(90deg); -ms-transform: rotate(90deg); top: 120px; left: 80px; position: absolute;"> Ishwardi Matsuoka Bangladesh Limited </div>&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;                                            </td>&ndash;&gt;-->
+<!--&lt;!&ndash;&lt;!&ndash;                                            <td style="width: 100%; height: 80%; vertical-align: top;">&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;&lt;!&ndash;                                              &lt;!&ndash; Second column content here &ndash;&gt;&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;&lt;!&ndash;                                                new1&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;&lt;!&ndash;                                            </td>&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;                                    </tr>&ndash;&gt;-->
+<!--&lt;!&ndash;                                </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                            </table>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+<!--                        <div class="col-xs-6">-->
+<!--                            <table style="width: 95mm; height: 65mm; background-color: white; margin:5pt">-->
+<!--                                <tr style="width: 100%; height: 100%;">-->
+<!--&lt;!&ndash;                                    <div class="row rotate" style="font-size:14pt; color:white; font-weight:bold;transform: rotate(270deg); -webkit-transform: rotate(270deg); -ms-transform: rotate(90deg); top: 160px; right: 160px; position: absolute;"> Ishwardi Matsuoka Bangladesh Limited </div>&ndash;&gt;-->
+<!--                                            <td style=" text-align: left; border: 1pt solid black; background-color: white;">-->
+<!--                                              &lt;!&ndash; First column content here &ndash;&gt;-->
+<!--&lt;!&ndash;                                                <div style="font-size:12pt; color:black; font-weight:bold;transform: rotate(270deg); -webkit-transform: rotate(270deg); -ms-transform: rotate(2700deg);"> Address</div>&ndash;&gt;-->
+<!--&lt;!&ndash;                                                <div class="row rotate" style="font-size:10pt; color:black; font-weight:bold;transform: rotate(270deg); -webkit-transform: rotate(270deg); -ms-transform: rotate(2700deg);"> Village: <t t-esc="employee.village"/></div>&ndash;&gt;-->
+<!--&lt;!&ndash;                                                <div class="row rotate" style="font-size:10pt; color:black; font-weight:bold;transform: rotate(270deg); -webkit-transform: rotate(270deg); -ms-transform: rotate(2700deg);"> Post Office: <t t-esc="employee.post_office"/></div>&ndash;&gt;-->
+<!--&lt;!&ndash;                                                <div class="row rotate" style="font-size:10pt; color:black; font-weight:bold;"> Police Station:: <t t-esc="employee.thana"/></div>&ndash;&gt;-->
+<!--&lt;!&ndash;                                                <div class="row rotate" style="font-size:10pt; color:black; font-weight:bold;"> District: <t t-esc="employee.home_town_id.name"/></div>&ndash;&gt;-->
+<!--&lt;!&ndash;                                                <div class="row rotate" style="font-size:10pt; color:black; font-weight:bold;"> Blood Group: <t t-esc="blood_group"/></div>&ndash;&gt;-->
+<!--&lt;!&ndash;                                                <div class="row rotate" style="font-size:10pt; color:black; font-weight:bold;"> NID: <t t-esc="employee.nid"/></div>&ndash;&gt;-->
+<!--                                                <div class="row rotate" style="font-size:12pt; color:black; font-weight:bold;transform: rotate(270deg); -webkit-transform: rotate(270deg); -ms-transform: rotate(2700deg); top: 185px; right: 460px; position: absolute;"> Address</div>-->
+<!--                                                <div class="row rotate" style="font-size:10pt; color:black; font-weight:bold;transform: rotate(270deg); -webkit-transform: rotate(270deg); -ms-transform: rotate(2700deg); top: 130px; right: 380px; position: absolute;"> Village: <t t-esc="employee.village"/> </div>-->
+<!--                                                <div class="row rotate" style="font-size:10pt; color:black; font-weight:bold;transform: rotate(270deg); -webkit-transform: rotate(270deg); -ms-transform: rotate(2700deg); top: 130px; right: 350px; position: absolute;"> Post Office: <t t-esc="employee.post_office"/> </div>-->
+<!--&lt;!&ndash;                                                <div class="row rotate" style="font-size:10pt; color:black; font-weight:bold;transform: rotate(270deg); -webkit-transform: rotate(270deg); -ms-transform: rotate(2700deg); top: 130px; right: 340px; position: absolute;"> Police Station:: <t t-esc="employee.thana"/> </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                                                <div class="row rotate" style="font-size:10pt; color:black; font-weight:bold;transform: rotate(270deg); -webkit-transform: rotate(270deg); -ms-transform: rotate(2700deg); top: 130px; right: 330px; position: absolute;"> District: <t t-esc="employee.home_town_id.name"/> </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                                                <div class="row rotate" style="font-size:10pt; color:black; font-weight:bold;transform: rotate(270deg); -webkit-transform: rotate(270deg); -ms-transform: rotate(2700deg); top: 130px; right: 320px; position: absolute;"> Blood Group: <t t-esc="blood_group"/> </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                                                <div class="row rotate" style="font-size:10pt; color:black; font-weight:bold;transform: rotate(270deg); -webkit-transform: rotate(270deg); -ms-transform: rotate(2700deg); top: 130px; right: 310px; position: absolute;"> NID: <t t-esc="employee.nid"/> </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                                                <div class="row rotate" style="font-size:10pt; color:black; font-weight:bold;transform: rotate(270deg); -webkit-transform: rotate(270deg); -ms-transform: rotate(2700deg); top: 90px; right: 80px; position: absolute;"> Police Station: <t t-esc="employee.name"/> </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                                                <div class="row rotate" style="font-size:10pt; color:black; font-weight:bold;transform: rotate(270deg); -webkit-transform: rotate(270deg); -ms-transform: rotate(2700deg); top: 90px; right: 80px; position: absolute;"> Name: <t t-esc="employee.name"/> </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                                                <div class="row rotate" style="font-size:10pt; color:black; font-weight:bold;transform: rotate(360deg); -webkit-transform: rotate(360deg); -ms-transform: rotate(360deg); top: 40px; right: 110px; position: absolute;"> ID No: <t t-esc="employee.id_card_no"/> </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                                                <div class="row rotate" style="font-size:10pt; color:black; text-align: left; font-weight:bold;transform: rotate(-270deg); -webkit-transform: rotate(90deg); -ms-transform: rotate(90deg); top: 55px; right: 75px; position: absolute;"> Issue:<t t-esc="datetime.datetime.now().strftime('%d-%m-%Y')"/> </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                                                <div class="row rotate" style="font-size:10pt; color:black; text-align: left; font-weight:bold;transform: rotate(-270deg); -webkit-transform: rotate(90deg); -ms-transform: rotate(90deg); top: 73px; right: 40px; position: absolute;"> Designation:<t t-esc="employee.job_id.name"/> </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                                                <div class="row rotate" style="font-size:10pt; color:black; text-align: left; font-weight:bold;transform: rotate(-270deg); -webkit-transform: rotate(90deg); -ms-transform: rotate(90deg); top: 43px; right: 55px; position: absolute;"> Section:<t t-esc="employee.section_id.name"/> </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                                                <div class="row rotate" style="font-size:10pt; color:black; font-weight:bold;transform: rotate(-270deg); -webkit-transform: rotate(90deg); -ms-transform: rotate(90deg); top: 78px; right: 5px; position: absolute;"> Joining Date:<t t-esc="employee.initial_employment_date.strftime('%d-%m-%Y')"/> </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                                                <div class="row rotate" style="font-size:10pt; color:black; font-weight:bold;transform: rotate(-270deg); -webkit-transform: rotate(90deg); -ms-transform: rotate(90deg); top: 40px; right: 5px; position: absolute;"> Card Holder</div>&ndash;&gt;-->
+
+<!--                                            </td>-->
+<!--&lt;!&ndash;                                            <td style="width: 100%; height: 80%; vertical-align: top;">&ndash;&gt;-->
+<!--&lt;!&ndash;                                              &lt;!&ndash; Second column content here &ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;                                                new1&ndash;&gt;-->
+<!--&lt;!&ndash;                                            </td>&ndash;&gt;-->
+<!--                              </tr>-->
+<!--&lt;!&ndash;                                            <div style="width:100%; height:80%; background-color: white;">&ndash;&gt;-->
+<!--&lt;!&ndash;                                                new2&ndash;&gt;-->
+<!--&lt;!&ndash;                                            </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                                            <div style="width:100%; height:20%; background-color: #0e499d;">&ndash;&gt;-->
+<!--&lt;!&ndash;                                                nwe3&ndash;&gt;-->
+<!--&lt;!&ndash;                                            </div>&ndash;&gt;-->
+<!--                            </table>-->
+<!--                        </div>-->
+<!--                    </div>-->
+
+                </t>
+            </div>
+        </t>
+    </template>
+
+</odoo>
+
+<!--<?xml version="1.0" encoding="utf-8"?>-->
+<!--<odoo>-->
+<!--    <report-->
+<!--        id="custom_hr_employee.hr_employee_print_badge_custom"-->
+<!--        string="Print Badge"-->
+<!--        model="hr.employee"-->
+<!--        report_type="qweb-pdf"-->
+<!--        name="custom_hr_employee.print_employee_badge_custom"-->
+<!--        file="custom_hr_employee.print_employee_badge_custom"-->
+<!--        print_report_name="'Print Badge - %s' % (object.name).replace('/', '')"-->
+<!--    />-->
+<!--	-->
+<!--    <template id="print_employee_badge_custom">-->
+<!--        <t t-call="web.basic_layout">-->
+<!--            <div class="page">-->
+<!--                <t t-foreach="docs" t-as="employee">-->
+<!--                    <div class="col-md-6">-->
+<!--                        <table style="width:243pt; height:153pt; border: 1pt solid black; border-collapse:separate; border-radius:8pt; margin:5pt">-->
+<!--                            <td style="width:33%;" valign="center">-->
+<!--                                <table style="width:77pt; height:150pt">-->
+<!--                                    <tr style="height:30%">-->
+<!--                                        <td align="center" valign="center">-->
+<!--                                            <img t-if="employee.company_id.logo" t-att-src="image_data_uri(employee.company_id.logo)" style="max-height:45pt;max-width:90%" alt="Company Logo"/>-->
+<!--                                        </td>-->
+<!--                                    </tr>-->
+<!--                                    <tr style="height:70%;">-->
+<!--                                        <td align="center" valign="center">-->
+<!--                                            <img t-if="employee.image_1920" t-att-src="image_data_uri(employee.image_1920)" style="max-height:85pt;max-width:90%" alt="Employee Image"/>-->
+<!--                                        </td>-->
+<!--                                    </tr>-->
+<!--                                </table>-->
+<!--                            </td>-->
+<!--                            <td style="width:67%" valign="center">-->
+<!--                                <table style="width:155pt; height:85pt">-->
+<!--                                    <tr><th><div style="font-size:15pt; margin-bottom:0pt;margin-top:0pt;" align="center"><t t-esc="employee.name"/></div></th></tr>-->
+<!--                                    <tr><td><div align="center" style="font-size:10pt;margin-bottom:5pt;"><t t-esc="employee.job_id.name"/></div></td></tr>-->
+<!--                                    <tr><td><img alt="barcode" t-if="employee.barcode" t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('Code128', employee.barcode, 600, 120)" style="max-height:50pt;max-width:100%;" align="center"/></td></tr>-->
+<!--                                </table>-->
+<!--                            </td>-->
+<!--                        </table>-->
+<!--                    </div>-->
+<!--                </t>-->
+<!--            </div>-->
+<!--        </t>-->
+<!--    </template>-->
+<!--</odoo>-->
+
+<!--<?xml version="1.0"?>-->
+<!--<odoo>-->
+<!--  <data>-->
+<!--    <report-->
+<!--      id="report_employee_badge"-->
+<!--      model="hr.employee"-->
+<!--      string="Employee Badge"-->
+<!--      report_type="qweb-pdf"-->
+<!--      name="hr.employee.badge"-->
+<!--      file="hr.employee.badge"-->
+<!--      attachment_use="False"-->
+<!--    />-->
+
+<!--    <template id="hr_employee_badge">-->
+<!--      <t t-call="web.html_container">-->
+<!--        <t t-foreach="docs" t-as="o">-->
+<!--          <div class="page">-->
+<!--            &lt;!&ndash; First page &ndash;&gt;-->
+<!--            <div class="header">-->
+<!--              <div class="company_name">-->
+<!--                <span t-field="o.company_id.name"/>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--            <div class="content">-->
+<!--              <div class="employee_info">-->
+<!--                <div class="photo">-->
+<!--                  <img t-if="o.image" t-att-src="'data:image/png;base64,'+o.image" height="80"/>-->
+<!--                  <img t-if="not o.image" t-att-src="'/web/image/hr.employee/'+str(o.id)+'/image_1920'" height="80"/>-->
+<!--                </div>-->
+<!--                <div class="details">-->
+<!--                  <div class="name">-->
+<!--                    <span t-field="o.name"/>-->
+<!--                  </div>-->
+<!--                  <div class="id">-->
+<!--                    <span>ID: </span><span t-field="o.identification_id"/>-->
+<!--                  </div>-->
+<!--                  <div class="issue_date">-->
+<!--                    <span>Issue Date: </span><span t-field="o.issue_date"/>-->
+<!--                  </div>-->
+<!--                  <div class="designation">-->
+<!--                    <span>Designation: </span><span t-field="o.job_title"/>-->
+<!--                  </div>-->
+<!--                  <div class="section">-->
+<!--                    <span>Section: </span><span t-field="o.department_id.name"/>-->
+<!--                  </div>-->
+<!--                  <div class="joining_date">-->
+<!--                    <span>Joining Date: </span><span t-field="o.date_of_joining"/>-->
+<!--                  </div>-->
+<!--                </div>-->
+<!--              </div>-->
+<!--            </div>-->
+
+<!--            &lt;!&ndash; Second page &ndash;&gt;-->
+<!--            <div class="header">-->
+<!--              <div class="company_address">-->
+<!--                <span t-field="o.company_id.street"/>-->
+<!--                <br/>-->
+<!--                <span t-field="o.company_id.street2"/>-->
+<!--                <br/>-->
+<!--                <span t-field="o.company_id.city"/> - <span t-field="o.company_id.zip"/> <span t-field="o.company_id.state_id.name"/>-->
+<!--                <br/>-->
+<!--                <span t-field="o.company_id.country_id.name"/>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--            <div class="content">-->
+<!--              <div class="employee_info">-->
+<!--                <div class="details">-->
+<!--                  <div class="address">-->
+<!--                    <span>Address: </span><span t-field="o.address_home_id.street"/>-->
+<!--                  </div>-->
+<!--                  <div class="village">-->
+<!--                    <span>Village: </span><span t-field="o.address_home_id.street2"/>-->
+<!--                  </div>-->
+<!--                  <div class="post_office">-->
+<!--                    <span>Post Office: </span><span t-field="o.address_home_id.city"/>-->
+<!--                  </div>-->
+<!--                  <div class="district">-->
+<!--                    <span>District: </span><span t-field="o.address_home_id.state_id.name"/>-->
+<!--                  </div>-->
+<!--                  <div class="blood_group">-->
+<!--                    <span>Blood Group: </span><span t-field="o.blood_group"/>-->
+<!--                  </div>-->
+<!--                  <div class="nid_no">-->
+<!--                    <span>NID No: </span><span t-field="o.nid_no"/>-->
+

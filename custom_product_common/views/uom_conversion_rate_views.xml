@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data>
+        <record id="view_uom_conversion_rate_tree" model="ir.ui.view">
+            <field name="name">uom.conversion.rate.tree</field>
+            <field name="model">uom.conversion.rate</field>
+            <field name="arch" type="xml">
+                <tree string="UoM Conversion Rate" editable="bottom">
+                    <field name="from_uom_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" required="1"/>
+                    <field name="to_value" required="1"/>
+                    <field name="to_uom_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" required="1"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_uom_conversion_rate_search" model="ir.ui.view">
+            <field name="name">uom.conversion.rate.search</field>
+            <field name="model">uom.conversion.rate</field>
+            <field name="arch" type="xml">
+                <search string="Search UoM Conversion Rate">
+                    <field name="from_uom_id"/>
+                    <field name="to_uom_id"/>
+               </search>
+            </field>
+        </record>
+
+        <record id="action_uom_conversion_rate" model="ir.actions.act_window">
+            <field name="name">UoM Conversion Rate</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_mode">tree</field>
+            <field name="res_model">uom.conversion.rate</field>
+	        <field name="help" type="html">
+	            <p class="o_view_nocontent_smiling_face">
+	                UoM Conversion Rate
+	            </p>
+	        </field>
+	    </record>
+
+        <!-- Purchase Menu: Product > UoM Conversion Rate -->
+        <menuitem id="menu_uom_conversion_rate" name="UoM Conversion Rate" action="action_uom_conversion_rate" sequence="102" parent="purchase.menu_purchase_products"/>
+    </data>
+</odoo>

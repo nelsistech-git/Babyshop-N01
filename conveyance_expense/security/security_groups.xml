@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="module_category_conveyance" model="ir.module.category">
+        <field name="name">Conveyance</field>
+        <field name="sequence">20</field>
+    </record>
+
+    <record id="group_conveyance_user" model="res.groups">
+        <field name="name">User</field>
+        <field name="category_id" ref="module_category_conveyance"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <record id="group_conveyance_supervisor" model="res.groups">
+        <field name="name">Approved by</field>
+        <field name="category_id" ref="module_category_conveyance"/>
+        <field name="implied_ids" eval="[(4, ref('group_conveyance_user'))]"/>
+    </record>
+
+    <record id="group_conveyance_vice_president" model="res.groups">
+        <field name="name">management-Authorized by</field>
+        <field name="category_id" ref="module_category_conveyance"/>
+        <field name="implied_ids" eval="[(4, ref('group_conveyance_supervisor'))]"/>
+    </record>
+
+    <record id="group_conveyance_ceo" model="res.groups">
+        <field name="name">CFO</field>
+        <field name="category_id" ref="module_category_conveyance"/>
+        <field name="implied_ids" eval="[(4, ref('group_conveyance_vice_president'))]"/>
+    </record>
+
+    <record id="group_conveyance_manager" model="res.groups">
+        <field name="name">Manager</field>
+        <field name="category_id" ref="module_category_conveyance"/>
+        <field name="implied_ids" eval="[(4, ref('group_conveyance_ceo'))]"/>
+        <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+    </record>
+    <!-- Record Rule: Regular users see ONLY their own conveyance sheets -->
+    <record id="rule_conveyance_sheet_user_own" model="ir.rule">
+        <field name="name">Conveyance Sheet: User sees own records only</field>
+        <field name="model_id" ref="model_conveyance_sheet"/>
+        <field name="domain_force">[('employee_id.user_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- Record Rule: Supervisors and above see ALL records (overrides above rule via OR) -->
+    <record id="rule_conveyance_sheet_supervisor_all" model="ir.rule">
+        <field name="name">Conveyance Sheet: Approved by sees all records</field>
+        <field name="model_id" ref="model_conveyance_sheet"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_conveyance_supervisor'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+</odoo>

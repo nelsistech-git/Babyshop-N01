@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <record id="inventory_transfer_report_tmpl" model="ir.actions.report">
+            <field name="name">Inventory Transfer Report</field>
+            <field name="model">inventory.transfer.report.wizard</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">custom_stock.inventory_transfer_report_pdf</field>
+            <field name="report_file">custom_stock.inventory_transfer_report_pdf</field>
+            <field name="print_report_name">Inventory Transfer Report</field>
+        </record>
+
+        <template id="inventory_transfer_report_pdf">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <style type="text/css">
+                            table, tr, th, td {
+                                border: 1px solid #000; !important;
+                            }
+                        </style>
+
+                        <div class="oe_structure"/>
+
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <h3 class="text-center head_font_color"><strong>Inventory Transfer Report</strong></h3><br/>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <div><strong>Start Date:</strong> <t t-esc="form['start_date']" t-options='{"widget": "date"}'/></div>
+                                <div><strong>End Date:</strong> <t t-esc="form['end_date']" t-options='{"widget": "date"}'/></div>
+                                <div><strong>Transfer Number:</strong> <t t-esc="transfer_number"/></div>
+                            </div>
+                            <div class="col-6 text-right">
+                                <div><strong>Source Location:</strong> <t t-esc="src_loc_name"/></div>
+                                <div><strong>Destination Location:</strong> <t t-esc="dest_loc_name"/></div>
+                                <div><strong>Category:</strong> <t t-esc="categ_name"/></div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <table class="table table-condensed">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center align-middle bg_color font_color"><strong>Sl. No.</strong></th>
+                                        <th class="text-left align-middle bg_color font_color"><strong>Category Name</strong></th>
+                                        <th class="text-center align-middle bg_color font_color"><strong>Barcode</strong></th>
+                                        <th class="text-left align-middle bg_color font_color"><strong>Product Name</strong></th>
+                                        <th class="text-left align-middle bg_color font_color"><strong>UoM</strong></th>
+                                        <th class="text-left align-middle bg_color font_color text-nowrap"><strong>Source Location</strong></th>
+                                        <th class="text-left align-middle bg_color font_color text-nowrap"><strong>Destination Location</strong></th>
+                                        <th class="text-right align-middle bg_color font_color"><strong>Qty.</strong></th>
+                                        <th class="text-right align-middle bg_color font_color"><strong>Sale Price</strong></th>
+                                        <th class="text-right align-middle bg_color font_color"><strong>Total Sale</strong></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-set="sl_no" t-value="1"/>
+                                    <t t-set="t_quantity" t-value="0"/>
+                                    <t t-set="t_sales_price" t-value="0"/>
+                                    <t t-set="total_sales_price" t-value="0"/>
+                                    <t t-foreach="csr" t-as="rec">
+                                        <tr>
+                                            <td class="text-center align-middle">
+                                                <t t-esc="sl_no"/>
+                                            </td>
+                                            <td class="text-left align-middle">
+                                                <t t-esc="rec['categ_name']"/>
+                                            </td>
+                                            <td class="text-center align-middle">
+                                                <t t-esc="rec['barcode']"/>
+                                            </td>
+                                            <td class="text-left align-middle">
+                                                <t t-esc="rec['product']"/>
+                                            </td>
+                                            <td class="text-left align-middle">
+                                                <t t-esc="rec['uom']"/>
+                                            </td>
+                                            <td class="text-left align-middle">
+                                                <t t-esc="rec['src_location']"/>
+                                            </td>
+                                            <td class="text-left align-middle">
+                                                <t t-esc="rec['dest_location']"/>
+                                            </td>
+                                            <td class="text-right align-middle">
+                                                <t t-esc="'{0:,.3f}'.format(rec['qty'])"/>
+                                                <t t-set="t_quantity" t-value="t_quantity + rec['qty']"/>
+                                            </td>
+                                            <td class="text-right align-middle">
+                                                <t t-esc="'{0:,.2f}'.format(rec['sale_price'])"/>
+                                                <t t-set="t_sales_price" t-value="t_sales_price + rec['sale_price']"/>
+                                            </td>
+                                            <td class="text-right align-middle">
+                                                <t t-esc="'{0:,.2f}'.format(rec['total_sales'])"/>
+                                                <t t-set="total_sales_price" t-value="total_sales_price + rec['total_sales']"/>
+                                            </td>
+                                            <t t-set="sl_no" t-value="sl_no + 1"/>
+                                        </tr>
+                                    </t>
+                                    <tr>
+                                        <t>
+                                            <td class="text-right align-middle" colspan="7"><strong>Total</strong></td>
+                                        </t>
+                                        <td class="text-right align-middle">
+                                            <strong><t t-esc="'{0:,.2f}'.format(t_quantity)"/></strong>
+                                        </td>
+                                        <td class="text-right align-middle">
+                                            <strong><t t-esc="'{0:,.2f}'.format(t_sales_price)"/></strong>
+                                        </td>
+                                        <td class="text-right align-middle">
+                                            <strong><t t-esc="'{0:,.2f}'.format(total_sales_price)"/></strong>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

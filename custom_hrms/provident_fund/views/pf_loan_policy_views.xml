@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="view_loan_policy_form" model="ir.ui.view">
+        <field name="name">pf.loan.policy.form</field>
+        <field name="model">pf.loan.policy</field>
+        <field name="arch" type="xml">
+            <form string="Loan Configuration">
+                <sheet>
+                    <h1 class="mt0">
+                        <div>
+                            <field name="name" class="oe_inline" placeholder="Name"/>
+                        </div>
+                    </h1>
+                    <group>
+                        <group>
+                            <field name="loan_eligibility_base"/>
+                            <field name="duration_type"/>
+<!--                            <field name="loan_max_percent"/>-->
+                            <field name="loan_interest"/>
+                        </group>
+                        <group>
+                            <field name="loan_amount_source"/>
+                            <field name="loan_eligibility_duration" placeholder="In Month"/>
+                            <field name="minimum_loan_amount"/>
+                            <field name="month_gap_loan"/>
+                            <field name="max_no_installment"/>
+                            <field name="minimum_installment_amount"/>
+                        </group>
+                    </group>
+                    <notebook colspan="4">
+                        <page string="Eligible Loan Configuration ">
+                            <field name="loan_policy_line">
+                                <tree string="Policy" editable="bottom">
+                                    <field name="from_month"/>
+                                    <field name="to_month"/>
+                                    <field name="loan_max_percent"/>
+<!--                                    <field name="loan_interest"/>-->
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_loan_policy_tree" model="ir.ui.view">
+        <field name="name">pf.loan.policy.tree</field>
+        <field name="model">pf.loan.policy</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="loan_eligibility_base"/>
+<!--                <field name="loan_eligibility_duration"/>-->
+                <field name="duration_type"/>
+<!--                <field name="loan_max_percent"/>-->
+<!--                <field name="loan_interest"/>-->
+            </tree>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_loan_policy">
+        <field name="name">Loan Configuration</field>
+        <field name="res_model">pf.loan.policy</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!--<menuitem id="menu_pf_loan_policy"
+              name="PF Loan Policy"
+              parent="menu_pf_configuration"
+              groups="base.group_system"
+              action="action_loan_policy"
+              sequence="3"/>-->
+</odoo>

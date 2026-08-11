@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright (c) 2016-Present Webkul Software Pvt. Ltd. (<https://webkul.com/>) -->
+<!-- See LICENSE file for full copyright and licensing details. -->
+<!-- License URL : <https://store.webkul.com/license.html/> -->
+<!DOCTYPE html>
+<odoo>
+    <template id="pos_kitchen_screen_template" name="PKS Main screen">
+        &lt;!DOCTYPE html&gt;
+        <html>
+            <head>
+                <title>POS Kitchen Screen</title>
+                <!-- <link rel="stylesheet" type="text/css" href="/web/static/lib/fontawesome/css/font-awesome.css"/> -->
+                <script class="origin" type="text/javascript" src="/web/static/lib/jquery/jquery.js"></script>
+                <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+                <meta http-equiv="content-type" content="text/html, charset=utf-8"/>
+                <meta name="viewport" content="width=device-width, initial-scale=1"/>
+                <meta name="apple-mobile-web-app-capable" content="yes"/>
+                <meta name="mobile-web-app-capable" content="yes"/>
+                <link rel="shortcut icon" href="/web/static/src/img/favicon.ico" type="image/x-icon"/>
+                <t t-call-assets="web.assets_common"/>
+                <t t-call-assets="web.assets_frontend"/>
+                <t t-call-assets="point_of_sale.assets"/>
+            </head>
+            <div class="loading-review-screen" style="background:#80808047;height: 100%;">
+                <div class="wrap_loading">
+                    <div class="d-flex justify-content-center" >
+                        <div class="wk-loader"></div>
+                    </div>
+                    <div class="loading-content">
+                        Loading Kitchen Data, Please Wait!!!
+                    </div>
+                </div>
+            </div>
+            <body class="o_pos_kitchen_management" t-att-screen-id="screen_config.id">
+                <div class="container" style="display:none;">
+                    <div class="navbar">
+                        <div class="logo">
+                            <img class="chef-hat" style="margin: 0 5px; height: 60px;" src="/pos_all_in_one_screen/static/src/img/chef.png" alt="kitchen-chef"/>
+                            Kitchen POS
+                        </div>
+                        <div class="options">
+                            <span class="oe-status" style="border-radius: 100px;">
+                                <input class="search-orders" placeholder="search orders"/>
+                                <i class="fa fa-search toggle-search"/>
+                                <i class="fa fa-circle filter filter-fresh" style="color: #2495c5;"/>
+                                <i class="fa fa-circle filter filter-pending" style="color: #dfb265;"/>
+                                <i class="fa fa-circle filter filter-done" style="color: green;"/>
+                                <i class="fa fa-circle filter filter-alert" style="color: red;"/>
+                            </span>
+                            <span class="oe-status status-update">
+                                <i class="fa fa-refresh"/>
+                            </span>
+                            <span class="oe-status">
+                                <i class="fa fa-wifi"/>
+                            </span>
+                            <span class="oe-status fullscreen">
+                                <i class="fa fa-expand"/>
+                            </span>
+                            <span class="oe-status bell">
+                                <i class="fa fa-bell"></i>
+                                <i class="notify fa fa-circle"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="kitchen-status-container">
+                        <span class="toggle-sidebar">
+                            <i class="fa fa-toggle-off"/>
+                            <i class="fa fa-toggle-on"/>
+                        </span>
+                        <div class="kitchen-status-details">
+                            <span> <span class="bold pending-orders" t-esc="pending_orders"/> Pending Orders</span>
+                            <span>Average Pending <span class="bold average-pending" t-esc="order_last_hour"/></span>
+                            <span>Max Pending <span class="bold max-pending" t-esc="order_last_hour"/></span>
+                            <span>Orders in Last Hour <span class="bold order-last-hour" t-esc="order_last_hour"/></span>
+                            <span>Orders in Last 15 Min <span class="bold order-last-15-min" t-esc="orders_last_15_min"/></span>
+                        </div>
+                    </div>
+                    <div class="container-body">
+                        <div class="sidebar">
+                            <div class="product-details" style="padding: 15px 20px;">
+                                <span class="product-name" t-out="'Product'"/>
+                                <span class="product-quantity" t-out="'Qty'"/>
+                            </div>
+                            <div class="products">
+                                <t t-foreach="screen_config.pos_category_ids" t-as="categ" t-key="categ">
+                                    <div class="product-category" t-out="categ.name"/>
+                                    <div class="categ-products" t-att-categ-id="categ.id">
+                                        <t t-set="products" t-value="data['product_data']"/>
+                                        <t t-foreach="products" t-as="id" t-key="id" >
+                                            <t t-set="product" t-value="products[id]"/>
+                                            <t t-log="'-----------------------------------'"/>
+                                            <t t-log="product['pos_categ_ids']"/>
+                                            <t t-log="product['categ']"/>
+                                            <t t-log="'-----------------------------------'"/>
+                                            <!-- <div class="product-details" t-if="product['pos_categ_ids'].includes(categ.id)" t-att-product-id="id">
+                                                <span class="product-name" t-out="product['name']"/>
+                                                <span class="product-quantity" t-out="product['qty']"/>
+                                            </div> -->
+                                        </t>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+                        <div class="kitchen-order-list">
+                            <t t-foreach="data['order_data']" t-as="order" t-key="order" >
+                                <div class="kitchen-order"  t-att-order-id="order['id']" 
+                                t-if="order and not(order['order_progress'] == 'done' and not(order['order_type'] == 'takeaway')) and len(order['lines'])">
+                                    <t t-if="order['order_progress'] == 'accepted'">
+                                        <div class="order-header" style="background:#2495c5;">
+                                            <span t-if="order['members']">
+                                                <i class="fa fa-users" aria-hidden="true"></i>
+                                                <t t-esc="order['members']"/>
+                                            </span>
+                                            <span class="token">
+                                                <t t-out="order['kitchen_order_name']" />
+                                            </span>
+                                            <span class="time">
+                                                <i class="fa fa-clock-o" aria-hidden="true"/>
+                                                <span t-if="order['order_date']" class="order-time" t-esc="order['order_date']"/>
+                                                <span t-if="order['order_date']" class="pending-time"/>
+                                            </span>
+                                        </div>
+                                    </t>
+                                    <t t-elif="order['order_progress'] == 'partially_done' or order['order_progress'] == 'pending'">
+                                        <div class="order-header" style="background:#fda400;">
+                                            <span t-if="order['members']">
+                                                <i class="fa fa-users" aria-hidden="true"></i>
+                                                <t t-esc="order['members']"/>
+                                            </span>
+                                            <span class="token">
+                                                <t t-out="order['kitchen_order_name']" />
+                                            </span>
+                                            <span class="time">
+                                                <i class="fa fa-clock-o" aria-hidden="true"/>
+                                                <span t-if="order['order_date']" class="order-time" t-esc="order['order_date']"/>
+                                                <span t-if="order['order_date']" class="pending-time"/>
+                                            </span>
+                                        </div>
+                                    </t>
+                                    <t t-elif="order['order_progress'] == 'done'">
+                                        <div class="order-header" style="background:green;">
+                                            <span t-if="order['members']">
+                                                <i class="fa fa-users" aria-hidden="true"></i>
+                                                <t t-esc="order['members']"/>
+                                            </span>
+                                            <span class="token">
+                                                <t t-out="order['kitchen_order_name']" />
+                                            </span>
+                                            <span class="time">
+                                                <i class="fa fa-clock-o" aria-hidden="true"/>
+                                                <span t-if="order['order_date']" class="order-time" t-esc="order['order_date']"/>
+                                                <span t-if="order['order_date']" class="pending-time"/>
+                                            </span>
+                                        </div>
+                                    </t>
+
+                                    <div class="order-status">
+                                        <t t-if="order['order_type'] == 'takeaway'">
+                                            Takeaway
+                                        </t>
+                                        <t t-else="">
+                                            Dining
+                                        </t>
+                                    </div>
+                                    <div class="order-body">
+                                        <t t-foreach="order['lines']" t-as="line" t-key="line">
+                                            <div class="order-line" t-if="line" t-att-line-id="line['id']" t-att-product-id="line['product_id'][0]">
+                                                <span t-out="line['qty']" style="color:green;" /> 
+                                                x 
+                                                <span t-out="line['product_id'][1]" /> 
+                                                <i class="done-line fa fa-check" style="display:none;"></i>
+                                                <t t-if="line['state'] == 'done'">
+                                                    <i class="done-line fa fa-check"></i>
+                                                </t>
+                                                <t t-if="'discount' in line and line['discount'] > 0">
+                                                    ( <t t-out="line['discount']" /> %)
+                                                </t>
+                                                <t t-if="'qty_added' in line">
+                                                    <span class="qty-added" style="color:green;">
+                                                        [+ <t t-out="line['qty_added']" />]
+                                                    </span>
+                                                </t>
+                                                <t t-if="'qty_removed' in line">
+                                                    <span class="qty-added" style="color:red;">
+                                                        [- <t t-out="line['qty_removed']" />]
+                                                    </span>
+                                                </t>
+                                                <div t-if="line['note']" style="word-wrap: break-word; color: #868686;font-style: italic;">
+                                                    <t t-esc="line['note']"/>
+                                                </div>
+                                            </div>
+                                        </t>
+                                    </div>
+                                    <div class="order-footer">
+                                        <t t-if="order['order_progress'] == 'done'">
+                                            <span class="wk-button picked-up done-button">Picked Up</span>
+                                        </t>
+                                        <t t-elif="order['order_progress'] == 'accepted'">
+                                            <span class="wk-button proceed-order">Start</span>
+                                        </t>
+                                        <t t-else="">
+                                            <span class="wk-button order-done">Done</span>
+                                        </t>
+                                        <span class="wk-button view-detail">View Details</span>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+                        <div class="chef">
+                            <img style="height: 250px;" src="/pos_all_in_one_screen/static/src/img/chefImage.jpg" alt="kitchen-chef"/>
+                            <div style="color: red; font-family: 'FontAwesome'; font-size: 34px;">No running Orders in the kitchen.........</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="notification-bar">
+                    <div class="notif-header">
+                        <i class="fa fa-close close-notif-bar"/>
+                        <span style="margin-right:auto;">
+                            Notifications
+                        </span> 
+                    </div>
+                    <div class="notifications">
+                        <t t-foreach="notifications['order_data']" t-as="notif" t-key="notif">
+                            <div class="notification" t-att-order-id="notif['id']" t-if="len(notif['lines'])">
+                                <div class="status">
+                                    <i class="fa fa-circle" style="color:green"/>
+                                </div>
+                                <div style="padding-left:4%; width:100%;">
+                                    <div class="notif-detail">
+                                        <span class=""> <t t-esc="notif['kitchen_order_name']"/> </span>
+                                        <span class="order-time"> <t t-esc="notif['order_date']"/> </span>
+                                    </div>
+                                    <div class="notif-body">
+                                        Total <t t-esc="len(notif['lines'])"/> Products in this Order.
+                                    </div>
+                                    <div class="view-order"> View </div>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+                <div class="overlay"></div>
+            </body>
+        </html>
+    </template>
+</odoo>

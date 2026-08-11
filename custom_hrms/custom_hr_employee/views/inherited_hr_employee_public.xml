@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_hr_employee_list_tree" model="ir.ui.view">
+            <field name="name">hr.employee.public2.tree</field>
+            <field name="model">hr.employee.public.two</field>
+            <field name="arch" type="xml">
+                <tree string="Employee List">
+                    <!--                        <field name="identification_id"/>-->
+                    <field name="name"/>
+                    <field name="department_id"/>
+                    <!--                        <field name="company_unit_id"/>-->
+                    <!--                        <field name="user_work_location_id"/>-->
+                    <!--                        <field name="job_id"/>-->
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="inherited_view_hr_employee_list_tree">
+            <field name="name">hr.employee.public2.tree</field>
+            <field name="model">hr.employee.public.two</field>
+            <field name="inherit_id" ref="custom_hr_employee.view_hr_employee_list_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//tree" position="attributes">
+                    <attribute name='create'>false</attribute>
+                    <attribute name='edit'>false</attribute>
+                    <attribute name='delete'>false</attribute>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="action_hr_employee_list" model="ir.actions.act_window">
+            <field name="name">Employee List</field>
+            <field name="res_model">hr.employee.public.two</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_mode">tree</field>
+        </record>
+
+        <record id="action_hr_employee_list" model="ir.actions.act_window">
+            <field name="name">Employee List</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hr.employee.public.two</field>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_hr_employee_list_tree"/>
+        </record>
+
+        <menuitem id="menu_emp_list_view" name="Employee List" parent="hr.menu_hr_root" sequence="5" active="false"
+                  action="action_hr_employee_list"
+        />
+        <!--            groups="custom_hr_employee.group_employee_list_viewer"-->
+
+    </data>
+</odoo>

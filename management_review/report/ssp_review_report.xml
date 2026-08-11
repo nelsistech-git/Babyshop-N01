@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <template id="ssp_review_report_document">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <div class="row" style="display:block;">
+                            <div class="text-center" style="padding-bottom:50px;">
+                                <h3><t t-esc="report_header"/></h3>
+                                <h5><t t-esc="start_date"/> to <t t-esc="end_date"/></h5>
+                            </div>
+                        </div>
+                        
+                        <table class="table table-condensed">
+                            <thead>
+                                <tr style="background:#999999">
+                                    <t t-set="idx" t-value="0"/>
+                                    <t t-foreach="table_header" t-as="header">
+                                        <t t-if="col_type[idx]=='currency'">
+                                            <th style="color: black;text-align: right;"><t t-esc="header"/></th>
+                                        </t>
+                                        <t t-if="col_type[idx]=='number'">
+                                            <th style="color: black;text-align: right;"><t t-esc="header"/></th>
+                                        </t>
+                                        <t t-if="col_type[idx]=='text'">
+                                            <th style="color: black;text-align: left;"><t t-esc="header"/></th>
+                                        </t>
+                                        <t t-set='idx' t-value="idx + 1"/>
+                                    </t>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="data_line" t-as="line">
+                                    <tr>
+                                        <t t-set="idx" t-value="0"/>
+                                        <t t-foreach="line" t-as="data">
+                                            <t t-if="col_type[idx]=='currency'">
+                                                <td align="right"><t t-esc="data"/> &#2547;</td>
+                                            </t>
+                                            <t t-if="col_type[idx]=='number'">
+                                                <td align="right"><t t-esc="data"/></td>
+                                            </t>
+                                            <t t-if="col_type[idx]=='text'">
+                                                <td align="left"><t t-esc="data"/></td>
+                                            </t>
+                                            <t t-set='idx' t-value="idx + 1"/>
+                                        </t>
+                                    </tr>
+                                </t>
+                                <tr>
+                                    <t t-set="idx" t-value="0"/>
+                                    <t t-foreach="footer" t-as="data">
+                                        <t t-if="col_type[idx]=='currency'">
+                                            <td align="right"><b><t t-esc="data"/> <t t-if="data != ''">&#2547;</t></b></td>
+                                        </t>
+                                        <t t-if="col_type[idx]=='number'">
+                                            <td align="right"><b><t t-esc="data"/></b></td>
+                                        </t>
+                                        <t t-if="col_type[idx]=='text'">
+                                            <td align="left"><b><t t-esc="data"/></b></td>
+                                        </t>
+                                        <t t-set='idx' t-value="idx + 1"/>
+                                    </t>
+                                </tr>
+                            </tbody>
+                        </table> 
+
+                        
+                    </div>
+                </t>
+            </t>
+        </template>
+
+
+        <template id="ssp_review_report_document_comparision">
+            <div class="Main-Class">
+            <style>
+                .container {
+                max-width: 95% !important;;
+                }
+            </style>
+            <t t-call="web.html_container">
+                
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <div class="row" style="display:block;">
+                            <div class="text-center" style="padding-bottom:50px;">
+                                <h3><t t-esc="report_header"/></h3>
+                                <h5><t t-esc="start_date"/> to <t t-esc="end_date"/></h5>
+                            </div>
+                        </div>
+                        <div class="row" style="overflow-wrap: anywhere; font-size: 10px;">
+                            <table class="table table-bordered" style="font-size: 11px;border: 1px solid #0078ee;">
+                                <thead>
+                                    <tr style="background:#999999">
+                                        <t t-set="idx" t-value="0"/>
+                                        <t t-foreach="table_header" t-as="header">
+                                            <t t-if="col_type[idx]=='currency'">
+                                                <th style="padding: 0.75rem 0em;color: black;text-align: center;"><t t-esc="header"/></th>
+                                            </t>
+                                            <t t-if="col_type[idx]=='number'">
+                                                <th style="padding: 0.75rem 0em;color: black;text-align: center;"><t t-esc="header"/></th>
+                                            </t>
+                                            <t t-if="col_type[idx]=='text'">
+                                                <th style="padding: 0.75rem 0em;color: black;text-align: left;"><t t-esc="header"/></th>
+                                            </t>
+                                            <t t-set='idx' t-value="idx + 1"/>
+                                        </t>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="data_line" t-as="line">
+                                        <tr>
+                                            <t t-set="idx" t-value="0"/>
+                                            <t t-foreach="line" t-as="data">
+                                                <t t-if="col_type[idx]=='currency'">
+                                                    <td style="padding: 0.75rem 0em;" align="center"><t t-esc="data"/> &#2547;</td>
+                                                </t>
+                                                <t t-if="col_type[idx]=='number'">
+                                                    <td style="padding: 0.75rem 0em;" align="center"><t t-esc="data"/></td>
+                                                </t>
+                                                <t t-if="col_type[idx]=='text'">
+                                                    <td style="padding: 0.75rem 0em;" align="left"><t t-esc="data"/></td>
+                                                </t>
+                                                <t t-set='idx' t-value="idx + 1"/>
+                                            </t>
+                                        </tr>
+                                    </t>
+                                    <tr>
+                                        <t t-set="idx" t-value="0"/>
+                                        <t t-foreach="footer" t-as="data">
+                                            <t t-if="col_type[idx]=='currency'">
+                                                <td style="padding: 0.75rem 0em;" align="center"><b><t t-esc="data"/> <t t-if="data != ''">&#2547;</t></b></td>
+                                            </t>
+                                            <t t-if="col_type[idx]=='number'">
+                                                <td style="padding: 0.75rem 0em;" align="center"><b><t t-esc="data"/></b></td>
+                                            </t>
+                                            <t t-if="col_type[idx]=='text'">
+                                                <td style="padding: 0.75rem 0em;" align="center"><b><t t-esc="data"/></b></td>
+                                            </t>
+                                            <t t-set='idx' t-value="idx + 1"/>
+                                        </t>
+                                    </tr>
+                                </tbody>
+                            </table> 
+                        </div>
+                        
+                    </div>
+                </t>
+                
+            </t>
+            </div>
+        </template>
+        
+    </data>
+</odoo>

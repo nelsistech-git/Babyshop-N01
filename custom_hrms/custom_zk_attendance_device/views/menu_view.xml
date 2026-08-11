@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+	<data>
+		<record model="ir.ui.menu" id="hr_attendance.menu_hr_attendance_root">
+			<field name='name'>HR- Attendances</field>
+			<!--<field name="groups_id" eval="[(6,0,[ref('custom_zk_attendance_device.group_attendance_list_viewer')]), (4,ref('hr_attendance.group_hr_attendance_officer'))]"/>-->
+			<field name="groups_id" eval="[(6,0,[ref('custom_zk_attendance_device.group_hr_attendance_root_menu')])]"/>
+			<field name="sequence" eval="15" />
+    	</record>
+
+		<menuitem id="menu_hr_attendance_manage_attendances" name="Manager" parent="hr_attendance.menu_hr_attendance_root" sequence="1" groups="custom_zk_attendance_device.group_attendance_list_viewer,hr_attendance.group_hr_attendance_officer"/>
+
+		<!--<record model="ir.ui.menu" id="hr_attendance.menu_hr_attendance_view_attendances">
+			<field name="groups_id" eval="[(6,0,[ref('custom_zk_attendance_device.group_attendance_list_viewer')]), (4,ref('hr_attendance.group_hr_attendance_officer'))]"/>
+    	</record>-->
+
+		<menuitem name="Settings" parent="hr_attendance.menu_hr_attendance_settings"
+			id="hr_attendance_settings" sequence="1"
+			groups="hr_attendance.group_hr_attendance_manager" action="hr_attendance.action_hr_attendance_settings" />
+		
+		<!--<menuitem id="hr_attendance.menu_hr_attendance_my_attendances" name="Check In / Check Out" parent="hr_attendance.menu_hr_attendance_root" sequence="999" groups="base.group_system" action="hr_attendance.hr_attendance_action_my_attendances"/>-->
+
+		<menuitem id="hr_attendance.menu_hr_attendance_kiosk_no_user_mode" name="Kiosk Mode" parent="menu_hr_attendance_manage_attendances" sequence="99" groups="base.group_system" active="False" action="hr_attendance.open_kiosk_url"/>
+
+		<menuitem id="hr_attendance.menu_hr_attendance_view_attendances" name="Attendances" parent="menu_hr_attendance_manage_attendances" sequence="3" groups="hr_attendance.group_hr_attendance_officer" action="hr_attendance.hr_attendance_action"/>
+    	<!--<menuitem id="hr_attendance.menu_hr_attendance_view_employees_kanban" name="Employees" parent="menu_hr_attendance_manage_attendances" sequence="23" groups="hr_attendance.group_hr_attendance_officer" action="hr.open_view_employee_list_my"/>-->
+		<!--<menuitem id="menu_hr_attendance_view_attendances" name="Overview" parent="menu_hr_attendance_root" sequence="5" groups="hr_attendance.group_hr_attendance_officer" action="hr_attendance_action"/>-->
+
+		<menuitem id="custom_hr_employee.menu_employee_iom"
+				  name="Employee IOM"
+				  sequence="21"
+				  action="custom_hr_employee.action_employee_iom"
+				  parent="menu_hr_attendance_manage_attendances"
+				  groups="hr.group_hr_manager"
+			/>
+
+		<menuitem id="menu_hr_attendance_manage_attendances_sub_manual"
+              name="Manual Attendances"
+              sequence="13"
+              parent="menu_hr_attendance_manage_attendances"
+              groups="hr_attendance.group_hr_attendance_officer"
+        />
+
+
+	</data>
+</odoo>

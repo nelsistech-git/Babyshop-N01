@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Module Category -->
+    <record id="module_category_merchandiser_bp" model="ir.module.category">
+        <field name="name">Merchandiser BP</field>
+        <field name="description">Manage Merchandiser workflows: Costing, Sample, Order and Production.</field>
+        <field name="sequence">10</field>
+    </record>
+
+    <!-- User Group -->
+    <record id="group_merchandiser_user" model="res.groups">
+        <field name="name">User</field>
+        <field name="category_id" ref="module_category_merchandiser_bp"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="comment">Can create and edit Costing, Samples, Orders and Production. Cannot delete or cancel records.</field>
+    </record>
+
+    <!-- Manager Group -->
+    <record id="group_merchandiser_manager" model="res.groups">
+        <field name="name">Manager</field>
+        <field name="category_id" ref="module_category_merchandiser_bp"/>
+        <field name="implied_ids" eval="[(4, ref('group_merchandiser_user'))]"/>
+        <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+        <field name="comment">Full access: create, edit, delete and cancel all records.</field>
+    </record>
+
+</odoo>

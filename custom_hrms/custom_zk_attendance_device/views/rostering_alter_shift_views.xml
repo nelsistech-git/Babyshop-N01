@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+     <record id="view_rostering_alter_shift_form" model="ir.ui.view">
+     <field name="name">view.rostering.alter.shift.form</field>
+     <field name="model">rostering.alter.shift</field>
+     <field name="arch" type="xml">
+           <form>
+               <header>
+                    <button name="action_done" id="action_confirm" class="btn-primary"
+                            type="object" string="Done" confirm="Are you sure you want to Done?" invisible="state not in ['draft']" />
+<!--                    <button name="action_draft" id="action_draft" class="btn-secondary"-->
+<!--                            type="object" string="Set to Draft" />-->
+
+                    <button name="action_cancel" confirm="Are you sure you want to Cancel?" type="object" string="Cancel" invisible="state not in ['draft']" />
+                   <field name="state" widget="statusbar" statusbar_visible="draft,done"/>
+                </header>
+               <sheet>
+                   <group>
+                       <group>
+<!--                           <field name="name" required="1" />-->
+<!--                           <field name="month"/>-->
+                           <field readonly="state not in ['draft']" name="date"/>
+                           <field readonly="state not in ['draft']" name="department_id"  options='{"no_open": True, "no_create": True}'/>
+                           <field readonly="state not in ['draft']" name="remarks"/>
+                       </group>
+                   </group>
+                   
+                  <group>
+                       <group string="From Employee">
+                           <field readonly="state not in ['draft']" domain="[('department_id','=',department_id)]" name="from_employee_id"  options='{"no_open": True, "no_create": True}'/>
+                           <field style="color:red" readonly="1" name="err_msg_from" invisible="err_msg_from == False"/>
+                           <field name="from_shift_ids" readonly="1" force_save="1" widget="many2many_tags"/>
+                       </group>
+                       <group string="To Employee">
+                           <field readonly="state not in ['draft']" domain="[('department_id','=',department_id)]" name="to_employee_id"  options='{"no_open": True, "no_create": True}'/>
+                           <field style="color:red" readonly="1" name="err_msg_to" invisible="err_msg_to == False"/>
+                           <field name="to_shift_ids" readonly="1" force_save="1" widget="many2many_tags"/>
+                       </group>
+                  </group>
+
+               </sheet>
+               <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers" />
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+           </form>
+       </field>
+   </record>
+
+
+   <record id="view_rostering_alter_shift_tree" model="ir.ui.view">
+       <field name="name">rostering.alter.shift.tree</field>
+       <field name="model">rostering.alter.shift</field>
+       <field name="arch" type="xml">
+           <tree string="Rostering Alter List" decoration-muted="state=='cancel'" decoration-success="state=='done'" >
+<!--               <field name="name" />-->
+               <field name="date"/>
+               <field name="department_id"/>
+               <field name="from_employee_id"/>
+               <field name="to_employee_id"/>
+               <field name="state"/>
+           </tree>
+       </field>
+   </record>
+
+   <record id="view_rostering_alter_shift_filter" model="ir.ui.view">
+       <field name="name">rostering.alter.shift.filter</field>
+       <field name="model">rostering.alter.shift</field>
+       <field name="arch" type="xml">
+           <search string="Search List">
+               <field name="department_id" filter_domain="[('department_id', 'ilike', self)]"/>
+               <field name="from_employee_id" filter_domain="[('from_employee_id', 'ilike', self)]"/>
+               <field name="to_employee_id" filter_domain="[('to_employee_id', 'ilike', self)]"/>
+          </search>
+       </field>
+   </record>
+    
+   <record id="rostering_alter_shift_action" model="ir.actions.act_window">
+       <field name="name">Employee Alter Shifting</field>
+       <field name="res_model">rostering.alter.shift</field>
+       <field name="view_mode">tree,form</field>
+       <field name="help" type="html">
+           <p class="o_view_nocontent_smiling_face">
+               Create a New Rostering Alter Shift
+           </p>
+       </field>
+   </record>
+
+<!--    <menuitem  id="sub_menu_rostering_alter_shift" name="Employee Alter Shifting" parent="root_menu_rostering_shift" action="rostering_alter_shift_action" sequence="10"/>-->
+
+</odoo>

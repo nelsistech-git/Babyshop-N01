@@ -1,0 +1,328 @@
+// ─── Scoped to the open full-screen apps menu ────────────────────────────────
+.o_navbar_apps_menu.show .dropdown-menu {
+
+    // Keep the theme's row+wrap layout. We achieve "tab bar above apps" by
+    // giving the tab bar width:100% — that forces a natural line break so all
+    // app icons flow in rows underneath it, exactly like the original grid.
+
+    // ── Tab bar ───────────────────────────────────────────────────────────────
+    .o_col_tab_bar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px;
+        width: 100%;
+        flex-shrink: 0;
+        // The parent dropdown has padding-left/right: 20vw on lg screens, so its
+        // content area is only 60vw wide. Setting width:100vw + margin-left:-20vw
+        // makes the tab bar span the full viewport width while keeping its content
+        // aligned with the app icons below. flex-shrink:0 prevents it being squished.
+        padding: 10px 12px;
+        background: rgba(0, 0, 0, 0.28);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        @media (min-width: 992px) {
+            width: 100vw;
+            margin-left: -20vw;
+            padding-left: 20vw;
+            padding-right: 20vw;
+        }
+
+        .o_col_tab {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 12px;
+            border: 1.5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 0.82rem;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: background 0.15s, border-color 0.15s, transform 0.1s;
+            user-select: none;
+
+            &:hover {
+                background: rgba(255, 255, 255, 0.22);
+                border-color: rgba(255, 255, 255, 0.6);
+            }
+
+            &.active {
+                background: #fff;
+                color: #333;
+                border-color: #fff;
+
+                .o_col_tab_count { background: rgba(0,0,0,0.1); color: #555; }
+            }
+
+            // Highlighted when an app is dragged over it
+            &.drop-over {
+                background: rgba(255, 255, 255, 0.4);
+                border-color: #fff;
+                transform: scale(1.06);
+                box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.35);
+            }
+
+            .o_col_tab_icon { font-size: 0.95rem; }
+
+            .o_col_tab_count {
+                min-width: 17px;
+                padding: 0 4px;
+                border-radius: 9px;
+                background: rgba(0,0,0,0.2);
+                color: rgba(255,255,255,0.85);
+                font-size: 0.7rem;
+                text-align: center;
+                line-height: 16px;
+            }
+
+            // Rename / delete buttons — hidden until hover
+            .o_col_tab_actions { display: none; gap: 3px; }
+            &:hover .o_col_tab_actions,
+            &.active .o_col_tab_actions { display: inline-flex; }
+
+            .o_col_tab_btn {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 16px;
+                height: 16px;
+                border-radius: 50%;
+                font-size: 10px;
+                cursor: pointer;
+            }
+
+            .o_col_rename_btn {
+                background: rgba(255,255,255,0.25);
+                &:hover { background: rgba(255,255,255,0.5); }
+            }
+
+            .o_col_delete_btn {
+                background: rgba(220,53,69,0.5);
+                color: #fff;
+                &:hover { background: rgba(220,53,69,0.9); }
+            }
+        }
+
+        // Inline rename mode tab
+        .o_col_tab_editing {
+            gap: 5px;
+            padding: 5px 10px;
+            border-style: dashed;
+            cursor: default;
+
+            .o_col_tab_rename_input {
+                width: 100px;
+                background: transparent;
+                border: none;
+                border-bottom: 1px solid rgba(255,255,255,0.7);
+                color: #fff;
+                font-size: 0.82rem;
+                outline: none;
+                padding: 0 2px;
+
+                &::placeholder { color: rgba(255,255,255,0.45); }
+            }
+        }
+
+        // "New folder" button
+        .o_col_add_btn {
+            padding: 5px 12px;
+            border: 1.5px dashed rgba(255,255,255,0.4);
+            border-radius: 18px;
+            background: transparent;
+            color: rgba(255,255,255,0.7);
+            font-size: 0.82rem;
+            cursor: pointer;
+            transition: all 0.15s;
+
+            &:hover {
+                border-color: rgba(255,255,255,0.8);
+                color: #fff;
+                background: rgba(255,255,255,0.1);
+            }
+        }
+    }
+
+    // ── Drag hint bar ─────────────────────────────────────────────────────────
+    .o_col_drag_hint {
+        width: 100%;
+        flex-shrink: 0;
+        text-align: center;
+        padding: 5px;
+        font-size: 0.76rem;
+        color: rgba(255,255,255,0.6);
+        background: rgba(0,0,0,0.15);
+        letter-spacing: 0.01em;
+        @media (min-width: 992px) {
+            width: 100vw;
+            margin-left: -20vw;
+        }
+    }
+
+    // ── First-time hint ───────────────────────────────────────────────────────
+    .o_col_first_hint {
+        width: 100%;
+        text-align: center;
+        padding: 14px;
+        color: rgba(255,255,255,0.45);
+        font-size: 0.78rem;
+        font-style: italic;
+        margin-top: 6px;
+    }
+
+    // ── App being dragged ─────────────────────────────────────────────────────
+    .o_app_dragging { opacity: 0.3; pointer-events: none; }
+
+    // ── Standalone app: hover target for "create folder" ─────────────────────
+    .o_app_folder_target > a .mk_app_icon {
+        box-shadow:
+            0 0 0 3px rgba(255,255,255,0.7),
+            0 8px 20px rgba(0,0,0,0.15) !important;
+        transform: scale(1.08) translateY(-2px) !important;
+    }
+
+    .o_create_folder_badge {
+        position: absolute;
+        top: 0; right: 0;
+        font-size: 1.1rem;
+        pointer-events: none;
+        animation: o_badge_pop 0.5s ease infinite alternate;
+    }
+
+    @keyframes o_badge_pop {
+        from { transform: scale(0.85); opacity: 0.7; }
+        to   { transform: scale(1.1);  opacity: 1; }
+    }
+
+    // ── Folder icon (iOS-style mosaic) ────────────────────────────────────────
+    .o_folder_item {
+        &.drop-over > a .o_folder_icon {
+            box-shadow:
+                0 0 0 4px rgba(255,255,255,0.75),
+                0 8px 24px rgba(0,0,0,0.2) !important;
+            transform: scale(1.1) !important;
+        }
+
+        // CRITICAL: inner elements must not capture mouse/drag events —
+        // the drop handler must fire on the outer .o_folder_item div
+        > a * { pointer-events: none; }
+    }
+
+    .o_folder_icon {
+        // Same outer dimensions as .mk_app_icon
+        width: 70px !important;
+        max-width: 70px !important;
+        height: 70px !important;
+        padding: 7px !important;
+        border-radius: 14px !important;
+        background-color: rgba(255,255,255,0.18) !important;
+        border: 1px solid rgba(255,255,255,0.25);
+        box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1), 0 4px 10px rgba(0,0,0,0.08) !important;
+
+        // 2×2 grid
+        display: grid !important;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr 1fr;
+        gap: 3px;
+        position: relative;
+        overflow: hidden;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 3px;
+        }
+
+        .o_folder_empty_slot {
+            border-radius: 3px;
+            background: rgba(255,255,255,0.1);
+        }
+
+        .o_folder_drop_plus {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: #fff;
+            background: rgba(0,120,255,0.4);
+            border-radius: 14px;
+        }
+    }
+
+    // ── Folder grid header (shown inside folder tab view) ─────────────────────
+    .o_folder_grid_header {
+        width: 100%;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        color: rgba(255,255,255,0.75);
+        font-size: 0.82rem;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        @media (min-width: 992px) {
+            width: 100vw;
+            margin-left: -20vw;
+            padding-left: 20vw;
+            padding-right: 20vw;
+        }
+
+        .o_folder_grid_icon { font-size: 1.1rem; }
+        .o_folder_grid_title { font-weight: 600; color: #fff; font-size: 0.9rem; }
+        .o_folder_grid_count { color: rgba(255,255,255,0.55); }
+        .o_folder_grid_tip {
+            margin-left: auto;
+            font-style: italic;
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.45);
+        }
+    }
+
+    // ── Empty folder state ────────────────────────────────────────────────────
+    .o_folder_empty_state {
+        width: 100%;
+        text-align: center;
+        padding: 50px 20px;
+        color: rgba(255,255,255,0.65);
+        font-size: 0.95rem;
+
+        div { font-size: 3rem; margin-bottom: 10px; }
+        p { margin: 0; }
+        strong { color: rgba(255,255,255,0.9); }
+    }
+
+    // ── Apps inside open folder ───────────────────────────────────────────────
+    .o_folder_app {
+        position: relative;
+
+        .o_remove_app_btn {
+            position: absolute;
+            top: 8px;
+            // Align with the right edge of the icon (icon max-width 70px, centered in o_app width)
+            right: calc(50% - 38px);
+            width: 19px;
+            height: 19px;
+            border-radius: 50%;
+            background: rgba(220,53,69,0.75);
+            color: #fff;
+            border: 1.5px solid rgba(255,255,255,0.8);
+            font-size: 10px;
+            line-height: 16px;
+            text-align: center;
+            padding: 0;
+            cursor: pointer;
+            display: none;
+            z-index: 5;
+
+            &:hover { background: #dc3545; }
+        }
+
+        &:hover .o_remove_app_btn { display: block; }
+    }
+}

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <data>
+        <record id="view_employee_leave_report_wizard_form" model="ir.ui.view">
+            <field name="name">employee.leave.report.wizard.form</field>
+            <field name="model">employee.leave.report.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Leave Report (Date Wise)">
+                    <group>
+                        <group>
+                            <field name="start_date"/>
+                            <field name="end_date"/>
+                            <field name="user_work_location_id" placeholder="All" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                        </group>
+                        <group>
+                            <field name="company_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="leave_type_id" placeholder="All" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="department_id" placeholder="All" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="status" placeholder="All"/>
+                            <field name="sbu_unit_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="category_ids" widget="many2many_tags" options="{'color_field': 'color', 'no_open': True, 'no_create': 1, 'no_create_edit': 1, 'no_quick_create': True}" />
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="employee_leave_report_pdf" string="Download (PDF)" type="object" class="btn-primary"/>
+                        <button name="employee_leave_report_excel" string="Download (Excel)" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="employee_leave_report_pdf_action" model="ir.actions.act_window">
+            <field name="name">Leave Report (Date Wise)</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">employee.leave.report.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_employee_leave_report_wizard_form"/>
+            <field name="target">new</field>
+        </record>
+
+        <!--<menuitem name="Leave Report (Date Wise)" id="menu_employee_leave_report" sequence="2" parent="custom_hr_report.menu_leave_report_root" action="employee_leave_report_pdf_action" groups="hr.group_hr_user" />-->
+        <menuitem name="Leave Report (Date Wise)" id="menu_employee_leave_report_leave" sequence="51" parent="hr_holidays.menu_hr_holidays_report" action="employee_leave_report_pdf_action" groups="hr.group_hr_user" />
+
+
+    </data>
+</odoo>

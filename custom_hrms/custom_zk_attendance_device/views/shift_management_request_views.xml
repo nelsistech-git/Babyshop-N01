@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+     <record id="view_shift_management_request_form" model="ir.ui.view">
+     <field name="name">shift.management.request.form</field>
+     <field name="model">shift.management.request</field>
+     <field name="arch" type="xml">
+           <form>
+               <header>
+                    <button name="action_confirm" id="action_confirm" class="btn-primary"
+                            type="object" string="Request" invisible="state not in ['draft']" groups="custom_zk_attendance_device.group_emp_shifting_user"/>
+
+                    <button name="action_draft" id="action_draft" class="btn-secondary"
+                            type="object" string="Set to Draft" groups="custom_zk_attendance_device.group_emp_shifting_administrator" /> <!--invisible="state not in ['confirm','cancel']"-->
+
+                    <button name="action_approve" confirm="Are you sure you want to Approve?" id="action_approve" class="btn-primary"
+                            type="object" string="Approve" invisible="state not in ['confirm','cancel']" groups="custom_zk_attendance_device.group_emp_shifting_administrator"/>
+                    <button name="action_cancel" confirm="Are you sure you want to Cancel?" type="object" string="Cancel" invisible="state not in ['draft']" groups="custom_zk_attendance_device.group_emp_shifting_user"/>
+
+
+                   <button name="action_confirm_all" id="action_confirm_all"
+                            type="object" string="Request All" invisible="state not in ['draft']" confirm="Are you sure you want to Confirm all draft?" groups="base.group_system"/>
+                   <button name="action_approve_all" confirm="Are you sure you want to Approve all confirmed?" id="action_approve_all"
+                            type="object" string="Approve All" invisible="state not in ['confirm','cancel']" groups="base.group_system"/>
+
+                   <field name="state" widget="statusbar" statusbar_visible="draft,confirm,approve"/>
+                </header>
+               <sheet>
+                   <group>
+                       <group>
+                           <field name="employee_id"  readonly="state not in ['draft']" options='{"no_open": True, "no_create": True}'/>
+                           <field name="date_from"  readonly="state not in ['draft']"/>
+                           <field name="date_to"  readonly="state not in ['draft']"/>
+                           <field name="resource_calendar_id"  readonly="state not in ['draft']"  options='{"no_open": True, "no_create": True}'/>
+                          <field name="short_name" />
+                           <field name="hour_from_per_day_m" widget="float_time" string="Start Time"/>
+                           <field name="hour_to_per_day_e" widget="float_time" string="End Time"/>
+                           <field name="is_over_ride_day" />
+                       </group>
+                       <group>
+                           <field name="user_work_location_id" readonly="1" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="department_id" readonly="1" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="job_id" readonly="1" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="manager_id" readonly="1" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                       </group>
+                   </group>
+
+                    <br/>
+                   <group>
+                       <group>
+                           <field name="requested_by_id" readonly="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                           <field name="request_date" readonly="1"/>
+                       </group>
+                        <group>
+                           <field name="approved_by_id" readonly="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                           <field name="approve_date" readonly="1"/>
+                       </group>
+                   </group>
+               </sheet>
+
+           </form>
+       </field>
+   </record>
+
+   <record id="view_shift_management_request_tree" model="ir.ui.view">
+       <field name="name">shift.management.request.tree</field>
+       <field name="model">shift.management.request</field>
+       <field name="arch" type="xml">
+           <tree string="Shift Management Request List">
+               <field name="employee_id" />
+               <field name="user_work_location_id" />
+                <field name="department_id" />
+                <field name="job_id" />
+                <field name="manager_id" />
+
+               <field name="date_from" />
+               <field name="date_to"  />
+               <field name="short_name"  />
+               <field name="resource_calendar_id" />
+               <field name="hour_from_per_day_m" widget="float_time" string="Start Time"/>
+               <field name="hour_to_per_day_e" widget="float_time" string="End Time"/>
+               <field name="is_over_ride_day" />
+               <field name="request_date" />
+               <field name="approve_date" />
+               <field name="state" />
+           </tree>
+       </field>
+   </record>
+
+   <record id="view_shift_management_request_filter" model="ir.ui.view">
+       <field name="name">shift.management.request.filter</field>
+       <field name="model">shift.management.request</field>
+       <field name="arch" type="xml">
+           <search string="Search List">
+               <field name="employee_id" />
+               <field name="user_work_location_id" />
+                <field name="department_id" />
+                <field name="job_id" />
+                <field name="manager_id" />
+
+               <field name="date_from" />
+               <field name="date_to"  />
+               <field name="resource_calendar_id" />
+
+               <filter string="Draft" name="draft" domain="[('state','=','draft')]"/>
+               <filter string="Requested" name="confirm" domain="[('state','=','confirm')]"/>
+               <filter string="Approved" name="approve" domain="[('state','=','approve')]"/>
+               <filter string="Cancelled" name="cancel" domain="[('state','=','cancel')]"/>
+
+          </search>
+       </field>
+   </record>
+    
+   <record id="shift_management_request_action" model="ir.actions.act_window">
+       <field name="name">Employee Working Hours/Shift Request/Plan</field>
+       <field name="res_model">shift.management.request</field>
+       <field name="view_mode">tree,form</field>
+       <field name="help" type="html">
+           <p class="o_view_nocontent_smiling_face">
+               Create a New Employee Shift Management Request
+           </p>
+       </field>
+   </record>
+
+    <menuitem  id="sub_menu_shift_management_request" name="Employee Shift Request/Plan" parent="root_menu_shift_management" action="shift_management_request_action" sequence="1"/>
+
+</odoo>

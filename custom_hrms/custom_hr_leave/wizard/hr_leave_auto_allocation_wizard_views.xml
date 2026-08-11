@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_hr_leave_auto_allocation_wizard_form" model="ir.ui.view">
+            <field name="name">hr.leave.auto.allocation.wizard.form</field>
+            <field name="model">hr.leave.auto.allocation.wizard</field>
+            <field name="arch" type="xml">
+                <form string="HR Leave Auto Allocation">
+                    <group>
+                        <group>
+                            <field name="employee_id" placeholder="All"
+                                   options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                        </group>
+                        <group></group>
+                    </group>
+                    <footer>
+                        <button name="button_hr_leave_auto_allocation" string="Submit" type="object"
+                                class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_hr_leave_auto_allocation_wizard" model="ir.actions.act_window">
+            <field name="name">Auto Leave Allocations</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hr.leave.auto.allocation.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_hr_leave_auto_allocation_wizard_form"/>
+            <field name="target">new</field>
+        </record>
+
+        <menuitem id="menu_hr_leave_auto_allocation"
+                  name="Auto Leave Allocations"
+                  sequence="10"
+                  action="action_hr_leave_auto_allocation_wizard"
+                  parent="hr_holidays.menu_hr_holidays_management"
+                  groups="base.group_system"
+        />
+    </data>
+</odoo>

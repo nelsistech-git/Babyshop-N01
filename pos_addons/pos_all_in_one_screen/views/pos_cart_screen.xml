@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright (c) 2016-Present Webkul Software Pvt. Ltd. (<https://webkul.com/>) -->
+<!-- See LICENSE file for full copyright and licensing details. -->
+<!-- License URL : <https://store.webkul.com/license.html/> -->
+<!DOCTYPE html>
+<odoo>
+    <template id="pos_cart_screen_template" name="PKS Main screen">
+        &lt;!DOCTYPE html&gt;
+        <html>
+            <head>
+                <title>POS Cart Screen</title>
+                <script class="origin" type="text/javascript" src="/web/static/lib/jquery/jquery.js"></script>
+                <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+                <meta http-equiv="content-type" content="text/html, charset=utf-8"/>
+                <meta name="viewport" content="width=device-width, initial-scale=1"/>
+                <meta name="apple-mobile-web-app-capable" content="yes"/>
+                <meta name="mobile-web-app-capable" content="yes"/>
+                <link rel="shortcut icon" href="/web/static/src/img/favicon.ico" type="image/x-icon"/>
+                <t t-call-assets="web.assets_common"/>
+                <t t-call-assets="web.assets_frontend"/>
+                <t t-call-assets="point_of_sale.assets"/>
+            </head>
+            <body class="o_pos_cart_management d-flex">
+                <div class="loading-review-screen" style="background:#80808047;height: 100%; width:100%;">
+                    <div class="wrap_loading">
+                        <div class="d-flex justify-content-center" >
+                            <div class="wk-loader"></div>
+                        </div>
+                        <div class="loading-content">
+                            Your POS Session is not started yet, Please start to begin!!
+                        </div>
+                    </div>
+                </div>
+
+                <div class="welcome-screen" style="height: 100%; width: 100%; font-size: 20px; display:none;">
+                    <div class="d-flex justify-content-center" style="background-color:#FAFAFA;padding: 1em;box-shadow: 0 5px 5px -5px black;">
+                        <div>
+                            <h1 t-esc="company_name"/>
+                        </div>
+                    </div>
+                    <div class="row" style="height: 86%;">
+                        <div class="container" style="margin-top: 10px;max-height:100%;">
+                            <div class="row" style="height:auto;">
+                                <div class="d-flex flex-column justify-content-center mb-1 mt-2" style="width:100%;">
+                                    <div class="text-center welcome_screen">
+                                        <t t-if="screen_data and 'welcome_screen_heading' in screen_data">
+                                            <t t-esc="screen_data['welcome_screen_heading']"/>
+                                        </t> 
+                                        <t t-if="screen_data and 'welcome_screen_heading' not in screen_data">
+                                            <div>WELCOME!!</div>
+                                        </t>
+                                    </div>
+                                    <div class="text-center welcome-subheading">
+                                        <t t-if="screen_data and screen_data['welcome_screen_subheading']">
+                                            <t t-esc="screen_data['welcome_screen_subheading']"/>
+                                        </t> 
+                                        <t t-if="screen_data and 'welcome_screen_subheading' not in screen_data">
+                                            <div>TO <t t-esc="shop_name"/></div>
+                                        </t>
+                                    </div>
+                                    <t t-if="screen_data['welcome_screen_content']">
+                                        <div class="text-center">
+                                            <p class="welcome-main_content" t-esc="screen_data['welcome_screen_content']"/>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                            <div class="row" style="height:58%;width:100%;justify-content:center;">
+                                <div class="d-flex flex-row justify-content-center" style="width:100%;height:100%">
+                                    <t t-if="screen_data['welcome_screen_banner']">
+                                        <div class="d-inline-flex p-2 bd-highlight" style="width:33%;">
+                                            <img style="width:100%; height:100%;" href="#" alt="Promotional Image" class="img-responsive img-fluid img-thumbnail" t-att-src="image_data_uri(screen_data['welcome_screen_banner'])"/>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </body>
+        </html>
+    </template>
+</odoo>

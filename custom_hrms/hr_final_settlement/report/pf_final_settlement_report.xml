@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+	<data>
+
+        <record id="pf_final_settlement_report_id" model="ir.actions.report">
+            <field name="name">Print PF Settlement Letter</field>
+            <field name="model">employee.pf.settlement</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">hr_final_settlement.pf_final_settlement_report_view</field>
+            <field name="report_file">hr_final_settlement.pf_final_settlement_report_view</field>
+            <field name="print_report_name">(object.name)</field>
+            <field name="paperformat_id" ref="custom_common_settings.paperformat_custom_a4_bd"/>
+
+        </record>
+
+
+		<template id="pf_final_settlement_report_view">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <style type="text/css">
+                            th, tr, td{
+                                background: white !important;
+                                padding: 0px!important;
+                            }
+                            .text-color{
+                                color: black;
+                            }
+                            .td-border{
+                                border: 1px solid #000;
+                                border-top: 1px solid #000 !important;
+                            }
+                            .td-bold{
+                                font-weight:bold
+                            }
+
+                        </style>
+                        <div class="oe_structure"/>
+                        <t t-foreach="request.env['employee.pf.settlement'].search([('id', '=', id)], limit=1)" t-as="obj">
+                        <div>
+                            <h4 class="text-center head_font_color"><strong>Final Settlement of Provident Fund</strong></h4>
+                        </div>
+                        <br/>
+                            <div>
+                                <strong><p style="float:left; margin-bottom: 2px; color: #000">Date</p></strong>
+                                <p style="float:right; margin-bottom: 2px"><t t-esc="obj.date_requested.strftime('%d-%b-%Y')"/></p>
+                            </div>
+                        <table style="border-collapse: collapse;width: 100%; margin-bottom: 2em;" class="table table-condensed">
+                            <thead class="td-border">
+                                <tr class="td-border">
+                                    <td class="text-left head_font_color td-border">Employee ID:</td>
+                                    <td class="text-left head_font_color td-border"><t t-esc="obj.old_empid"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left head_font_color td-border">Employee Name:</td>
+                                    <td class="text-left head_font_color td-border"><t t-esc="obj.employee_id.name"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left head_font_color td-border">Designation:</td>
+                                    <td class="text-left head_font_color td-border"><t t-esc="obj.job_position.name"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left head_font_color td-border">E-TIN</td>
+                                    <td class="text-left head_font_color td-border"><t t-esc="obj.employee_id.tax_id"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left head_font_color td-border">Joining Date:</td>
+                                    <td class="text-left head_font_color td-border"><t t-esc="obj.initial_employment_date.strftime('%d-%b-%Y')"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left head_font_color td-border">Left Date:</td>
+                                    <td class="text-left head_font_color td-border"><t t-esc="obj.last_day_of_work.strftime('%d-%b-%Y')"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left head_font_color td-border">Membership Date:</td>
+                                    <td class="text-left head_font_color td-border"><t t-esc="obj.pf_profile_id.membership_date.strftime('%d-%b-%Y')"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left head_font_color td-border">Service period (year):</td>
+                                    <td class="text-left head_font_color td-border"><t t-esc="obj.length_of_service"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left head_font_color td-border">Membership Period:</td>
+                                    <td class="text-left head_font_color td-border"><t t-esc="obj.membership_period"/></td>
+                                </tr>
+                            </thead>
+                        </table>
+                        <br/>
+                        <table style="border-collapse: collapse;width: 100%; margin-bottom: 2em;" class="table table-condensed">
+                            <thead class="td-border">
+                                <tr class="td-border">
+                                    <td class="text-left head_font_color td-border td-bold">Total Contribution Balance:</td>
+                                    <td class="text-right head_font_color td-border td-bold"><t t-esc="'{0:,.2f}'.format(obj.total_contribution)"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left head_font_color td-border">Employee Contribution:</td>
+                                    <td class="text-right head_font_color td-border"><t t-esc="'{0:,.2f}'.format(obj.contribution_pf)"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left head_font_color td-border">Company Contribution:</td>
+                                    <td class="text-right head_font_color td-border"><t t-esc="'{0:,.2f}'.format(obj.contribution_cpf)"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left head_font_color td-border">Employee Profit:</td>
+                                    <td class="text-right head_font_color td-border"><t t-esc="'{0:,.2f}'.format(obj.profit_pf)"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left head_font_color td-border">Company Profit:</td>
+                                    <td class="text-right head_font_color td-border"><t t-esc="'{0:,.2f}'.format(obj.profit_cpf)"/></td>
+                                </tr>
+                                <tr class="td-border">
+                                    <td class="text-left head_font_color td-border td-bold">Total Eligible Balance:</td>
+                                    <td class="text-right head_font_color td-border td-bold"><t t-esc="'{0:,.2f}'.format(obj.total_eligible)"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left head_font_color td-border">Employee Eligible:</td>
+                                    <td class="text-right head_font_color td-border"><t t-esc="'{0:,.2f}'.format(obj.contribution_eligible_pf)"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left head_font_color td-border">Company Eligible:</td>
+                                    <td class="text-right head_font_color td-border"><t t-esc="'{0:,.2f}'.format(obj.contribution_eligible_cpf)"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left head_font_color td-border">Employee Eligible Profit:</td>
+                                    <td class="text-right head_font_color td-border"><t t-esc="'{0:,.2f}'.format(obj.profit_eligible_pf)"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left head_font_color td-border">Company Eligible Profit:</td>
+                                    <td class="text-right head_font_color td-border"><t t-esc="'{0:,.2f}'.format(obj.profit_eligible_cpf)"/></td>
+                                </tr>
+
+                                <tr>
+                                    <td class="text-left head_font_color td-border td-bold">Final Return to Company:</td>
+                                    <td class="text-right head_font_color td-border td-bold"><t t-esc="'{0:,.2f}'.format(obj.reserve_amount)"/></td>
+                                </tr>
+
+
+                                <tr>
+                                    <td class="text-left head_font_color td-border td-bold">Less: Outstanding Loan</td>
+                                    <td class="text-right head_font_color td-border td-bold"><t t-esc="'{0:,.2f}'.format(obj.current_loan)"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left head_font_color td-border td-bold">Less: Others Adjustment</td>
+                                    <td class="text-right head_font_color td-border td-bold"><t t-esc="'{0:,.2f}'.format(obj.other_deduction)"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left head_font_color td-border td-bold">Final Net Payment</td>
+                                    <td class="text-right head_font_color td-border td-bold"><t t-esc="'{0:,.2f}'.format(obj.total_amount)"/></td>
+                                </tr>
+                            </thead>
+                        </table>
+                        <br/><br/>
+
+                            <div class="row">
+                            <table style="width: 100%; border: none !important;">
+                                <tr>
+                                    <td style="width: 20%;text-align:center;border: none !important;">
+                                        <img t-if="obj.submitted_by_id.signature" t-att-src="image_data_uri(obj.submitted_by_id.signature)"
+                                     style="max-height:30pt;max-width:90%;" alt="-"/>
+                                    </td>
+                                    <td style="width: 20%;text-align:center;border: none !important;">
+                                        <img t-if="obj.hr_approver_id.signature" t-att-src="image_data_uri(obj.hr_approver_id.signature)"
+                                     style="max-height:30pt;max-width:90%;" alt="-"/>
+                                    </td>
+                                    <td style="width: 20%;text-align:center;border: none !important;">
+                                        <img t-if="obj.acc_approver_id.signature" t-att-src="image_data_uri(obj.acc_approver_id.signature)"
+                                     style="max-height:30pt;max-width:90%;" alt="-"/>
+                                    </td>
+                                    <td style="width: 20%;text-align:center;border: none !important;">
+                                        <img t-if="obj.admin_approver_id.signature" t-att-src="image_data_uri(obj.admin_approver_id.signature)"
+                                     style="max-height:30pt;max-width:90%;" alt="-"/>
+                                    </td>
+                                    <td style="width: 20%;text-align:center;border: none !important;">
+                                        <img t-if="obj.settlement_by_id.signature" t-att-src="image_data_uri(obj.settlement_by_id.signature)"
+                                     style="max-height:30pt;max-width:90%;" alt="-"/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="row">
+                            <table style="width: 100%; border: none !important;">
+                                <tr >
+                                    <td style="width: 20%;text-align:center;border: none !important;">
+                                        <p style="color: #000; font-size: 20px;">
+                                            Submitted By<br/>
+                                            <span t-esc="obj.submitted_by_id.name"/>
+                                        </p>
+                                    </td>
+                                    <td style="width: 20%;text-align:center;border: none !important;">
+                                        <p style="color: #000; font-size: 20px;">
+                                            HR<br/>
+                                            <span t-esc="obj.hr_approver_id.name"/>
+                                        </p>
+                                    </td>
+                                    <td style="width: 20%;text-align:center;border: none !important;">
+                                        <p style="color: #000; font-size: 20px; ">
+                                            Accounts<br/>
+                                            <span t-esc="obj.acc_approver_id.name"/>
+                                        </p>
+                                    </td>
+                                    <td style="width: 20%;text-align:center;border: none !important;">
+                                        <p style="color: #000; font-size: 20px; ">
+                                            Trusty<br/>
+                                            <span t-esc="obj.admin_approver_id.name"/>
+                                        </p>
+                                    </td>
+                                    <td style="width: 20%; text-align:center;border: none !important;">
+                                        <p style="color: #000; font-size: 20px;">
+                                            Settlement By<br/>
+                                            <span t-esc="obj.settlement_by_id.name"/>
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        </t>
+                    </div>
+                </t>
+            </t>
+
+		</template>
+
+	</data>
+</odoo>

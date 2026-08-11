@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_location_form_inherit_stationary" model="ir.ui.view">
+        <field name="name">stock.location.form.inherit.stationary</field>
+        <field name="model">stock.location</field>
+        <field name="inherit_id" ref="stock.view_location_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='usage']" position="after">
+                <field name="is_stationary_location"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_location_tree_inherit_stationary" model="ir.ui.view">
+        <field name="name">stock.location.list.inherit.stationary</field>
+        <field name="model">stock.location</field>
+        <field name="inherit_id" ref="stock.view_location_tree2"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='usage']" position="after">
+                <field name="is_stationary_location"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_stationary_stock_quant_list" model="ir.ui.view">
+        <field name="name">stock.quant.stationary.list</field>
+        <field name="model">stock.quant</field>
+        <field name="arch" type="xml">
+            <tree string="Stationary Stock" create="false" delete="false">
+                <field name="product_id" string="Product"/>
+                <field name="lot_id" string="Lot/Serial" optional="show"/>
+                <field name="location_id" string="Location"/>
+                <field name="quantity" string="Quantity"/>
+                <field name="reserved_quantity" string="Reserved" optional="show"/>
+                <field name="available_quantity" string="Available"/>
+                <field name="product_uom_id" string="UoM"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_stationary_stock_quant_form" model="ir.ui.view">
+        <field name="name">stock.quant.stationary.form</field>
+        <field name="model">stock.quant</field>
+        <field name="arch" type="xml">
+            <form string="Stationary Stock">
+                <sheet>
+                    <group>
+                        <group string="Product">
+                            <field name="company_id" invisible="1"/>
+                            <field name="product_id" string="Product"/>
+                            <field name="lot_id" string="Lot/Serial Number"/>
+                            <field name="product_uom_id" string="Unit of Measure"/>
+                        </group>
+                        <group string="Location &amp; Quantity">
+                            <field name="location_id" string="Location"/>
+                            <field name="quantity" string="Quantity"/>
+                            <field name="reserved_quantity" string="Reserved Quantity"/>
+                            <field name="available_quantity" string="Available Quantity"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_stationary_stock" model="ir.actions.act_window">
+        <field name="name">Stationary Stock</field>
+        <field name="res_model">stock.quant</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('location_id.is_stationary_location', '=', True)]</field>
+        <field name="context">{}</field>
+        <field name="view_ids" eval="[
+            (5, 0, 0),
+            (0, 0, {'view_mode': 'tree', 'view_id': ref('view_stationary_stock_quant_list')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('view_stationary_stock_quant_form')}),
+        ]"/>
+    </record>
+
+</odoo>

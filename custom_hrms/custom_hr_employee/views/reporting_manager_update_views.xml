@@ -1,0 +1,97 @@
+<odoo>
+    <data>
+        <record id="views_hr_reporting_manager_update_tree" model="ir.ui.view">
+            <field name="name">hr.reporting.manager.view.tree</field>
+            <field name="model">hr.reporting.manager</field>
+            <field name="arch" type="xml">
+                <tree delete="0" decoration-info="state=='draft'"
+                      decoration-success="state=='confirm'" string="Reporting Manager Update">
+                    <field name="user_work_location_id"/>
+                    <field name="requested_date"/>
+                    <field name="current_reporting_manager_id"/>
+                    <field name="new_reporting_manager_id"/>
+                    <field name="state" string="Status"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="views_hr_reporting_manager_update_form" model="ir.ui.view">
+            <field name="name">hr.reporting.manager.view.form</field>
+            <field name="model">hr.reporting.manager</field>
+            <field name="arch" type="xml">
+                <form string="">
+                    <header>
+                        <field name="state" widget="statusbar"
+                               statusbar_visible="draft,confirm"/>
+                        <button name="action_confirm" type="object"
+                                string="Confirm"
+                                invisible="state != 'draft'"
+                                confirm="Are you sure you want to confirm?"
+                                class="oe_highlight"/>
+                    </header>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="user_work_location_id" required="1" readonly="state != 'draft'"
+                                       options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="requester_id" readonly="1" force_save="1"
+                                       options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            </group>
+                            <group>
+                                <field name="requested_date" readonly="1" force_save="1"
+                                       options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            </group>
+                        </group>
+                        <group>
+                            <group string="Current Reporting Manager">
+                                <field name="current_reporting_manager_id" readonly="1" force_save="1"
+                                       options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="crm_work_location_id" readonly="1" force_save="1"
+                                       options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="crm_id_card_no" readonly="1" force_save="1"/>
+                                <field name="crm_department_id" readonly="1" force_save="1"
+                                       options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="crm_designation_id" readonly="1" force_save="1"
+                                       options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="crm_reporting_manager_id" readonly="1" force_save="1"
+                                       options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            </group>
+                            <group string="New Reporting Manager">
+                                <field name="new_reporting_manager_id" required="1" readonly="state != 'draft'"
+                                       options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="nrm_work_location_id" readonly="1" force_save="1"
+                                       options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="nrm_id_card_no" readonly="1" force_save="1"/>
+                                <field name="nrm_department_id" readonly="1" force_save="1"
+                                       options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="nrm_designation_id" readonly="1" force_save="1"
+                                       options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="nrm_reporting_manager_id" readonly="1" force_save="1"
+                                       options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+
+        <record id="action_hr_reporting_manager_update"
+                model="ir.actions.act_window">
+            <field name="name">Employee Reporting Manager</field>
+            <field name="res_model">hr.reporting.manager</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create a Employee Reporting Manager Update Record
+                </p>
+            </field>
+        </record>
+
+        <menuitem id="menu_hr_reporting_manager_update"
+                  name="Employee Reporting Manager Update"
+                  parent="menu_hr_employee_operations"
+                  action="action_hr_reporting_manager_update"
+                  groups="hr.group_hr_manager" sequence="25"/>
+    </data>
+</odoo>

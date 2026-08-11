@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  	<data>
+      	<record model="ir.ui.view" id="hr_attendance_view_form">
+		    <field name="name">attendance.form</field>
+		    <field name="model">hr.attendance</field>
+		    <field name="inherit_id" ref="hr_attendance.hr_attendance_view_form"/>
+		    <field name="arch" type="xml">
+				<xpath expr="//form" position="attributes" >
+                     <attribute name='create'>false</attribute>
+					<attribute name='edit'>false</attribute>
+                     <attribute name='delete'>false</attribute>
+                </xpath>
+				<field name="employee_id" position="replace">
+		            <field name="employee_id" options="{'no_open':True,'no_create':1,'no_create_edit':1}" readonly="1"/>
+		        </field>
+		    	<field name="check_in" position="after">
+		            <field name="checkin_device_id" options="{'no_open':True,'no_create':1,'no_create_edit':1}" readonly="1"/>
+		        </field>
+		        <field name="check_out" position="after">
+		            <field name="checkout_device_id" options="{'no_open':True,'no_create':1,'no_create_edit':1}" readonly="1"/>
+		            <field name="activity_id" options="{'no_open':True,'no_create':1,'no_create_edit':1}" readonly="1"/>
+		        </field>
+		   </field>
+		</record>
+		
+		<record model="ir.ui.view" id="view_hr_attendance_kanban">
+		    <field name="name">hr.attendance.kanban</field>
+        	<field name="model">hr.attendance</field>
+		    <field name="inherit_id" ref="hr_attendance.view_hr_attendance_kanban"/>
+		    <field name="arch" type="xml">
+				<xpath expr="//kanban" position="attributes" >
+                     <attribute name='create'>false</attribute>
+					<attribute name='edit'>false</attribute>
+                     <attribute name='delete'>false</attribute>
+                </xpath>
+		   </field>
+		</record>
+
+		<record model="ir.ui.view" id="hr_attendance_view_filter_inherit">
+		    <field name="name">hr.attendance.search</field>
+        	<field name="model">hr.attendance</field>
+		    <field name="inherit_id" ref="hr_attendance.hr_attendance_view_filter"/>
+		    <field name="arch" type="xml">
+				<field name="department_id" position="after">
+		        	<field name="dayofweek" />
+					<field name="manual_flag" />
+					<field name="status" />
+					<field name="policy_process" />
+					<field name="manual_absent" />
+					<field name="manual_weekend" />
+					<field name="attendance_date" />
+
+					<separator />
+					<filter name="today" string="Today"
+						domain="[('attendance_date', '=', datetime.datetime.now().strftime('%Y-%m-%d'))]" />
+					<separator />
+
+		        </field>
+		   </field>
+		</record>
+
+		<record model="ir.ui.view" id="view_attendance_tree">
+		    <field name="name">hr.attendance.tree</field>
+		    <field name="model">hr.attendance</field>
+		    <field name="inherit_id" ref="hr_attendance.view_attendance_tree"/>
+			<field name="priority">11</field>
+		    <field name="arch" type="xml">
+		    	<xpath expr="//tree" position="attributes" >
+                     <attribute name='create'>false</attribute>
+                     <attribute name='delete'>false</attribute>
+                </xpath>
+		    	
+                <field name="employee_id" position="replace">
+		            <field name="employee_id" options="{'no_open':True,'no_create':1,'no_create_edit':1}" readonly="1"/>
+		        </field>
+		        <field name="check_in" position="replace">
+		        	<field name="attendance_date" readonly="1"/>
+		            <field name="dayofweek"/>
+		            <field name="resource_calendar_id" readonly="1" optional="hide"/>
+		            <field name="is_over_ride_day" readonly="1" optional="hide"/>
+					<field name="resource_calendar_id_prev" readonly="1" optional="hide"/>
+		            <field name="is_over_ride_day_prev" readonly="1" optional="hide"/>
+
+		            <field name="pl_sign_in" readonly="1" string="Planning IN" widget='float_time' optional="hide"/>
+		            <field name="pl_sign_in_time" readonly="1" string="Planning IN Full" optional="hide" />
+		            <field name="check_in" readonly="1" widget='time'/>
+					<field name="check_in_location" readonly="1" optional="hide"/>
+		            <field name="act_late_in" readonly="1" widget='float_time'/>
+		            <field name="late_in" readonly="1" widget='float_time' optional="hide"/>
+		            <field name="late_in_abs" readonly="1" optional="hide"/>
+		            <field name="checkin_device_id" options="{'no_open':True,'no_create':1,'no_create_edit':1}" readonly="1" optional="hide"/>
+		        </field>
+		        <field name="check_out" position="replace">
+		        	<field name="pl_sign_out" readonly="1" string="Planning OUT" widget='float_time' optional="hide"/>
+		        	<field name="pl_sign_out_time" readonly="1" string="Planning OUT Full" optional="hide"/>
+		            <field name="check_out" readonly="1"/>
+					<field name="check_out_location" readonly="1" optional="hide"/>
+		            <field name="act_diff_time" readonly="1" widget='float_time'/>
+		            <field name="diff_time" readonly="1" widget='float_time' optional="hide"/>
+		            <field name="checkout_device_id" options="{'no_open':True,'no_create':1,'no_create_edit':1}" readonly="1" optional="hide"/>
+		            <field name="manual_flag" readonly="1" optional="hide"/>
+		            <field name="manual_reason" readonly="1" optional="hide"/>
+					<field name="manual_uid" readonly="1" optional="hide"/>
+		            <field name="manual_time" readonly="1" optional="hide"/>
+		            <field name="manual_absent" readonly="1" optional="hide"/>
+		            <field name="act_overtime" readonly="1" widget='float_time'/>
+		            <field name="overtime" readonly="1" widget='float_time' optional="hide"/>
+		            
+		            <field name="policy_process" readonly="1" optional="hide"/>
+		            <field name="active" readonly="1" optional="hide"/>
+		            <field name="note" readonly="1" optional="hide"/>
+		        </field>
+                
+		    	<field name="employee_id" position="after">
+		            <!-- <field name="department_id"/> -->
+					<field name="emp_card_no" options="{'no_open':True,'no_create':1,'no_create_edit':1}"/>
+		            <field name="job_id" options="{'no_open':True,'no_create':1,'no_create_edit':1}"/>
+		            <field name="user_work_location_id" options="{'no_open':True,'no_create':1,'no_create_edit':1}" readonly="1" optional="hide"/>
+		        </field>
+		        
+		    	<!-- <field name="check_in" position="before">
+		            <field name="attendance_date" readonly="1"/>
+		            <field name="dayofweek"/>
+		            <field name="pl_sign_in_time" readonly="1" string="Planning IN"/>
+		        </field> -->
+		        
+		    	<!-- <field name="check_in" position="after">
+		            <field name="checkin_device_id" options="{'no_open':True,'no_create':1,'no_create_edit':1}" readonly="1"/>
+		        </field> -->
+		        <field name="active" position="after">
+		            <!-- <field name="checkout_device_id" options="{'no_open':True,'no_create':1,'no_create_edit':1}" readonly="1"/>
+		            <field name="manual_flag" readonly="1"/>
+		            <field name="manual_reason" readonly="1"/>
+		            <field name="active" readonly="1"/> -->
+		            <!-- <field name="activity_id"/> -->	
+		            
+		            <field name="status" readonly="1"/>
+		        </field>
+		        
+		        <field name="worked_hours" position="after">
+		        	<field name="punch_count" readonly="1" optional="hide"/>
+					<button name="update_manual_reason_note" type="object" string="Edit"
+						confirm="Are you sure you want to Update?" groups="hr_attendance.group_hr_attendance_manager"/>
+		            <!--<button name="set_attendance_policy_data" type="object" string="Checking"
+						confirm="Are you sure you want to Check?" groups="hr_attendance.group_hr_attendance_manager"/>-->
+		        </field>
+
+				<field name="worked_hours" position="replace">
+				</field>
+				<field name="check_out" position="after">
+					<field name="worked_hours" string="Work Hours" widget="float_time"/>
+		        </field>
+
+		   </field>
+		</record>
+		
+		<record id="hr_attendance.hr_attendance_action" model="ir.actions.act_window">
+			<field name="name">Attendances</field>
+			<field name="res_model">hr.attendance</field>
+			<field name="view_mode">tree,kanban</field>
+			<field name="context">{"search_default_today":1}</field>
+			<field name="search_view_id" ref="hr_attendance.hr_attendance_view_filter" />
+			<field name="help" type="html">
+				<p class="o_view_nocontent_empty_folder">
+					No attendance records found
+				</p><p>
+					The attendance records of your employees will be displayed here.
+				</p>
+			</field>
+		</record>
+
+		<record id="inherited_hr_attendance_search_inherit_cus_hr_att_view" model="ir.ui.view">
+			<field name="name">inherited.hr.attendance.search.inherit.cus.hr.att.view</field>
+			<field name="model">hr.attendance</field>
+			<field name="inherit_id" ref="hr_attendance.hr_attendance_view_filter"/>
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='employee_id']" position="before">
+					<field name="id_card_no" filter_domain="[('id_card_no', '=', self)]"/>
+				</xpath>
+				<xpath expr="//field[@name='employee_id']" position="after">
+					<field name="device_user_id" filter_domain="[('device_user_id', '=', self)]"/>
+				</xpath>
+			</field>
+		</record>
+
+<!--		<menuitem id="hr_attendance.menu_hr_attendance_my_attendances" name="Check In / Check Out" parent="hr_attendance.menu_hr_attendance_root" sequence="10" groups="base.group_system" action="hr_attendance.hr_attendance_action_my_attendances"/>-->
+
+  	</data>
+</odoo>

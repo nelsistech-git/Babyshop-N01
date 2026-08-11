@@ -1,0 +1,35 @@
+/** @odoo-module */
+
+import { registry } from "@web/core/registry"
+import { loadJS } from "@web/core/assets"
+const { Component, onWillStart, useRef, onMounted } = owl
+
+export class ChartRenderer extends Component {
+    static template = "operation_overview.GraphWidget";
+    setup() {
+        this.chart = null;
+        console.log("TEST")
+        this.canvasRef = useRef("canvas");
+        this.data = JSON.parse(this.props.record.data[this.props.name]);
+
+        onWillStart(async () => await loadBundle("web.chartjs_lib"));
+
+        useEffect(() => {
+            this.renderChart();
+            return () => {
+                if (this.chart) {
+                    this.chart.destroy();
+                }
+            };
+        });
+        console.log("ChartRenderer setup updated")
+    }
+
+}
+
+ChartRenderer.template = "operation_overview.GraphWidget"
+
+
+
+registry.category("fields").add("operation_overview.GraphWidget", ChartRenderer);
+

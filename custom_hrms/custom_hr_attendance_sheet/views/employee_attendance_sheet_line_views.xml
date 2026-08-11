@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+	<data>
+		<!-- <record id="view_emp_attendance_line_data_form" model="ir.ui.view">
+			<field name="name">Employee Attendance Details Form</field>
+			<field name="model">employee.attendance.sheet.line</field>
+			<field name="arch" type="xml">
+				<form string="Employee Attendance Details">
+					<sheet>
+						<group>
+							<group>
+								<field name="user_id" />
+								<field name="timestamp" />
+								<field name="status" groups="base.group_no_one" />
+								<field name="attendance_state_id" />
+								<field name="valid" />
+								<field name="employee_id" />
+								<field name="hr_attendance_id" groups="base.group_no_one" />
+								<field name="device_id" />
+							</group>
+							<group></group>
+						</group>
+					</sheet>
+				</form>
+			</field>
+		</record>
+		
+		<record id="view_emp_attendance_line_data_pivot" model="ir.ui.view">
+			<field name="name">Employee Attendance Details Pivot</field>
+			<field name="model">employee.attendance.sheet.line</field>
+			<field name="arch" type="xml">
+				<pivot string="Employee Attendance Details">
+					<field name="timestamp" type="col" />
+					<field name="user_id" type="row" />
+				</pivot>
+			</field>
+		</record> -->
+		
+		<record id="view_emp_attendance_line_data_tree" model="ir.ui.view">
+			<field name="name">Employee Attendance Details</field>
+			<field name="model">employee.attendance.sheet.line</field>
+			<field name="arch" type="xml">
+				<tree string="Employee Attendance Details" create="false"
+					edit="false" delete="false">
+					<field name="date" />
+					<field name="day" />
+					<field name="employee_id" />
+					<field name="resource_calendar_id" optional="hide"/>
+					<field name="is_over_ride_day" optional="hide"/>
+					<field name="pl_sign_in"
+                           string="PL/IN"
+                           widget="float_time"/>
+                    <field name="pl_sign_out"
+                           string="PL/OUT"
+                           widget="float_time"/>
+                    <field name="ac_sign_in"
+                           string="ACT/IN"
+                           widget="float_time"/>
+                    <field name="ac_sign_out"
+                           string="ACT/OUT"
+                           widget="float_time"/>
+                    <field name="work_hours"
+                           widget="float_time"
+                           string="Work Hours"
+                           sum="Total"/>
+                    <field name="worked_hours"
+                           widget="float_time"
+                           string="Worked/H for OT"
+                           sum="Total" optional="hide"/>
+                    <field name="act_late_in"
+                           groups="base.group_no_one"
+                           widget="float_time"
+                           sum="Total"/>
+                    <field name="late_in"
+                           widget="float_time"
+                           sum="Total"/>
+					<field name="late_in_abs"
+                           sum="Total"/>
+					<field name="act_diff_time"
+                           groups="base.group_no_one"
+                           widget="float_time"
+                           sum="Total"/>
+                    <field name="diff_time"
+                           widget="float_time"
+                           sum="Total"/>
+                    <field name="act_overtime"
+                           groups="base.group_no_one"
+                           widget="float_time"
+                           sum="Total"/>
+                    <field name="overtime"
+                           widget="float_time"
+                           sum="Total"/>
+
+                    <field name="status"/>
+                    <field name="note"/>   
+                    <field name="manual_flag"/> 
+                    <field name="manual_reason"/>
+                    <field name="punch_count"/>
+                    <field name="manual_absent"/>                    
+				</tree>
+			</field>
+		</record>
+		<record id="emp_attendance_line_data_search_view" model="ir.ui.view">
+			<field name="name">Employee Attendance Details</field>
+			<field name="model">employee.attendance.sheet.line</field>
+			<field name="arch" type="xml">
+				<search string="Search Employee Attendance Details">
+					<field name="employee_id" />
+					<field name="resource_calendar_id" />
+					<field name="date" />
+					<field name="day" />					
+					<field name="status" />
+					<field name="state" />
+					<field name="punch_count"/>
+					<field name="manual_absent"/>
+					<separator />
+					<filter name="today" string="Today"
+						domain="[('date', '=', datetime.datetime.now().strftime('%Y-%m-%d'))]" />
+					<separator />
+					
+					<group expand="0" string="Group By...">
+						<filter string="Employee" name="employee_id"
+							context="{'group_by': 'employee_id'}" />
+					</group>
+				</search>
+			</field>
+		</record>
+		
+		<record model="ir.actions.act_window" id="action_emp_attendance_line_data">
+			<field name="name">Employee Attendance (Details)</field>
+			<field name="res_model">employee.attendance.sheet.line</field>
+			<field name="view_mode">tree</field>
+			<field name="context">{'search_default_today':1, 'group_by':[]}</field>
+		</record>
+		
+		<menuitem id="emp_attendance_line_data_menu" name="Employee Attendance Details"
+			parent="custom_zk_attendance_device.menu_hr_attendance_manage_attendances" sequence="1" action="action_emp_attendance_line_data"
+			groups="hr_attendance.group_hr_attendance_manager" />
+<!--			groups="hr_attendance.group_hr_attendance_officer" />-->
+
+
+	</data>
+</odoo>

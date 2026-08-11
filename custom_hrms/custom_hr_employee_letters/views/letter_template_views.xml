@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <!--Form View-->
+        <record id="employee_letter_template_view_form" model="ir.ui.view">
+			<field name="name">employee.letter.template.form</field>
+			<field name="model">employee.letter.template</field>
+			<field name="arch" type="xml">
+				<form string="Letter Template Form">
+					<sheet>
+						<group>
+							<group>							
+								<field name="type" />
+								<field name="template_type" />
+							</group>
+                            <group>
+								<field name="name" />
+								<field name="active" />
+							</group>
+						</group>
+						<separator string="Letter Template" colspan="4" />
+						<field name="description" placeholder="Letter Description" widget="html"/>
+						<br/><br/>
+						<span groups="base.group_system" ><span style="font-weight:bold;">Using Variables:</span><br/>
+							'$emp_name', '$emp_department', '$emp_gender_salutation', '$emp_designation', '$emp_company', '$reference', '$date', '$effective_date', '$cc', '$agreement_date', '$emp_joining_date', '$emp_gender_pronoun', '$emp_job_location', '$emp_pa_pronoun', '$upto_date', '$next_year', '$last_business_date', '$emp_father_name', '$emp_permanent_ad', '$emp_position', '$confirm_date', '$handover_from', '$to_location', '$handover_to', '$to_designation', '$area_code', '$emp_passport_no', '$report_department', '$present_address'
+
+						</span><br/>
+						<span groups="base.group_system" ><span style="font-weight:bold;">For Increment/Decrement:</span><br/>
+							 $emp_name, $emp_department, $emp_designation, $emp_id, $present_sal, $inc_amt, $new_sal, $ref_no, $print_date, $effective_date
+						</span>
+					</sheet>
+				</form>
+			</field>
+		</record>
+
+        <!--Tree View-->
+        <record id="employee_letter_template_view_tree" model="ir.ui.view">
+			<field name="name">employee.letter.template.tree</field>
+			<field name="model">employee.letter.template</field>
+			<field name="arch" type="xml">
+				<tree string="Letter Template">
+					<field name="name" />
+					<field name="template_type" />
+					<field name="type" />
+					<field name="active" />
+				</tree>
+			</field>
+		</record>
+
+        <!--Search View-->
+<!--        <record id="employee_letter_template_view_search" model="ir.ui.view">-->
+<!--			<field name="name">employee.letter.template.search</field>-->
+<!--			<field name="model">employee.letter.template</field>-->
+<!--			<field name="arch" type="xml">-->
+<!--				<search>-->
+<!--					<field name="name" />-->
+<!--					<field name="template_type" />-->
+<!--					<field name="type" />-->
+<!--					<field name="active" />-->
+<!--					<filter string="Active" name="active" domain="[('active','=',True)]" help="Filtered by Active Status" />-->
+<!--                    <filter string="Inactive" name="inactive" domain="[('active','=',False)]" help="Filtered by Inactive Status" />-->
+<!--                    <filter string="Type" domain="[]" context="{'group_by':'type'}"/>-->
+<!--					<filter string="Letter Type" domain="[]" context="{'group_by':'template_type'}"/>-->
+<!--					<separator />-->
+<!--				</search>-->
+<!--			</field>-->
+<!--		</record>-->
+
+        <!--List Action-->
+        <record id="employee_letter_template_list_action" model="ir.actions.act_window">
+			<field name="name">Letter Template</field>
+			<field name="res_model">employee.letter.template</field>
+<!--			<field name="view_type">form</field>-->
+<!--			<field name="view_mode">tree,form</field>-->
+			<field name="help" type="html">
+				<p class="oe_view_nocontent_create">Create Letter Template</p>
+			</field>
+		</record>
+
+        <!--Menu Item-->
+        <menuitem id="menu_employee_letter_template_config" name="Letter Templates"
+			parent="custom_hr_employee.menu_hr_employee_settings_root" action="employee_letter_template_list_action"
+			sequence="40" groups="hr.group_hr_manager,hr.group_hr_user"/>
+
+    </data>
+</odoo>

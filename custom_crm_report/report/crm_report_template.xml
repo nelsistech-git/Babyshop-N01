@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="report_crm_report_template">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <div class="page">
+
+                    <!-- Report Title -->
+                    <div class="row mb-4">
+                        <div class="col-12 text-center">
+                            <h3 style="font-weight: bold;">CRM Report</h3>
+                            <t t-set="wizard" t-value="docs[0]"/>
+                            <t t-if="wizard.date_from or wizard.date_to">
+                                <p style="margin:0;">
+                                    <t t-if="wizard.date_from">
+                                        <strong>From:</strong>
+                                        <t t-esc="wizard.date_from"/>
+                                    </t>
+                                    <t t-if="wizard.date_to">
+                                        &amp;nbsp;&amp;nbsp;
+                                        <strong>To:</strong>
+                                        <t t-esc="wizard.date_to"/>
+                                    </t>
+                                </p>
+                            </t>
+                            <t t-if="wizard.salesperson_id">
+                                <p style="margin:0;">
+                                    <strong>Salesperson:</strong>
+                                    <t t-esc="wizard.salesperson_id.name"/>
+                                </p>
+                            </t>
+                        </div>
+                    </div>
+
+                    <!-- Table -->
+                    <table class="table table-bordered" style="font-size:10px; width:100%;">
+                        <thead>
+                            <tr style="background-color:#6C7E7F; color:white; text-align:center;">
+                                <th>CUSTOMER NAME</th>
+                                <th>BRAND NAME</th>
+                                <th>BUSINESS TYPES</th>
+                                <th>NO. OF FOLLOWERS</th>
+                                <th>FABRIC TYPES</th>
+                                <th>ITEMS</th>
+                                <th>CONTACT</th>
+                                <th>LOCATION</th>
+                                <th>WEBSITE</th>
+                                <th>PAGE LINK</th>
+                                <th>CATEGORY</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="leads" t-as="lead">
+                                <tr>
+                                    <td>
+                                        <t t-esc="lead.partner_id.name or lead.partner_name or ''"/>
+                                    </td>
+                                    <td>
+                                        <t t-esc="lead.x_brand_name or ''"/>
+                                    </td>
+                                    <td>
+                                        <t t-esc="lead.business_type or ''"/>
+                                    </td>
+                                    <td>
+                                        <t t-esc="lead.followers_type or ''"/>
+                                    </td>
+                                    <td>
+                                        <t t-esc="lead.fabric_type or ''"/>
+                                    </td>
+                                    <td>
+                                        <t t-esc="lead.product_details or ''"/>
+                                    </td>
+                                    <td>
+                                        <t t-esc="lead.mobile or ''"/>
+                                    </td>
+                                    <td>
+                                        <t t-set="loc_street" t-value="lead.street or (lead.partner_id and lead.partner_id.street) or ''"/>
+                                        <t t-set="loc_city" t-value="lead.city or (lead.partner_id and lead.partner_id.city) or ''"/>
+                                        <t t-if="loc_street or loc_city">
+                                            <t t-esc="loc_street"/>
+                                            <t t-if="loc_street and loc_city">, </t>
+                                            <t t-esc="loc_city"/>
+                                        </t>
+                                    </td>
+                                    <td>
+                                        <t t-esc="lead.website or lead.partner_id.website or ''"/>
+                                    </td>
+                                    <td>
+                                        <t t-esc="lead.x_page_link or ''"/>
+                                    </td>
+                                    <td style="text-align:center;">
+                                        <t t-esc="lead.x_category or ''"/>
+                                    </td>
+                                </tr>
+                            </t>
+                            <t t-if="not leads">
+                                <tr>
+                                    <td colspan="11" style="text-align:center;">No records found.</td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+
+                </div>
+            </t>
+        </t>
+    </template>
+
+</odoo>

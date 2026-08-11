@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="inherited_po_view_search" model="ir.ui.view">
+        <field name="name">account.move.search</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_account_invoice_filter"/>
+        <field name="arch" type="xml">
+            <!-- Added PO Type in Purchase Order Search-->
+             <xpath expr="//search" position="inside">
+                 <field name="courier_id"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="account_move_form_view" model="ir.ui.view">
+        <field name="name">account.move.form.view</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <field name="journal_id" position="after">
+                <field name="challan_no" readonly="1" force_save="1" invisible="context.get('default_type') not in ('in_invoice', 'in_refund','in_receipt')"/>
+                <field name="picking_id" readonly="1" attrs="{'invisible': ['|',('picking_id',  '=', False),('type',  '!=', 'entry')]}"/>
+                <field name="credit_tenor_date"
+                       attrs="{'invisible': ['|',('credit_tenor_date',  '=', False),('type',  '=', 'entry')], 'readonly':[('state','=','posted')]}"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="account_move_inherit_custom_stock_tree_view" model="ir.ui.view">
+        <field name="name">account.move.tree</field>
+        <field name="inherit_id" ref="account.view_invoice_tree"/>
+        <field name="model">account.move</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='invoice_origin']" position="after">
+                <field name="credit_tenor_date" optional="hidden"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

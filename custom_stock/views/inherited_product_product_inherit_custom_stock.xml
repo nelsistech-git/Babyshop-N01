@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="product_template_only_form_view_inherit_custom_stock" model="ir.ui.view">
+            <field name="name">product.template.only.form.view.inherit.custom.stock</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="stock.product_template_form_view_procurement_button"/>
+            <field name="arch" type="xml">
+                <xpath expr="//button[@name='action_update_quantity_on_hand']" position="attributes">
+                    <attribute name="groups">base.group_system</attribute>
+                </xpath>
+                <xpath expr="//button[@name='%(stock.action_product_replenish)d']" position="attributes">
+                    <attribute name="groups">base.group_system</attribute>
+                </xpath>
+                <xpath expr="//button[@name='action_open_quants']" position="attributes">
+                    <attribute name="groups">base.group_system</attribute>
+                </xpath>
+                <xpath expr="//button[@name='action_product_tmpl_forecast_report']" position="attributes">
+                    <attribute name="groups">base.group_system</attribute>
+                </xpath>
+            </field>
+        </record>
+
+        <record model="ir.ui.menu" id="stock.product_product_menu">
+            <field name="groups_id" eval="[(4,ref('base.group_system')),(6,0,[ref('custom_stock.group_inventory_product_sub_menu')])]"/>
+        </record>
+        <record model="ir.ui.menu" id="stock.menu_product_variant_config_stock">
+            <field name="groups_id" eval="[(4,ref('base.group_system')),(6,0,[ref('custom_stock.group_inventory_product_sub_menu')])]"/>
+        </record>
+        <record model="ir.ui.menu" id="custom_stock.product_product_menu_stock">
+            <field name="groups_id" eval="[(4,ref('base.group_system')),(6,0,[ref('custom_stock.group_inventory_product_sub_menu')])]"/>
+        </record>
+    </data>
+</odoo>

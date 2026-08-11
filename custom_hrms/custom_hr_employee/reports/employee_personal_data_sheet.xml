@@ -1,0 +1,451 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- Paper Format -->
+        <record id="employee_personal_data_sheet_paperformat" model="report.paperformat">
+            <field name="name">Employee Personal Data Sheet</field>
+            <field name="default" eval="False"/>
+            <field name="format">A4</field>
+            <field name="orientation">Portrait</field>
+            <field name="margin_top">10</field>
+            <field name="margin_bottom">10</field>
+            <field name="margin_left">10</field>
+            <field name="margin_right">10</field>
+            <field name="header_line" eval="False"/>
+            <field name="header_spacing">5</field>
+            <field name="dpi">90</field>
+        </record>
+
+        <!-- Report Action -->
+        <record id="action_employee_personal_data_sheet" model="ir.actions.report">
+            <field name="name">Employee Details</field>
+            <field name="model">hr.employee</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">custom_hr_employee.template_employee_personal_data_sheet</field>
+            <field name="report_file">custom_hr_employee.template_employee_personal_data_sheet</field>
+            <field name="paperformat_id" ref="custom_hr_employee.employee_personal_data_sheet_paperformat"/>
+            <field name="binding_model_id" ref="hr.model_hr_employee"/>
+            <field name="binding_type">report</field>
+        </record>
+
+        <!-- Button in HR Employee Form -->
+        <record id="view_employee_personal_data_sheet_button" model="ir.ui.view">
+            <field name="name">hr.employee.personal.data.sheet.button</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[@name='button_box']" position="before">
+                    <header>
+                        <button name="%(custom_hr_employee.action_employee_personal_data_sheet)d"
+                                string="Employee Details"
+                                type="action"
+                                class="btn-secondary"/>
+                    </header>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- QWeb PDF Template -->
+        <template id="template_employee_personal_data_sheet">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="employee">
+                    <div class="page" style="padding: 10mm;">
+                        <style>
+                            .pds-wrap { width: 100%; display: flex; flex-direction: column; }
+                            .pds-table { width: 100%; border-collapse: collapse; font-size: 11px; font-family: Arial, sans-serif; table-layout: fixed; flex: 1; }
+                            .pds-table td { border: 1px solid #000; padding: 1px 6px; vertical-align: middle; height: 7.5mm; }
+                            .pds-title { background-color: #8fbc5a; text-align: center; font-size: 13px; font-weight: bold; height: 10mm !important; }
+                            .pds-section { background-color: #a0a0a0; text-align: center; font-weight: bold; font-size: 11px; height: 7mm !important; }
+                            .pds-subsection { background-color: #c0c0c0; text-align: center; font-weight: bold; height: 7mm !important; }
+                            .pds-label { background-color: #e8f0d8; font-weight: bold; width: 18%; }
+                            .pds-val { width: 32%; }
+                            .pds-sig { height: 18mm !important; vertical-align: bottom !important; padding-bottom: 4px !important; }
+                            .doc-table { width: 100%; border-collapse: collapse; font-size: 10px; font-family: Arial, sans-serif; }
+                            .doc-table th { background-color: #a0a0a0; color: #fff; border: 1px solid #000; padding: 4px 5px; text-align: center; font-weight: bold; font-size: 10px; }
+                            .doc-table td { border: 1px solid #000; padding: 3px 5px; text-align: center; vertical-align: middle; height: 7mm; }
+                            .doc-table td.doc-name { text-align: left; }
+                        </style>
+
+                        <div class="pds-wrap">
+                        <table class="pds-table">
+
+                            <!-- TITLE -->
+                            <tr><td colspan="4" class="pds-title">Employee Personal Information Data Sheet *</td></tr>
+
+                            <!-- Employee ID & Date of Joining -->
+                            <tr>
+                                <td class="pds-label">Employee ID:</td>
+                                <td class="pds-val"><t t-if="'id_card_no' in employee._fields"><t t-esc="employee.id_card_no or ''"/></t></td>
+                                <td class="pds-label">Date of Joining:</td>
+                                <td class="pds-val"><t t-if="'initial_employment_date' in employee._fields"><t t-esc="employee.initial_employment_date or ''"/></t></td>
+                            </tr>
+
+                            <!-- Date of Confirmation & Probation -->
+                            <tr>
+                                <td class="pds-label">Date of Confirmation:</td>
+                                <td class="pds-val"><t t-if="'date_of_confirmation' in employee._fields"><t t-esc="employee.date_of_confirmation or ''"/></t></td>
+                                <td class="pds-label">Probation Period:</td>
+                                <td class="pds-val">
+                                    <t t-if="'probation_period' in employee._fields and employee.probation_period">
+                                        <t t-esc="employee.probation_period.name"/>
+                                    </t>
+                                </td>
+                            </tr>
+
+                            <!-- PERSONAL INFORMATION -->
+                            <tr><td colspan="4" class="pds-section">PERSONAL INFORMATION</td></tr>
+
+                            <tr>
+                                <td class="pds-label">Name of Employee:</td>
+                                <td colspan="3"><t t-esc="employee.name or ''"/></td>
+                            </tr>
+
+                            <!-- DOB + Age -->
+                            <tr>
+                                <td class="pds-label">Date of Birth:</td>
+                                <td class="pds-val"><t t-esc="employee.birthday or ''"/></td>
+                                <td class="pds-label">Age:</td>
+                                <td class="pds-val"><t t-if="'age' in employee._fields"><t t-esc="employee.age or ''"/></t></td>
+                            </tr>
+
+                            <!-- Place of Birth + Gender -->
+                            <tr>
+                                <td class="pds-label">Place of Birth:</td>
+                                <td class="pds-val"><t t-if="'place_of_birth' in employee._fields"><t t-esc="employee.place_of_birth or ''"/></t></td>
+                                <td class="pds-label">Gender:</td>
+                                <td class="pds-val">
+                                    <t t-if="'gender' in employee._fields">
+                                        <t t-set="gender_val" t-value="dict(employee._fields['gender'].selection).get(employee.gender)"/>
+                                        <t t-esc="gender_val or ''"/>
+                                    </t>
+                                </td>
+                            </tr>
+
+                            <!-- Blood Group + Religion -->
+                            <tr>
+                                <td class="pds-label">Blood Group:</td>
+                                <td class="pds-val">
+                                    <t t-if="'blood_group' in employee._fields">
+                                        <t t-set="blood_grp" t-value="dict(employee._fields['blood_group'].selection).get(employee.blood_group)"/>
+                                        <t t-esc="blood_grp or ''"/>
+                                    </t>
+                                </td>
+                                <td class="pds-label">Religion:</td>
+                                <td class="pds-val">
+                                    <t t-if="'religion' in employee._fields">
+                                        <t t-set="religion_val" t-value="dict(employee._fields['religion'].selection).get(employee.religion)"/>
+                                        <t t-esc="religion_val or ''"/>
+                                    </t>
+                                </td>
+                            </tr>
+
+                            <!-- Height + Weight -->
+                            <tr>
+                                <td class="pds-label">Height:</td>
+                                <td class="pds-val"><t t-if="'height' in employee._fields"><t t-esc="employee.height or ''"/></t></td>
+                                <td class="pds-label">Weight (KG):</td>
+                                <td class="pds-val"><t t-if="'weight' in employee._fields"><t t-esc="employee.weight or ''"/></t></td>
+                            </tr>
+
+                            <!-- Nationality + NID -->
+                            <tr>
+                                <td class="pds-label">Nationality:</td>
+                                <td class="pds-val"><t t-esc="employee.country_id.name or ''"/></td>
+                                <td class="pds-label">NID/Birth Cert.:</td>
+                                <td class="pds-val"><t t-if="'nid' in employee._fields"><t t-esc="employee.nid or ''"/></t></td>
+                            </tr>
+
+                            <!-- Present Address -->
+                            <tr>
+                                <td class="pds-label">Present Address:</td>
+                                <td colspan="3"><t t-if="'present_address' in employee._fields"><t t-esc="employee.present_address or ''"/></t></td>
+                            </tr>
+
+                            <!-- Permanent Address -->
+                            <tr>
+                                <td class="pds-label">Permanent Address:</td>
+                                <td colspan="3">
+                                    <t t-if="'p_address_id' in employee._fields and employee.p_address_id">
+                                        <t t-esc="employee.p_address_id"/>
+                                    </t>
+                                </td>
+                            </tr>
+
+                            <!-- Private Address -->
+                            <tr>
+                                <td class="pds-label">Private Address:</td>
+                                <td colspan="3">
+                                    <t t-if="employee.address_home_id">
+                                        <t t-esc="employee.address_home_id.contact_address or ''"/>
+                                    </t>
+                                </td>
+                            </tr>
+
+                            <!-- Division + District -->
+                            <tr>
+                                <td class="pds-label">Division:</td>
+                                <td class="pds-val">
+                                    <t t-if="'division_id' in employee._fields and employee.division_id">
+                                        <t t-esc="employee.division_id.name or ''"/>
+                                    </t>
+                                </td>
+                                <td class="pds-label">District:</td>
+                                <td class="pds-val">
+                                    <t t-if="'district_id' in employee._fields and employee.district_id">
+                                        <t t-esc="employee.district_id.name or ''"/>
+                                    </t>
+                                </td>
+                            </tr>
+
+                            <!-- Upazila + Postcode -->
+                            <tr>
+                                <td class="pds-label">Upazila/Thana:</td>
+                                <td class="pds-val">
+                                    <t t-if="'upazila_id' in employee._fields and employee.upazila_id">
+                                        <t t-esc="employee.upazila_id.name or ''"/>
+                                    </t>
+                                </td>
+                                <td class="pds-label">Postcode:</td>
+                                <td class="pds-val"><t t-if="'zip' in employee._fields"><t t-esc="employee.zip or ''"/></t></td>
+                            </tr>
+
+                            <!-- Housing Status + Office Phone -->
+                            <tr>
+                                <td class="pds-label">Housing Status:</td>
+                                <td class="pds-val">
+                                    <t t-if="'housing_status' in employee._fields">
+                                        <t t-set="housing_val" t-value="dict(employee._fields['housing_status'].selection).get(employee.housing_status)"/>
+                                        <t t-esc="housing_val or ''"/>
+                                    </t>
+                                </td>
+                                <td class="pds-label">Office Phone:</td>
+                                <td class="pds-val"><t t-esc="employee.work_phone or ''"/></td>
+                            </tr>
+
+                            <!-- Office Email + Personal Mobile -->
+                            <tr>
+                                <td class="pds-label">Office Email:</td>
+                                <td class="pds-val"><t t-esc="employee.work_email or ''"/></td>
+                                <td class="pds-label">Personal Mobile:</td>
+                                <td class="pds-val"><t t-if="'contact_no' in employee._fields"><t t-esc="employee.contact_no or ''"/></t></td>
+                            </tr>
+
+                            <!-- Personal Email + Passport -->
+                            <tr>
+                                <td class="pds-label">Personal Email:</td>
+                                <td class="pds-val"><t t-if="'email_personal' in employee._fields"><t t-esc="employee.email_personal or ''"/></t></td>
+                                <td class="pds-label">Passport No.:</td>
+                                <td class="pds-val"><t t-esc="employee.passport_id or ''"/></td>
+                            </tr>
+
+                            <!-- Driving License -->
+                            <tr>
+                                <td class="pds-label">Driving License:</td>
+                                <td class="pds-val"><t t-if="'driving_license' in employee._fields"><t t-esc="employee.driving_license or ''"/></t></td>
+                                <td class="pds-label"></td>
+                                <td class="pds-val"></td>
+                            </tr>
+
+                            <!-- FAMILY INFORMATION -->
+                            <tr><td colspan="4" class="pds-section">FAMILY INFORMATION</td></tr>
+
+                            <tr>
+                                <td class="pds-label">Father's Name:</td>
+                                <td class="pds-val"><t t-if="'fam_father' in employee._fields"><t t-esc="employee.fam_father or ''"/></t></td>
+                                <td class="pds-label">Father's Occupation:</td>
+                                <td class="pds-val"><t t-if="'father_occupation' in employee._fields"><t t-esc="employee.father_occupation or ''"/></t></td>
+                            </tr>
+
+                            <tr>
+                                <td class="pds-label">Father's Phone:</td>
+                                <td class="pds-val"><t t-if="'father_phone' in employee._fields"><t t-esc="employee.father_phone or ''"/></t></td>
+                                <td class="pds-label">Mother's Name:</td>
+                                <td class="pds-val"><t t-if="'fam_mother' in employee._fields"><t t-esc="employee.fam_mother or ''"/></t></td>
+                            </tr>
+
+                            <tr>
+                                <td class="pds-label">Mother's Occupation:</td>
+                                <td class="pds-val"><t t-if="'mother_occupation' in employee._fields"><t t-esc="employee.mother_occupation or ''"/></t></td>
+                                <td class="pds-label">Mother's Phone:</td>
+                                <td class="pds-val"><t t-if="'mother_phone' in employee._fields"><t t-esc="employee.mother_phone or ''"/></t></td>
+                            </tr>
+
+                            <tr>
+                                <td class="pds-label">Guardian Name:</td>
+                                <td class="pds-val"><t t-if="'guardian_name' in employee._fields"><t t-esc="employee.guardian_name or ''"/></t></td>
+                                <td class="pds-label">Marital Status:</td>
+                                <td class="pds-val">
+                                    <t t-if="'marital' in employee._fields">
+                                        <t t-set="marital_val" t-value="dict(employee._fields['marital'].selection).get(employee.marital)"/>
+                                        <t t-esc="marital_val or ''"/>
+                                    </t>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td class="pds-label">Spouse's Name:</td>
+                                <td class="pds-val"><t t-if="'fam_spouse' in employee._fields"><t t-esc="employee.fam_spouse or ''"/></t></td>
+                                <td class="pds-label"></td>
+                                <td class="pds-val"></td>
+                            </tr>
+
+                            <!-- EMERGENCY CONTACT -->
+                            <tr><td colspan="4" class="pds-section">EMERGENCY CONTACT</td></tr>
+
+                            <t t-set="em_list" t-value="employee.em_contact_ids if 'em_contact_ids' in employee._fields else []"/>
+
+                            <tr>
+                                <td class="pds-label">01. Name:</td>
+                                <td colspan="3"><t t-if="em_list and len(em_list) >= 1"><t t-esc="em_list[0].contact_name or ''"/></t></td>
+                            </tr>
+                            <tr>
+                                <td class="pds-label">Relation:</td>
+                                <td class="pds-val"><t t-if="em_list and len(em_list) >= 1"><t t-esc="em_list[0].contact_rel or ''"/></t></td>
+                                <td class="pds-label">Telephone No:</td>
+                                <td class="pds-val"><t t-if="em_list and len(em_list) >= 1"><t t-esc="em_list[0].contact_no or ''"/></t></td>
+                            </tr>
+                            <tr>
+                                <td class="pds-label">Address:</td>
+                                <td colspan="3"><t t-if="em_list and len(em_list) >= 1"><t t-esc="em_list[0].contact_address or ''"/></t></td>
+                            </tr>
+                            <tr>
+                                <td class="pds-label">02. Name:</td>
+                                <td colspan="3"><t t-if="em_list and len(em_list) >= 2"><t t-esc="em_list[1].contact_name or ''"/></t></td>
+                            </tr>
+                            <tr>
+                                <td class="pds-label">Relation:</td>
+                                <td class="pds-val"><t t-if="em_list and len(em_list) >= 2"><t t-esc="em_list[1].contact_rel or ''"/></t></td>
+                                <td class="pds-label">Telephone No:</td>
+                                <td class="pds-val"><t t-if="em_list and len(em_list) >= 2"><t t-esc="em_list[1].contact_no or ''"/></t></td>
+                            </tr>
+                            <tr>
+                                <td class="pds-label">Address:</td>
+                                <td colspan="3"><t t-if="em_list and len(em_list) >= 2"><t t-esc="em_list[1].contact_address or ''"/></t></td>
+                            </tr>
+
+                            <!-- DISEASE & LEGAL -->
+                            <tr>
+                                <td colspan="2" class="pds-subsection">DISEASE</td>
+                                <td colspan="2" class="pds-subsection">LEGAL</td>
+                            </tr>
+                            <tr>
+                                <td class="pds-label">Disease 1:</td>
+                                <td class="pds-val"></td>
+                                <td class="pds-label">Police Verification:</td>
+                                <td class="pds-val"></td>
+                            </tr>
+                            <tr>
+                                <td class="pds-label">Disease 2:</td>
+                                <td class="pds-val"></td>
+                                <td class="pds-label">Character Certificate:</td>
+                                <td class="pds-val"></td>
+                            </tr>
+
+                            <!-- REFERENCE -->
+                            <tr><td colspan="4" class="pds-section">REFERENCE</td></tr>
+                            <tr>
+                                <td colspan="2" class="pds-subsection">Reference 01</td>
+                                <td colspan="2" class="pds-subsection">Reference 02</td>
+                            </tr>
+                            <tr>
+                                <td class="pds-label">Name:</td><td class="pds-val"></td>
+                                <td class="pds-label">Name:</td><td class="pds-val"></td>
+                            </tr>
+                            <tr>
+                                <td class="pds-label">Relation:</td><td class="pds-val"></td>
+                                <td class="pds-label">Relation:</td><td class="pds-val"></td>
+                            </tr>
+                            <tr>
+                                <td class="pds-label">Profession:</td><td class="pds-val"></td>
+                                <td class="pds-label">Profession:</td><td class="pds-val"></td>
+                            </tr>
+                            <tr>
+                                <td class="pds-label">Address:</td><td class="pds-val"></td>
+                                <td class="pds-label">Address:</td><td class="pds-val"></td>
+                            </tr>
+                            <tr>
+                                <td class="pds-label">Phone Number:</td><td class="pds-val"></td>
+                                <td class="pds-label">Phone Number:</td><td class="pds-val"></td>
+                            </tr>
+
+                            <!-- BANK INFO (PERSONAL) -->
+                            <tr><td colspan="4" class="pds-section">BANK INFO (PERSONAL)</td></tr>
+                            <tr>
+                                <td class="pds-label">Personal Bank Name:</td>
+                                <td class="pds-val"><t t-if="'personal_bank_name' in employee._fields"><t t-esc="employee.personal_bank_name or ''"/></t></td>
+                                <td class="pds-label">Account No:</td>
+                                <td class="pds-val"><t t-if="'personal_account_no' in employee._fields"><t t-esc="employee.personal_account_no or ''"/></t></td>
+                            </tr>
+                            <tr>
+                                <td class="pds-label">Account Holder:</td>
+                                <td class="pds-val"><t t-if="'personal_account_holder' in employee._fields"><t t-esc="employee.personal_account_holder or ''"/></t></td>
+                                <td class="pds-label">Account Type:</td>
+                                <td class="pds-val">
+                                    <t t-if="'personal_account_type' in employee._fields">
+                                        <t t-set="acc_type_val" t-value="dict(employee._fields['personal_account_type'].selection).get(employee.personal_account_type)"/>
+                                        <t t-esc="acc_type_val or ''"/>
+                                    </t>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="pds-label">Nominee Name:</td>
+                                <td class="pds-val"><t t-if="'nominee_name' in employee._fields"><t t-esc="employee.nominee_name or ''"/></t></td>
+                                <td class="pds-label">Relation (Nominee):</td>
+                                <td class="pds-val"><t t-if="'nominee_relation' in employee._fields"><t t-esc="employee.nominee_relation or ''"/></t></td>
+                            </tr>
+
+
+
+                        </table>
+                        </div>
+
+                        <!-- PAGE 2: DOCUMENT LIST + SIGNATURE -->
+                        <div style="page-break-before: always; padding-top: 5mm;">
+                            <style>
+                                .doc-table2 { width: 100%; border-collapse: collapse; font-size: 11px; font-family: Arial, sans-serif; }
+                                .doc-table2 th { background-color: #a0a0a0; color: #fff; border: 1px solid #000; padding: 6px 8px; text-align: center; font-weight: bold; font-size: 12px; }
+                                .doc-table2 td { border: 1px solid #000; padding: 5px 8px; vertical-align: middle; height: 9mm; font-size: 11px; }
+                                .doc-table2 td.doc-type { width: 30%; text-align: center; }
+                                .doc-table2 td.doc-name { width: 70%; text-align: left; }
+                                .doc2-title { background-color: #8fbc5a; text-align: center; font-size: 13px; font-weight: bold; padding: 8px; border: 1px solid #000; margin-bottom: 8px; font-family: Arial, sans-serif; }
+                                .doc2-sig { margin-top: 20mm; font-family: Arial, sans-serif; font-size: 11px; }
+                            </style>
+                            <div class="doc2-title">DOCUMENT LIST</div>
+                            <table class="doc-table2">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 30%;">Type</th>
+                                        <th style="width: 70%;">Document Name</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-set="doc_list" t-value="employee.document_line_ids if 'document_line_ids' in employee._fields else []"/>
+                                    <t t-if="doc_list">
+                                        <t t-foreach="doc_list" t-as="doc_item">
+                                            <tr>
+                                                <td class="doc-type"><t t-esc="doc_item.type or ''"/></td>
+                                                <td class="doc-name"><t t-esc="doc_item.document_name or ''"/></td>
+                                            </tr>
+                                        </t>
+                                    </t>
+                                    <t t-if="not doc_list or len(doc_list) == 0">
+                                        <tr><td class="doc-type"></td><td class="doc-name"></td></tr>
+                                        <tr><td class="doc-type"></td><td class="doc-name"></td></tr>
+                                        <tr><td class="doc-type"></td><td class="doc-name"></td></tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                            <div class="doc2-sig">
+                                ___________________________<br/>
+                                <strong>Signature / Date</strong>
+                            </div>
+                        </div>
+
+                    </div>
+                </t>
+            </t>
+        </template>
+
+    </data>
+</odoo>

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+	<data>
+        <record id="inventory_minimum_stock_report_tmpl" model="ir.actions.report">
+            <field name="name">Inventory Minimum Stock Report</field>
+            <field name="model">inventory.minimum.stock.report.wizard</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">custom_stock.inventory_minimum_stock_report_view</field>
+            <field name="report_file">custom_stock.inventory_minimum_stock_report_view</field>
+            <field name="print_report_name">Inventory Minimum Stock Report</field>
+        </record>
+
+		<template id="inventory_minimum_stock_report_view">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <style type="text/css">
+                            table, th, tr, td{
+                                background: white !important;
+                                border: 1px solid black;
+                            }
+                        </style>
+                        <div class="oe_structure"/>
+                        <div>
+                            <h3 class="text-center head_font_color">
+                                <strong>Inventory Minimum Stock Report</strong>
+                            </h3>
+                        </div>
+                        <br/>
+                        <div class="row">
+                            <div class="col-6">
+                                <p style="color: #000; font-size: 15px;">
+                                    <strong>Location: <span t-esc="locationName"/></strong> </p>
+                            </div>
+                            <div class="col-6 text-right">
+                                <p style="color: #000; font-size: 15px;">
+                                <strong>Product: <span t-esc="productName"/></strong></p>
+                            </div>
+                        </div>
+
+                        <table style="border-collapse: collapse;width: 100%; margin-bottom: 2em;" class="table table-condensed">
+                            <thead>
+                                <tr>
+                                    <th class="text-center align-middle bg_color font_color">Sl.</th>
+<!--                                    <th class="text-left align-middle">Location</th>-->
+                                    <th class="text-left align-middle bg_color font_color">Category</th>
+                                    <th class="text-left align-middle bg_color font_color">Product</th>
+                                    <th class="text-left align-middle bg_color font_color">UOM</th>
+                                    <th class="text-center align-middle bg_color font_color">On Hand Stock</th>
+                                    <th class="text-center align-middle bg_color font_color">Minimum Qty.</th>
+                                    <th class="text-center align-middle bg_color font_color">Diff.</th>
+                                </tr>
+                            </thead>
+                            <tbody class="consumed_tbody">
+                                <t t-set="sl_no" t-value="1"/>
+                                <t t-foreach="csr" t-as="line">
+
+                                    <t t-if="line['diff'] &lt; 0">
+                                        <tr style="color:red">
+                                            <td class="text-center align-middle">
+                                                <span t-esc="sl_no"/>
+                                            </td>
+                                            <td class="text-left align-middle">
+                                                <span t-esc="line['category']"/>
+                                            </td>
+                                            <td class="text-left align-middle">
+                                                <span t-esc="line['product']"/>
+                                            </td>
+                                            <td class="text-left align-middle">
+                                                <span t-esc="line['uom_name']"/>
+                                            </td>
+                                            <td class="text-center align-middle">
+                                                <span t-esc="line['on_hand_stock']"/>
+                                            </td>
+                                            <td class="text-center align-middle">
+                                                <span t-esc="line['minimum_stock']"/>
+                                            </td>
+                                            <td class="text-center align-middle">
+                                                <span t-esc="line['diff']"/>
+                                            </td>
+                                        </tr>
+
+                                    </t>
+                                    <t t-else="">
+                                        <tr >
+                                            <td class="text-center align-middle">
+                                                <span t-esc="sl_no"/>
+                                            </td>
+                                            <td class="text-left align-middle">
+                                                <span t-esc="line['category']"/>
+                                            </td>
+                                            <td class="text-left align-middle">
+                                                <span t-esc="line['product']"/>
+                                            </td>
+                                            <td class="text-left align-middle">
+                                                <span t-esc="line['uom_name']"/>
+                                            </td>
+                                            <td class="text-center align-middle">
+                                                <span t-esc="line['on_hand_stock']"/>
+                                            </td>
+                                            <td class="text-center align-middle">
+                                                <span t-esc="line['minimum_stock']"/>
+                                            </td>
+                                            <td class="text-center align-middle">
+                                                <span t-esc="line['diff']"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+
+                                    <t t-set="sl_no" t-value="sl_no + 1"/>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+		</template>
+	</data>
+</odoo>

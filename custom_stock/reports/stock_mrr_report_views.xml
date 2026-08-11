@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <record id="stock_mrr_report_id" model="ir.actions.report">
+            <field name="name">MRR Report</field>
+            <field name="model">stock.mrr.report.wizard</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">custom_stock.stock_mrr_report_qweb</field>
+            <field name="report_file">custom_stock.stock_mrr_report_qweb</field>
+            <field name="print_report_name">Print_MRR_Report</field>
+        </record>
+<!--        <report id="stock_mrr_report_id"-->
+<!--                model="stock.mrr.report.wizard"-->
+<!--			    string="MRR Report"-->
+<!--                name="custom_stock.stock_mrr_report_qweb"-->
+<!--			    file="custom_stock.stock_mrr_report_qweb"-->
+<!--                report_type="qweb-pdf"-->
+<!--        />-->
+        <template id="stock_mrr_report_qweb">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <div class="page">
+                    <style type="text/css">
+                        th{
+                            background: #90ee90;
+                        }
+
+                        tr:nth-child(even) {
+                            background-color: #dddddd;
+                        }
+
+                        h2 {
+                            color:teal;
+                            text-align:center !important;
+                        }
+
+                        .total-row{
+                            background-color: #ffffff !important;
+                            text-align: center !important;
+                            border: 1px solid #000; !important
+                        }
+
+                    </style>
+
+                    <div class="oe_structure"/>
+
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <h2 class="head_font_color">BARCODE WISE PURCHASE DETAIL REPORT</h2><br/>
+                            <p style="color: #000; text-align: center; font-size:25px ">Date Range:  <t t-esc="from_date"/> To <t t-esc="to_date"/> </p>
+                        </div>
+                    </div>
+                    <br/>
+                    <div class="row">
+                        <table class="table">
+                            <thead >
+                                <tr>
+                                    <th rowspan="2" class="align-middle bg_color font_color"><strong>SL. No</strong></th>
+                                    <th rowspan="2" class="align-middle bg_color font_color"><strong>Barcode</strong></th>
+                                    <th rowspan="2" class="align-left bg_color font_color"><strong>Item Name</strong></th>
+                                    <th style="text-align: right" class="align-right bg_color font_color" rowspan="2" ><strong>Rate</strong></th>
+                                    <th style="text-align: right" class="align-right bg_color font_color" rowspan="2" ><strong>B. Qty</strong></th>
+                                    <th style="text-align: right" class="align-right bg_color font_color" rowspan="2" ><strong>Quantity</strong></th>
+                                    <th style="text-align: right" class="align-right bg_color font_color" rowspan="2" ><strong>Amount</strong></th>
+                                </tr>
+
+                            </thead>
+                            <tbody>
+                                <t t-foreach="csr" t-as="line">
+                                    <tr style="border: 1px solid #000;">
+                                        <td class="text-middle" >
+                                           <t t-esc="line['sl']"/>
+                                        </td>
+                                         <td class="text-middle" >
+                                           <t t-esc="line['barcode']"/>
+                                        </td>
+                                         <td class="text-left" >
+                                           <t t-esc="line['name']"/>
+                                        </td>
+                                         <td class="text-right" >
+                                           <t t-esc="line['price_unit']"/>
+                                        </td>
+                                         <td class="text-right" >
+                                           <t t-esc="line['bonus_qty']"/>
+                                        </td>
+                                         <td class="text-right" >
+                                           <t t-esc="line['qty']"/>
+                                        </td>
+                                        <td class="text-right" >
+                                            <t t-esc="line['total_amount']"/>
+                                        </td>
+                                    </tr>
+                                </t>
+
+                                 <tr class="total-row">
+                                     <td class="text-right margin-auto" style="border: 1px solid #000;" t-att-colspan="4">
+                                        <p style="font-weight: bold" >Total:</p>
+                                    </td>
+                                    <td class="text-right"><strong><t t-esc="'{0:,.2f}'.format(total_bonus_qty)"/></strong></td>
+                                    <td class="text-right"><strong><t t-esc="'{0:,.2f}'.format(total_qty)"/></strong></td>
+                                    <td class="text-right"><strong><t t-esc="'{0:,.2f}'.format(total_amount)"/></strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                     <div style="margin-top:200px" class="row">
+                        <div style="text-align:center" class="col-4">
+                            <p style="margin:0 auto; border-top:1px solid #000; width:200px; font-wight:bold">Prepared By</p>
+                        </div>
+                        <div style="text-align:center" class="col-4">
+                            <p style="margin:0 auto; border-top:1px solid #000; width:200px; font-wight:bold">Checked By</p>
+                        </div>
+                        <div style="text-align:center" class="col-4">
+                            <p style="margin:0 auto; border-top:1px solid #000; width:200px; font-wight:bold">Approved By</p>
+                        </div>
+                    </div>
+
+                </div>
+            </t>
+        </t>
+    </template>
+    </data>
+</odoo>

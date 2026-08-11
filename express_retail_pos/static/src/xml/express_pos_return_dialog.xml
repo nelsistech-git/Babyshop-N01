@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates xml:space="preserve">
+
+<t t-name="express_retail_pos.ExpressPosReturnDialog" owl="1">
+    <Dialog title="'Express Return / Exchange'">
+        <div class="o_express_pos_return_dialog">
+            <div t-if="state.step === 'search'">
+                <input type="text" class="form-control mb-2"
+                       placeholder="Search order number or customer..."
+                       t-model="state.query"
+                       t-on-input="onSearchInput"/>
+                <div class="list-group">
+                    <a href="#" class="list-group-item list-group-item-action"
+                       t-foreach="state.results" t-as="order" t-key="order.id"
+                       t-on-click.prevent="() => this.selectOrder(order)">
+                        <t t-esc="order.name"/>
+                        -
+                        <t t-esc="order.partner_name"/>
+                        (<t t-esc="order.amount_total.toFixed(2)"/>)
+                    </a>
+                </div>
+            </div>
+            <div t-if="state.step === 'lines'">
+                <div class="mb-2">
+                    <button class="btn btn-sm btn-link" t-on-click="backToSearch">← Back to search</button>
+                    <strong>Order: <t t-esc="state.sourceOrder.name"/></strong>
+                </div>
+                <table class="table">
+                    <thead>
+                        <tr><th>Product</th>
+                            <th>Delivered Qty</th>
+                            <th>Return Qty</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="state.lines" t-as="line" t-key="line.line_id">
+                            <td><t t-esc="line.name"/></td>
+                            <td><t t-esc="line.qty_delivered"/></td>
+                            <td>
+                                <input type="number" step="0.01" min="0" class="form-control"
+                                       t-att-max="line.qty_delivered"
+                                       t-att-value="state.returnQty[line.line_id]"
+                                       t-on-change="(ev) => this.onQtyChange(line.line_id, ev)"/>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <t t-set-slot="footer">
+            <button t-if="state.step === 'lines'" class="btn btn-danger"
+                    t-att-disabled="!hasSelection or state.processing"
+                    t-on-click="executeReturn">
+                Execute Return
+            </button>
+            <button class="btn btn-secondary" t-on-click="() => this.props.close()">Close</button>
+        </t>
+    </Dialog>
+</t>
+
+</templates>

@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+	<data>
+
+        <record id="probationary_employee_report_tmpl" model="ir.actions.report">
+            <field name="name">Probationary Employee Report</field>
+            <field name="model">probationary.employee.report.wizard</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">custom_hr_report.probationary_employee_report_view</field>
+            <field name="report_file">custom_hr_report.probationary_employee_report_view</field>
+            <field name="paperformat_id" ref="custom_common_settings.paperformat_custom_a4_bd"/>
+        </record>
+
+		<template id="probationary_employee_report_view">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <style type="text/css">
+                             table, th, tr, td{
+                                background: white !important;
+                                border: 1px solid black;
+                            }
+                        </style>
+                        <div class="oe_structure"/>
+                        <div>
+                            <h3 class="text-center head_font_color">
+                                <strong>
+                                    <span t-esc="form['company_id'][1]"/>
+                                    <br/>
+                                    Probationary Employee Report
+                                </strong>
+                            </h3>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <p style="color: #000; font-size: 15px;">
+                                <strong>From Date:</strong> <t t-esc="form['from_date']" t-options='{"widget": "date"}'/>
+                                <br/>
+                                <strong>Work/Job Location:</strong> <t t-esc="work_location_name"/></p>
+                            </div>
+                            <div class="col-6 text-right">
+                                <p style="color: #000; font-size: 15px;">
+                                <strong>To Date:</strong> <t t-esc="form['to_date']" t-options='{"widget": "date"}'/>
+                                <br/>
+                                <strong>Department Name:</strong>  <t t-esc="department_name"/>
+                                    <t t-if="buisness_unit">
+                                        <br/>
+                                        <strong>Office/business Unit:</strong>  <t t-esc="buisness_unit"/>
+                                    </t>
+                                    <t t-if="tag_names_list">
+                                        <br/>
+                                        <strong>Tags:</strong>  <t t-esc="tag_names_list"/>
+                                    </t>
+                                </p>
+                            </div>
+                        </div>
+                        <br/>
+
+                        <div>
+                            <h6 class="text-left">
+                                <strong>
+<!--                                            Branch: <span t-esc="line[str(line2)][0]['location_name']"/><br/>-->
+                                </strong>
+                            </h6>
+                        </div>
+                        <table style="border-collapse: collapse;width: 100%; margin-bottom: 2em;" class="table table-condensed">
+                            <thead>
+                                <tr>
+<!--                                            <th class="text-center align-middle">Sl. No.</th>-->
+                                    <th class="text-left align-middle bg_color font_color">Employee Name</th>
+                                    <th class="text-left align-middle bg_color font_color">Employee ID No</th>
+                                    <th class="text-left align-middle bg_color font_color">Work/Job Location</th>
+                                    <th class="text-left align-middle bg_color font_color">Department</th>
+                                    <th class="text-left align-middle bg_color font_color">Designation</th>
+                                    <th class="text-center align-middle bg_color font_color">Date of Joining</th>
+                                    <th class="text-center align-middle bg_color font_color">Probation Period</th>
+                                    <th class="text-center align-middle bg_color font_color">Date of Confirmation</th>
+                                    <th class="text-center align-middle bg_color font_color">Length of Service</th>
+                                    <th class="text-center align-middle bg_color font_color">Remaining Confirmation Date</th>
+                                </tr>
+                            </thead>
+                            <tbody class="consumed_tbody">
+                                <t t-foreach="csr" t-as="line">
+                                    <tr>
+                                        <td class="text-left align-middle">
+                                            <span t-esc="line['employee_name']"/>
+                                        </td>
+                                        <td class="text-left align-middle">
+                                            <span t-esc="line['emp_id_card']"/>
+                                        </td>
+                                        <td class="text-left align-middle">
+                                            <span t-esc="line['work_location']"/>
+                                        </td>
+                                        <td class="text-left align-middle">
+                                            <span t-esc="line['department_name']"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <span t-esc="line['designation_name']"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <span t-esc="line['joining_date']"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <span t-esc="line['probation']"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <span t-esc="line['date_of_confirmation']"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <span t-esc="line['length_of_service']"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <span t-esc="line['remaining_confirmation_day']"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+<!--                        <t t-foreach="line" t-as="line2">-->
+<!--                                -->
+<!--                            </t>-->
+
+<!--                        <t t-set="sl_no" t-value="1"/>-->
+
+<!--                        <t t-foreach="csr" t-as="line">-->
+<!--                            -->
+<!--                        </t>-->
+                    </div>
+                </t>
+            </t>
+		</template>
+	</data>
+</odoo>

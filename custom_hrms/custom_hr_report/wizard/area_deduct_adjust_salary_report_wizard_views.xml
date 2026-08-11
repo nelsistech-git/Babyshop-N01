@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <data>
+        <record id="view_area_deduct_adjust_salary_report_wizard_form" model="ir.ui.view">
+            <field name="name">area.deduct.adjust.salary.report.wizard.form</field>
+            <field name="model">area.deduct.adjust.salary.report.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Area Deduction Adjustment Salary Report">
+                    <group>
+                        <group>
+                            <field name="from_date" required="1"/>
+                            <field name="to_date" required="1"/>
+                        </group>
+                        <group>
+                            <field name="company_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="user_work_location_id" placeholder="All" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="department_id" placeholder="All" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="sbu_unit_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="category_ids" widget="many2many_tags" options="{'color_field': 'color', 'no_open': True, 'no_create': 1, 'no_create_edit': 1, 'no_quick_create': True}" />
+                        </group>
+                    </group>
+                    <footer>
+                        <!--need to edit this sql (billal-05-11-2023)-->
+                        <button name="area_deduct_adjust_salary_report_pdf" string="Download (PDF)" type="object" class="btn-primary"/>
+                        <button name="area_deduct_adjust_salary_report_excel" string="Download (Excel)" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="area_deduct_adjust_salary_report_wizard_action" model="ir.actions.act_window">
+            <field name="name">Area Deduction Adjustment Salary Report</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">area.deduct.adjust.salary.report.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_area_deduct_adjust_salary_report_wizard_form"/>
+            <field name="target">new</field>
+        </record>
+
+        <!--<menuitem name="Area Deduction Adjustment Salary Report" id="menu_area_deduct_adjust_salary_report" sequence="40" parent="custom_hr_report.menu_salary_report_root" action="area_deduct_adjust_salary_report_wizard_action" groups="hr.group_hr_user" />-->
+
+        <menuitem name="Area Deduction Adjustment Salary Report" id="menu_area_deduct_adjust_salary_report_payroll" sequence="8" parent="hr_payroll.menu_report_payroll_salary" action="area_deduct_adjust_salary_report_wizard_action" groups="hr.group_hr_user" />
+
+    </data>
+</odoo>

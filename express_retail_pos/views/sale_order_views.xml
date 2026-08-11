@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sale_order_form_express_pos" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit.express.pos</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_confirm']" position="before">
+                <button name="action_express_print_duplicate_receipt" type="object"
+                        string="Print Duplicate Receipt" invisible="not is_express_pos"/>
+            </xpath>
+            <xpath expr="//div[hasclass('oe_button_box')]" position="inside">
+                <button class="oe_stat_button" type="object" name="action_view_express_approvals"
+                        icon="fa-gavel" invisible="not is_express_pos">
+                    <span>Approvals</span>
+                </button>
+            </xpath>
+            <field name="client_order_ref" position="after">
+                <field name="is_express_pos" invisible="1"/>
+                <field name="express_pos_brand_id" invisible="not is_express_pos"/>
+                <field name="express_pos_branch_id" invisible="not is_express_pos"/>
+                <field name="is_daily_closed" invisible="not is_express_pos" readonly="1"/>
+                <field name="loyalty_card_id" invisible="not is_express_pos"/>
+                <field name="loyalty_points_earned" invisible="not is_express_pos" readonly="1"/>
+            </field>
+        </field>
+    </record>
+</odoo>

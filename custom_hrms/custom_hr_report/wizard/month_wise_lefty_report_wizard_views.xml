@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <data>
+        <record id="view_month_wise_lefty_report_wizard_form" model="ir.ui.view">
+            <field name="name">month.wise.lefty.report.wizard.form</field>
+            <field name="model">month.wise.lefty.report.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Month wise Lefty Report">
+                    <group>
+                        <group>
+                            <field name="year" required="1"/>
+                            <field name="month"/>
+                            <field name="lefty_days"/>
+                        </group>
+                        <group>
+                            <field name="company_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="sbu_unit_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="category_ids" widget="many2many_tags" options="{'color_field': 'color', 'no_open': True, 'no_create': 1, 'no_create_edit': 1, 'no_quick_create': True}" />
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="month_wise_lefty_report_pdf" string="Download (PDF)" type="object" class="btn-primary"/>
+                        <button name="month_wise_lefty_report_excel" string="Download (Excel)" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="month_wise_lefty_report_wizard_action" model="ir.actions.act_window">
+            <field name="name">Month wise Lefty Report</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">month.wise.lefty.report.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_month_wise_lefty_report_wizard_form"/>
+            <field name="target">new</field>
+        </record>
+
+        <!--<menuitem id="menu_month_wise_lefty_report" name="Month Wise Lefty Report" sequence="35" parent="custom_hr_report.menu_attendance_report_root" action="month_wise_lefty_report_wizard_action" groups="hr.group_hr_user" />-->
+        <menuitem id="menu_month_wise_lefty_report_att" name="Month Wise Lefty Report" sequence="40" parent="custom_hr_attendance_sheet.menu_attendance_report_root_attendance_sub" action="month_wise_lefty_report_wizard_action" groups="hr.group_hr_user" />
+
+    </data>
+</odoo>

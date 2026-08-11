@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+	<data>
+		<record model="ir.ui.view" id="view_employee_form">
+			<field name="name">employee.form</field>
+			<field name="model">hr.employee</field>
+			<field name="inherit_id" ref="hr_attendance.view_employee_form_inherit_hr_attendance" />
+			<field name="arch" type="xml">
+				<xpath expr="//notebook[1]/page[@name='unmapped_emp_devices']" position="before">
+					<page string="Attendance Details"						
+						readonly = "1"
+						groups="base.group_system"
+						name="emp_attendance_details">
+						<field name="attendance_line_ids">
+							<tree name="attendance_line_ids" nolabel="1"
+								create="false" delete="false" edit="false">
+								<field name="state" invisible="1"/>
+                                   <field name="date"/>
+                                   <field name="day" string="Day"/>
+                                   <field name="pl_sign_in"
+                                          string="PL/IN"
+                                          widget="float_time"/>
+                                   <field name="pl_sign_out"
+                                          string="PL/OUT"
+                                          widget="float_time"/>
+                                   <field name="ac_sign_in"
+                                          string="ACT/IN"
+                                          widget="float_time"/>
+                                   <field name="ac_sign_out"
+                                          string="ACT/OUT"
+                                          widget="float_time"/>
+                                   <field name="work_hours"
+										   widget="float_time"
+										   string="Work Hours"
+										   sum="Total"/>
+									<field name="worked_hours"
+										   widget="float_time"
+										   string="Worked/H for OT"
+										   sum="Total" optional="hide"/>
+                                   <field name="act_late_in"
+                                          groups="base.group_no_one"
+                                          widget="float_time"
+                                          sum="Total"/>
+                                   <field name="late_in"
+                                          widget="float_time"
+                                          sum="Total"/>
+								   <field name="late_in_abs"
+                                          sum="Total"/>
+                                   <field name="act_overtime"
+                                          groups="base.group_no_one"
+                                          widget="float_time"
+                                          sum="Total"/>
+                                   <field name="overtime"
+                                          widget="float_time"
+                                          sum="Total"/>
+                                   <field name="act_diff_time"
+                                          groups="base.group_no_one"
+                                          widget="float_time"
+                                          sum="Total"/>
+                                   <field name="diff_time"
+                                          widget="float_time"
+                                          sum="Total"/>
+                                   <field name="status"/>
+                                   <field name="note"/>                                    
+							</tree>
+						</field>
+					</page>
+				</xpath>
+
+			</field>
+		</record>
+
+	</data>
+</odoo>

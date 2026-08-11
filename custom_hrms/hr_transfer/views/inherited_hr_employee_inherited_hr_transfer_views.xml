@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <record id="inherited_hr_employee_inherited_hr_transfer_form_view" model="ir.ui.view">
+            <field name="name">inherited.hr.employee.inherited.hr.transfer.form</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_form"/>
+            <field name="arch" type="xml">
+                 <xpath expr="//group[@name='OfficialBankInfo']" position="after" groups="hr.group_hr_user">
+                     <!--Employee Transfer History Section-->
+                     <!--<group string="Transfer History" name="transfer_history">-->
+                     <separator string="Transfer History"></separator>
+                        <field name="transfer_ids" string="Transfer History" context="{'default_employee_id': active_id}" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" nolable="1">
+                            <tree string="Transfer History" default_order='effective_date desc' create="0" delete="0">
+                                <field name="type" readonly="1" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="from_company" readonly="1" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="to_company" readonly="1" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="from_location" string="From Location" readonly="1" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="to_location"  string="To Location" readonly="1" force_save="1" options="{'no_open':True,'create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="from_department_id" readonly="1" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="to_department_id" readonly="1"  force_save="1" options="{'no_open':True,'create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+
+                                <field name="prev_from_date" readonly="1" force_save="1" optional="hide"/>
+                                <field name="prev_to_date" readonly="1" force_save="1" optional="hide"/>
+                                <field name="effective_date" readonly="1" force_save="1" />
+                            </tree>
+                            <form string="Transfer History">
+                                <group>
+                                    <group>
+                                        <field name="type" readonly="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                        <field name="from_company" readonly="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                        <field name="to_company" readonly="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                        <field name="from_location" readonly="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                        <field name="to_location" readonly="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                        <field name="prev_from_date" readonly="1" />
+                                        <field name="prev_to_date" readonly="1" />
+                                        <field name="effective_date" readonly="1" />
+                                    </group>
+                                </group>
+                            </form>
+                        </field>
+                   <!-- </group>-->
+                 </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

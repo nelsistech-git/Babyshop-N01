@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="module_category_express_pos" model="ir.module.category">
+        <field name="name">Express Retail Sales</field>
+        <field name="sequence">20</field>
+    </record>
+
+    <!-- Cashier: day-to-day checkout console access -->
+    <record id="group_express_pos_user" model="res.groups">
+        <field name="name">Cashier</field>
+        <field name="category_id" ref="module_category_express_pos"/>
+        <field name="implied_ids" eval="[(4, ref('sales_team.group_sale_salesman'))]"/>
+    </record>
+
+    <!-- Branch Manager: first approval level, sees only last 7 days of sales -->
+    <record id="group_express_pos_branch_manager" model="res.groups">
+        <field name="name">Branch Manager</field>
+        <field name="category_id" ref="module_category_express_pos"/>
+        <field name="implied_ids" eval="[(4, ref('group_express_pos_user'))]"/>
+    </record>
+
+    <!-- General Manager: second approval level -->
+    <record id="group_express_pos_gm" model="res.groups">
+        <field name="name">General Manager (GM)</field>
+        <field name="category_id" ref="module_category_express_pos"/>
+        <field name="implied_ids" eval="[(4, ref('group_express_pos_branch_manager'))]"/>
+    </record>
+
+    <!-- Managing Director: final approval level, full unrestricted access -->
+    <record id="group_express_pos_md" model="res.groups">
+        <field name="name">Managing Director (MD)</field>
+        <field name="category_id" ref="module_category_express_pos"/>
+        <field name="implied_ids" eval="[(4, ref('group_express_pos_gm'))]"/>
+        <field name="users" eval="[(4, ref('base.user_admin'))]"/>
+    </record>
+
+    <!-- Legacy alias kept so earlier configuration views referencing the
+         original single "Manager" group keep working; maps to full MD access. -->
+    <record id="group_express_pos_manager" model="res.groups">
+        <field name="name">Manager (Full Config Access)</field>
+        <field name="category_id" ref="module_category_express_pos"/>
+        <field name="implied_ids" eval="[(4, ref('group_express_pos_md'))]"/>
+    </record>
+
+    <!-- Record rules
+         =============
+         Multi-branch isolation: a Cashier only ever sees/sells Express POS
+         orders for branches where they are listed as staff (branch.user_ids)
+         or as the branch manager (branch.manager_id). Orders with no branch
+         set, or ordinary (non-Express) sale.order records, are unaffected -
+         this rule only tightens Express POS data, it never blocks the
+         standard Sales app rules already provided by sale_management.
+
+         Branch Manager additionally keeps the "last 7 days" restriction on
+         top of the same branch scoping (both conditions must hold), stored
+         via the indexed is_within_7_days boolean (computed on write, expired
+         daily by ir_cron_expire_7_day_window) rather than inline date math,
+         since ir.rule's domain_force evaluation context does not reliably
+         expose datetime/relativedelta at all evaluation points.
+
+         GM/MD implicitly hold the Branch Manager and Cashier groups too (via
+         implied_ids), so a further, fully permissive rule scoped to the GM
+         group is required - Odoo OR-combines rules that target different
+         groups a user belongs to, and the GM rule's "allow everything" wins
+         that OR for GM/MD users. -->
+    <record id="rule_sale_order_cashier_own_branch" model="ir.rule">
+        <field name="name">Express POS: Cashier sees only their assigned branch(es)</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="groups" eval="[(4, ref('group_express_pos_user'))]"/>
+        <field name="domain_force"><![CDATA[['|', ('is_express_pos', '=', False),
+            '|', ('express_pos_branch_id', '=', False),
+            '|', ('express_pos_branch_id.user_ids', 'in', [user.id]), ('express_pos_branch_id.manager_id', '=', user.id)]]]></field>
+    </record>
+
+    <record id="rule_sale_order_branch_manager_7days" model="ir.rule">
+        <field name="name">Express POS: Branch Manager sees own branch, last 7 days only</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="groups" eval="[(4, ref('group_express_pos_branch_manager'))]"/>
+        <field name="domain_force"><![CDATA[['|', ('is_express_pos', '=', False),
+            '&', ('is_within_7_days', '=', True),
+            '|', ('express_pos_branch_id', '=', False),
+            '|', ('express_pos_branch_id.user_ids', 'in', [user.id]), ('express_pos_branch_id.manager_id', '=', user.id)]]]></field>
+    </record>
+
+    <record id="rule_sale_order_gm_full_access" model="ir.rule">
+        <field name="name">Express POS: GM/MD unrestricted sales visibility</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="groups" eval="[(4, ref('group_express_pos_gm'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+
+    <!-- Same branch scoping mirrored onto the Sales Analysis report (its own
+         field is called branch_id, not express_pos_branch_id). -->
+    <record id="rule_pos_sales_report_cashier_own_branch" model="ir.rule">
+        <field name="name">Express POS Report: Cashier sees only their branch(es)</field>
+        <field name="model_id" ref="model_express_pos_sales_report"/>
+        <field name="groups" eval="[(4, ref('group_express_pos_user'))]"/>
+        <field name="domain_force"><![CDATA[['|', ('branch_id', '=', False),
+            '|', ('branch_id.user_ids', 'in', [user.id]), ('branch_id.manager_id', '=', user.id)]]]></field>
+    </record>
+
+    <record id="rule_pos_sales_report_gm_full_access" model="ir.rule">
+        <field name="name">Express POS Report: GM/MD unrestricted visibility</field>
+        <field name="model_id" ref="model_express_pos_sales_report"/>
+        <field name="groups" eval="[(4, ref('group_express_pos_gm'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+</odoo>

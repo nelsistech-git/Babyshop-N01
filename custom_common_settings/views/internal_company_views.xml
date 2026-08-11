@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_internal_company_form" model="ir.ui.view">
+        <field name="name">internal.company.form</field>
+        <field name="model">internal.company</field>
+        <field name="arch" type="xml">
+            <form string="Inter Company"  copy="false">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name" />
+                            <field name="code" />
+                            <field name="partner_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="address" />
+                            <field name="note" />
+                            <field name="active" />
+                        </group>
+                        <group string="Accounting Settings">
+                            <field name="receivable_acc_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="payable_acc_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <br/>
+                            <field name="payment_journal_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="payment_acc_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                        </group>
+                    </group>
+
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_internal_company_search" model="ir.ui.view">
+        <field name="name">internal.company.search</field>
+        <field name="model">internal.company</field>
+        <field name="arch" type="xml">
+            <search string="Search">
+                <field name="name" />
+                <field name="code" />
+                <field name="address" />
+                <field name="note" />
+                <field name="active" />
+            </search>
+        </field>
+    </record>
+
+	<record id="view_internal_company_tree" model="ir.ui.view">
+         <field name="name">internal.company.tree</field>
+         <field name="model">internal.company</field>
+         <field name="arch" type="xml">
+             <tree string="Inter Company">
+             	 <field name="name" />
+                <field name="code" />
+                <field name="address" />
+                <field name="note" />
+                <field name="active" />
+             </tree>
+         </field>
+    </record>
+
+    <record id="action_internal_company" model="ir.actions.act_window">
+        <field name="type">ir.actions.act_window</field>
+        <field name="name">Inter Company</field>
+        <field name="res_model">internal.company</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Create Inter Company!
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_internal_company" name="Inter Companies" parent="base.menu_users" action="action_internal_company" groups="custom_common_settings.group_sale_controller" sequence="17"/>
+</odoo>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <data>
+        <record id="current_stock_report_wizard_form" model="ir.ui.view">
+            <field name="name">current.stock.report.wizard.form</field>
+            <field name="model">current.stock.report.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Current Stock Report">
+                    <group>
+                        <group>
+                            <field name="report_type" widget="radio"/>
+                        </group>
+                        <group>
+                            <field name="location_type" required="1" invisible="report_type == '03'"/>
+                            <field name="location_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" invisible="report_type == '03' or location_type == False"/>
+                            <field name="sale_type" placeholder="All"/>
+                            <field name="category_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="product_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" invisible="report_type == '02'"/>
+                            <field name="is_all_product" />
+                        </group>
+                    </group>
+                    <footer>
+<!--                        <button name="current_stock_report_pdf" string="Download (PDF)" type="object" class="btn-primary"/>-->
+                        <button name="current_stock_report_excel" string="Download (Excel)" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="current_stock_report_action" model="ir.actions.act_window">
+            <field name="name">Current Stock Report</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">current.stock.report.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="current_stock_report_wizard_form"/>
+            <field name="target">new</field>
+        </record>
+
+        <report id="current_stock_report"
+                model="current.stock.report.wizard"
+			    string="Current Stock Report"
+                name="custom_stock.current_stock_report_qweb"
+			    file="custom_stock.current_stock_report_qweb"
+                report_type="qweb-pdf" />
+		
+        <menuitem id="menu_current_stock_report_wizard"
+              name="Current Stock Report"
+              sequence="1"
+              action="current_stock_report_action"
+              parent="stock.menu_warehouse_report"
+        />
+        <menuitem id="menu_current_stock_report_wizard_acc_module"
+              name="Current Stock Report"
+              sequence="1"
+              action="current_stock_report_action"
+              parent="base_accounting_kit.submenu_inventory_reporting"
+        />
+    </data>
+</odoo>

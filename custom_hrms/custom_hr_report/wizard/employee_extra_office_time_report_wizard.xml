@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_emp_extra_office_time_report_wizard_form" model="ir.ui.view">
+            <field name="name">employee.extra.office.time.report.wizard.form</field>
+            <field name="model">employee.extra.office.time.report.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Employee Extra Office Time Report">
+                    <group>
+                        <group>
+                            <field name="start_date" required="1"/>
+                            <field name="end_date" required="1"/>
+                            <field name="status" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                        </group>
+                        <group>
+                            <field name="company_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="user_work_location_id" placeholder="All" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <!--<field name="department_id" placeholder="All" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>-->
+                            <field name="department_ids" placeholder="All" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" widget="many2many_tags"/>
+                            <field name="employee_id" placeholder="All" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="employee_extra_ot_2h_time_report_pdf" string="OT Sheet 3hours (PDF)" type="object" class="btn-primary"/>
+                        <button name="employee_extra_ot_more2h_time_report_pdf" string="Extra OT Sheet 3hours More (PDF)" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_emp_extra_office_time_report_wizard" model="ir.actions.act_window">
+            <field name="name">Employee Extra Office Time Report</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">employee.extra.office.time.report.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_emp_extra_office_time_report_wizard_form"/>
+            <field name="target">new</field>
+        </record>
+
+        <!--<menuitem id="menu_emp_extra_office_time_report_wizard_form"
+              name="Employee Extra Office Time Report"
+              sequence="26"
+              action="action_emp_extra_office_time_report_wizard"
+              parent="custom_hr_report.menu_attendance_report_root"
+              groups="hr.group_hr_user"
+        />-->
+        <menuitem id="menu_emp_extra_office_time_report_wizard_form_att"
+              name="Employee Extra Office Time Report"
+              sequence="30"
+              action="action_emp_extra_office_time_report_wizard"
+              parent="custom_hr_attendance_sheet.menu_attendance_report_root_attendance_sub"
+              groups="hr.group_hr_user"
+        />
+    </data>
+</odoo>

@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright (c) 2016-Present Webkul Software Pvt. Ltd. (<https://webkul.com/>) -->
+<!-- See LICENSE file for full copyright and licensing details. -->
+<!-- License URL : <https://store.webkul.com/license.html/> -->
+<templates>
+    <t t-name="PushNotificationWidget">
+        <div class="push_notification" style="position:absolute;top:10%;width:100%;">
+            <div style="float:right;background: #222222;box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.16);border-radius: 6px;width:231px;min-height:90px;height: 163px;
+            overflow-y: scroll;">
+                <div style="padding:3px 12px;height:34px;background: rgba(255, 255, 255, 0.03);">
+                    <div style="display:inline-block;width:100%;margin-top:4px;">
+                        <div style="display:block;float:left;font-style: normal;font-weight: 600;font-size: 12px;line-height: 63.8%;text-transform: uppercase;color: #FFFFFF;">
+                            <img style="position:relative;top:4px" src="/pos_all_in_one_screen/static/src/img/PNChef.png" />
+                            <span style="margin-left:5px;">KITCHEN</span>
+                        </div>
+                        <div style="margin-top:9px;display:block;float:right;font-style: normal;font-weight: normal;font-size: 10px;line-height: 63.8%;text-transform: uppercase;color: #FFFFFF;">
+                            <!-- Time -->
+                            <t t-esc="time" />
+                        </div>
+                    </div>
+                </div>
+                <div style="padding:10px 12px;">
+                    <t t-foreach="orders" t-as="res" t-key="res">
+                        <t t-set="state" t-value="orders[res][0]" />
+                        <div class="recent_item">
+                            <div style="margin-top:5px;font-family: Open Sans;font-style: normal;font-weight: 600;font-size: 12px;line-height: 63.8%;color: #FFFFFF;">
+                                Order Id:
+                                <span class="push_token_number">
+                                    <t t-esc="res" />
+                                </span>
+                            </div>
+                            <p style="font-style: normal;font-weight: normal;font-size: 12px;line-height: 63.8%;color: #FFFFFF;">
+                                The Order has been
+                                <t t-if="state == 'new'">
+                                        New
+                                </t>
+                                <t t-if="state == 'partially_done'">
+                                        Partially Done
+                                </t>
+                                <t t-if="state == 'pending'">
+                                        Pending
+                                </t>
+                                <t t-if="state == 'done'">
+                                        Done
+                                </t>
+                                <t t-if="state == 'cancel'">
+                                        Cancel
+                                </t>
+                                now.
+                            </p>
+                        </div>
+                        <br />
+                    </t>
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <t t-name="RecentNotificationsTemplate">
+        <div class="push_notification" style="
+       position: absolute;top: 20%;right: 0;width: 22%;height: 190px;overflow-y: scroll;">
+            <div style="float:right;background: #222222;box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.16);border-radius: 6px;width:231px;">
+                <div style="padding:3px 12px;height:34px;background: rgba(255, 255, 255, 0.03);">
+                    <div style="display:inline-block;width:100%;margin-top:4px;">
+                        <div style="display:block;float:left;font-style: normal;font-weight: 600;font-size: 12px;line-height: 63.8%;text-transform: uppercase;color: #FFFFFF;">
+                            <img style="position:relative;top:4px" src="/pos_all_in_one_screen/static/src/img/PNChef.png" />
+                            <span style="margin-left:5px;">KITCHEN</span>
+                        </div>
+                    </div>
+                </div>
+                <div style="padding:10px 12px;">
+                    <t t-foreach="data" t-as="res" t-key="res">
+                        <div class="recent_item">
+                            <div style="margin-top:5px;font-family: Open Sans;font-style: normal;font-weight: 600;font-size: 12px;line-height: 63.8%;color: #FFFFFF;">
+                                Order Id:
+                                <span class="push_token_number">
+                                    <t t-esc="res[0]" />
+                                </span>
+                                <span style="float:right" class="time">
+                                    <t t-esc="res[2]" />
+                                </span>
+                            </div>
+                            <p style="font-style: normal;font-weight: normal;font-size: 12px;line-height: 11px;color: #FFFFFF;">
+                                The Order has been
+                                <t t-if="res[1][0] == 'new'">
+                                        New
+                                </t>
+                                <t t-if="res[1][0] == 'partially_done'">
+                                        Partially Done
+                                </t>
+                                <t t-if="res[1][0] == 'pending'">
+                                        Pending
+                                </t>
+                                <t t-if="res[1][0] == 'done'">
+                                        Done
+                                </t>
+                                <t t-if="res[1][0] == 'cancel'">
+                                        Cancel
+                                </t>
+                                now.
+                            </p>
+                        </div>
+                        <br />
+                    </t>
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <t t-extend="OrderSelectorWidget">
+        <t t-jquery=".orders.touch-scrollable" t-operation="replace">
+            <span class="orders touch-scrollable">
+                <t t-foreach="widget.pos.get_order_list()" t-as="order" t-key="order">
+                    <t t-if="order === widget.pos.get_order()">
+                        <t t-if="order.order_progress and order.order_progress == 'done'">
+                            <span class="order-button select-order selected" style="width:108px;background:#06f106;" t-att-data-uid="order.uid">
+                                <span class="order-sequence">
+                                    <t t-esc="order.sequence_number" />
+                                </span>
+                                <t t-esc="moment(order.date_order).format('hh:mm')" />
+                                <span style="position:relative;bottom:28px;left:12px;">
+                                    <t t-if="widget.pos.get_order()">
+                                        <t t-esc="order.token_number" />
+                                    </t>
+                                </span>
+                            </span>
+                        </t>
+                        <t t-elif="order.order_progress and (order.order_progress == 'pending' or order.order_progress == 'partially_paid')">
+                            <span class="order-button select-order selected" style="width:108px;background:#f19114;" t-att-data-uid="order.uid">
+                                <span class="order-sequence">
+                                    <t t-esc="order.sequence_number" />
+                                </span>
+                                <t t-esc="moment(order.date_order).format('hh:mm')" />
+                                <span style="position:relative;bottom:28px;left:12px;">
+                                    <t t-if="widget.pos.get_order()">
+                                        <t t-esc="order.token_number" />
+                                    </t>
+                                </span>
+                            </span>
+                        </t>
+                        <t t-else="">
+                            <span class="order-button select-order selected" style="width:108px;" t-att-data-uid="order.uid">
+                                <span class="order-sequence">
+                                    <t t-esc="order.sequence_number" />
+                                </span>
+                                <t t-esc="moment(order.date_order).format('hh:mm')" />
+                                <span style="position:relative;bottom:28px;left:12px;">
+                                    <t t-if="widget.pos.get_order()">
+                                        <t t-esc="order.token_number" />
+                                    </t>
+                                </span>
+                            </span>
+                        </t>
+                    </t>
+                    <t t-if="order !== widget.pos.get_order()">
+                        <t t-if="order.order_progress and order.order_progress == 'done'">
+                            <span class="order-button select-order" style="width:7px;background:#06f106;" t-att-data-uid="order.uid">
+                                <span class="order-sequence">
+                                    <t t-esc="order.sequence_number" />
+                                </span>
+                                <span style="position:relative;bottom:28px;color:black;">
+                                    <t t-if="widget.pos.get_order()">
+                                        <t t-esc="order.token_number" />
+                                    </t>
+                                </span>
+                            </span>
+                        </t>
+                        <t t-elif="order.order_progress and (order.order_progress == 'pending' or order.order_progress == 'partially_paid')">
+                            <span class="order-button select-order" style="width:7px;background:#f19114;" t-att-data-uid="order.uid">
+                                <span class="order-sequence">
+                                    <t t-esc="order.sequence_number" />
+                                </span>
+                                <span style="position:relative;bottom:28px;color:black;">
+                                    <t t-if="widget.pos.get_order()">
+                                        <t t-esc="order.token_number" />
+                                    </t>
+                                </span>
+                            </span>
+                        </t>
+                        <t t-else="">
+                            <span class="order-button select-order" style="width:7px;" t-att-data-uid="order.uid">
+                                <span class="order-sequence">
+                                    <t t-esc="order.sequence_number" />
+                                </span>
+                                <span style="position:relative;bottom:28px;color:black;">
+                                    <t t-if="widget.pos.get_order()">
+                                        <t t-esc="order.token_number" />
+                                    </t>
+                                </span>
+                            </span>
+                        </t>
+                    </t>
+                </t>
+            </span>
+        </t>
+    </t>
+</templates>

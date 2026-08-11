@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="inherit_account_move_inherit_hr_payroll_form_view" model="ir.ui.view">
+        <field name="name">account.move.form.view</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <field name="to_check" position="after">
+                <field name="fs_dept" invisible="context.get('default_type') not in ('in_receipt','entry')" required="1" attrs="{'readonly': [('state',  '=', 'posted')]}"/>
+            </field>
+        </field>
+    </record>
+
+<!--    <record id="inherit_account_move_tree_view" model="ir.ui.view">-->
+<!--        <field name="name">account.move.tree.lc.inherit.custom_po</field>-->
+<!--        <field name="model">account.move</field>-->
+<!--        <field name="inherit_id" ref="account.view_invoice_tree"/>-->
+<!--        <field name="arch" type="xml">-->
+<!--            &lt;!&ndash; Added PO Type in Purchase Order Tree &ndash;&gt;-->
+<!--             <xpath expr="//field[@name='invoice_date_due']" position="after">-->
+<!--                 <field name="po_lc_id" invisible="context.get('default_type') not in ('in_invoice', 'in_refund','in_receipt')"/>-->
+<!--            </xpath>-->
+<!--        </field>-->
+<!--    </record>-->
+
+<!--     <record id="view_account_move_tree_search" model="ir.ui.view">-->
+<!--        <field name="name">account.move.tree.search</field>-->
+<!--        <field name="model">account.move</field>-->
+<!--        <field eval="3" name="priority"/>-->
+<!--        <field name="inherit_id" ref="account.view_account_invoice_filter"/>-->
+<!--        <field name="arch" type="xml">-->
+<!--            &lt;!&ndash; Filter by customer mobile &ndash;&gt;-->
+<!--            <xpath expr="//search/field[@name='name']" position="after">-->
+<!--                <field name="po_lc_id" string="LC No"/>-->
+<!--                <filter string="Foreign Bill" name="foreign_bill" domain="[('po_id.po_type','=','foreign')]"/>-->
+<!--                <filter string="Local Bill" name="local_bill" domain="[('po_id.po_type','=','local')]"/>-->
+<!--            </xpath>-->
+<!--        </field>-->
+<!--    </record>-->
+
+
+</odoo>

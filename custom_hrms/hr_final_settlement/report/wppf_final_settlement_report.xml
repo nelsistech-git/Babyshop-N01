@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+	<data>
+
+        <record id="wppf_final_settlement_report_id" model="ir.actions.report">
+            <field name="name">Print WPPF Settlement Letter</field>
+            <field name="model">employee.wppf.settlement</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">hr_final_settlement.wppf_final_settlement_report_view</field>
+            <field name="report_file">hr_final_settlement.wppf_final_settlement_report_view</field>
+            <field name="print_report_name">(object.name)</field>
+        </record>
+
+
+		<template id="wppf_final_settlement_report_view">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <style type="text/css">
+                            th, tr, td{
+                                background: white !important;
+                                padding: 0px!important;
+                                margin: 0px!important;
+                            }
+                            .text-color{
+                                color: black;
+                            }
+                            .td-border{
+                                border: 1px solid #000;
+                                border-top: 1px solid #000 !important;
+                            }
+                            .td-bold{
+                                font-weight:bold
+                            }
+
+                        </style>
+                        <div class="oe_structure"/>
+                        <t t-foreach="request.env['employee.wppf.settlement'].search([('id', '=', id)])" t-as="obj">
+                        <div>
+                            <h4 class="text-center head_font_color"><strong>Final Settlement of WPPF</strong></h4>
+                        </div>
+                        <br/>
+                            <div>
+                                <strong><p style="float:left; margin-bottom: 2px; color: #000">Date</p></strong>
+                                <p style="float:right; margin-bottom: 2px"><t t-esc="obj.date_requested"/>
+                                </p>
+                            </div>
+                        <table style="border-collapse: collapse;width: 100%; margin-bottom: 2em;" class="table table-condensed">
+                            <thead class="td-border">
+                                <tr class="td-border">
+                                    <td class="text-left head_font_color td-border">Employee ID:</td>
+                                    <td class="text-left head_font_color td-border"><t t-esc="obj.old_empid"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left head_font_color td-border">Employee Name:</td>
+                                    <td class="text-left head_font_color td-border"><t t-esc="obj.employee_id.name"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left head_font_color td-border">Designation:</td>
+                                    <td class="text-left head_font_color td-border"><t t-esc="obj.job_position.name"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left head_font_color td-border">E-TIN</td>
+                                    <td class="text-left head_font_color td-border"><t t-esc="obj.employee_id.tax_id"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left head_font_color td-border">Joining Date:</td>
+                                    <td class="text-left head_font_color td-border"><t t-esc="obj.initial_employment_date"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left head_font_color td-border">Left Date:</td>
+                                    <td class="text-left head_font_color td-border"><t t-esc="obj.last_day_of_work"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left head_font_color td-border">Membership Date:</td>
+                                    <td class="text-left head_font_color td-border"><t t-esc="obj.pf_profile_id.membership_date"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left head_font_color td-border">Service period (year):</td>
+                                    <td class="text-left head_font_color td-border"><t t-esc="obj.length_of_service"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left head_font_color td-border">Membership Period:</td>
+                                    <td class="text-left head_font_color td-border"><t t-esc="obj.membership_period"/></td>
+                                </tr>
+                            </thead>
+                        </table>
+                        <br/>
+                        <table style="border-collapse: collapse;width: 100%; margin-bottom: 2em;" class="table table-condensed">
+                            <thead class="td-border">
+                                <tr class="td-border">
+                                    <td class="text-left head_font_color td-border td-bold">Total Contribution Balance:</td>
+                                    <td class="text-right head_font_color td-border td-bold"><t t-esc="obj.total_contribution"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left head_font_color td-border">Employee Contribution:</td>
+                                    <td class="text-right head_font_color td-border"><t t-esc="obj.contribution_pf"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left head_font_color td-border">Company Contribution:</td>
+                                    <td class="text-right head_font_color td-border"><t t-esc="obj.contribution_cpf"/></td>
+                                </tr>
+
+                                <tr class="td-border">
+                                    <td class="text-left head_font_color td-border td-bold">Total Eligible Balance:</td>
+                                    <td class="text-right head_font_color td-border td-bold"><t t-esc="obj.total_eligible"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left head_font_color td-border">Employee Eligible:</td>
+                                    <td class="text-right head_font_color td-border"><t t-esc="obj.contribution_eligible_pf"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left head_font_color td-border">Company Eligible:</td>
+                                    <td class="text-right head_font_color td-border"><t t-esc="obj.contribution_eligible_cpf"/></td>
+                                </tr>
+
+                                <tr>
+                                    <td class="text-left head_font_color td-border td-bold">Final Net Payment</td>
+                                    <td class="text-right head_font_color td-border td-bold"><t t-esc="obj.total_amount"/></td>
+                                </tr>
+                            </thead>
+                        </table>
+
+                        <div class="row" style="margin: 6em auto 0 auto !important;">
+                            <div class="col-4 text-center">
+                                <div>
+                                    <p style="padding-top: 20px;text-align:center;text-decoration: underline; margin-bottom:0 !important;"><strong>Prepared by</strong></p>
+                                </div>
+                                <div style="font-weight:bold;">
+                                    <span t-esc="obj.submitted_by_id.name"/><br/>
+                                    <span t-esc="obj.submitted_by_id.job_id.name"/>
+                                </div>
+                            </div>
+                            <div class="col-4 text-center">
+                                <div>
+                                    <p style="padding-top: 20px;text-align:center;text-decoration: underline; margin-bottom:0 !important;"><strong>HR</strong></p>
+                                </div>
+                                <div style="font-weight:bold;">
+                                    <span t-esc="obj.hr_approver_id.name"/><br/>
+                                    <span t-esc="obj.hr_approver_id.job_id.name"/>
+                                </div>
+                            </div>
+                            <div class="col-4 text-center">
+                                <div>
+                                    <p style="padding-top: 20px;text-align:center;text-decoration: underline; margin-bottom:0 !important;"><strong>Accounts</strong></p>
+                                </div>
+                                <div style="font-weight:bold;">
+                                    <span t-esc="obj.acc_approver_id.name"/><br/>
+                                    <span t-esc="obj.acc_approver_id.job_id.name"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        </t>
+                    </div>
+                </t>
+            </t>
+
+		</template>
+
+	</data>
+</odoo>

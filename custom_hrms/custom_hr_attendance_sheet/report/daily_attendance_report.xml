@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_hr_daily_attendance_report" model="ir.actions.report">
+        <field name="name">Daily Attendance Report</field>
+        <field name="model">attendance.sheet</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">custom_hr_attendance_sheet.hr_daily_attendance_report</field>
+        <field name="report_file">custom_hr_attendance_sheet.hr_daily_attendance_report</field>
+        <field name="print_report_name">'Daily Attendance report - %s' % (object.employee_id.name)</field>
+    </record>
+
+
+    <template id="hr_daily_attendance_report">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <style type="text/css">
+                            th, tr, td{
+                                background: white !important;
+                            }
+                        </style>
+                        <h2 class="text-center head_font_color">
+                            Daily Attendance Report - <span><t t-esc="datetime.datetime.strptime(str(o.date_from), '%Y-%m-%d').strftime('%B %Y')"/></span>
+                        </h2>
+
+                        <br/>
+                        <table class="table table-condensed table-bordered" style="border: 1px solid black !important;">
+                            <tr>
+                                <td width="50%" style="border: 1px solid black !important;">
+                                    <div><strong>Employee ID: </strong><span t-field="o.employee_id.id_card_no"/></div>
+                                    <div><strong>Name: </strong><span t-field="o.employee_id"/></div>
+                                    <div><strong>Designation: </strong><span t-field="o.employee_id.job_id"/></div>
+                                    <div><strong>Department: </strong><span t-field="o.employee_id.department_id"/></div>
+                                    <div><strong>Joining Date: </strong><span t-field="o.employee_id.initial_employment_date"/></div>
+                                </td>
+                                <td width="50%" style="border: 1px solid black !important;"><strong>Company Information</strong>
+                                    <div><span t-field="o.company_id.name"/></div>
+                                    <div><span t-field="o.company_id.street"/></div>
+                                    <div><span t-field="o.company_id.street2" t-if="o.company_id.street2"/></div>
+                                    <div>
+                                        <span t-field="o.company_id.city"/>
+                                        <span t-field="o.company_id.state_id"/>
+                                        <span t-field="o.company_id.zip"/>
+                                    </div>
+                                    <div><span t-field="o.company_id.country_id"/></div>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <table class="table table-condensed">
+                            <thead>
+                                <tr>
+                                    <th class="bg_color font_color">Date</th>
+                                    <th class="bg_color font_color">Day</th>
+                                    <th class="bg_color font_color">In Time</th>
+                                    <th class="bg_color font_color">Out Time</th>
+                                    <th class="bg_color font_color">Status</th>
+                                    <th class="bg_color font_color">Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="o.line_ids" t-as="sheet_line">
+                                    <td><span t-field="sheet_line.date"/></td>
+                                    <td><span t-field="sheet_line.day"/></td>
+                                    <td><span t-field="sheet_line.ac_sign_in" t-options="{'widget': 'float_time'}"/></td>
+                                    <td><span t-field="sheet_line.ac_sign_out" t-options="{'widget': 'float_time'}"/></td>
+                                    <td><span t-field="sheet_line.status"/></td>
+                                    <td><span t-field="sheet_line.note"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="border-top: 1px solid black !important;"><strong>Total Working Days: </strong><span t-field="o.no_of_days"/></td>
+                                    <td style="border-top: 1px solid black !important;"><strong>Present: </strong><span t-field="o.no_presence"/></td>
+                                    <td style="border-top: 1px solid black !important;"><strong>Late: </strong><span t-field="o.no_late"/></td>
+                                    <td style="border-top: 1px solid black !important;"><strong>Early Out: </strong><span t-field="o.no_difftime"/></td>
+                                    <td style="border-top: 1px solid black !important;">
+                                        <strong>Absense: </strong><span t-field="o.no_absence"/><br/>
+                                        <strong>Public Holiday: </strong><span t-esc="len(o.line_ids.filtered(lambda x: x.status=='ph'))"/><br/>
+                                        <strong>Weekend: </strong><span t-esc="len(o.line_ids.filtered(lambda x: x.status=='weekend'))"/><br/>
+                                    </td>
+                                    <td style="border-top: 1px solid black !important;"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="chatroom.ConversationThread" owl="1">
+        <div class="o_ConversationThread" t-ref="threadRef"
+            t-on-scroll="syncMoreMessage"
+            t-att-data-chat-ui-tick="props.uiTick">
+            <t t-if="props.selectedConversation">
+                <div class="o_ConversationThread_empty text-muted text-center py-5 px-3 small"
+                    t-if="!props.selectedConversation.messages.length">
+                    <i class="fa fa-comments-o fa-2x mb-2 d-block opacity-50"/>
+                    <span t-out="emptyThreadHint"/>
+                </div>
+                <t t-set="lastDate" t-value="null" />
+                <t t-foreach="props.selectedConversation.messages" t-as="msg" t-key="msg.id">
+                    <t t-set="currentDate" t-value="msg.dateFull" />
+                    <t t-if="lastDate !== currentDate">
+                        <div class="o_acrux_date" t-att-title="msg.date">
+                            <span t-esc="msg.dateFull"/>
+                        </div>
+                    </t>
+                    <t t-set="lastDate" t-value="currentDate" />
+                    <Message message="msg" timeTick="props.uiTick" />
+                </t>
+            </t>
+        </div>
+    </t>
+
+</templates>

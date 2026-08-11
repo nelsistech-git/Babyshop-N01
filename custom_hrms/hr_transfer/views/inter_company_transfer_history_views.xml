@@ -1,0 +1,228 @@
+<odoo>
+    <data>		
+        <record id="inter_company_transfer_history_view_form" model="ir.ui.view">
+            <field name="name">inter.company.transfer.history.view.form</field>
+            <field name="model">inter.company.transfer.history</field>
+            <field name="arch" type="xml">
+                <form string="" create="false" edit="true" delete="false">
+                	<header>
+                		<field name="is_receive_emp" invisible="1"/>
+                		<field name="is_create_contract" invisible="1"/>
+                		<field name="is_create_journal" invisible="1"/>
+                		<field name="is_leave_create" invisible="1"/>
+                		<field name="transfer_type" invisible="1"/>
+	                    <button name="action_receive_emp" string="Receive Employee" type="object"
+	                            class="oe_highlight" groups="hr.group_hr_manager"
+                                invisible="transfer_type == 'out' or is_receive_emp == True"/>
+	                    		
+	                   <button name="action_create_contract" string="Create Contract" type="object"
+	                            class="oe_highlight" groups="hr.group_hr_manager"
+                               invisible="transfer_type == 'out' or is_receive_emp == False or is_create_contract == True"/>
+	                            
+	                </header>
+                    <sheet>
+                        <group>
+                            <group string="Transfer History Information">
+                                <field name="transfer_type"  readonly="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="transfer_reference" readonly="1" invisible="transfer_type == 'in'" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="in_reference" readonly="1" invisible="transfer_type == 'out'" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="employee_name" readonly="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>   
+                                <field name="identification_id" readonly="1"/>
+                    			<field name="id_card_no" readonly="1"/>
+                    			<field name="door_card_no" readonly="1"/>
+                                <field name="device_user_id" readonly="1"/> 
+                                <field name="work_email" readonly="1"/> 
+                                <field name="contact_no" readonly="1"/>
+                                <field name="initial_employment_date" readonly="1"/>
+
+                                <field name="requested_date" readonly="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="effected_date" readonly="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>                                
+                            </group>
+                            <group>
+                            	<field name="is_receive_emp" readonly="1" invisible="transfer_type == 'out'"/>
+                            	<field name="receive_emp_id" readonly="1" invisible="transfer_type == 'out'"/>
+                            	<field name="emp_private_address_id" readonly="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" invisible="transfer_type == 'out'"/>
+                            	
+                            	<field name="is_create_contract" readonly="1" invisible="transfer_type == 'out'"/>
+                            	<field name="is_create_journal" readonly="1" invisible="transfer_type == 'out'"/>
+                            	<field name="is_leave_create" readonly="1" invisible="transfer_type == 'out'"/>
+                            </group>
+                        </group>
+                        <group>
+                            <group string="Transfer From">
+                                <field name="from_company"  readonly="1" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="from_job_location" readonly="1" force_save="1"  options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="from_department"  force_save="1" readonly="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="from_designation" readonly="1" force_save="1"  options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>        
+                                <field name="gross_salary" readonly="1"/>                        
+                            </group>
+                            <group string="Transfer To">
+                                <field name="to_company"  readonly="1" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                
+                                <field name="to_job_location" readonly="1" invisible="transfer_type == 'in'" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="to_department" readonly="1" invisible="transfer_type == 'in'" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="to_designation" readonly="1" invisible="transfer_type == 'in'" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="to_resource_calendar" readonly="1" invisible="transfer_type == 'in'" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="to_att_policy" readonly="1" invisible="transfer_type == 'in'" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                                                
+                                <field name="to_job_location_id" readonly="1" invisible="transfer_type == 'out'" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="to_department_id" readonly="1" invisible="transfer_type == 'out'" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="to_designation_id" readonly="1" invisible="transfer_type == 'out'" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="to_resource_calendar_id" readonly="1" invisible="transfer_type == 'out'" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="to_att_policy_id" readonly="1" invisible="transfer_type == 'out'" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                
+                                <field name="note" readonly="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>                               
+                            </group>
+                        </group>
+                        <!-- <group>
+                        	<group string="Accounting Summary">                        		
+                                <field name="total_residual_loan" readonly="1"/>
+                                <field name="residual_Salary" readonly="1"/>
+                                <field name="advance_salary" readonly="1"/>
+                                
+                                <field name="loan_balance" readonly="1"/>
+                                <field name="loan_interest_balance" readonly="1"/>
+                                <field name="salary_adv_balance" readonly="1"/>
+                                <field name="tds_balance" readonly="1"/>
+                                <field name="pf_balance" readonly="1"/>
+                                <field name="salary_payable_balance" readonly="1"/>                                
+                            </group>
+                        	<group>
+                        	</group>
+                        </group> -->
+                        
+                        <group invisible="transfer_type == 'out' or is_receive_emp == False">
+                        	<button name="create_journal_transfer_receive" type="object" string="Accounts Update"
+                                    invisible="transfer_type == 'out' or is_create_journal == True" class="oe_highlight" style="width:150px;"/>
+                        </group>
+                        <group string="Accounting" >							
+                            <!-- <separator/> -->
+                            <group>
+                                <group string="Loan">
+                                <field name="loan_balance" readonly="1" force_save="1"/>
+                                <field name="loan_dr_acc" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" invisible="transfer_type == 'out'" readonly="is_create_journal == True"/>
+                                <field name="loan_cr_acc" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" invisible="transfer_type == 'out'" readonly="is_create_journal == True"/>
+                                </group>
+                                <group string="Loan Interest">
+                                	<field name="loan_interest_balance" readonly="1" force_save="1"/>
+                                    <field name="loan_interest_dr_acc" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" invisible="transfer_type == 'out'" readonly="is_create_journal == True"/>
+                                    <field name="loan_interest_cr_acc" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" invisible="transfer_type == 'out'" readonly="is_create_journal == True"/>
+                                </group>
+                                <group string="Salary Advance">
+                                	<field name="salary_adv_balance" readonly="1" force_save="1"/>
+                                    <field name="salary_adv_dr_acc" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" invisible="transfer_type == 'out'" readonly="is_create_journal == True"/>
+                                    <field name="salary_adv_cr_acc" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" invisible="transfer_type == 'out'" readonly="is_create_journal == True"/>
+                                </group>
+                                <group string="Salary Payable">
+                                	<field name="salary_payable_balance" readonly="1" force_save="1"/>
+                                    <field name="salary_payable_dr_acc" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" invisible="transfer_type == 'out'" readonly="is_create_journal == True"/>
+                                    <field name="salary_payable_cr_acc" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" invisible="transfer_type == 'out'" readonly="is_create_journal == True"/>
+                                </group>
+                            </group>
+
+                            <group>
+                                <group string="TDS" >
+                                	<field name="tds_balance" readonly="1" force_save="1"/>
+                                    <field name="tds_dr_acc" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" invisible="transfer_type == 'out'" readonly="is_create_journal == True"/>
+                                    <field name="tds_cr_acc" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" invisible="transfer_type == 'out'" readonly="is_create_journal == True"/>
+                                </group>
+                                <group string="PF" >
+                                	<field name="pf_balance" readonly="1" force_save="1"/>
+                                    <field name="pf_dr_acc" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" invisible="transfer_type == 'out'" readonly="is_create_journal == True"/>
+                                    <field name="pf_cr_acc" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" invisible="transfer_type == 'out'" readonly="is_create_journal == True"/>
+                                </group>
+                                
+                            </group>
+                        </group>
+                        
+                        <group invisible="transfer_type == 'out' or is_receive_emp == False">
+                        	<button name="action_create_leave_allocation" type="object" string="Leave Update"
+                                    invisible="transfer_type == 'out' or is_leave_create == True" class="oe_highlight" style="width:150px;"/>
+                        </group>
+                        <group string="Leave Balance">
+							<group>
+							  	<field name="leave_casual_balance" readonly="1" force_save="1" />
+							  	<field name="leave_sick_balance" readonly="1" force_save="1" />
+							  	<field name="leave_marriage_balance" readonly="1" force_save="1" />
+							</group>
+							<group>
+							</group>
+						</group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+		
+		<record id="inter_company_transfer_history_view_tree" model="ir.ui.view">
+            <field name="name">inter.company.transfer.history.view.tree</field>
+            <field name="model">inter.company.transfer.history</field>
+            <field name="arch" type="xml">
+                <tree decoration-success="transfer_type=='in'" decoration-danger="transfer_type=='out'" string="Employee Transfer History" create="false" edit="false" delete="false">
+                    <field name="transfer_type"/>
+                    <field name="transfer_reference"/>
+                    <field name="in_reference"/>
+                    <field name="employee_name"/>
+                    <field name="id_card_no"/>
+                    <field name="device_user_id"/>
+                    <field name="from_company"/>
+                    <field name="from_department"/>
+                    <field name="to_company"/>
+                    <field name="requested_date"/>
+                    <field name="effected_date"/>
+                    
+                    <field name="to_job_location"/>
+                    <field name="to_department"/>
+                    <field name="to_designation"/>
+                    <field name="is_receive_emp" />
+                    <!-- <field name="to_job_location_id" invisible="transfer_type == 'out'"/>
+                    <field name="to_department_id" invisible="transfer_type == 'out'"/>
+                    <field name="to_designation_id" invisible="transfer_type == 'out'"/> -->
+                </tree>
+            </field>
+        </record>
+		
+        <record id="view_hr_transfer_history_filter" model="ir.ui.view">
+            <field name="name">view.transfer.history.filter</field>
+            <field name="model">inter.company.transfer.history</field>
+            <field name="arch" type="xml">
+                <search string="Search Employee Transfer History">
+                    <field name="employee_name" string="Employee Name" filter_domain="[('employee_name', 'ilike', self)]"/>
+                    <field name="transfer_type" string="Transfer Type" filter_domain="[('transfer_type', 'ilike', self)]"/>
+                    <field name="from_company"/>
+                    <field name="from_department"/>
+                    <field name="from_designation"/>
+                    <field name="from_job_location"/>
+                    <field name="identification_id"/>
+                    <field name="id_card_no" filter_domain="[('id_card_no', '=', self)]"/>
+                    <field name="door_card_no"/>
+                    <field name="device_user_id" filter_domain="[('device_user_id', '=', self)]"/>
+                    <field name="work_email"/> 
+                    <field name="contact_no"/>
+                    <field name="initial_employment_date"/>
+                    <field name="to_company"/>
+                    <field name="to_job_location"/>
+                    <field name="to_department"/>
+                    <field name="to_designation"/>
+                    <field name="is_receive_emp" />
+                    
+					<filter string="IN" name="in_type_filter" domain="[('transfer_type', '=', 'in')]"/>
+                    <filter string="OUT" name="out_type_filter" domain="[('transfer_type', '=', 'out')]"/>
+                    
+               </search>
+            </field>
+        </record>
+
+        <record id="inter_company_transfer_history_action" model="ir.actions.act_window">
+            <field name="name">Employee Transfer History</field>
+            <field name="res_model">inter.company.transfer.history</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create a Employee Transfer History
+                </p>
+            </field>
+        </record>
+
+        <menuitem id="menu_inter_company_transfer_history_action" name="Inter Company Transfer History" parent="custom_hr_employee.menu_hr_employee_operations" action="hr_transfer.inter_company_transfer_history_action" sequence="20" groups="hr.group_hr_manager"/>
+    </data>
+</odoo>

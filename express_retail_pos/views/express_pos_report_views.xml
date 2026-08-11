@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_express_pos_sales_report_list" model="ir.ui.view">
+        <field name="name">express.pos.sales.report.list</field>
+        <field name="model">express.pos.sales.report</field>
+        <field name="arch" type="xml">
+            <tree string="Sales Analysis" create="false" edit="false" delete="false" default_order="date_order desc">
+                <field name="date_order"/>
+                <field name="order_id"/>
+                <field name="branch_id"/>
+                <field name="brand_id"/>
+                <field name="partner_id"/>
+                <field name="user_id" string="Cashier"/>
+                <field name="product_id"/>
+                <field name="categ_id"/>
+                <field name="qty" sum="Total Qty"/>
+                <field name="discount" avg="Avg Discount %"/>
+                <field name="price_subtotal" sum="Untaxed Total"/>
+                <field name="price_total" sum="Total"/>
+                <field name="state" optional="hide"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_express_pos_sales_report_pivot" model="ir.ui.view">
+        <field name="name">express.pos.sales.report.pivot</field>
+        <field name="model">express.pos.sales.report</field>
+        <field name="arch" type="xml">
+            <pivot string="Sales Analysis" display_quantity="true">
+                <field name="branch_id" type="row"/>
+                <field name="date_order" interval="day" type="col"/>
+                <field name="price_total" type="measure"/>
+                <field name="qty" type="measure"/>
+                <field name="order_count" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_express_pos_sales_report_graph" model="ir.ui.view">
+        <field name="name">express.pos.sales.report.graph</field>
+        <field name="model">express.pos.sales.report</field>
+        <field name="arch" type="xml">
+            <graph string="Sales Analysis" type="bar">
+                <field name="branch_id"/>
+                <field name="price_total" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_express_pos_sales_report" model="ir.actions.act_window">
+        <field name="name">Sales Analysis</field>
+        <field name="res_model">express.pos.sales.report</field>
+        <field name="view_mode">graph,pivot,tree</field>
+        <field name="context">{'search_default_state': 'sale'}</field>
+        <field name="help">Slice Express POS sales by branch, brand, cashier, product and category. Fully respects each
+            user's branch-visibility rules.
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <data>
+        <record id="paperformat_leave_report" model="report.paperformat">
+            <field name="name">Leave Report Paperformat</field>
+            <field name="default" eval="True"/>
+            <field name="format">A4</field>
+            <field name="orientation">Landscape</field>
+            <field name="margin_top">30</field>
+            <field name="margin_bottom">20</field>
+            <field name="margin_left">5</field>
+            <field name="margin_right">5</field>
+            <field name="header_line" eval="False"/>
+            <field name="header_spacing">25</field>
+            <field name="dpi">120</field>
+        </record>
+
+        <record id="leave_report_tmpl" model="ir.actions.report">
+            <field name="name">Leave Report</field>
+            <field name="model">leave.report.wizard</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">custom_hr_leave.leave_report_view</field>
+            <field name="report_file">custom_hr_leave.leave_report_view</field>
+            <field name="paperformat_id" ref="custom_hr_leave.paperformat_leave_report"/>
+        </record>
+
+        <template id="leave_report_view">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <style type="text/css">
+                            th, tr, td {
+                                background: white !important;
+                                border: 1px solid black !important;
+                            }
+                        </style>
+                        <div class="oe_structure"/>
+                        <div>
+                            <h3 class="text-center head_font_color">
+                                <strong>
+                                    <span t-esc="form['company_id'][1]"/>
+                                    <br/>
+                                    Leave Report (<span t-esc="form['start_date']" t-options='{"widget": "date"}'/>
+                                    -                                <span t-esc="form['end_date']" t-options='{"widget": "date"}'/>
+)
+                                <br/>
+                            </strong>
+                        </h3>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <p style="color: #000; font-size: 15px;">
+                                <strong>Work/Job Location:</strong>
+                                <t t-esc="work_location_name"/>
+                            </p>
+                        </div>
+                        <div class="col-6 text-right">
+                            <p style="color: #000; font-size: 15px;">
+                                <strong>Department Name:</strong>
+                                <t t-esc="dept_name"/>
+                                <t t-if="buisness_unit">
+                                    <br/>
+                                    <strong>Office/business Unit:</strong>
+                                    <t t-esc="buisness_unit"/>
+                                </t>
+                                <t t-if="tag_names_list">
+                                    <br/>
+                                    <strong>Tags:</strong>
+                                    <t t-esc="tag_names_list"/>
+                                </t>
+                            </p>
+                        </div>
+                    </div>
+                    <br/>
+
+                    <t t-set="sl_no" t-value="1"/>
+
+                    <t t-foreach="csr" t-as="line">
+                        <t t-foreach="line" t-as="line2">
+                            <div>
+                                <h6 class="text-left">
+                                    <strong>
+                                            Branch: <span t-esc="line[str(line2)][0]['loc_name']"/>
+                                    <br/>
+                                </strong>
+                            </h6>
+                        </div>
+                        <table style="border-collapse: collapse;width: 100%; margin-bottom: 2em;" class="table table-condensed">
+                            <thead>
+                                <tr>
+                                    <th rowspan="2" class="text-center align-middle bg_color font_color">Sl.
+                                                No.</th>
+                                    <th rowspan="2" class="text-left align-middle bg_color font_color">Employee
+                                                Name</th>
+                                    <th rowspan="2" class="text-left align-middle bg_color font_color">Employee
+                                                ID</th>
+                                    <th rowspan="2" class="text-left align-middle bg_color font_color">Work/Job
+                                                Location</th>
+                                    <th rowspan="2" class="text-left align-middle bg_color font_color">
+                                                Department</th>
+                                    <th rowspan="2" class="text-left align-middle bg_color font_color">
+                                                Designation</th>
+                                    <t t-foreach="len(leave_type_list)" t-as="l">
+                                        <th colspan="3" class="text-center align-middle bg_color font_color">
+                                            <span t-esc="leave_type_list[l]['leave_name']"/>
+                                        </th>
+                                    </t>
+                                    <th colspan="3" class="text-center align-middle bg_color font_color">
+                                                Total
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <t t-foreach="len(leave_type_list) + 1" t-as="l">
+                                        <th class="text-center align-middle bg_color font_color">Allocation</th>
+                                        <th class="text-center align-middle bg_color font_color">Enjoy</th>
+                                        <th class="text-center align-middle bg_color font_color">Remain</th>
+                                    </t>
+                                </tr>
+                            </thead>
+                            <tbody class="consumed_tbody">
+                                <t t-foreach="line[str(line2)]" t-as="line3">
+                                    <t t-set="total_alloc_count" t-value="0"/>
+                                    <t t-set="total_leave_count" t-value="0"/>
+                                    <t t-set="total_remain" t-value="0"/>
+                                    <tr>
+                                        <td class="text-center align-middle">
+                                            <span t-esc="sl_no"/>
+                                        </td>
+                                        <td class="text-left align-middle">
+                                            <span t-esc="line3['emp_name']"/>
+                                        </td>
+                                        <td class="text-left align-middle">
+                                            <span t-esc="line3['old_emp_id']"/>
+                                        </td>
+                                        <td class="text-left align-middle">
+                                            <span t-esc="line3['loc_name']"/>
+                                        </td>
+                                        <td class="text-left align-middle">
+                                            <span t-esc="line3['dept_name']"/>
+                                        </td>
+                                        <td class="text-left align-middle">
+                                            <span t-esc="line3['job_name']"/>
+                                        </td>
+                                        <t t-foreach="line3['leave_types']" t-as="type">
+                                            <td class="text-center align-middle">
+                                                <span t-esc="type['alloc_count']"/>
+                                                <t t-set="total_alloc_count" t-value="total_alloc_count + type['alloc_count']"/>
+                                            </td>
+                                            <td class="text-center align-middle">
+                                                <span t-esc="type['leave_count']"/>
+                                                <t t-set="total_leave_count" t-value="total_leave_count + type['leave_count']"/>
+                                            </td>
+                                            <td class="text-center align-middle">
+                                                <span t-esc="type['leave_remain']"/>
+                                                <t t-set="total_remain" t-value="total_remain + type['leave_remain']"/>
+                                            </td>
+                                        </t>
+                                        <td class="text-center align-middle">
+                                            <span t-esc="total_alloc_count"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <span t-esc="total_leave_count"/>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <span t-esc="total_remain"/>
+                                        </td>
+                                    </tr>
+                                    <t t-set="sl_no" t-value="sl_no + 1"/>
+                                    <t t-set="total_alloc_count" t-value="0"/>
+                                    <t t-set="total_leave_count" t-value="0"/>
+                                    <t t-set="total_remain" t-value="0"/>
+                                </t>
+                            </tbody>
+                        </table>
+                        <t t-set="sl_no" t-value="1"/>
+                    </t>
+                </t>
+            </div>
+        </t>
+    </t>
+</template>
+</data>
+</odoo>

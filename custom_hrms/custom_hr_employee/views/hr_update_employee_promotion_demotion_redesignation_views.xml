@@ -1,0 +1,144 @@
+<odoo>
+    <data>
+        <record id="hr_update_employee_promotion_demotion_redesignation_view_tree" model="ir.ui.view">
+            <field name="name">hr.update.employee.promotion.demotion.redesignation.view.tree</field>
+            <field name="model">update.employee.designation</field>
+            <field name="arch" type="xml">
+                <tree delete="0" decoration-muted="state=='cancel'"
+                      decoration-info="state=='draft'"
+                      decoration-success="state=='approved'" string="Employee Transfer">
+                    <!--					<field name="name" string="Reference" />-->
+                    <field name="type"/>
+                    <field name="employee_id"/>
+                    <field name="department_id"/>
+                    <field name="job_position"/>
+                    <field name="to_department_id"/>
+                    <field name="to_designation"/>
+                    <field name="date_exec"/>
+                    <field name="state" string="Status"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="hr_update_employee_promotion_demotion_redesignation_view_form" model="ir.ui.view">
+            <field name="name">hr.update.employee.promotion.demotion.redesignation.view.form</field>
+            <field name="model">update.employee.designation</field>
+            <field name="arch" type="xml">
+                <form string="">
+                    <header>
+                        <button name="action_confirm" type="object"
+                                string="Confirm"
+                                invisible="state not in ['draft']"
+                                class="oe_highlight"/>
+                        <button name="action_approved" type="object"
+                                string="Approved"
+                                invisible="state not in ['confirm']"
+                                class="oe_highlight"/>
+                        <button name="action_cancel" type="object" string="Cancel"
+                                invisible="state not in ['draft','confirm']"
+                                class="oe_highlight"/>
+                        <field name="state" widget="statusbar"
+                               statusbar_visible="draft,confirm,approved"/>
+                    </header>
+                    <sheet>
+                        <group >
+                            <!--							<h1>-->
+                            <!--								<field name="name" readonly="1" />-->
+                            <!--							</h1>-->
+                            <group>
+                                <field name="type" required="1" readonly="state != 'draft'"/>
+                                <field name="employee_id" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"
+                                       required="1" readonly="state != 'draft'"/>
+                            </group>
+                            <group>
+                            </group>
+
+                        </group>
+
+
+                        <group>
+                            <group string="Current Status">
+                                <field name="id_card_no" readonly="1" force_save="1"/>
+                                <field name="company_id" readonly="1" force_save="1"
+                                       options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="location_id" readonly="1" force_save="1"
+                                       options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="department_id" force_save="1" readonly="1"
+                                       options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="job_position" readonly="1" force_save="1"
+                                       options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="initial_employment_date" readonly="1" force_save="1"/>
+                            </group>
+                            <group string="Updated Status">
+                                <field name="date_exec"
+                                       readonly="state != 'draft'"
+                                       options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="to_department_id" force_save="1" required="1"
+                                       readonly="state != 'draft'"
+                                       options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="to_designation" force_save="1" required="1"
+                                       readonly="state != 'draft'"
+                                       options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"
+                                       /> <!--domain="[('department_id', '=', to_department_id)]"-->
+                            </group>
+                        </group>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"
+                               groups="base.group_user"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_hr_update_employee_promotion_demotion_redesignation_filter" model="ir.ui.view">
+            <field name="name">view.hr.update.employee.promotion.demotion.redesignation.filter</field>
+            <field name="model">update.employee.designation</field>
+            <field name="arch" type="xml">
+                <search string="Search Employee">
+                    <field name="employee_id" string="Employee Name"
+                           filter_domain="[('employee_id', 'ilike', self)]"/>
+                    <field name="department_id" string="Department"
+                           filter_domain="[('department_id', 'ilike', self)]"/>
+                    <field name="job_position" string="Designation"
+                           filter_domain="[('job_position', 'ilike', self)]"/>
+                    <field name="location_id" string="Job Location"
+                           filter_domain="[('location_id', 'ilike', self)]"/>
+                    <field name="id_card_no" filter_domain="[('id_card_no', '=', self)]"/>
+                    <field name="state" string="Status"
+                           filter_domain="[('state', 'ilike', self)]"/>
+
+                    <filter string="Draft" name="draft_filter"
+                            domain="[('state', '=', 'draft')]"/>
+                    <filter string="Confirm" name="draft_filter"
+                            domain="[('state', '=', 'confirm')]"/>
+                    <filter string="Approved" name="draft_filter"
+                            domain="[('state', '=', 'approved')]"/>
+                    <filter string="Cancelled" name="cancel_filter"
+                            domain="[('state', '=', 'cancel')]"/>
+                    <separator/>
+                </search>
+            </field>
+        </record>
+
+
+        <record id="hr_update_employee_promotion_demotion_redesignation_action"
+                model="ir.actions.act_window">
+            <field name="name">Update Employee Promotion/Demotion/Re-Designation</field>
+            <field name="res_model">update.employee.designation</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create a Employee Promotion/Demotion/Re-Designation of a Employee
+                </p>
+            </field>
+        </record>
+
+        <menuitem id="menu_hr_update_employee_promotion_demotion_redesignation_action"
+                  name="Update Employee Promotion/Demotion/Re-Designation"
+                  parent="custom_hr_employee.menu_hr_employee_operations"
+                  action="hr_update_employee_promotion_demotion_redesignation_action"
+                  sequence="15"/>
+    </data>
+</odoo>

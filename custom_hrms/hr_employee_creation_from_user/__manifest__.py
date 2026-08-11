@@ -1,0 +1,18 @@
+{
+    'name': 'Custom HR Employees From User',
+    'version': "1.0.0",
+    'category': "Human Resources",
+    'sequence': 1,
+    'summary': "Automatically Creates Employee While Creating User for Odoo v17",
+    'description': """This module helps you to create employees automatically while creating users for Odoo v17""",
+    'author': "Nelsis Tech Limited",
+    'company': "Nelsis Tech Limited",
+    'maintainer': "Nelsis Tech Limited",
+    'website': 'https://nelsistech.com/',
+    'depends': ['base', 'hr'],
+    'data': ['views/employee_creation_from_user_view.xml'],
+    'license': 'LGPL-3',
+    'installable': True,
+    'auto_install': False,
+    'application': True,
+}

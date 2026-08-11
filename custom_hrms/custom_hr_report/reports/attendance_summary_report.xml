@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+	<data>
+
+        <record id="employee_attendance_summary_report_tmpl" model="ir.actions.report">
+            <field name="name">Attendance Summary Report</field>
+            <field name="model">attendance.summary.report.wizard</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">custom_hr_report.employee_attendance_summary_report_view</field>
+            <field name="report_file">custom_hr_report.employee_attendance_summary_report_view</field>
+            <field name="paperformat_id" ref="custom_common_settings.paperformat_custom_a4_bd"/>
+        </record>
+
+		<template id="employee_attendance_summary_report_view">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <style type="text/css">
+                            table, th, tr, td{
+                                background: white !important;
+                                border: 1px solid black;
+                                padding: 2px !important;
+                            }
+                        </style>
+                        <div class="oe_structure"/>
+                        <div>
+                            <h3 class="text-center head_font_color">
+                                <strong>
+                                    <span>
+                                        <span t-esc="form['company_id'][1]"/>
+                                    <br/>
+                                        Attendance Summary Report
+                                    </span>
+                                    <br/>
+                                </strong>
+                            </h3>
+                            <div class="row">
+                                <div class="col-6 text-left">
+                                    <div style="color: #000; font-size: 15px;">
+                                        <strong>From Date:</strong> <t t-esc="form['start_date']" t-options='{"widget": "date"}'/>
+                                    </div>
+                                    <div style="color: #000; font-size: 15px;">
+                                        <strong>To Date:</strong> <t t-esc="form['end_date']" t-options='{"widget": "date"}'/>
+                                    </div>
+                                </div>
+                                <div class="col-6 text-right">
+                                    <div style="color: #000; font-size: 15px;">
+                                        <strong>Department:</strong> <t t-esc="dept_name"/>
+                                    </div>
+                                    <div style="color: #000; font-size: 15px;">
+                                        <strong>Work/Job Location:</strong> <t t-esc="work_loc_name"/>
+                                        <t t-if="buisness_unit">
+                                            <br/>
+                                            <strong>Office/business Unit:</strong>  <t t-esc="buisness_unit"/>
+                                        </t>
+                                        <t t-if="tag_names_list">
+                                            <br/>
+                                            <strong>Tags:</strong>  <t t-esc="tag_names_list"/>
+                                        </t>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <table style="border-collapse: collapse;width: 100%; margin-bottom: 5px;" t-if="work_loc_name=='All'">
+                            <thead>
+                                <tr style="color: black !important;">
+                                    <th class="text-center align-middle bg_color font_color">Sl.</th>
+                                    <th class="text-center align-middle bg_color font_color">Branch</th>
+                                    <th class="text-center align-middle bg_color font_color">Total Employee</th>
+                                    <th class="text-center align-middle bg_color font_color">Present</th>
+                                    <th class="text-center align-middl bg_color font_color">Absent</th>
+                                    <th class="text-center align-middl bg_color font_color">Weekend</th>
+                                    <th class="text-center align-middle bg_color font_color">Late</th>
+                                    <th class="text-center align-middle bg_color font_color">Early</th>
+                                    <th class="text-center align-middle bg_color font_color">Leave</th>
+                                    <th class="text-center align-middle bg_color font_color">Overtime</th>
+                                    <th class="text-center align-middle bg_color font_color">Manual Att.</th>
+                                    <th class="text-center align-middle bg_color font_color">Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-set="sum_sl_no" t-value="1"/>
+                                <t t-set="total_emp" t-value="0"/>
+                                <t t-set="total_present_days" t-value="0"/>
+                                <t t-set="total_absent_days" t-value="0"/>
+                                <t t-set="total_weekend_days" t-value="0"/>
+                                <t t-set="total_late_days" t-value="0"/>
+                                <t t-set="total_leave_days" t-value="0"/>
+                                <t t-set="total_manual_att" t-value="0"/>
+                                <t t-set="total_early_out" t-value="0"/>
+                                <t t-set="total_ovt" t-value="0"/>
+                                <t t-foreach="csr" t-as="line">
+                                    <t t-foreach="line" t-as="line2">
+                                        <t t-set="loc_id" t-value="line[str(line2)][0]['user_work_location_id']"/>
+                                        <tr>
+                                            <td class="text-center align-middle">
+                                                <t t-esc="sum_sl_no"/>
+                                            </td>
+                                            <td class="text-center align-middle body_col_bg_color">
+                                                <t t-esc="line[str(line2)][0]['loc_name']"/>
+                                            </td>
+                                            <td class="text-center align-middle">
+                                                <t t-esc="len(line[str(line2)])"/>
+                                                <t t-set="total_emp" t-value="total_emp + len(line[str(line2)])"/>
+                                            </td>
+                                            <td class="text-center align-middle">
+                                                <t t-esc="sum(x['present_day'] for x in line[str(line2)] if x['user_work_location_id']==loc_id)"/>
+                                                <t t-set="total_present_days" t-value="total_present_days + sum(x['present_day'] for x in line[str(line2)] if x['user_work_location_id']==loc_id)"/>
+                                            </td>
+                                            <td class="text-center align-middle">
+                                                <t t-esc="sum(x['absent_day'] for x in line[str(line2)] if x['user_work_location_id']==loc_id)"/>
+                                                <t t-set="total_absent_days" t-value="total_absent_days + sum(x['absent_day'] for x in line[str(line2)] if x['user_work_location_id']==loc_id)"/>
+                                            </td>
+                                            <td class="text-center align-middle">
+                                                <t t-esc="sum(x['weekend'] for x in line[str(line2)] if x['user_work_location_id']==loc_id)"/>
+                                                <t t-set="total_weekend_days" t-value="total_weekend_days + sum(x['weekend'] for x in line[str(line2)] if x['user_work_location_id']==loc_id)"/>
+                                            </td>
+                                            <td class="text-center align-middle">
+                                                <t t-esc="sum(x['late_day'] for x in line[str(line2)] if x['user_work_location_id']==loc_id)"/>
+                                                <t t-set="total_late_days" t-value="total_late_days + sum(x['late_day'] for x in line[str(line2)] if x['user_work_location_id']==loc_id)"/>
+                                            </td>
+                                            <td class="text-center align-middle">
+                                                <t t-esc="sum(x['early_out'] for x in line[str(line2)] if x['user_work_location_id']==loc_id)"/>
+                                                <t t-set="total_early_out" t-value="total_early_out + sum(x['early_out'] for x in line[str(line2)] if x['user_work_location_id']==loc_id)"/>
+                                            </td>
+                                            <td class="text-center align-middle">
+                                                <t t-esc="sum(x['leave_days'] for x in line[str(line2)] if x['user_work_location_id']==loc_id)"/>
+                                                <t t-set="total_leave_days" t-value="total_leave_days + sum(x['leave_days'] for x in line[str(line2)] if x['user_work_location_id']==loc_id)"/>
+                                            </td>
+                                            <td class="text-center align-middle">
+                                                <t t-esc="sum(x['ot_days'] for x in line[str(line2)] if x['user_work_location_id']==loc_id)"/>
+                                                <t t-set="total_ovt" t-value="total_ovt + sum(x['ot_days'] for x in line[str(line2)] if x['user_work_location_id']==loc_id)"/>
+                                            </td>
+                                            <td class="text-center align-middle">
+                                                <t t-esc="sum(x['manual_att'] for x in line[str(line2)] if x['user_work_location_id']==loc_id)"/>
+                                                <t t-set="total_manual_att" t-value="total_manual_att + sum(x['manual_att'] for x in line[str(line2)] if x['user_work_location_id']==loc_id)"/>
+                                            </td>
+                                            <td class="text-center align-middle">
+                                            </td>
+                                        </tr>
+                                        <t t-set="sum_sl_no" t-value="sum_sl_no + 1"/>
+                                    </t>
+                                </t>
+                                <tr>
+                                    <td class="text-right" colspan="2"><strong>Total</strong></td>
+                                    <td class="text-center">
+                                        <strong><t t-esc="total_emp"/></strong>
+                                    </td>
+                                    <td class="text-center">
+                                        <strong><t t-esc="total_present_days"/></strong>
+                                    </td>
+                                    <td class="text-center">
+                                        <strong><t t-esc="total_absent_days"/></strong>
+                                    </td>
+                                    <td class="text-center">
+                                        <strong><t t-esc="total_weekend_days"/></strong>
+                                    </td>
+                                    <td class="text-center">
+                                        <strong><t t-esc="total_late_days"/></strong>
+                                    </td>
+                                    <td class="text-center">
+                                        <strong><t t-esc="total_early_out"/></strong>
+                                    </td>
+                                    <td class="text-center">
+                                        <strong><t t-esc="total_leave_days"/></strong>
+                                    </td>
+                                    <td class="text-center">
+                                        <strong><t t-esc="total_ovt"/></strong>
+                                    </td>
+                                    <td class="text-center">
+                                        <strong><t t-esc="total_manual_att"/></strong>
+                                    </td>
+                                    <td class="text-center align-middle">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <p t-if="work_loc_name=='All'" style="page-break-after: always;"/>
+
+                        <t t-set="sl_no" t-value="1"/>
+
+                        <t t-foreach="csr" t-as="line">
+                            <t t-foreach="line" t-as="line2">
+                                <div>
+                                    <h6 class="text-left">
+                                        <strong>
+                                            Branch: <span t-esc="line[str(line2)][0]['loc_name']"/><br/>
+                                        </strong>
+                                    </h6>
+                                </div>
+                                <t t-set="loc_id" t-value="line[str(line2)][0]['user_work_location_id']"/>
+                                <table style="border-collapse: collapse;width: 100%; margin-bottom: 5px;">
+                                    <thead>
+                                        <tr style="color: black !important;">
+                                            <th class="text-center align-middle bg_color font_color">Total Employee</th>
+                                            <th class="text-center align-middle bg_color font_color">Total Present</th>
+                                            <th class="text-center align-middle bg_color font_color">Total Absent</th>
+                                            <th class="text-center align-middle bg_color font_color">Total Weekend</th>
+                                            <th class="text-center align-middle bg_color font_color">Total Late</th>
+                                            <th class="text-center align-middle bg_color font_color">Total Early Out</th>
+                                            <th class="text-center align-middle bg_color font_color">Total Leave</th>
+                                            <th class="text-center align-middle bg_color font_color">Total Overtime</th>
+                                            <th class="text-center align-middle bg_color font_color">Total Manual Att.</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="text-center align-middle">
+                                                <t t-esc="len(line[str(line2)])"/>
+                                            </td>
+                                            <td class="text-center align-middle">
+                                                <t t-esc="sum(x['present_day'] for x in line[str(line2)] if x['user_work_location_id']==loc_id)"/>
+                                            </td>
+                                            <td class="text-center align-middle">
+                                                <t t-esc="sum(x['absent_day'] for x in line[str(line2)] if x['user_work_location_id']==loc_id)"/>
+                                            </td>
+                                            <td class="text-center align-middle">
+                                                <t t-esc="sum(x['weekend'] for x in line[str(line2)] if x['user_work_location_id']==loc_id)"/>
+                                            </td>
+                                            <td class="text-center align-middle">
+                                                <t t-esc="sum(x['late_day'] for x in line[str(line2)] if x['user_work_location_id']==loc_id)"/>
+                                            </td>
+                                            <td class="text-center align-middle">
+                                                <t t-esc="sum(x['early_out'] for x in line[str(line2)] if x['user_work_location_id']==loc_id)"/>
+                                            </td>
+                                            <td class="text-center align-middle">
+                                                <t t-esc="sum(x['leave_days'] for x in line[str(line2)] if x['user_work_location_id']==loc_id)"/>
+                                            </td>
+                                            <td class="text-center align-middle">
+                                                <t t-esc="sum(x['ot_days'] for x in line[str(line2)] if x['user_work_location_id']==loc_id)"/>
+                                            </td>
+                                            <td class="text-center align-middle">
+                                                <t t-esc="sum(x['manual_att'] for x in line[str(line2)] if x['user_work_location_id']==loc_id)"/>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table style="border-collapse: collapse;width: 100%; margin-bottom: 2em;">
+                                    <thead>
+                                        <tr style="color: black !important;">
+                                            <th class="text-center align-middle bg_color font_color">Sl. No.</th>
+                                            <th class="text-center align-middle bg_color font_color">Employee ID</th>
+                                            <th class="text-center align-middle bg_color font_color">Employee Name</th>
+                                            <th class="text-center align-middle bg_color font_color">Department</th>
+                                            <th class="text-center align-middle bg_color font_color">Designation</th>
+                                            <th class="text-center align-middle bg_color font_color">Present</th>
+                                            <th class="text-center align-middle bg_color font_color">Absent</th>
+                                            <th class="text-center align-middle bg_color font_color">Weekend</th>
+                                            <th class="text-center align-middle bg_color font_color">Late</th>
+                                            <th class="text-center align-middle bg_color font_color">Early Out</th>
+                                            <th class="text-center align-middle bg_color font_color">Leave</th>
+                                            <th class="text-center align-middle bg_color font_color">Overtime</th>
+                                            <th class="text-center align-middle bg_color font_color">Manual Att.</th>
+                                            <th class="text-center align-middle bg_color font_color">Remarks</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="consumed_tbody">
+                                        <t t-foreach="line[str(line2)]" t-as="line3">
+                                            <tr>
+                                                <td class="text-center align-middle">
+                                                    <t t-esc="sl_no"/>
+                                                </td>
+                                                <td class="text-center align-middle">
+                                                    <span t-esc="line3['emp_id_card']"/>
+                                                </td>
+                                                <td class="text-center align-middle">
+                                                    <span t-esc="line3['employee_name']"/>
+                                                </td>
+                                                <td class="text-center align-middle">
+                                                    <span t-esc="line3['dept_name']"/>
+                                                </td>
+                                                <td class="text-center align-middle">
+                                                    <span t-esc="line3['designation']"/>
+                                                </td>
+                                                <td class="text-center align-middle">
+                                                    <span t-esc="line3['present_day']"/>
+                                                </td>
+                                                <td class="text-center align-middle">
+                                                  <span t-esc="line3['absent_day']"/>
+                                                </td>
+                                                <td class="text-center align-middle">
+                                                  <span t-esc="line3['weekend']"/>
+                                                </td>
+                                                <td class="text-center align-middle">
+                                                    <span t-esc="line3['late_day']"/>
+                                                </td>
+                                                <td class="text-center align-middle">
+                                                    <span t-esc="line3['early_out']"/>
+                                                </td>
+                                                <td class="text-center align-middle">
+                                                    <span t-esc="line3['leave_days']"/>
+                                                </td>
+                                                <td class="text-center align-middle">
+                                                    <span t-esc="line3['ot_days']"/>
+                                                </td>
+                                                <td class="text-center align-middle">
+                                                    <span t-esc="line3['manual_att']"/>
+                                                </td>
+                                                <td class="text-center align-middle">
+                                                </td>
+                                            </tr>
+                                            <t t-set="sl_no" t-value="sl_no + 1"/>
+                                        </t>
+                                    </tbody>
+                                </table>
+                                <p style="page-break-after: always;"/>
+                                <t t-set="sl_no" t-value="1"/>
+                            </t>
+                        </t>
+                    </div>
+                </t>
+            </t>
+		</template>
+	</data>
+</odoo>

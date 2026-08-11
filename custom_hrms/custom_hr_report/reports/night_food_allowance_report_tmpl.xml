@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+
+
+        <record id="night_food_allowance_report_id" model="ir.actions.report">
+            <field name="name">Night Food Allowance Report</field>
+            <field name="model">night.food.allowance.report.wizard</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">custom_hr_report.night_food_allowance_report_view</field>
+            <field name="report_file">custom_hr_report.night_food_allowance_report_view</field>
+        </record>
+
+		<template id="night_food_allowance_report_view">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <style type="text/css">
+                            th, tr, td{
+                                background: white !important;
+                                border: 1px solid black !important;
+                            }
+                        </style>
+
+                        <t t-set="data" t-value="request.env['night.food.allowance.report.wizard'].sudo().search([('id', '=', ftr_id)], limit=1).night_food_allowance_report_sql()"/>
+
+                        <t t-set="model" t-value="data['model']"/>
+                        <t t-set="form" t-value="data['form']"/>
+                        <t t-set="csr" t-value="data['csr']"/>
+                        <t t-set="touch_time_after" t-value="data['touch_time_after']"/>
+                        <t t-set="work_loc_name" t-value="data['work_loc_name']"/>
+                        <t t-set="start_date" t-value="data['start_date']"/>
+                        <t t-set="end_date" t-value="data['end_date']"/>
+                        <t t-set="dept_name" t-value="data['dept_name']"/>
+
+                        <div class="oe_structure"/>
+                        <div>
+                            <h3 class="text-center head_font_color">
+                                <strong>
+                                    <span t-esc="form['company_id'][1]"/>
+                                    <br/>
+                                    Night Food Allowance Report</strong>
+                            </h3>
+                        </div>
+                        <div class="row">
+                            <div class="col-4">
+                                <p style="color: #000; font-size: 15px;"><strong>From Date:</strong> <t t-esc="form['start_date']" t-options='{"widget": "date"}'/></p>
+                            </div>
+                            <div class="col-4 text-center">
+                                <p style="color: #000; font-size: 15px;"><strong>Touch Time After:</strong> <t t-esc="touch_time_after"/></p>
+                            </div>
+                            <div class="col-4 text-right">
+                                <p style="color: #000; font-size: 15px;"><strong>To Date:</strong> <t t-esc="form['end_date']" t-options='{"widget": "date"}'/></p>
+                            </div>
+                        </div>
+                        <br/>
+
+                        <t t-set="sl_no" t-value="1"/>
+
+                        <t t-foreach="csr" t-as="line">
+                            <t t-foreach="line" t-as="line2">
+                                <div>
+                                    <h6 class="text-left">
+                                        <strong>
+                                            Branch: <span t-esc="line[str(line2)][0]['location_name']"/><br/>
+                                        </strong>
+                                    </h6>
+                                </div>
+                                <table style="border-collapse: collapse;width: 100%; margin-bottom: 2em;" class="table table-condensed">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center align-middle bg_color font_color">Sl. No.</th>
+                                            <th class="text-center align-middle bg_color font_color">Date</th>
+                                            <th class="text-center align-middle bg_color font_color">Employee ID</th>
+                                            <th class="text-left align-middle bg_color font_color">Name of Employee</th>
+                                            <th class="text-left align-middle bg_color font_color">Punch Time</th>
+                                            <th class="text-left align-middle bg_color font_color">Department</th>
+                                            <th class="text-left align-middle bg_color font_color">Designation</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="consumed_tbody">
+                                        <t t-foreach="line[str(line2)]" t-as="line3">
+                                            <tr>
+                                                <td class="text-center align-middle">
+                                                    <span t-esc="sl_no"/>
+                                                </td>
+                                                <td class="text-center align-middle">
+                                                    <span t-esc="line3['date']"/>
+                                                </td>
+                                                <td class="text-center align-middle">
+                                                    <span t-esc="line3['emp_id_card']"/>
+                                                </td>
+                                                <td class="text-left align-middle">
+                                                    <span t-esc="line3['employee_name']"/>
+                                                </td>
+                                                <td class="text-left align-middle">
+                                                    <span t-esc="line3['timestamp2']"/>
+                                                </td>
+                                                <td class="text-left align-middle">
+                                                    <span t-esc="line3['department_name']"/>
+                                                </td>
+                                                <td class="text-left align-middle">
+                                                    <span t-esc="line3['designation_name']"/>
+                                                </td>
+                                                <t t-set="sl_no" t-value="sl_no + 1"/>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                                <t t-set="sl_no" t-value="1"/>
+                            </t>
+                        </t>
+                    </div>
+                </t>
+            </t>
+		</template>
+	</data>
+</odoo>

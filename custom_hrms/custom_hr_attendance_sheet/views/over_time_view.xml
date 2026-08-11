@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_overtime_details_tree" model="ir.ui.view">
+			<field name="name">Employee Overtime Details</field>
+			<field name="model">employee.attendance.sheet.line</field>
+			<field name="arch" type="xml">
+				<tree string="Employee Overtime Details" create="false"
+					edit="false" delete="false">
+					<field name="date" />
+					<field name="day" />
+					<field name="emp_card_no" />
+					<field name="employee_id" />
+					<field name="resource_calendar_id" optional="hide"/>
+					<field name="is_over_ride_day" optional="hide"/>
+					<field name="user_work_location_id" />
+					<field name="pl_sign_in"
+                           string="PL/IN"
+                           widget="float_time"/>
+                    <field name="pl_sign_out"
+                           string="PL/OUT"
+                           widget="float_time"/>
+                    <field name="ac_sign_in"
+                           string="ACT/IN"
+                           widget="float_time"/>
+                    <field name="ac_sign_out"
+                           string="ACT/OUT"
+                           widget="float_time"/>
+                    <field name="worked_hours"
+                           widget="float_time"
+                           string="Worked/H"
+                           sum="Total"/>
+                    <field name="overtime"
+                           widget="float_time"
+                           sum="Total"/>
+                    <field name="ovt_flag" string="Status"/>
+                    <field name="status" string="State"/>
+                    <button name="action_accept_overtime" type="object" string="Approved?" invisible="ovt_flag != '0'"
+						confirm="Are you sure you want to Approved?"/>
+					<button name="action_reject_overtime" type="object" string="Rejected?" invisible="ovt_flag != '0'"
+						confirm="Are you sure you want to Rejected?"/>
+					<button name="action_set_draft" type="object" string="Set to Draft?" invisible="ovt_flag == '0'"
+						confirm="Are you sure you want to Draft?"/>
+					<field name="status_uid" invisible="ovt_flag == '0'"/>
+					<field name="status_date" invisible="ovt_flag == '0'"/>
+				</tree>
+			</field>
+    </record>
+
+    <record id="view_overtime_filter" model="ir.ui.view">
+			<field name="name">Employee Overtime Details</field>
+			<field name="model">employee.attendance.sheet.line</field>
+			<field name="arch" type="xml">
+				<search string="Search Overtime Details">
+					<field name="employee_id" />
+					<field name="resource_calendar_id" />
+					<field name="emp_card_no" filter_domain="[('emp_card_no', '=', self)]"/>
+					<field name="date" />
+					<field name="user_work_location_id" />
+					<field name="ovt_flag" />
+					<field name="overtime" />
+					<field name="worked_hours" />
+					<field name="status_uid" />
+					<field name="status_date" />
+					<separator />
+					<filter string="Approved" name="ovt_flag" domain="[('ovt_flag','=','1')]"
+						help="Approved Overtime" />
+					<filter string="Not Approved" name="ovt_flag_reject" domain="[('ovt_flag','=','0')]"
+						help="Not Approved Overtime" />
+					<filter string="Extra Allowance" name="ovt_flag_extra" domain="[('ovt_flag','=','3')]"
+						help="Extra Allowance" />
+					<filter string="Working Day" name="ovt_flag_workd" domain="[('ovt_flag','=','9')]"
+						help="Working Day calculation" />
+					<separator />
+					<separator />
+					<filter string="Overtime Available" name="only_ovt" domain="[('overtime','>',0)]"
+						help="Only Overtime value available" />
+
+					<separator />
+					<filter name="today" string="Today"
+						domain="[('date', '=', datetime.datetime.now().strftime('%Y-%m-%d'))]" />
+					<separator />
+					<group expand="0" string="Group By...">
+						<filter string="Work/Job Location" name="user_work_location_id"
+							context="{'group_by': 'user_work_location_id'}" />
+					</group>
+					<group expand="0" string="Group By...">
+						<filter string="Employee" name="employee_id"
+							context="{'group_by': 'employee_id'}" />
+					</group>
+				</search>
+			</field>
+	</record>
+
+    <record id="action_overtime_details" model="ir.actions.act_window">
+        <field name="name">Overtime</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">employee.attendance.sheet.line</field>
+		<field name="domain">['|', '&amp;', ('status', 'in', ('ph','weekend')), ('punch_count', '=', 1), ('overtime', '>', 0)]</field>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="custom_hr_attendance_sheet.view_overtime_details_tree"/>
+        <field name="search_view_id" ref="custom_hr_attendance_sheet.view_overtime_filter"/>
+		<field name="context">{'search_default_today':1, 'group_by':[]}</field>
+    </record>
+
+    <menuitem id="menu_overtime"
+          name="Overtime"
+          sequence="7"
+          action="action_overtime_details"
+          parent="custom_zk_attendance_device.menu_hr_attendance_manage_attendances"
+          groups="hr_attendance.group_hr_attendance_officer"
+    />
+</odoo>

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+	<data>
+		<record id="view_hr_manual_absent_form" model="ir.ui.view">
+			<field name="name">hr.manual.absent.form</field>
+			<field name="model">hr.manual.absent</field>
+			<field name="arch" type="xml">
+				<form string="Manual Absent form">
+					<header>
+                         <button name="action_confirm" id="action_confirm" class="btn-primary" type="object" string="Confirm"
+								 invisible="state not in ['draft']"/>
+                         <button name="action_approve" id="action_approve" class="btn-primary" type="object" string="Approve"
+                                invisible="state not in ['confirm']" />
+                         <button name="action_draft" id="action_draft" type="object" string="Set to Draft"
+                                invisible="state not in ['draft','approve']" />
+                         <button name="action_cancel" id="action_cancel" type="object" string="Cancel"
+                                invisible="state not in ['draft']"/>
+                               
+                         <button name="action_is_apply" id="action_is_apply" class="btn-primary" type="object" string="Apply"
+                                invisible="is_apply == True or state != 'approve'"/>
+                         <button name="action_is_reverse" id="action_is_reverse" type="object" string="Reverse"
+								 invisible="is_reverse == True or is_apply == False"/>
+                                
+                        <field name="state" widget="statusbar" statusbar_visible="draft,confirm,approve"/>
+                    </header>
+                    <sheet>
+                    	<group>
+	                    	<group>
+								<field name="employee_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" readonly="state != 'draft'"/>
+								<field name="date" readonly="state != 'draft'"/>
+								<field name="day" readonly="1" force_save="1"/>
+								<field name="reason" readonly="state != 'draft'"/>
+							</group>
+							<group>
+								<field name="user_work_location_id" readonly="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+								<field name="department_id" readonly="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+								<field name="id_card_no" readonly="1"/>
+								<field name="device_user_id" readonly="1"/>
+								<field name="is_apply" readonly="1"/>
+	                    		<field name="apply_date" readonly="1"/>
+	                    		<field name="apply_uid" readonly="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+	                    		<field name="is_reverse" readonly="1"/>
+	                    		<field name="reverse_date" readonly="1"/>
+	                    		<field name="reverse_uid" readonly="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+							</group>
+						</group>
+					</sheet>
+
+					<div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" groups="base.group_user" />
+                        <field name="activity_ids" widget="mail_activity" />
+                        <field name="message_ids" widget="mail_thread" />
+                    </div>
+				</form>
+			</field>
+		</record>
+		
+		<record id="view_hr_manual_absent_tree" model="ir.ui.view">
+			<field name="name">hr.manual.absent.tree</field>
+			<field name="model">hr.manual.absent</field>
+			<field name="arch" type="xml">
+				<tree string="Manual Absent Tree">		
+					<field name="employee_id"/>			
+					<field name="date" />
+					<field name="day"/>					
+					<field name="reason" />
+					<field name="state" />
+					<field name="is_apply" />
+					<field name="is_reverse" />
+				</tree>
+			</field>
+		</record>
+		<record id="view_hr_manual_absent_search" model="ir.ui.view">
+			<field name="name">hr.manual.absent.tree</field>
+			<field name="model">hr.manual.absent</field>
+			<field name="arch" type="xml">
+				<search string="Manual Absent search">		
+					<field name="employee_id"/>			
+					<field name="date" />
+					<field name="day"/>					
+					<field name="reason" />
+					<field name="state" />
+					<field name="is_apply" />
+					<field name="is_reverse" />
+				</search>
+			</field>
+		</record>
+		
+		<record id="hr_manual_absent_search_view" model="ir.ui.view">
+			<field name="name">hr.manual.absent.search</field>
+			<field name="model">hr.manual.absent</field>
+			<field name="arch" type="xml">
+				<search string="Manual Absent Search">
+					<field name="employee_id" />
+					<field name="state" />
+				</search>
+			</field>
+		</record>
+		
+		<record model="ir.actions.act_window" id="action_hr_manual_absent">
+			<field name="name">Manual Absent</field>
+			<field name="res_model">hr.manual.absent</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="view_mode">tree,form</field>
+			<field name="help" type="html">
+				<p class="oe_view_nocontent_create">Create the first Manual Absent</p>
+			</field>
+		</record>
+		
+		<!--<menuitem id="hr_manual_absent_menu" name="Manual Absent"
+			parent="menu_hr_attendance_manage_attendances_sub_manual" sequence="5" action="action_hr_manual_absent"
+			groups="hr_attendance.group_hr_attendance_manager" />--> <!-- hr_attendance.group_hr_attendance_officer -->
+			
+	</data>
+</odoo>

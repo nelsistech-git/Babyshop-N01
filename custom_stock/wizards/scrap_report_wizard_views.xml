@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <data>
+        <record id="view_scrap_report_wizard_form" model="ir.ui.view">
+            <field name="name">scrap.report.wizard.form</field>
+            <field name="model">scrap.report.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Inventory Adjustment Report">
+                    <group>
+                        <group>
+                            <field name="start_date"/>
+                            <field name="category_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="product_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                        </group>
+                        <group>
+                            <field name="end_date"/>
+                            <field name="location_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="scrap_report_pdf" string="PDF" type="object" class="btn-primary"/>
+                        <button name="scrap_report_excel" string="Excel" type="object" class="btn-primary"/>
+                        <button name="scrap_report_html" string="View" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="scrap_report_wizard_action" model="ir.actions.act_window">
+            <field name="name">Scrap Report</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">scrap.report.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_scrap_report_wizard_form"/>
+            <field name="target">new</field>
+        </record>
+
+        <menuitem id="menu_scrap_report_wizard"
+              name="Scrap Report"
+              sequence="152"
+              action="scrap_report_wizard_action"
+              parent="stock.menu_warehouse_report" groups="stock.group_stock_manager"
+        />
+
+        <menuitem id="menu_scrap_report_wizard_acc_module"
+              name="Scrap Report"
+              sequence="1"
+              action="scrap_report_wizard_action"
+              parent="base_accounting_kit.submenu_inventory_reporting" groups="stock.group_stock_manager"
+        />
+    </data>
+</odoo>

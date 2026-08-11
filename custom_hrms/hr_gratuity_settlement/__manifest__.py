@@ -1,0 +1,28 @@
+# -*- coding: utf-8 -*-
+{
+    'name': 'Custom HR Gratuity Settlement',
+    'version': "1.0.0",
+    'category': "Human Resources",
+    'sequence': 1,
+    'summary': "Employee Gratuity Settlement for Odoo v17",
+    'description': """Employee Gratuity Settlement for Odoo v17""",
+    'author': "Nelsis Tech Limited",
+    'company': "Nelsis Tech Limited",
+    'maintainer': "Nelsis Tech Limited",
+    'website': 'https://nelsistech.com/',
+    'depends': ['base', 'custom_hr_employee', 'hr_payroll', 'account','custom_hr_report'],
+    'data': [
+        'data/sequence.xml',
+        'data/gratuity_sequence.xml',
+        'views/hr_gratuity_view.xml',
+        'views/hr_gratuity_accounting_configuration.xml',
+        'views/gratuity_configuration_view.xml',
+        'views/hr_contract_views.xml',
+        'views/hr_training_view.xml',
+        'security/ir.model.access.csv',
+    ],
+    'license': 'LGPL-3',
+    'installable': True,
+    'auto_install': False,
+    'application': True,
+}

@@ -1,0 +1,104 @@
+<odoo>
+    <data>
+        <record id="view_hr_contract_update_form" model="ir.ui.view">
+            <field name="name">hr.contract.update.form</field>
+            <field name="model">hr.contract.update</field>
+            <field name="arch" type="xml">
+                <form delete ="0" duplicate ="0" string="">
+                    <header>
+                        <button string="Confirm" type="object" name="action_confirmation" invisible="state != 'draft'" class="oe_highlight" confirm="Are you sure you want to confirm?"/>
+                        <button string="Cancel" type="object" name="action_cancel" invisible="state != 'draft'" />
+                        <button string="Approve" type="object" groups="hr.group_hr_user" name="action_approve" invisible="state != 'confirm'" class="oe_highlight" confirm="Are you sure you want to approve?"/>
+                        <button string="Apply" type="object" groups="hr.group_hr_manager" name="apply_contract_update" invisible="state != 'approved'" class="oe_highlight" confirm="Are you sure you want to apply in contract?"/>
+                        <button string="Set to Draft" type="object" groups="base.group_system" name="reset_to_draft" invisible="state != 'confirm'"/>
+                        <button name='action_print' string='Print List' type="object" />
+                        <field name="state" widget="statusbar" statusbar_visible="draft,confirm,approved,applied"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" required="1" readonly="state != 'draft'"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="type" required="1" readonly="state != 'draft'"/>
+                                <field name="confirm_date" readonly="1" invisible="not confirm_date"/>
+                                <field name="effective_date" required="1" readonly="state != 'draft'"/>
+                                <field name="next_increment_date" readonly="state != 'draft'" invisible="type != 'increment'"/>
+                                <field name="yearly_increment" readonly="state != 'draft'" invisible="type != 'increment'"/>
+                                <field name="is_salary_review" readonly="state != 'draft'" invisible="type != 'increment'"/>
+                                <field name="calculation_based_on" readonly="state != 'draft'"/>
+                            </group>
+                            <group>
+                                <field name="total_gross_salary"/>
+                                <field name="total_amount" string='Total Increment Amount' invisible="type != 'increment'"/>
+                                <field name="total_amount" string='Total Decrement Amount' invisible="type == 'increment'"/>
+                                <field name="total_new_gross_salary"/>
+                            </group>
+                        </group>
+
+                        <separator string="Employees"></separator>
+                        <!--<group>-->
+                         <field name="hr_contract_update_line_ids" nolabel="1" readonly="state != 'draft'">
+                             <tree editable="bottom">
+                                <field name="employee_id" required="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="id_card_no" readonly="1" force_save="1"/>
+                                <field name="department_id" readonly="1" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="job_id" readonly="1" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="user_work_location_id" readonly="1" force_save="1" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="gross_salary" readonly="1" force_save="1" sum="Total Gross"/>
+                                <field name="basic_salary" readonly="1" force_save="1" sum="Total Basic"/>
+                                 <field name="type" force_save="1"/>
+
+                                 <field name="percentage" force_save="1" readonly="parent.state != 'draft' or type != 'percentage'" sum="Total"/>
+                                <field name="amount" force_save="1" readonly="parent.state != 'draft' or type != 'fixed'" sum="Total"/>
+
+                                <field name="new_gross_salary" readonly="1" force_save="1" sum="Total New Gross"/>
+                                <!--<field name="new_basic_salary" readonly="1" force_save="1" sum="Total New Basic"/>-->
+                            </tree>
+                         </field>
+                        <!--</group>-->
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+
+        <record id="view_hr_contract_update_tree" model="ir.ui.view">
+            <field name="name">hr.contract.update.tree</field>
+            <field name="model">hr.contract.update</field>
+            <field name="arch" type="xml">
+                <tree delete ="0" string="Employee Contract Update" decoration-muted="state=='cancel'"
+					decoration-info="state=='confirm'"
+					decoration-success="state=='approved'">
+                    <field name="name"/>
+                    <field name="type"/>
+                    <field name="effective_date"/>
+                    <field name="state"/>
+
+                    <field name="confirm_date"/>
+                    <field name="confirm_uid" optional="hide"/>
+                    <field name="approve_date" optional="hide"/>
+                    <field name="approve_uid" optional="hide"/>
+                    <field name="applied_date" optional="hide"/>
+                    <field name="applied_uid" optional="hide"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_hr_contract_update" model="ir.actions.act_window">
+            <field name="name">Employee Contract Update (Increment/Decrement)</field>
+            <field name="res_model">hr.contract.update</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create a Employee Contract Update Record of a Employee
+                </p>
+            </field>
+        </record>
+
+        <menuitem id="menu_hr_contract_update_action" name="Employee Contract Update (Increment/Decrement)" parent="custom_hr_employee.menu_hr_employee_operations"
+                  action="action_hr_contract_update" groups="hr.group_hr_manager" sequence="80"/>
+    </data>
+</odoo>

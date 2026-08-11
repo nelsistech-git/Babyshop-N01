@@ -1,0 +1,728 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright (c) 2016-Present Webkul Software Pvt. Ltd. (<https://webkul.com/>) -->
+<!-- See LICENSE file for full copyright and licensing details. -->
+<!-- License URL : <https://store.webkul.com/license.html/> -->
+<odoo>
+	<data>
+		<record id="kitchen_pos_config_form_inherited_1" model="ir.ui.view">
+			<field name="name">res.config.settings.view.restaurant.form.inherit.po_clear_cart</field>
+			<field name="model">res.config.settings</field>
+			<field name="inherit_id" ref="point_of_sale.res_config_settings_view_form" />
+			<field name="arch" type="xml">
+				<xpath expr="//block[@id='pos_interface_section']" position="inside">
+					<div id="pos_auto_accept" class="col-12 col-lg-6 o_setting_box">
+						<div class="o_setting_left_pane">
+							<div class="content-group">
+								<field name="pos_auto_accept" required="1" />
+							</div>
+						</div>
+						<div class="o_setting_right_pane">
+							<span class="o_form_label">Auto Accept</span>
+							<div class="text-muted">
+								Auto Accept Kitchen Orders
+							</div>
+						</div>
+					</div>
+					<div id="order_action" class="col-12 col-lg-6 o_setting_box">
+						<div class="o_setting_left_pane">
+						</div>
+						<div class="o_setting_right_pane">
+							<span class="o_form_label">Order To Show</span>
+							<div class="text-muted">
+								Show the kitchen items at kitchen
+							</div>
+							<div class="content-group mt16 row">
+								<field name="pos_order_action" required="1" />
+							</div>
+						</div>
+					</div>
+					<div id="pos_is_done_orderline_restricted" class="col-12 col-lg-6 o_setting_box">
+						<div class="o_setting_left_pane">
+							<field name="pos_is_done_orderline_restricted"/>
+						</div>
+						<div class="o_setting_r_pane">
+							<span class="o_form_label">Restrict Modification in Done Orderline</span>
+							<div class="text-muted">
+								User cannot remove or change quantity after orderline is 'Done'.
+							</div>
+							<div class="content-group mt16 row">
+							</div>
+						</div>
+					</div>
+					<!-- <div id="pos_review_screen" class="col-12 o_setting_box col-lg-6">
+						<div class="o_setting_left_pane"></div>
+						<div class="o_setting_right_pane">
+							<span class="o_form_label">Pos Customer Screen</span>
+							<div class="text-muted">
+								Add the banners, title and other stuffs..
+							</div>
+							<div class="content-group mt16 row">
+								<field name="wk_pos_review_screen" invisible="1"/>
+							</div>
+							<div>
+								<div class="mt8">
+									<button name="open_screen_configuration" type="object" string="Screen Configuration" class="btn-link" icon="fa-arrow-right"/>
+								</div>
+							</div>
+						</div>
+					</div> -->
+				</xpath>
+			</field>
+		</record>
+
+		<record id="pos_screen_conf_tree" model="ir.ui.view">
+			<field name="name">pos.screen.config.tree</field>
+			<field name="model">pos.screen.config</field>
+			<field name="arch" type="xml">
+				<tree string="POS Screen Config Tree">
+					<field name="name" string="Screen Config" />
+					<field name="url" />
+					<field name="type" />
+					<field name="pos_config_ids" invisible="type != 'kitchen'"/>
+					<field name="related_id" invisible="type != 'review'"/>
+				</tree>
+			</field>
+		</record>
+		<record id="pos_screen_conf_form" model="ir.ui.view">
+			<field name="name">pos.screen.config.form</field>
+			<field name="model">pos.screen.config</field>
+			<field name="arch" type="xml">
+				<form string="POS Screen Form">
+					<sheet>
+						<h1 style="text-align:center;" name="configuration">General Configurations</h1>
+						<div class="row mt16 o_settings_container" id="screen_config_name">
+							<div class="oe_title" style="margin-left:2%;" id="title">
+								<label for="name" class="oe_edit_only" />
+								<h1> <field name="name" required="1" /> </h1>
+							</div>
+						</div>
+
+						<div class="row mt16 o_settings_container" id="general_conf">
+							<div class="col-12 o_setting_box" style="width: 50%;" >
+								<div class="o_setting_left_pane"></div>
+								<div class="o_setting_right_pane" style="width:100%;">
+									<label for="type"/>
+									<div class="text-muted">
+										Select type of Screen
+									</div>
+									<field name="type"/>
+								</div>
+							</div>
+
+							<div class="col-12 o_setting_box" style="width: 50%;" >
+								<div class="o_setting_left_pane"></div>
+								<div class="o_setting_right_pane" style="width:100%;">
+									<label for="url"/>
+									<div class="text-muted">
+										Pos Screen Display Url
+									</div>
+									<field name="url"/>
+								</div>
+							</div>
+
+							<div class="col-12 o_setting_box" style="width: 50%;" >
+								<div class="o_setting_left_pane"></div>
+								<div class="o_setting_right_pane" style="width:100%;">
+									<label for="ip_address"/>
+									<div class="text-muted">
+										Pos Screen IP Address
+									</div>
+									<field name="ip_address"/>
+								</div>
+							</div>
+						</div>
+
+						<div class="row mt16 o_settings_container" id="kitchen_conf" invisible="type != 'kitchen'">
+							<div class="col-12 o_setting_box" id="pos_config_ids" style="width: 50%;" >
+								<div class="o_setting_right_pane">
+									<span class="o_form_label">Allowed POS</span>
+									<div class="text-muted">
+										Add Pos Allowed On Screen
+									</div>
+									<div class="content-group mt16">
+										<field name="pos_config_ids" colspan="4" nolabel="1" widget="many2many_tags" required="type == 'kitchen'"/>
+									</div>
+								</div>
+							</div>
+							<div class="col-12 o_setting_box" id="pos_category_ids" style="width: 50%;" >
+								<div class="o_setting_left_pane"></div>
+								<div class="o_setting_right_pane">
+									<span class="o_form_label">Allowed POS Categories</span>
+									<div class="text-muted">
+										Add Pos Categories Allowed On Screen
+									</div>
+									<div class="content-group mt16">
+										<field name="pos_category_ids" colspan="4" nolabel="1" widget="many2many_tags" required="type == 'kitchen'"/>
+									</div>
+								</div>
+							</div>
+							<!-- <div class="col-12  o_setting_box" id="pos_category_ids" style="width: 50%;" >
+								<div class="o_setting_right_pane">
+									<span class="o_form_label">Arragement of Kitchen Orders</span>
+									<div class="text-muted">
+										Select the order of kitchen orders
+									</div>
+									<div class="content-group mt16">
+										<field name="queue_order" colspan="4" nolabel="1" required="1" />
+									</div>
+								</div>
+							</div>
+							<div class="col-12 o_setting_box" id="orders_on_grid" style="width: 50%;" >
+								<div class="o_setting_right_pane">
+									<span class="o_form_label">Orders On Grid Screen</span>
+									<div class="text-muted">
+										Add the orders on grid screen
+									</div>
+									<div class="content-group mt16">
+										<field name="orders_on_grid" required="1" />
+									</div>
+								</div>
+							</div> -->
+							<!-- <div class="col-12 col-lg-6 o_setting_box" id="wk-is-pos-changed">
+								<div class="o_setting_left_pane">
+									<field name="is_changed"/>
+								</div>
+								<div class="o_setting_right_pane">
+									<label for="is_changed"/>
+									<div class="text-muted">
+										Pos Is Changed
+									</div>
+								</div>
+							</div> -->
+
+							<div class="col-12 col-lg-6 o_setting_box">
+								<div class="o_setting_right_pane">
+									<label for="accepted_order_color"/>
+									<field name="accepted_order_color" widget="color"/>
+									<div class="text-muted"> 
+										Color for Accepted Orders
+									</div>
+								</div>
+							</div>
+
+							<div class="col-12 col-lg-6 o_setting_box">
+								<div class="o_setting_right_pane">
+									<label for="pending_order_color"/>
+									<field name="pending_order_color" widget="color"/>
+									<div class="text-muted"> 
+										Color for Pending Orders
+									</div>
+								</div>
+							</div>
+
+							<div class="col-12 col-lg-6 o_setting_box" id="wk-is-pos-changed">
+								<div class="o_setting_right_pane">
+									<label for="threshold_time"/>
+									<field name="threshold_time"/>
+									<div class="text-muted">
+										Thershold time for Kitchen Order
+									</div>
+								</div>
+							</div>
+
+							<div class="col-12 col-lg-6 o_setting_box">
+								<div class="o_setting_right_pane">
+									<label for="threshold_order_color"/>
+									<field name="threshold_order_color" widget="color"/>
+									<div class="text-muted"> 
+										Color for Orders which passed the threshold time
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="row mt16 o_settings_container" id="review_conf" invisible="type != 'review'">
+							<div class="col-12 o_setting_box" style="width: 50%;">
+								<div class="o_setting_left_pane">
+								</div>
+								<div class="o_setting_right_pane">
+									<label for="related_id"/>
+									<div class="text-muted">
+										Assign this configuration to POS
+									</div>
+									<field name="related_id" style="width:400px;" required="type == 'review'"/>
+								</div>
+							</div>
+							<div id="welcome_screen_heading" class="col-12 o_setting_box" style="width: 50%;">
+								<div class="o_setting_right_pane">
+									<label for="welcome_screen_heading" string="Welcome Screen Heading"/>
+									<div class="text-muted">
+										Welcome Screen Heading
+									</div>
+									<field name="welcome_screen_heading" style="width:400px;overflow: auto;"/>
+								</div>
+								<div class="o_setting_left_pane">
+								</div>
+							</div>
+							<div class="col-12 o_setting_box" style="width: 50%;" >
+								<div class="o_setting_left_pane">
+								</div>
+								<div class="o_setting_right_pane">
+									<label for="welcome_screen_subheading"/>
+									<div class="text-muted">
+										Welcome Screen SubHeading
+									</div>
+									<field name="welcome_screen_subheading" style="width:400px;overflow: auto;"/>
+								</div>
+							</div>
+							<div id="welcome_screen_content" class="col-12 o_setting_box" style="width: 50%;">
+								<div class="o_setting_left_pane">
+								</div>
+								<div class="o_setting_right_pane">
+									<label for="welcome_screen_content" />
+									<div class="text-muted">
+										Show review screen automatically on validation of a POS Order.
+									</div>
+									<field name="welcome_screen_content" style="width:400px;overflow: auto;"/>
+								</div>
+							</div>
+							<div id="welcome_screen_banner" class="col-12 o_setting_box" style="width: 50%;">
+								<div class="o_setting_left_pane">
+								</div>
+								<div class="o_setting_right_pane">
+									<label for="welcome_screen_banner" />
+									<div class="text-muted">
+										Select Banner Image for Welcome Screen
+									</div>
+									<field name="welcome_screen_banner" style="width:400px;overflow: auto;"/>
+								</div>
+							</div>
+						</div>
+
+						<div class="row mt16 o_settings_container" id="cart_conf" invisible="type != 'cart'">
+							<div class="col-12 o_setting_box" style="width: 50%;">
+								<div class="o_setting_left_pane">
+								</div>
+								<div class="o_setting_right_pane">
+									<label for="related_id"/>
+									<div class="text-muted">
+										Assign this configuration to POS
+									</div>
+									<field name="related_id" style="width:400px;" required="type == 'cart'"/>
+								</div>
+							</div>
+							<div id="welcome_screen_heading" class="col-12 o_setting_box" style="width: 50%;">
+								<div class="o_setting_right_pane">
+									<label for="welcome_screen_heading" string="Welcome Screen Heading"/>
+									<div class="text-muted">
+										Welcome Screen Heading
+									</div>
+									<field name="welcome_screen_heading" style="width:400px;overflow: auto;"/>
+								</div>
+								<div class="o_setting_left_pane">
+								</div>
+							</div>
+							<div class="col-12 o_setting_box" style="width: 50%;" >
+								<div class="o_setting_left_pane">
+								</div>
+								<div class="o_setting_right_pane">
+									<label for="welcome_screen_subheading"/>
+									<div class="text-muted">
+										Welcome Screen SubHeading
+									</div>
+									<field name="welcome_screen_subheading" style="width:400px;overflow: auto;"/>
+								</div>
+							</div>
+							<div id="welcome_screen_content" class="col-12 o_setting_box" style="width: 50%;">
+								<div class="o_setting_left_pane">
+								</div>
+								<div class="o_setting_right_pane">
+									<label for="welcome_screen_content" />
+									<div class="text-muted">
+										Show review screen automatically on validation of a POS Order.
+									</div>
+									<field name="welcome_screen_content" style="width:400px;overflow: auto;"/>
+								</div>
+							</div>
+							<div id="welcome_screen_banner" class="col-12 o_setting_box" style="width: 50%;">
+								<div class="o_setting_left_pane">
+								</div>
+								<div class="o_setting_right_pane">
+									<label for="welcome_screen_banner" />
+									<div class="text-muted">
+										Select Banner Image for Welcome Screen
+									</div>
+									<field name="welcome_screen_banner" style="width:400px;overflow: auto;"/>
+								</div>
+							</div>
+							<div class="col-12 o_setting_box" style="width: 50%;">
+								<div class="o_setting_left_pane">
+								</div>
+								<div class="o_setting_right_pane">
+									<label for="show_cart_type"/>
+									<div class="text-muted">
+										show_cart_type
+									</div>
+									<field name="show_cart_type" style="width:400px;"/>
+								</div>
+							</div>
+							<div class="col-12 o_setting_box" style="width: 50%;">
+								<div class="o_setting_left_pane">
+								</div>
+								<div class="o_setting_right_pane">
+									<label for="show_product_image"/>
+									<div class="text-muted">
+										show_product_image
+									</div>
+									<field name="show_product_image" style="width:400px;"/>
+								</div>
+							</div>
+						</div>
+					</sheet>
+				</form>
+			</field>
+		</record>
+
+		<record id="view_pos_screens_kanban" model="ir.ui.view">
+			<field name="name">pos.screens.kanban.view</field>
+			<field name="model">pos.screen.config</field>
+			<field name="arch" type="xml">
+				<kanban create="false" class="o_kanban_dashboard o_pos_kanban">
+					<field name="name"/>
+					<field name="type"/>
+					<field name="current_session_id"/>
+					<field name="current_session_state"/>
+					<field name="pos_category_ids"/>
+					<field name="pending_order_count"/>
+					<field name="proceed_order_count"/>
+					<field name="category_names"/>
+					<templates>
+						<t t-name="kanban-box">
+							<div>
+								<div class="o_kanban_card_header">
+									<div class="o_kanban_card_header_title mb16">
+										<div class="o_primary">
+											<t t-esc="record.name.value"/>
+										</div>
+									</div>
+									<div class="o_kanban_manage_button_section">
+										<a class="o_kanban_manage_toggle_button" href="#"><i class="fa fa-ellipsis-v" role="img" aria-label="Manage" title="Manage"/></a>
+									</div>
+								</div>
+								<div class="container o_kanban_card_content">
+									<div class="row">
+										<div class="col-6 o_kanban_primary_left">
+											<button t-if="record.current_session_state.raw_value != 'closing_control'" class="btn btn-primary" name="open_ui" type="object">
+												<t t-if="record.current_session_state.raw_value === 'opened'">Open Screen</t>
+												<t t-elif="!record.current_session_id.raw_value">New Session</t>
+												<t t-elif="record.current_session_state.raw_value === 'opening_control'">Open Session</t>
+											</button>
+											<button t-if="record.current_session_id.raw_value and record.current_session_state.raw_value != 'closed'" class="btn btn-secondary" name="open_existing_session_cb" type="object">Close</button>
+										</div>
+										<div class="col-6 o_kanban_primary_right">
+											<div t-if="record.category_names.value" class="row">
+												<div class="col-6">
+													<span>POS Categories</span>
+												</div>
+												<div class="col-6">
+													<span><t t-esc="record.category_names.value"/></span>
+												</div>
+											</div>
+											<div t-if="record.pending_order_count.value and record.type.value == 'Kitchen Screen'" class="row">
+												<div class="col-6">
+													<span>Pending Orders</span>
+												</div>
+												<div class="col-6">
+													<span><t t-esc="record.pending_order_count.value"/></span>
+												</div>
+											</div>
+											<div t-if="record.proceed_order_count.value and record.type.value == 'Kitchen Screen'" class="row">
+												<div class="col-6">
+													<span>Proceed Orders</span>
+												</div>
+												<div class="col-6">
+													<span><t t-esc="record.proceed_order_count.value"/></span>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div style="text-align:right;">
+										<field name="current_user_id" widget="many2one_avatar_user"/>
+									</div>
+								</div>
+								<div class="container o_kanban_card_manage_pane dropdown-menu" role="menu">
+                                	<div class="row">
+										<div class="col-6 o_kanban_card_manage_section o_kanban_manage_view">
+											<div role="menuitem" class="o_kanban_card_manage_title">
+												<span>View</span>
+											</div>
+											<div role="menuitem">
+												<a name="open_screen_config" type="object"> Configuration </a>
+											</div>
+											<div role="menuitem">
+												<a name="open_pos_config" type="object"> POS Configs </a>
+											</div>
+											<div role="menuitem">
+												<a name="open_screen_sessions" type="object">Sessions</a>
+											</div>
+											<div role="menuitem" t-if="record.type.value == 'Kitchen Screen'">
+												<a name="open_screen_orders" type="object">Orders</a>
+											</div>
+											<div role="menuitem" t-if="record.type.value == 'Review Screen'">
+												<a name="open_screen_reviews" type="object">Reviews</a>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</t>
+					</templates>
+				</kanban>
+			</field>
+		</record>
+
+		<record id="pos_review_record_tree" model="ir.ui.view">
+			<field name="name">pos.review.record.tree</field>
+			<field name="model">pos.review.record</field>
+			<field name="arch" type="xml">
+				<tree string="POS Review Record Tree" create="false" edit="false" >
+					<field name="name"/>
+					<field name="salesperson"/>
+					<field name="customer" />
+					<field name="review_rating" widget="priority" readonly="1"/>
+				</tree>
+			</field>
+		</record>
+		<record id="pos_review_screen_form" model="ir.ui.view">
+			<field name="name">pos.review.screen.form</field>
+			<field name="model">pos.screen.config</field>
+			<field name="inherit_id" ref="pos_all_in_one_screen.pos_screen_conf_form"></field>
+			<field name="arch" type="xml">
+				<xpath expr="//div[@id='review_conf']" position="inside">
+					<h2>POS Review Screen Configuration</h2>
+					<separator/>
+					<div class="row mt16 o_settings_container" id="pos_review_screen_config">
+						<div class="row mt16 o_settings_container">
+							<div id="on_validation" class="col-12 o_setting_box" style="width: 500px;">
+								<div class="o_setting_left_pane">
+									<field name="auto_review_screen_validate" style="with:400px;"/>
+								</div>
+								<div class="o_setting_right_pane">
+									<label for="auto_review_screen_validate" />
+									<div class="text-muted">
+										Show review screen automatically on validation of a POS Order.
+									</div>
+								</div>
+							</div>
+							<div id="review_screen_reset" class="col-12 o_setting_box" style="width: 500px;">
+								<div class="o_setting_right_pane">
+									<label for="screen_reset_timeout"/>
+									<div class="text-muted">
+										Review screen timeout on which the screen will get automatically reset.
+									</div>
+									<field name="screen_reset_timeout" style="with:400px;"/>
+								</div>
+							</div>
+							<div class="col-12 o_setting_box" style="width: 500px;" >
+								<div class="o_setting_left_pane">
+									<field name="show_review_button" style="width:400px;"/>
+								</div>
+								<div class="o_setting_right_pane">
+									<label for="show_review_button"/>
+									<div class="text-muted">
+										Show review button on receipt screen.
+									</div>
+								</div>
+							</div>
+							<div class="col-12 o_setting_box" style="width: 500px;">
+								<div class="o_setting_left_pane">
+									<field name="is_show_content_box" style="with:400px;"/>
+								</div>
+								<div class="o_setting_right_pane">
+									<label for="is_show_content_box"/>
+									<div class="text-muted">
+										Show or hide the content box on review screen
+									</div>
+								</div>
+							</div>
+							<div id="title" class="col-12 o_setting_box" style="width: 500px;">
+								<div class="o_setting_right_pane">
+									<label for="title"/>
+									<div class="text-muted">
+										Review screen main heading.
+									</div>
+									<field name="title" style="width:400px;"/>
+								</div>
+							</div>
+							<div class="col-12 o_setting_box" style="width: 500px;">
+								<div class="o_setting_right_pane">
+									<label for="review_screen_content"/>
+									<div class="text-muted">
+										Contents which is shown on the review screen
+									</div>
+									<field name="review_screen_content" string="Review Screen Content" style="width:400px;height:100px;"/>
+								</div>
+							</div>
+							<div id="review_banner" class="col-12 o_setting_box" style="width: 500px;">
+								<div class="o_setting_right_pane">
+									<label for="banner"/>
+									<div class="text-muted">
+										Review screen display banner
+									</div>
+									<field name="banner"/>
+								</div>
+							</div>
+							<div id="type_of_icons" class="col-12 o_setting_box" style="width: 500px;">
+								<div class="o_setting_right_pane">
+									<label for="type_of_icons"/>
+									<div class="text-muted">
+										Type of Review icons display on review screen
+									</div>
+									<field name="type_of_icons" required="1"/>
+								</div>
+							</div>
+						</div>
+					</div>
+				</xpath>
+			</field>
+		</record>
+		<record id="pos_review_record_form" model="ir.ui.view">
+			<field name="name">pos.review.record.form</field>
+			<field name="model">pos.review.record</field>
+			<field name="arch" type="xml">
+				<form string="POS Review Record Form" create="false" edit="false">
+					<sheet>
+						<notebook>	
+							<page name="review_record" string="Pos Review Records">
+								<group col="2">
+									<field name="name"/>
+									<field name="review_rating" widget="priority" readonly="1"/>
+									<field name="salesperson" />
+									<field name="customer" />
+									<field name="review_content" style="width:800px;"/>
+								</group>
+							</page>
+						</notebook>
+					</sheet>
+				</form>
+			</field>
+		</record>
+
+		<record id="view_pos_kitchen_order_tree" model="ir.ui.view">
+			<field name="name">pos.kitchen.order.tree</field>
+			<field name="model">pos.kitchen.order</field>
+			<field name="arch" type="xml">
+				<tree string="POS Kitchen Orders" create="0">
+					<field name="pos_reference"/>
+					<field name="kitchen_order_name"/>
+					<field name="screen_session_id" widget="badge"/>
+					<field name="date_order"/>
+					<field name="partner_id"/>
+					<field name="order_progress" widget="badge" 
+						decoration-info="order_progress in ('new', 'accepted')" 
+						decoration-success="order_progress in ('done', 'picked_up')" 
+						decoration-warning="order_progress in ('pending', 'partially_done')" 
+					/>
+					<field name="config_id" widget="badge"/>
+				</tree>
+			</field>
+		</record>
+		<record id="view_pos_pos_kitchen_order_form" model="ir.ui.view">
+			<field name="name">pos.kitchen.order.form</field>
+			<field name="model">pos.kitchen.order</field>
+			<field name="arch" type="xml">
+				<form string="Point of Sale Kitchen Orders" create="0">
+					<header>
+						<field name="order_progress" widget="statusbar" statusbar_visible="new,pending,done" nolabel="1" />
+					</header>
+					<sheet>
+					<group col="4" colspan="4" name="order_fields">
+						<field name="pos_reference" />
+						<field name="kitchen_order_name"/>
+						<field name="date_order"/>
+						<field name="session_id" />
+						<field string="User" name="user_id"/>
+						<field name="partner_id" />
+						
+						<field name="screen_session_id"/>
+
+						<field name="config_id"/>
+						<field name="out_of_stock_products" widget="many2many_tags" invisible="out_of_stock_products == []"/>
+						<field name="cancellation_reason" invisible="not cancellation_reason"/>
+
+					</group>
+					<notebook colspan="4">
+						<page string="Products">
+							<field name="lines" colspan="4" nolabel="1">
+								<tree string="Order lines" editable="bottom">
+									<field name="full_product_name"/>
+									<field name="state"/>
+									<field name="qty"/>
+								</tree>
+							</field>
+							<div class="oe_clear"/>
+						</page>
+					</notebook>
+				</sheet>
+				</form>
+			</field>
+		</record>
+
+		<record id="customer_screen_pos_order_form_inherited" model="ir.ui.view">
+			<field name="name">customer.scree.pos.order.form</field>
+			<field name="model">pos.order</field>
+			<field name="inherit_id" ref="point_of_sale.view_pos_pos_form"/>
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='pricelist_id']" position="after">
+					<field name="review_record_id"/>
+				</xpath>
+			</field>
+		</record>
+
+		<!-- Actions -->
+		<record id="action_pos_screens_kanban" model="ir.actions.act_window">
+			<field name="name">POS Screens</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="res_model">pos.screen.config</field>
+			<field name="view_mode">kanban</field>
+			<field name="domain"></field>
+		</record>
+		<record id="pos_screen_config_action_id" model="ir.actions.act_window">
+			<field name="name">POS Screen Config</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="res_model">pos.screen.config</field>
+			<field name="view_mode">tree,form</field>
+			<field name="view_id" ref="pos_all_in_one_screen.pos_screen_conf_tree" />
+		</record>
+		<record id="pos_kitchen_order_action" model="ir.actions.act_window">
+			<field name="name">Pos Kitchen Orders</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="res_model">pos.kitchen.order</field>
+			<field name="view_id" ref="view_pos_kitchen_order_tree" />
+		</record>
+		<record id="pos_review_record_action_id" model="ir.actions.act_window">
+			<field name="name">POS Review Record</field>
+            <field name="type">ir.actions.act_window</field>
+			<field name="res_model">pos.review.record</field>
+			<field name="view_mode">tree,form</field>
+			<field name="view_id" ref="pos_all_in_one_screen.pos_review_record_tree" />
+		</record>
+
+		<!-- Menus -->
+    	<menuitem 
+			id="menu_pos_screens" 
+			action="action_pos_screens_kanban" 
+			name="Screens" 
+		/>
+		<menuitem
+			id="pos_screen_config_main_menu"
+			parent="menu_pos_screens"
+			name='Pos Screen Configuration'
+			groups="point_of_sale.group_pos_manager"
+			action="pos_screen_config_action_id"
+		/>
+		<menuitem
+			id="pos_review_record_menu_id"
+			name="POS Reviews"
+			parent="menu_pos_screens"
+			action="pos_review_record_action_id"
+		/>
+		<menuitem
+			id="pos_all_in_one_screen_orders_view"
+			parent="menu_pos_screens"
+			name='Pos Kitchen Orders'
+			groups="point_of_sale.group_pos_manager"
+			action="pos_kitchen_order_action"
+		/>
+	</data>
+</odoo>

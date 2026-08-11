@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_picking_type_form_inherit_stock" model="ir.ui.view">
+        <field name="name">Operation Types</field>
+        <field name="model">stock.picking.type</field>
+        <field name="inherit_id" ref="stock.view_picking_type_form"/>
+        <field name="arch" type="xml">
+            <field name="default_location_src_id" position="attributes">
+                <attribute name="attrs">{"required": [("code", "!=", "internal")]}</attribute>
+            </field>
+            <field name="default_location_dest_id" position="attributes">
+                <attribute name="attrs">{"required": [("code", "!=", "internal")]}</attribute>
+            </field>
+        </field>
+    </record>
+
+    <record model="ir.ui.menu" id="stock.stock_picking_type_menu">
+        <field name="groups_id" eval="[(6,0,[ref('custom_common_settings.group_inventory_overview_top_menu')])]"/>
+    </record>
+</odoo>

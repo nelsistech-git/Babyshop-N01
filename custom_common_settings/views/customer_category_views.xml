@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data>
+        <!-- Customer category -->
+        <record id="view_customer_category_tree_view" model="ir.ui.view">
+            <field name="name">view.customer.category.list.tree</field>
+            <field name="model">customer.category</field>
+            <field name="arch" type="xml">
+                <tree editable="bottom" string="Customer Category" delete="0">
+                    <field name="sequence" widget="handle"/>
+                    <field name="name" required="1"/>
+                    <field name="note" />
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_customer_category_filter" model="ir.ui.view">
+            <field name="name">customer.type.list.select</field>
+            <field name="model">customer.category</field>
+            <field name="priority" eval="15"/>
+            <field name="arch" type="xml">
+                <search string="Search Customer Type">
+                    <field name="name" string="Customer Category" filter_domain="[('name', 'ilike', self)]"/>
+               </search>
+            </field>
+        </record>
+
+        <record id="view_customer_category_action" model="ir.actions.act_window">
+            <field name="name">Customer Category</field>
+            <field name="res_model">customer.category</field>
+            <field name="view_mode">tree</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Please Create Customer Category
+                </p>
+            </field>
+        </record>
+
+    </data>
+</odoo>

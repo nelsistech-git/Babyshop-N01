@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_attendance_sheet_checkin_checkout_wizard_form" model="ir.ui.view">
+        <field name="name">attendance.sheet.checkin.checkout.wizard.form</field>
+        <field name="model">attendance.sheet.checkin.checkout.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Attendance Sheet Check In / Check Out">
+                <group>
+                    <group>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                        <field name="location"/>
+                    </group>
+                    <group>
+                        <field name="department_id"/>
+                        <field name="employee_ids" widget="many2many_tags"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="action_download_excel"
+                            string="Download Excel"
+                            type="object"
+                            class="btn-primary"/>
+                    <button string="Cancel"
+                            class="btn-secondary"
+                            special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_attendance_sheet_checkin_checkout_wizard" model="ir.actions.act_window">
+        <field name="name">Attendance Sheet Check In / Check Out</field>
+        <field name="res_model">attendance.sheet.checkin.checkout.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

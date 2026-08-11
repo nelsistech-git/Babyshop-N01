@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Contract View -->
+    <record id="hr_contract_form_inherit" model="ir.ui.view">
+        <field name="name">hr.contract.view.form.inherit</field>
+        <field name="model">hr.contract</field>
+        <field name="inherit_id" ref="hr_contract.hr_contract_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='job_id']" position="before">
+                <field name="currency_id" invisible="1"/>
+                <field name="company_country_id" invisible="1"/>
+                <field name="structure_type_id" required="1" domain="['|', ('country_id', '=', False), ('country_id', '=', company_country_id)]" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                <field name="struct_id" required="1" domain="[('type_id', '=', structure_type_id)]" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                <field name="bonus_struct_id" domain="[('regular_pay', '=', False)]" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+            </xpath>
+<!--            <xpath expr="//page[@name='information']" position="attributes">
+                <attribute name="attrs">{'invisible': [('wage_type', '=', 'hourly')]}</attribute>
+            </xpath>-->
+            <xpath expr="//page[@name='information']" position="replace">
+                <page string="Salary Information" name="information_salary">
+                    <group name="main_info_hourly">
+                        <group name="salary_and_advantages_hourly" string="Wages">
+                            <field name="wage_type"/>
+                            <field name="gross_salary" widget="monetary"/>
+                            <field name="wage"/>
+<!--                            <label for="wage"/>
+                            <div class="o_row" name="wage">
+                                <field name="wage" nolabel="1"/>
+                                <span attrs="{'invisible': [('wage_type', '=', 'monthly')]}">/ hour</span>
+                                <span invisible="wage_type != 'monthly'">/ month</span>
+                            </div>-->                            
+<!--                            <field name="advantages" nolabel="1" placeholder="Advantages..." colspan="2" invisible="1"/>-->
+                        </group>
+                        <group string="Other Settings" name='hourly_settings'>
+                            <label for="is_ot_allowed"/>
+                            <div class="o_row">
+                                <field name="is_ot_allowed" nolabel="1"/>
+                            </div>
+                            <label for="ot_type"/>
+                            <div class="o_row">
+                                <field name="ot_type" nolabel="1" required="1"/>
+                            </div>
+                            <label for="ot_hourly_rate"/>
+                            <div class="o_row">
+                                <field name="ot_hourly_rate" nolabel="1"/>
+                                <span>/ hour</span>
+                            </div>
+                            <label for="is_pf_allowed"/>
+                            <div class="o_row">
+                                <field name="is_pf_allowed" nolabel="1"/>
+                            </div>
+
+                            <label for="pf_value"/>
+                            <div class="o_row">
+                                <field name="pf_value" nolabel="1"/>
+                                <span>/ month</span>
+                            </div>
+                        </group>
+                    </group>
+                    
+                    <group>
+                    	<group string="Allowances" name='allowances' invisible="wage_type != 'monthly'">
+                            <label for="hra"/>
+                            <div class="o_row">
+                                <field name="hra" nolabel="1"/>
+                                <span>/ month</span>
+                            </div>
+
+                            <label for="da"/>
+                            <div class="o_row">
+                                <field name="da" nolabel="1"/>
+                                <span>/ month</span>
+                            </div>
+                            
+                            <label for="travel_allowance"/>
+                            <div class="o_row">
+
+                                <field name="travel_allowance" nolabel="1"/>
+                                <span>/ month</span>
+                            </div>
+                            <label for="meal_allowance"/>
+                            <div class="o_row">
+
+                                <field name="meal_allowance" nolabel="1"/>
+                                <span>/ month</span>
+                            </div>
+                            <label for="medical_allowance"/>
+                            <div class="o_row">
+
+                                <field name="medical_allowance" nolabel="1"/>
+                                <span>/ month</span>
+                            </div>
+                            <label for="mobile_allowance"/>
+                            <div class="o_row">
+                                <field name="mobile_allowance" nolabel="1"/>
+                                <span>/ month</span>
+                            </div>
+                            <label for="car_allowance"/>
+                            <div class="o_row">
+                                <field name="car_allowance" nolabel="1"/>
+                                <span>/ month</span>
+                            </div>
+                            <label for="lfa_allowance"/>
+                            <div class="o_row">
+                                <field name="lfa_allowance" nolabel="1"/>
+                                <span>/ month</span>
+                            </div>
+                            <label for="salary_bonus_allowance"/>
+                            <div class="o_row">
+                                <field name="salary_bonus_allowance" nolabel="1"/>
+                                <span>/ month</span>
+                            </div>
+                            <label for="other_allowance"/>
+                            <div class="o_row">
+                                <field name="other_allowance" nolabel="1"/>
+                                <span>/ month</span>
+                            </div>                            
+                            <label for="total_allowance"/>
+                            <div class="o_row" style="font-weight:bold;font-size:14px;">
+                                <field name="total_allowance" nolabel="1" widget="monetary"/>
+                                <span>/ month</span>
+                            </div>
+                        </group>  
+                        <group string="Other/Extra Allowance (Daily)" name='extra_settings' invisible="wage_type != 'monthly'">
+	                    	<label for="daily_allowance" string="Daily Allowance"/>
+                            <div class="o_row">
+                                <field name="daily_allowance" nolabel="1"/>
+                                <span>/ day</span>
+                            </div>
+
+	                    	<label for="ot_day_count" string="OT Day Count" name='ot_day_count'/>
+                            <div class="o_row">
+                                <field name="ot_day_count" nolabel="1"/>
+                            </div>
+                            <label for="ot_daily_salary" string="OT Daily Salary" name='ot_daily_salary'/>
+                            <div class="o_row">
+                                <field name="ot_daily_salary" nolabel="1" widget="monetary"/>
+                                <span>/ day</span>
+                            </div>
+                            <label for="ot_daily_allowance" string="OT Daily Allowance" name='ot_daily_allowance'/>
+                            <div class="o_row">
+                                <field name="ot_daily_allowance" nolabel="1" widget="monetary"/>
+                                <span>/ day</span>
+                            </div>
+                            <label for="is_tiffin_alw_allowed"/>
+                            <div class="o_row">
+                                <field name="is_tiffin_alw_allowed" nolabel="1"/>
+                            </div>
+                            <label for="tiffin_alw_type"/>
+                            <div class="o_row">
+                                <field name="tiffin_alw_type" nolabel="1"/>
+                            </div>
+                            <label for="tiffin_allowance" string="Tiffin Allowance" name='tiffin_allowance'/>
+                            <div class="o_row">
+                                <field name="tiffin_allowance" nolabel="1" widget="monetary"/>
+                                <!--<span>/ day</span>-->
+                            </div>
+	                    </group>
+                   </group>
+                    
+                    <group>
+                    	<group string="Deduction" name='deductions' invisible="wage_type != 'monthly'">
+                            <label for="pf_deduction"/>
+                            <div class="o_row">
+                                <field name="pf_deduction" nolabel="1"/>
+                                <span>/ month</span>
+                            </div>
+                            <label for="tds_deduction"/>
+                            <div class="o_row">
+                                <field name="tds_deduction" nolabel="1"/>
+                                <span>/ month</span>
+                            </div>
+                            <label for="stamp_deduction"/>
+                            <div class="o_row" name="div_stamp_deduction">
+                                <field name="stamp_deduction" nolabel="1"/>
+                                <span>/ month</span>
+                            </div>
+                            <label for="total_deduction"/>
+                            <div class="o_row" style="font-weight:bold;font-size:14px;">
+                                <field name="total_deduction" nolabel="1" widget="monetary"/>
+                                <span>/ month</span>
+                            </div>
+                            <!--<label for="company_pf_contribution" name="div_company_pf_contribution"/>
+                            <div class="o_row">
+                                <field name="company_pf_contribution" nolabel="1"/>
+                                <span>/ month</span>
+                            </div>
+                             <label for="profit"/>
+                            <div class="o_row" name="div_profit">
+                                <field name="profit" nolabel="1"/>
+                                <span>/ month</span>
+                            </div>-->
+                        </group>
+                        <group string="Other/Extra Allowance (Monthly)" name='other_allowances' invisible="wage_type != 'monthly'">
+                            <label for="special_house_rent"/>
+                            <div class="o_row">
+                                <field name="special_house_rent" nolabel="1"/>
+                                <span>/ month</span>
+                            </div>
+                            <label for="special_incentive"/>
+                            <div class="o_row">
+                                <field name="special_incentive" nolabel="1"/>
+                                <span>/ month</span>
+                            </div>
+                            <label for="profit_sharing"/>
+                            <div class="o_row">
+
+                                <field name="profit_sharing" nolabel="1"/>
+                                <span>/ month</span>
+                            </div>
+                            <label for="festival_bonus"/>
+                            <div class="o_row">
+                                <field name="festival_bonus" nolabel="1"/>
+                                <span>/ month</span>
+                            </div>
+                            <label for="special_bonus"/>
+                            <div class="o_row">
+                                <field name="special_bonus" nolabel="1"/>
+                                <span>/ month</span>
+                            </div>
+                            <label for="is_att_bonus_allowed" string="Is Att. Bonus Allowed?"/>
+                            <div class="o_row">
+                                <field name="is_att_bonus_allowed" nolabel="1"/>
+                            </div>
+                            <label for="att_bonus_rate" string="Att. Bonus Rate" name='att_bonus_rate'/>
+                            <div class="o_row">
+                                <field name="att_bonus_rate" nolabel="1" widget="monetary"/>
+                            </div>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Summary" name='net_salary' invisible="wage_type != 'monthly'">
+	                    	<label for="net_salary" string="Net Salary" name='net_salary' invisible="wage_type != 'monthly'"/>
+                            <div class="o_row" style="font-weight:bold;font-size:14px;">
+                                <field name="net_salary" nolabel="1" widget="monetary"/>
+                                <span>/ month</span>
+                            </div>
+	                    </group>	                        
+                        <group string="Payment Information" name='disbursement' invisible="wage_type != 'monthly'">
+                            <label for="disbursement_type"/>
+                            <div class="o_row">
+                                <field name="disbursement_type" required="1" nolabel="1"/>
+                            </div>
+                            <label for="s_bank_name" invisible="disbursement_type == 'cash'"/>
+                            <div class="o_row">
+                                <field name="s_bank_name" invisible="disbursement_type == 'cash'" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            </div>
+
+                            <label for="s_bank_account_no" invisible="disbursement_type == 'cash'"/>
+                            <div class="o_row">
+                                <field name="s_bank_account_no" invisible="disbursement_type == 'cash'" />
+                            </div>
+
+                            <label for="bank_account_id" invisible="disbursement_type == 'cash'"/>
+                            <div class="o_row">
+                                <field name="bank_account_id" invisible="disbursement_type == 'cash'"  options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            </div>
+                            <label for="cash_account_id" invisible="disbursement_type == 'bank'"/>
+                            <div class="o_row">
+                                <field name="cash_account_id" invisible="disbursement_type == 'bank'" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            </div>
+                        </group>	                    
+                    </group>
+                </page>
+            </xpath>
+<!--            <xpath expr="//label[@for='wage']" position="before">
+                <field name="wage_type"/>
+            </xpath>-->
+        </field>
+    </record>
+
+    <record id="action_hr_contract_repository" model="ir.actions.act_window">
+        <field name="name">Contracts</field>
+        <field name="res_model">hr.contract</field>
+        <field name="view_mode">tree,kanban,form,activity</field>
+        <field name="domain">[('employee_id', '!=', False)]</field>
+        <field name="context">{'search_default_running': 1, 'search_default_to_renew': 1}</field>
+        <field name="search_view_id" ref="hr_contract.hr_contract_view_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+            Create a new contract
+            </p>
+        </field>
+    </record>
+</odoo>

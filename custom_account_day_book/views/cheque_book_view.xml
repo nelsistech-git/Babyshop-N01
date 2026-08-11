@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="cheque_report_form_view" model="ir.ui.view">
+         <field name="name">report.configuration.tree</field>
+         <field name="model">report.configuration</field>
+         <field name="arch" type="xml">
+             <tree string="Cheque" editable="bottom">
+                 <field name="branch_name"/>
+                 <field name="account_no"/>
+                 <field name="company_name"/>
+             </tree>
+         </field>
+    </record>
+
+
+    <record id="cheque_report_view" model="ir.actions.act_window">
+        <field name="name">Cheque Report</field>
+        <field name="res_model">report.configuration</field>
+        <field name="view_mode">tree</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Please Create Report Settings Information
+            </p>
+        </field>
+    </record>
+		
+    <!-- Reporting menu -->
+
+
+<!--    <report-->
+<!--        id="cheque_report"-->
+<!--        string="Cheque report"-->
+<!--        model="report.configuration"-->
+<!--        report_type="qweb-pdf"-->
+<!--        name="custom_account_day_book.cheque_reports"-->
+<!--        file="custom_account_day_book.cheque_reports"-->
+<!--        menu="False"-->
+<!--        />-->
+    <record id="cheque_report" model="ir.actions.report">
+        <field name="name">Cheque report</field>
+        <field name="model">budget.particular.report.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">custom_account_day_book.cheque_reports</field>
+        <field name="report_file">custom_account_day_book.cheque_reports</field>
+    </record>
+
+    <record id="action_cheque_report" model="ir.actions.server">
+        <field name="name">Cheque Report</field>
+        <field name="type">ir.actions.server</field>
+        <field name="model_id" ref="model_report_configuration"/>
+        <field name="state">code</field>
+        <field name="code">
+        action = model.print_report()
+        </field>
+   </record>
+
+    <menuitem id="menu_account_cash_flow"
+      name="Cheque Print"
+      sequence="1"
+      action="action_cheque_report"
+      parent="base_accounting_kit.account_reports_generic_statements" />
+
+     <menuitem id="menu_account_cheque_report" name="Cheque Print Settings" action="cheque_report_view" sequence="2"
+                  parent="account.account_invoicing_menu"/>
+
+
+</odoo>

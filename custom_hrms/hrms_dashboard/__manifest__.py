@@ -1,0 +1,38 @@
+{
+    'name': "Open HRMS HR Dashboard",
+    'version': '17.0.1.0.2',
+    'summary': """Open HRMS - HR Dashboard""",
+    'description': """Open HRMS - HR Dashboard""",
+    'category': 'Generic Modules/Human Resources',
+    'author': 'Nelsis Tech Limited',
+    'company': 'Nelsis Tech Limited',
+    'maintainer': 'Nelsis Tech Limited',
+    'website': "https://www.nelsistech.com",
+    'depends': ['hr', 'hr_holidays', 'hr_timesheet', 'hr_payroll',
+                'hr_attendance', 'hr_timesheet_attendance',
+                'hr_recruitment', 'hr_resignation', 'event',
+                'hr_reward_warning','custom_hr_employee'],
+    'external_dependencies': {
+        'python': ['pandas'],
+    },
+    'data': [
+        'security/ir.model.access.csv',
+        'report/broadfactor.xml',
+        'views/hr_leave_views.xml',
+        'views/hrms_dashboard_menus.xml',
+    ],
+    'assets': {
+        'web.assets_backend': [
+            'hrms_dashboard/static/src/css/hrms_dashboard.css',
+            'hrms_dashboard/static/src/css/lib/nv.d3.css',
+            'hrms_dashboard/static/src/js/hrms_dashboard.js',
+            'hrms_dashboard/static/src/js/lib/d3.min.js',
+            'hrms_dashboard/static/src/xml/hrms_dashboard.xml',
+            'https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js',
+        ],
+    },
+    'images': ["static/description/banner.jpg"],
+    'license': 'LGPL-3',
+    'installable': True,
+    'application': True,
+}

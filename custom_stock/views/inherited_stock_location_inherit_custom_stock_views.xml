@@ -1,0 +1,267 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<odoo>
+    <data>
+        <record id="inherited_stock_location_inh_custom_stock_view_form" model="ir.ui.view">
+            <field name="name">inherited.stock.location.inh.custom.stock.view.form</field>
+            <field name="model">stock.location</field>
+            <field name="inherit_id" ref="stock.view_location_form"/>
+            <field name="priority">20</field>
+<!--            <field name="mode">primary</field>-->
+            <field name="arch" type="xml">
+                <xpath expr="//form/sheet" position="before">
+                    <header>
+                        <button name="action_confirm" type="object" string="Confirm " invisible="state != 'draft'" class="oe_highlight" confirm="Are you sure you want to confirm?" groups="stock.group_stock_manager" />
+                        <button name="action_done" type="object" string="Done" invisible="state != 'confirm'"  class="oe_highlight" confirm="Are you sure you want to done?" groups="stock.group_stock_manager" />
+                        <button name="action_cancel" type="object" string="Cancel" invisible="state not in ('confirm','done')" confirm="Are you sure you want to cancel?" groups="stock.group_stock_manager" />
+                        <button name="action_draft" type="object" string="Send To Draft" invisible="state not in ('confirm','cancel')" class="oe_highlight" groups="stock.group_stock_manager" />
+                        <field name="state" widget="statusbar"/>
+                    </header>
+                </xpath>
+
+                <xpath expr="//form/sheet/h1" position="after">
+                    <div>
+                        <field name="store_no" readonly="1" style="font-size:14px; font-weight:bold;"/>
+                    </div>
+                </xpath>
+
+                <xpath expr="//form/sheet/group[1]/group[@name='additional_info']/field[@name='scrap_location']" position="after">
+                    <field name="is_loss_loc"/>
+                    <field name="is_qc_loc"/>
+                </xpath>
+                <xpath expr="//form/sheet/group[1]/group[@name='additional_info']/field[@name='return_location']" position="after">
+                    <field name="is_work_loc"/>
+                    <field name="is_work_loc_default"/>
+                    <field name="store_type_rpt"/>
+                </xpath>
+
+                <xpath expr="//form/sheet/group[1]" position="before">
+                    <group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company" options="{'no_open':True,'no_create':1,'no_create_edit':1}"
+                                   readonly="state not in 'draft'"/>
+                            <field name="type"/>
+                            <field name="store_address" string="Address" />
+                            <field name="mobile" widget="phone"/>
+                            <field name="phone" widget="phone"/>
+                            <field name="email" widget="email"/>
+                            <field name="vat_reg" string="VAT Reg. No."/>
+                            <field name="bin_no"/>
+                            <field name="tin_no"/>
+                            <field name="login_lock"/>
+                        </group>
+                        <group>
+                            <field name="division_id" options="{'no_open':True,'no_create':1,'no_create_edit':1}"
+                                   readonly="state not in 'draft'"/>
+                            <field name="district_id" options="{'no_open':True,'no_create':1,'no_create_edit':1}"
+                                   readonly="state not in 'draft'" domain="[('division_id', '=', division_id)]" />
+                            <field name="store_zone_id" options="{'no_open':True,'no_create':1,'no_create_edit':1}" readonly="state not in 'draft'"/>
+                            <field name="area_manager_id" options="{'no_open':True,'no_create':1,'no_create_edit':1}"/>
+                            <field name="store_manager_id" string="Location Manager" options="{'no_open':True,'no_create':1,'no_create_edit':1}"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Display Capacity">
+                            <field name="store_shelf" readonly="state not in 'draft'" />
+                            <field name="store_hanging" readonly="state not in 'draft'" />
+                            <field name="display_area" readonly="state not in 'draft'" />
+                        </group>
+
+                        <group string="Internal Go-Down">
+                            <field name="store_area" readonly="state not in 'draft'" />
+                            <field name="shop_capacity" readonly="state not in 'draft'" />
+                        </group>
+
+                        <separator string="Location Agreement Details" colspan="12"></separator>
+
+                        <group>
+                            <field name="agreement_signup_date" readonly="state not in 'draft'" />
+                            <field name="agreement_expire_date" readonly="state not in 'draft'" />
+                            <field name="shop_type_id" options="{'no_open':True,'no_create':1,'no_create_edit':1}" readonly="state not in 'draft'" />
+                            <field name='joint_venture_flag' invisible="1" />
+                            <field name='rented_flag' invisible="1" />
+                            <field name="commission" readonly="state not in 'draft'"  invisible="joint_venture_flag == False"/>
+                            <field name="rent" invisible="rented_flag == False" readonly="state not in 'draft'"/>
+                            <field name="increment_rate" invisible="rented_flag == False" readonly="state not in 'draft'" />
+                            <field name="renew_month" invisible="rented_flag == False" readonly="state not in 'draft'" />
+                            <field name="last_renew_date" invisible="rented_flag == False" readonly="state not in 'draft'" />
+                            <field name="before_notification_day" invisible="rented_flag == False" readonly="state not in 'draft'" />
+                        </group>
+
+<!--                        <group colspan="12">-->
+<!--                            <separator string="Land Owner Details" colspan="12"></separator>-->
+<!--                            <field name="land_owner_ids" nolabel="1" readonly="state not in 'draft'">-->
+<!--                                <tree string="Land Owner Details" editable="bottom">-->
+<!--                                    <field name="name" />-->
+<!--                                    <field name="phone" />-->
+<!--                                    <field name="email" />-->
+<!--                                    <field name="land_owner_address" />-->
+<!--                                </tree>-->
+<!--                            </field>-->
+<!--                        </group>-->
+
+                        <group string="Inter Company Settings" >
+                            <field name="inter_company_id" string="Inter Company" options="{'no_open':True,'no_create':1,'no_create_edit':1}" />
+                            <field name="is_inter_company_journal" />
+                            <field name='inter_comp_tr_acc_id' options="{'no_open':True,'no_create':1,'no_create_edit':1}" />
+                            <field name='inter_comp_tr_pay_acc_id' options="{'no_open':True,'no_create':1,'no_create_edit':1}" />
+                        </group>
+                        <group string="Inter Transfer Accounting" >
+                            <field name="is_transfer_journal" />
+                            <field name="transfer_st_acc_id" options="{'no_open':True,'no_create':1,'no_create_edit':1}"/>
+                        </group>
+
+                    </group>
+                    <notebook colspan="4">
+                        <page string="Salesman Information" name="Salesman Information" autofocus="autofocus">
+                            <br/>
+                            <group>
+                                <field name="shop_user_ids" options="{'no_open':True,'no_create':1,'no_create_edit':0}">
+                                    <tree create="false" delete="false" edit="true" editable="bottom">
+                                        <field name="name"/>
+                                        <field name="login" string="E-mail"/>
+                                        <!-- <field name="sales_man_serial" string="Serial No."/> -->
+                                    </tree>
+                                </field>
+                            </group>
+                        </page>
+                        <page string="External Go-down" name="External Go-down">
+                            <br/>
+                            <field name="godown_ids" options="{'no_open':True,'no_create':1,'no_create_edit':1}" />
+                        </page>
+                        <page string="CCTV Link" name="CCTV Link">
+                            <label for="cctv_link" string="CCTV Link"></label>
+                            <br />
+                            <field name="cctv_link" widget="url" />
+                        </page>
+                        <page string="Attachments" name="Attachments" groups="stock.group_stock_manager">
+                            <label for="attachement_file_ids" string="Attachement"></label>
+                            <br />
+                            <br />
+                            <field name="attachement_file_ids" widget="many2many_binary" />
+                        </page>
+                        <page string="Accounts" name="other_settings" groups="stock.group_stock_manager">
+                            <group string="Particular Accounts">
+                                <group>
+                                    <field name="payment_journal_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                    <field name="payment_account_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                    <field name="receive_journal_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                    <field name="receive_account_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                    <field name="loan_account_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                    <field name="tailor_expense_account_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                    <field name="tailor_income_account_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                </group>
+                                <group>
+                                    <field name="mo_debit_account_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                    <field name="mo_credit_account_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                    <field name="mfg_wip_account_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                    <separator/>
+                                    <field name="other_cost_debit_account_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                    <field name="other_cost_credit_account_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </xpath>
+            </field>
+		</record>
+
+        <record id="inherited_stock_location_inh_custom_stock_view_tree" model="ir.ui.view">
+            <field name="name">inherited.stock.location.inh.custom.stock.view.tree</field>
+            <field name="model">stock.location</field>
+            <field name="inherit_id" ref="stock.view_location_tree2"/>
+<!--            <field name="mode">primary</field>-->
+            <field name="arch" type="xml">
+                <xpath expr="//tree/field[@name='complete_name']" position="after">
+                    <field name="type"/>
+                </xpath>
+                <xpath expr="//tree/field[@name='usage']" position="after">
+                    <field name="store_no"/>
+                    <field name="store_zone_id"/>
+                    <field name="area_manager_id"/>
+                    <field name="store_manager_id" string="Location Manager"/>
+                    <field name="mobile"/>
+                    <field name="phone"/>
+                    <field name="email"/>
+                    <field name="state"/>
+                    <field name="login_lock"/>
+                    <field name="inter_company_id"/>
+                </xpath>
+            </field>
+		</record>
+
+        <record id="inherited_stock_location_inh_custom_stock_search" model="ir.ui.view">
+            <field name="name">inherited.stock.location.inh.custom.stock.search</field>
+            <field name="model">stock.location</field>
+            <field name="inherit_id" ref="stock.view_location_search"/>
+<!--            <field name="mode">primary</field>-->
+            <field name="arch" type="xml">
+                <xpath expr="//search/field[@name='complete_name']" position="after">
+                    <field name="type"/>
+                    <field name="store_no"/>
+                    <field name="store_zone_id"/>
+                    <field name="district_id"/>
+                    <field name="division_id"/>
+                    <field name="store_manager_id" string="Location Manager"/>
+                    <field name="mobile"/>
+                    <field name="phone"/>
+                    <field name="email"/>
+                    <field name="area_manager_id"/>
+                    <field name="state"/>
+                    <field name="company_id"/>
+                    <field name="inter_company_id"/>
+                </xpath>
+                <xpath expr="//search/filter[@name='inactive']" position="before">
+                    <filter name="draft" string="Draft" domain="[('state','=','draft')]" />
+                    <filter name="confirm" string="Confirmed" domain="[('state','=','confirm')]" />
+                    <filter name="done" string="Done" domain="[('state','=','done')]" />
+                    <filter name="cancel" string="Cancelled" domain="[('state','=','cancel')]" />
+                    <separator />
+                    <filter name="login_lock" string="Login Lock" domain="[('login_lock','=',True)]" />
+                </xpath>
+            </field>
+		</record>
+
+<!--        <record id="inherited_stock_location_inh_custom_stock_view_access" model="ir.ui.view">-->
+<!--            <field name="name">inherited.stock.location.inh.custom.stock.view.access</field>-->
+<!--            <field name="model">stock.location</field>-->
+<!--            <field name="inherit_id" ref="custom_stock.inherited_stock_location_inh_custom_stock_view_form"/>-->
+<!--			<field name="groups_id" eval="[(6, 0, [ref('stock.group_stock_manager')])]" />-->
+<!--			<field name="arch" type="xml">-->
+<!--				<xpath expr="//field[@name='store_manager_id']" position="attributes">-->
+<!--					<attribute name="attrs">{'readonly':[('state','in',['cancel'])]}</attribute>-->
+<!--				</xpath>-->
+
+<!--				<xpath expr="//field[@name='area_manager_id']" position="attributes">-->
+<!--					<attribute name="attrs">{'readonly':[('state','in',['cancel'])]}</attribute>-->
+<!--				</xpath>-->
+<!--			</field>-->
+<!--		</record>-->
+
+        <record id="inherited_stock_location_inh_custom_stock_action" model="ir.actions.act_window">
+            <field name="name">Store Location</field>
+			<field name="res_model">stock.location</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="view_mode">tree,form</field>
+			<field name="view_id" ref="custom_stock.inherited_stock_location_inh_custom_stock_view_form" />
+			<field name="context">{'search_default_state': 'done','default_usage':'internal','default_is_work_loc':True}</field>
+<!--			<field name="domain">[('is_work_loc','=',True)]</field>-->
+			<field name="domain">[('usage', '=', 'internal')]</field>
+			<field name="search_view_id" ref="custom_stock.inherited_stock_location_inh_custom_stock_search" />
+			<field name="help" type="html">
+				<p class="o_view_nocontent_smiling_face">Create Stock Locations</p>
+			</field>
+		</record>
+
+        <record id="inherited_stock_location_inh_custom_stock_action_tree" model="ir.actions.act_window.view">
+			<field name="sequence" eval="1" />
+			<field name="view_mode">tree</field>
+			<field name="view_id" ref="inherited_stock_location_inh_custom_stock_view_tree"/>
+			<field name="act_window_id" ref="inherited_stock_location_inh_custom_stock_action"/>
+		</record>
+
+        <menuitem id="inherited_stock_location_menu" name="Store Location"
+                  parent="stock.menu_stock_warehouse_mgmt"
+                  groups="stock.group_stock_manager"
+                  action="inherited_stock_location_inh_custom_stock_action" sequence="6"/>
+    </data>
+</odoo>

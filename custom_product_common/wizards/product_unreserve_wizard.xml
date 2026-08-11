@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_product_unreserve_wizard_form" model="ir.ui.view">
+        <field name="name">view.product.unreserve.wizard.form</field>
+        <field name="model">product.unreserve.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Product Unreserve">
+                <group>
+                    <group>
+                        <field required="1" name="type" widget='radio'/>
+                        <field required="1" name="location_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" />
+                        <field required="1" name="product_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                        <field required="1" name="qty_available" readonly="1" force_save="1"/>
+                        <field required="1" name="qty_reserve" readonly="1" force_save="1"/>
+                        <field required="1" name="quant_id" invisible="1"/>
+                        <field name="qty_unreserve" attrs="{'invisible': [('type', '=', '02')],'required': [('type', '=', '01')]}"/>
+                        <field name="fixed_reserve" attrs="{'invisible': [('type', '=', '01')],'required': [('type', '=', '02')]}"/>
+                    </group>
+                </group>
+                <footer>
+                    <button attrs="{'invisible': [('type', '=', '02')]}" name="action_done" confirm="Are you sure?" string='Unreserve' type="object" class="btn-primary"/>
+                    <button attrs="{'invisible': [('type', '=', '01')]}" name="action_done" confirm="Are you sure?" string='Set fix Reserve' type="object" class="btn-primary"/>
+                    or
+<!--                    <button name="action_done_reserve" confirm="Are you sure?" string="Reserve" type="object" class="btn-primary"/>-->
+<!--                    or-->
+                    <button string="Close" special="cancel" class="oe_link" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Product detail_view Wizard Action -->
+    <record id="action_product_unreserve_view_wizard" model="ir.actions.act_window">
+        <field name="name">Product Unreserve View</field>
+        <field name="res_model">product.unreserve.wizard</field>
+        <field name="view_mode">form</field>
+<!--        <field name="view_id" ref="custom_product_common.view_product_unreserve_wizard_form"/>-->
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_product_unreserve_view_wizard"
+              name="Product Unreserve"
+              sequence="210"
+              action="action_product_unreserve_view_wizard"
+              parent="stock.menu_stock_warehouse_mgmt"/>
+</odoo>

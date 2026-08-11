@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+	<record id="view_employee_loan_type_form" model="ir.ui.view">
+		<field name="name">view.employee.loan.type.form</field>
+		<field name="model">employee.loan.type</field>
+		<field name="arch" type="xml">
+			<form string="Employee Loan Type">
+				<sheet>
+                    <group string="Loan:">
+                        <group>
+                            <field name="name"/>
+                            <field name="type" required="1"/>
+                            <field name="pf_policy_id" domain="[('type','in',['loan', 'loan_settlement'])]" required="type == 'pf_loan'" invisible="type != 'pf_loan'" options="{'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                            <field name="minimum_loan_amount"/>
+                            <field name="loan_limit"/>
+                            <field name="loan_term"/>
+                            <field name="minimum_installment_amount"/>
+                            <field name="is_apply_top_up"/>
+                            <field name="top_up_paid_chk_amt"/>
+                            <field name="top_up_paid_chk_month"/>
+                            <field name="is_default"/>
+                        </group>
+                        <group>
+                            <field name="journal_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                    		<field name="loan_account" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                    		<field name="loan_payment_account" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" />
+                    		<field name="loan_payment_account_rcv" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" />
+                    		<field name="debit_process_fee_account" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" />
+                        </group>
+                    </group>
+                    <group string="Interest:">
+                    	<group>
+                            <field name="is_apply_interest"/>
+                            <field name="interest_rate" invisible="is_apply_interest != True"/>
+                            <field name="interest_type" invisible="is_apply_interest != True"/>
+                    	</group>
+                    	<group>
+                    		<field name="interest_account" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" invisible="is_apply_interest != True" required="is_apply_interest == True" />
+                    	</group>
+                    </group>
+				</sheet>
+			</form>
+		</field>
+	</record>
+    <record id="view_employee_loan_type_tree" model="ir.ui.view">
+        <field name="name">view.employee.loan.type.tree</field>
+        <field name="model">employee.loan.type</field>
+        <field name="arch" type="xml">
+            <tree string="Employee Loan Type">
+                <field name="name"/>
+                <field name="loan_limit"/>
+                <field name="loan_term"/>
+                <field name="interest_rate"/>
+                <field name="interest_type"/>
+            </tree>
+        </field>
+    </record>
+    
+    <record id="action_setting" model="ir.actions.act_window">
+            <field name="name">Loan Type</field>
+            <field name="res_model">employee.loan.type</field>
+            <field name="type">ir.actions.act_window</field>
+            <!-- <field name="view_type">form</field> -->
+            <field name="view_mode">tree,form</field>
+            <field name="domain"></field>
+            <field name="context">{ 
+                    'search_default_id': [active_id],
+                    'default_id': active_id,
+             }
+            </field>
+            <field name="search_view_id" ref="view_employee_loan_type_form"/>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click here to create a new Loan.
+              </p>
+            </field>
+        </record>
+    
+    <record model="ir.actions.act_window" id="action_employee_loan_type">
+        <field name="name">Employee Loan Type</field>
+        <field name="res_model">employee.loan.type</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    
+    <menuitem name="Loan Type" id="menu_employee_loan_type" parent="menu_main_employee_loan_config"
+              action="action_employee_loan_type"
+              groups="hr.group_hr_user" sequence="1"/>
+
+</odoo>

@@ -1,0 +1,627 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="ssp_review_mail_template" model="mail.template">
+        <field name="name">Management Review Mail Template</field>
+        <field name="model_id" ref="management_review.model_ssp_review"/>
+        <field name="subject">${&apos;%s:- %s&apos; % (object.company_id.name, object.name)}</field>
+        <field name="email_from">${(&apos;%s&apos; % (object.company_id.partner_id.email_formatted or
+            user.email_formatted))|safe}</field>
+        <field name="partner_to"></field>
+        <field name="body_html" type="html">
+            <table style="width: 100%; border-spacing: 0; font-family: Helvetica,Arial,Verdana,sans-serif;">
+                <tr>
+                    <td align="center" valign="top" style="border-collapse: collapse; padding: 0">
+                        <t t-set="user" t-value="ctx.get(&apos;user&apos;, user)"/>
+                        <t t-set="company" t-value="object.company_id"/>
+                        <t t-set="domain_info" t-value="object.get_domain_info()"/>
+                        <t t-set="graph_data" t-value="object.get_graph_data(company)"/>
+                        <t t-set="sales_data" t-value="object.compute_sales_data(company)"/>
+                        <t t-set="purchase_data" t-value="object.compute_purchase_data(company)"/>
+                        <t t-set="account_data" t-value="object.compute_account_data(company)"/>
+                        <t t-set="current_balance_data" t-value="object.compute_balance_data(company)"/><!-- Header -->
+                        <table style="width: 100%; max-width: 600px; border-spacing: 0; border: 1px solid #e7e7e7; border-bottom: none; color: #6e7172; line-height: 23px; text-align: left;">
+                            <tr>
+                                <td style="border-collapse: collapse; padding: 10px 20px; text-align: left;">
+                                    <strong style="color: #000000; font-size: 22px; line-height: 32px;">
+                                        <t t-esc="object.name"/>
+                                    </strong>
+                                    <div style="color: #000000; font-size: 15px;">
+                                        <t t-esc="domain_info.get(&apos;date&apos;)"/>
+                                    </div>
+                                    <div style="color: #000000; font-size: 20px;">
+                                        <span style="color: #5b7e82;font-weight:bold;">Latest Asset
+                                            Update:- <t t-esc="graph_data.get(&apos;value&apos;)"/> BDT</span>
+                                        <span>
+                                            <img t-attf-src="{{domain_info.get(&apos;base_url&apos;)}}/management_review/static/src/img/{{graph_data.get(&apos;img&apos;)}}" style="display: inline-block; height: 35px; margin-left: 12px; margin-right: 12px;border-radius: 50%;padding-bottom:8px;"/>
+                                        </span>
+                                    </div>
+                                </td>
+                                <td style="text-align: right; padding: 10px 20px">
+                                    <img style="padding: 0px; margin: 0px; height: auto; width:
+                                    80px;" t-attf-src="{{domain_info.get(&apos;base_url&apos;)}}/logo.png?company={{company.id}}"/>
+                                    <div style="padding-top: 5px;">
+                                        <a t-attf-href="/web#menu_id={{domain_info.get(&apos;menu&apos;)}}" style="background-color: #875A7B; margin-left: 5px; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;">
+                                            Connect</a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" style="text-align: center;">
+                                    <hr width="95%" style="background-color: rgb(204,204,204); border: medium none; clear: both; display: block; font-size: 0px; min-height: 1px; line-height: 0; margin: 16px 0px 16px 14px;"/>
+                                </td>
+                            </tr>
+                        </table><!-- Sales -->
+                        <table style="border-spacing: 0; width: 100%; max-width: 600px;">
+                            <tr>
+                                <td style="border-collapse: collapse; background-color: #ffffff; border-left: 1px solid #e7e7e7; border-right: 1px solid #e7e7e7; line-height: 21px; padding: 0 20px 10px 20px; text-align: center; font-size: xx-large;">
+                                    <br/>
+                                    <span style="font-size:20px;line-height:12px;align-items:center;">
+                                        <img t-attf-src="{{domain_info.get(&apos;base_url&apos;)}}/sale_management/static/description/icon.png" style="display: inline-block; height: 25px; margin-left: auto; margin-right: 12px;border-radius: 50%;"/>
+                                        <span class="margin-top:-5px">Collection
+                                                Review</span>
+                                    </span>
+                                </td><!-- <td style="border-collapse: collapse; background-color:
+                                #ffffff; border-left: 1px solid #e7e7e7; border-right: 1px solid
+                                #e7e7e7; line-height: 21px; padding: 0 20px 10px 20px; text-align:
+                                left;"><br/>
+                        <span style="color: #3d466e; font-size: 18px; font-weight: 500; line-height: 23px;">Sales
+                                Review</span>
+                        <span style="float: right;">
+                            <img t-attf-t-attf-t-attf-t-attf-src="sale_management/static/description/icon.png" style="display:
+                                inline-block; height: 30px; margin-left: auto; margin-right:
+                                12px;"/>
+                        </span>
+                    </td> -->
+                            </tr>
+                            <tr>
+                                <td style="border-collapse: collapse; margin: 0; padding:0;">
+                                    <table style="width: 100%; border-spacing: 0; background-color: #f9f9f9; border: 1px solid #e7e7e7; border-top: none;">
+                                        <tr>
+                                            <td style="border-collapse: collapse; margin: 0; display: block; border-top: 2px solid #56b3b5;">
+                                                <table style="width: 100%; border-spacing: 0;">
+                                                    <tr>
+                                                        <td style="width: 60%; padding-left: 20px; border-collapse: collapse; text-align: left;">
+                                                            <span style="color: #56b3b5; font-size: 15px; font-weight: bold; text-decoration: none; line-height: 36px;">Total
+                                                                Invoiced Amount</span>
+                                                        </td>
+                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                            <span style="color: #875a7b; font-size: 15px; font-weight: bold; text-decoration: none; line-height: 36px;">
+                                                                <t t-esc="sales_data.get(&apos;total_invoice_amount&apos;)"/>
+                                                                ৳</span>
+                                                        </td>
+                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                            <div>
+                                                                <a t-attf-href="/ssp-review/{{object.company_id.id}}/total-invoiced-amount/{{domain_info.get(&apos;start_date&apos;)}}/{{domain_info.get(&apos;end_date&apos;)}}" style="background-color: #5b7e82; margin-left: 5px; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff !important; border-radius: 5px; font-size:13px;">
+                                                                    REPORT</a>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="border-collapse: collapse; margin: 0; border-top: 2px solid #56b3b5;">
+                                                <table style="width: 100%; border-spacing: 0;">
+                                                    <tr>
+                                                        <td style="width: 60%; border-collapse: collapse; padding-left: 20px; text-align: left;">
+                                                            <span style="color: #56b3b5; font-size: 15px; font-weight: bold; text-decoration: none; line-height: 36px;">Total
+                                                                Invoice Received Amount</span>
+                                                        </td>
+                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                            <span style="color: #875a7b; font-size: 15px; font-weight: bold; text-decoration: none; line-height: 36px;">
+                                                                <t t-esc="sales_data.get(&apos;total_invoice_received_amount&apos;)"/>
+                                                                ৳</span>
+                                                        </td>
+                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                            <div>
+                                                                <a t-attf-href="/ssp-review/{{object.company_id.id}}/total-invoice-received-amount/{{domain_info.get(&apos;start_date&apos;)}}/{{domain_info.get(&apos;end_date&apos;)}}" style="background-color: #5b7e82; margin-left: 5px; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff !important; border-radius: 5px; font-size:13px;">
+                                                                    REPORT</a>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="border-collapse: collapse; margin: 0; border-top: 2px solid #56b3b5;">
+                                                <table style="width: 100%; border-spacing: 0;">
+                                                    <tr>
+                                                        <td style="width: 60%; border-collapse: collapse; padding-left: 20px; text-align: left;">
+                                                            <span style="color: #56b3b5; font-size: 15px; font-weight: bold; text-decoration: none; line-height: 36px;">Total
+                                                                Invoice Due Amount</span>
+                                                        </td>
+                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                            <span style="color: #875a7b; font-size: 15px; font-weight: bold; text-decoration: none; line-height: 36px;">
+                                                                <t t-esc="sales_data.get(&apos;total_invoice_due_amount&apos;)"/>
+                                                                ৳</span>
+                                                        </td>
+                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                            <div>
+                                                                <a t-attf-href="/ssp-review/{{object.company_id.id}}/total-invoice-due-amount/{{domain_info.get(&apos;start_date&apos;)}}/{{domain_info.get(&apos;end_date&apos;)}}" style="background-color: #5b7e82; margin-left: 5px; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff !important; border-radius: 5px; font-size:13px;">
+                                                                    REPORT</a>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="border-collapse: collapse; margin: 0; border-top: 2px solid #56b3b5;">
+                                                <table style="width: 100%; border-spacing: 0;">
+                                                    <tr>
+                                                        <td style="width: 60%; border-collapse: collapse; padding-left: 20px; text-align: left;">
+                                                            <span style="color: #56b3b5; font-size: 15px; font-weight: bold; text-decoration: none; line-height: 36px;">Total
+                                                                Due Collection Amount</span>
+                                                        </td>
+                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                            <span style="color: #875a7b; font-size: 15px; font-weight: bold; text-decoration: none; line-height: 36px;">
+                                                                <t t-esc="sales_data.get(&apos;total_due_collection_amount&apos;)"/>
+                                                                ৳</span>
+                                                        </td>
+                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                            <div>
+                                                                <a t-attf-href="/ssp-review/{{object.company_id.id}}/total-due-collection-amount/{{domain_info.get(&apos;start_date&apos;)}}/{{domain_info.get(&apos;end_date&apos;)}}" style="background-color: #5b7e82; margin-left: 5px; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff !important; border-radius: 5px; font-size:13px;">
+                                                                    REPORT</a>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="border-collapse: collapse; margin: 0; border-top: 2px solid #56b3b5;">
+                                                <table style="width: 100%; border-spacing: 0;">
+                                                    <tr>
+                                                        <td style="width: 60%; border-collapse: collapse; padding-left: 20px; text-align: left;">
+                                                            <span style="color: #56b3b5; font-size: 15px; font-weight: bold; text-decoration: none; line-height: 36px;">Total
+                                                                Received Amount</span>
+                                                        </td>
+                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                            <span style="color: #875a7b; font-size: 15px; font-weight: bold; text-decoration: none; line-height: 36px;">
+                                                                <t t-esc="sales_data.get(&apos;total_received_payment_amount&apos;)"/>
+                                                                ৳</span>
+                                                        </td>
+                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                            <div>
+                                                                <a t-attf-href="/ssp-review/{{object.company_id.id}}/total-received-amount/{{domain_info.get(&apos;start_date&apos;)}}/{{domain_info.get(&apos;end_date&apos;)}}" style="background-color: #5b7e82; margin-left: 5px; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff !important; border-radius: 5px; font-size:13px;">
+                                                                    REPORT</a>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="border-collapse: collapse; margin: 0; border-top: 2px solid #56b3b5;">
+                                                <table style="width: 100%; border-spacing: 0;">
+                                                    <tr>
+                                                        <td style="width: 60%; border-collapse: collapse; padding-left: 20px; text-align: left;">
+                                                            <span style="color: #56b3b5; font-size: 15px; font-weight: bold; text-decoration: none; line-height: 36px;">Total
+                                                                Invoice Refund Amount</span>
+                                                        </td>
+                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                            <span style="color: #875a7b; font-size: 15px; font-weight: bold; text-decoration: none; line-height: 36px;">
+                                                                <t t-esc="sales_data.get(&apos;total_invoice_refund_amount&apos;)"/>
+                                                                ৳</span>
+                                                        </td>
+                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                            <div>
+                                                                <a t-attf-href="/ssp-review/{{object.company_id.id}}/total-invoice-refund-amount/{{domain_info.get(&apos;start_date&apos;)}}/{{domain_info.get(&apos;end_date&apos;)}}" style="background-color: #5b7e82; margin-left: 5px; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff !important; border-radius: 5px; font-size:13px;">
+                                                                    REPORT</a>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table><!-- supply chain review -->
+                        <table style="border-spacing: 0; width: 100%; max-width: 600px;">
+                            <tr>
+                                <td style="border-collapse: collapse; background-color: #ffffff; border-left: 1px solid #e7e7e7; border-right: 1px solid #e7e7e7; line-height: 21px; padding: 0 20px 10px 20px; text-align: center; font-size: xx-large;">
+                                    <br/>
+                                    <span style="font-size:20px;line-height:12px;align-items:center;font-weight:600;">
+                                        <img t-attf-src="{{domain_info.get(&apos;base_url&apos;)}}/purchase/static/description/icon.png" style="display: inline-block; height: 25px; margin-left: auto; margin-right: 12px;border-radius: 50%;font-size:13px;line-height:12px"/>Supply
+                                        Chain Review </span>
+                                </td><!-- <td style="border-collapse: collapse; background-color:
+                                #ffffff; border-left: 1px solid #e7e7e7; border-right: 1px solid
+                                #e7e7e7; line-height: 21px; padding: 0 20px 10px 20px; text-align:
+                                left;"><br/>
+                        <span style="color: #3d466e; font-size: 18px; font-weight: 500; line-height: 23px;">Purchase
+                                Review</span>
+                        <span style="float: right;">
+                            <img t-attf-t-attf-t-attf-src="purchase/static/description/icon.png" style="display: inline-block;
+                                height: 30px; margin-left: auto; margin-right: 12px;"/>
+                        </span>
+                    </td> -->
+                            </tr>
+                            <tr>
+                                <td style="border-collapse: collapse; margin: 0; padding:0;">
+                                    <table style="width: 100%; border-spacing: 0; background-color: #f9f9f9; border: 1px solid #e7e7e7; border-top: none;">
+                                        <tr>
+                                            <td style="border-collapse: collapse; margin: 0; display: block; border-top: 2px solid #56b3b5;">
+                                                <table style="width: 100%; border-spacing: 0;">
+                                                    <tr>
+                                                        <td style="width: 60%; padding-left: 20px; border-collapse: collapse; text-align: left;">
+                                                            <span style="color: #56b3b5; font-size: 15px; font-weight: bold; text-decoration: none; line-height: 36px;">Total
+                                                                Billed Amount</span>
+                                                        </td>
+                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                            <span style="color: #875a7b; font-size: 15px; font-weight: bold; text-decoration: none; line-height: 36px;">
+                                                                <t t-esc="purchase_data.get(&apos;total_bill_amount&apos;)"/>
+                                                                ৳</span>
+                                                        </td>
+                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                            <div>
+                                                                <a t-attf-href="/ssp-review/{{object.company_id.id}}/total-bill-amount/{{domain_info.get(&apos;start_date&apos;)}}/{{domain_info.get(&apos;end_date&apos;)}}" style="background-color: #5b7e82; margin-left: 5px; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff !important; border-radius: 5px; font-size:13px;">
+                                                                    REPORT</a>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="border-collapse: collapse; margin: 0; border-top: 2px solid #56b3b5;">
+                                                <table style="width: 100%; border-spacing: 0;">
+                                                    <tr>
+                                                        <td style="width: 60%; border-collapse: collapse; padding-left: 20px; text-align: left;">
+                                                            <span style="color: #56b3b5; font-size: 15px; font-weight: bold; text-decoration: none; line-height: 36px;">Total
+                                                                Bill Paid Amount</span>
+                                                        </td>
+                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                            <span style="color: #875a7b; font-size: 15px; font-weight: bold; text-decoration: none; line-height: 36px;">
+                                                                <t t-esc="purchase_data.get(&apos;total_bill_paid_amount&apos;)"/>
+                                                                ৳</span>
+                                                        </td>
+                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                            <div>
+                                                                <a t-attf-href="/ssp-review/{{object.company_id.id}}/total-bill-paid-amount/{{domain_info.get(&apos;start_date&apos;)}}/{{domain_info.get(&apos;end_date&apos;)}}" style="background-color: #5b7e82; margin-left: 5px; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff !important; border-radius: 5px; font-size:13px;">
+                                                                    REPORT</a>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="border-collapse: collapse; margin: 0; border-top: 2px solid #56b3b5;">
+                                                <table style="width: 100%; border-spacing: 0;">
+                                                    <tr>
+                                                        <td style="width: 60%; border-collapse: collapse; padding-left: 20px; text-align: left;">
+                                                            <span style="color: #56b3b5; font-size: 15px; font-weight: bold; text-decoration: none; line-height: 36px;">Total
+                                                                Bill Due Amount</span>
+                                                        </td>
+                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                            <span style="color: #875a7b; font-size: 15px; font-weight: bold; text-decoration: none; line-height: 36px;">
+                                                                <t t-esc="purchase_data.get(&apos;total_bill_due_amount&apos;)"/>
+                                                                ৳</span>
+                                                        </td>
+                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                            <div>
+                                                                <a t-attf-href="/ssp-review/{{object.company_id.id}}/total-bill-due_amount/{{domain_info.get(&apos;start_date&apos;)}}/{{domain_info.get(&apos;end_date&apos;)}}" style="background-color: #5b7e82; margin-left: 5px; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff !important; border-radius: 5px; font-size:13px;">
+                                                                    REPORT</a>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="border-collapse: collapse; margin: 0; border-top: 2px solid #56b3b5;">
+                                                <table style="width: 100%; border-spacing: 0;">
+                                                    <tr>
+                                                        <td style="width: 60%; border-collapse: collapse; padding-left: 20px; text-align: left;">
+                                                            <span style="color: #56b3b5; font-size: 15px; font-weight: bold; text-decoration: none; line-height: 36px;">Total
+                                                                Due Paid Amount</span>
+                                                        </td>
+                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                            <span style="color: #875a7b; font-size: 15px; font-weight: bold; text-decoration: none; line-height: 36px;">
+                                                                <t t-esc="purchase_data.get(&apos;total_due_paid_amount&apos;)"/>
+                                                                ৳</span>
+                                                        </td>
+                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                            <div>
+                                                                <a t-attf-href="/ssp-review/{{object.company_id.id}}/total-due-paid-amount/{{domain_info.get(&apos;start_date&apos;)}}/{{domain_info.get(&apos;end_date&apos;)}}" style="background-color: #5b7e82; margin-left: 5px; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff !important; border-radius: 5px; font-size:13px;">
+                                                                    REPORT</a>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="border-collapse: collapse; margin: 0; border-top: 2px solid #56b3b5;">
+                                                <table style="width: 100%; border-spacing: 0;">
+                                                    <tr>
+                                                        <td style="width: 60%; border-collapse: collapse; padding-left: 20px; text-align: left;">
+                                                            <span style="color: #56b3b5; font-size: 15px; font-weight: bold; text-decoration: none; line-height: 36px;">Total
+                                                                Payment Amount</span>
+                                                        </td>
+                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                            <span style="color: #875a7b; font-size: 15px; font-weight: bold; text-decoration: none; line-height: 36px;">
+                                                                <t t-esc="purchase_data.get(&apos;total_payment_amount&apos;)"/>
+                                                                ৳</span>
+                                                        </td>
+                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                            <div>
+                                                                <a t-attf-href="/ssp-review/{{object.company_id.id}}/total-payment-amount/{{domain_info.get(&apos;start_date&apos;)}}/{{domain_info.get(&apos;end_date&apos;)}}" style="background-color: #5b7e82; margin-left: 5px; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff !important; border-radius: 5px; font-size:13px;">
+                                                                    REPORT</a>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="border-collapse: collapse; margin: 0; border-top: 2px solid #56b3b5;">
+                                                <table style="width: 100%; border-spacing: 0;">
+                                                    <tr>
+                                                        <td style="width: 60%; border-collapse: collapse; padding-left: 20px; text-align: left;">
+                                                            <span style="color: #56b3b5; font-size: 15px; font-weight: bold; text-decoration: none; line-height: 36px;">Total
+                                                                Bill Refund Amount</span>
+                                                        </td>
+                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                            <span style="color: #875a7b; font-size: 15px; font-weight: bold; text-decoration: none; line-height: 36px;">
+                                                                <t t-esc="purchase_data.get(&apos;total_bill_refund_amount&apos;)"/>
+                                                                ৳</span>
+                                                        </td>
+                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                            <div>
+                                                                <a t-attf-href="/ssp-review/{{object.company_id.id}}/total-bill-refund-amount/{{domain_info.get(&apos;start_date&apos;)}}/{{domain_info.get(&apos;end_date&apos;)}}" style="background-color: #5b7e82; margin-left: 5px; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff !important; border-radius: 5px; font-size:13px;">
+                                                                    REPORT</a>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table><!-- financial review -->
+                        <table style="border-spacing: 0; width: 100%; max-width: 600px;">
+                            <tr>
+                                <td style="border-collapse: collapse; background-color: #ffffff; border-left: 1px solid #e7e7e7; border-right: 1px solid #e7e7e7; line-height: 21px; padding: 0 20px 10px 20px; text-align: center; font-size: xx-large;">
+                                    <br/>
+                                    <span style="font-size:20px;line-height:12px;align-items:center;font-weight:600;">
+                                        <img t-attf-src="{{domain_info.get(&apos;base_url&apos;)}}/account/static/description/icon.png" style="display: inline-block; height: 25px; margin-left: auto; margin-right: 12px;border-radius: 50%;font-size:13px;line-height:12px"/>Financial
+                                        Review </span>
+                                </td><!-- <td style="border-collapse: collapse; background-color:
+                                #ffffff; border-left: 1px solid #e7e7e7; border-right: 1px solid
+                                #e7e7e7; line-height: 21px; padding: 0 20px 10px 20px; text-align:
+                                left;"><br/>
+                        <span style="color: #3d466e; font-size: 18px; font-weight: 500; line-height: 23px;">Account
+                                Review</span>
+                        <span style="float: right;">
+                            <img t-attf-t-attf-src="account_invoicing/static/description/icon.png" style="display:
+                                inline-block; height: 30px; margin-left: auto; margin-right:
+                                12px;"/>
+                        </span>
+                    </td> -->
+                            </tr>
+                            <tr>
+                                <td style="border-collapse: collapse; margin: 0; padding:0;">
+                                    <table style="width: 100%; border-spacing: 0; background-color: #f9f9f9; border: 1px solid #e7e7e7; border-top: none;">
+                                        <tr>
+                                            <td style="border-collapse: collapse; margin: 0; display: block; border-top: 2px solid #56b3b5;">
+                                                <table style="width: 100%; border-spacing: 0;">
+                                                    <tr>
+                                                        <td style="width: 60%; padding-left: 20px; border-collapse: collapse; text-align: left;">
+                                                            <span style="color: #56b3b5; font-size: 15px; font-weight: bold; text-decoration: none; line-height: 36px;">Total
+                                                                Collection</span>
+                                                        </td>
+                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                            <span style="color: #875a7b; font-size: 15px; font-weight: bold; text-decoration: none; line-height: 36px;">
+                                                                <t t-esc="account_data.get(&apos;total_income&apos;)"/>
+                                                                ৳</span>
+                                                        </td>
+                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                            <div>
+                                                                <a t-attf-href="/ssp-review/{{object.company_id.id}}/income/{{domain_info.get(&apos;start_date&apos;)}}/{{domain_info.get(&apos;end_date&apos;)}}" style="background-color: #5b7e82; margin-left: 5px; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff !important; border-radius: 5px; font-size:13px;">
+                                                                    REPORT</a>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="border-collapse: collapse; margin: 0; display: block; border-top: 2px solid #56b3b5;">
+                                                <table style="width: 100%; border-spacing: 0;">
+                                                    <tr>
+                                                        <td style="width: 60%; padding-left: 20px; border-collapse: collapse; text-align: left;">
+                                                            <span style="color: #56b3b5; font-size: 15px; font-weight: bold; text-decoration: none; line-height: 36px;">Operation
+                                                                Expense</span>
+                                                        </td>
+                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                            <span style="color: #875a7b; font-size: 15px; font-weight: bold; text-decoration: none; line-height: 36px;">
+                                                                <t t-esc="account_data.get(&apos;total_expense&apos;)"/>
+                                                                ৳</span>
+                                                        </td>
+                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                            <div>
+                                                                <a t-attf-href="/ssp-review/{{object.company_id.id}}/expense/{{domain_info.get(&apos;start_date&apos;)}}/{{domain_info.get(&apos;end_date&apos;)}}" style="background-color: #5b7e82; margin-left: 5px; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff !important; border-radius: 5px; font-size:13px;">
+                                                                    REPORT</a>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="border-collapse: collapse; margin: 0; display: block; border-top: 2px solid #56b3b5;">
+                                                <table style="width: 100%; border-spacing: 0;">
+                                                    <tr>
+                                                        <td style="width: 60%; padding-left: 20px; border-collapse: collapse; text-align: left;">
+                                                            <span style="color: #56b3b5; font-size: 15px; font-weight: bold; text-decoration: none; line-height: 36px;">Total
+                                                                Revenue Amount</span>
+                                                        </td>
+                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                            <span style="color: #875a7b; font-size: 15px; font-weight: bold; text-decoration: none; line-height: 36px;">
+                                                                <t t-esc="account_data.get(&apos;total_revenue&apos;)"/>
+                                                                ৳</span>
+                                                        </td>
+                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                            <div>
+                                                                <a t-attf-href="/ssp-review/{{object.company_id.id}}/revenue/{{domain_info.get(&apos;start_date&apos;)}}/{{domain_info.get(&apos;end_date&apos;)}}" style="background-color: #5b7e82; margin-left: 5px; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff !important; border-radius: 5px; font-size:13px;">
+                                                                    REPORT</a>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table><!-- overall balance -->
+                        <table style="border-spacing: 0; width: 100%; max-width: 600px;">
+                            <tr>
+                                <td style="border-collapse: collapse; background-color: #ffffff; border-left: 1px solid #e7e7e7; border-right: 1px solid #e7e7e7; line-height: 21px; padding: 0 20px 10px 20px; text-align: center; font-size: xx-large;">
+                                    <br/>
+                                    <span style="font-size:20px;line-height:12px;align-items:center;font-weight:600;">
+                                        <img t-attf-src="{{domain_info.get(&apos;base_url&apos;)}}/stock/static/description/icon.png" style="display: inline-block; height: 25px; margin-left: auto; margin-right: 12px;border-radius: 50%;font-size:13px;line-height:12px"/>Overall
+                                        Balance </span>
+                                </td><!-- <td style="border-collapse: collapse; background-color:
+                                #ffffff; border-left: 1px solid #e7e7e7; border-right: 1px solid
+                                #e7e7e7; line-height: 21px; padding: 0 20px 10px 20px; text-align:
+                                left;"><br/>
+                        <span style="color: #3d466e; font-size: 18px; font-weight: 500; line-height: 23px;">Current
+                                Balance</span>
+                        <span style="float: right;">
+                            <img t-attf-src="stock/static/description/icon.png" style="display: inline-block; height: 30px;
+                                margin-left: auto; margin-right: 12px;"/>
+                        </span>
+                    </td> -->
+                            </tr>
+                            <tr>
+                                <td style="border-collapse: collapse; margin: 0; padding:0;">
+                                    <table style="width: 100%; border-spacing: 0; background-color: #f9f9f9; border: 1px solid #e7e7e7; border-top: none;">
+                                        <tr>
+                                            <td style="border-collapse: collapse; margin: 0; display: block; border-top: 2px solid #56b3b5;">
+                                                <table style="width: 100%; border-spacing: 0;">
+                                                    <tr>
+                                                        <td style="width: 60%; padding-left: 20px; border-collapse: collapse; text-align: left;">
+                                                            <span style="color: #56b3b5; font-size: 15px; font-weight: bold; text-decoration: none; line-height: 36px;">Asset
+                                                                Stock on Hand</span>
+                                                        </td>
+                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                            <span style="color: #875a7b; font-size: 15px; font-weight: bold; text-decoration: none; line-height: 36px;">
+                                                                <t t-esc="current_balance_data.get(&apos;current_stock_value&apos;)"/>
+                                                                ৳</span>
+                                                        </td>
+                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                            <div>
+                                                                <a t-attf-href="/ssp-review/{{object.company_id.id}}/current-stock-value/{{domain_info.get(&apos;start_date&apos;)}}/{{domain_info.get(&apos;end_date&apos;)}}" style="background-color: #5b7e82; margin-left: 5px; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff !important; border-radius: 5px; font-size:13px;">
+                                                                    REPORT</a>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="border-collapse: collapse; margin: 0; display: block; border-top: 2px solid #56b3b5;">
+                                                <table style="width: 100%; border-spacing: 0;">
+                                                    <tr>
+                                                        <td style="width: 60%; padding-left: 20px; border-collapse: collapse; text-align: left;">
+                                                            <span style="color: #56b3b5; font-size: 15px; font-weight: bold; text-decoration: none; line-height: 36px;">Cash
+                                                                In Hand Balance</span>
+                                                        </td>
+                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                            <span style="color: #875a7b; font-size: 15px; font-weight: bold; text-decoration: none; line-height: 36px;">
+                                                                <t t-esc="current_balance_data.get(&apos;cash_in_hand&apos;)"/>
+                                                                ৳</span>
+                                                        </td>
+                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                            <div>
+                                                                <a t-attf-href="/ssp-review/{{object.company_id.id}}/cash-in-hand/{{domain_info.get(&apos;start_date&apos;)}}/{{domain_info.get(&apos;end_date&apos;)}}" style="background-color: #5b7e82; margin-left: 5px; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff !important; border-radius: 5px; font-size:13px;">
+                                                                    REPORT</a>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="border-collapse: collapse; margin: 0; border-top: 2px solid #56b3b5;">
+                                                <table style="width: 100%; border-spacing: 0;">
+                                                    <tr>
+                                                        <td style="width: 60%; border-collapse: collapse; padding-left: 20px; text-align: left;">
+                                                            <span style="color: #56b3b5; font-size: 15px; font-weight: bold; text-decoration: none; line-height: 36px;">Cash
+                                                                At Bank Balance</span>
+                                                        </td>
+                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                            <span style="color: #875a7b; font-size: 15px; font-weight: bold; text-decoration: none; line-height: 36px;">
+                                                                <t t-esc="current_balance_data.get(&apos;cash_at_bank&apos;)"/>
+                                                                ৳</span>
+                                                        </td>
+                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                            <div>
+                                                                <a t-attf-href="/ssp-review/{{object.company_id.id}}/cash-at-bank/{{domain_info.get(&apos;start_date&apos;)}}/{{domain_info.get(&apos;end_date&apos;)}}" style="background-color: #5b7e82; margin-left: 5px; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff !important; border-radius: 5px; font-size:13px;">
+                                                                    REPORT</a>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="border-collapse: collapse; margin: 0; border-top: 2px solid #56b3b5;">
+                                                <table style="width: 100%; border-spacing: 0;">
+                                                    <tr>
+                                                        <td style="width: 60%; border-collapse: collapse; padding-left: 20px; text-align: left;">
+                                                            <span style="color: #56b3b5; font-size: 15px; font-weight: bold; text-decoration: none; line-height: 36px;">Total
+                                                                Receivable</span>
+                                                        </td>
+                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                            <span style="color: #875a7b; font-size: 15px; font-weight: bold; text-decoration: none; line-height: 36px;">
+                                                                <t t-esc="current_balance_data.get(&apos;receivable&apos;)"/>
+                                                                ৳</span>
+                                                        </td>
+                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                            <div>
+                                                                <a t-attf-href="/ssp-review/{{object.company_id.id}}/receivable/{{domain_info.get(&apos;start_date&apos;)}}/{{domain_info.get(&apos;end_date&apos;)}}" style="background-color: #5b7e82; margin-left: 5px; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff !important; border-radius: 5px; font-size:13px;">
+                                                                    REPORT</a>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="border-collapse: collapse; margin: 0; border-top: 2px solid #56b3b5;">
+                                                <table style="width: 100%; border-spacing: 0;">
+                                                    <tr>
+                                                        <td style="width: 60%; border-collapse: collapse; padding-left: 20px; text-align: left;">
+                                                            <span style="color: #56b3b5; font-size: 15px; font-weight: bold; text-decoration: none; line-height: 36px;">Total
+                                                                Payable</span>
+                                                        </td>
+                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                            <span style="color: #875a7b; font-size: 15px; font-weight: bold; text-decoration: none; line-height: 36px;">
+                                                                <t t-esc="current_balance_data.get(&apos;payable&apos;)"/>
+                                                                ৳</span>
+                                                        </td>
+                                                        <td style="width: 20%; border-collapse: collapse; text-align: right;">
+                                                            <div>
+                                                                <a t-attf-href="/ssp-review/{{object.company_id.id}}/payable/{{domain_info.get(&apos;start_date&apos;)}}/{{domain_info.get(&apos;end_date&apos;)}}" style="background-color: #5b7e82; margin-left: 5px; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff !important; border-radius: 5px; font-size:13px;">
+                                                                    REPORT</a>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_inherited_hr_employee_inherit_employee_wppf" model="ir.ui.view">
+        <field name="name">HR Employee WPPF</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='hr_settings']" position="after">
+
+
+                <page name="hr_employee_wppf" string="WPPF Information">
+
+                    <group>
+                        <group>
+                            <field name="is_wppf_user"/>
+                            <field name="wppf_policy_id" readonly="1" options="{'no_open':True,'no_create_edit':1}"/>
+                            <field name="is_wppf_restricted"/>
+                        </group>
+                        <group></group>
+                    </group>
+                    <separator string="WPPF Information" colspan="2"/>
+                    <group name="employee_wppf" colspan="2">
+                        <field name="employee_wppf_ids" context="{'default_employee_id': active_id}">
+                            <tree string="Employee WPPF" editable="bottom" create="0" delete="0" edit="0">
+                                <field name="year" readonly="1"/>
+                                <field name="month" readonly="1"/>
+                                <field name="pf_amount" sum="Total"/>
+                                <field name="cpf_amount" sum="Total"/>
+                                <field name="total_pf_amount" sum="Total"/>
+                                <field name="contribution_type" readonly="1" force_save="1"/>
+                                <field name="state" readonly="1" force_save="1"/>
+                            </tree>
+                            <form string="Employee WPPF">
+                                <group name="employee_wppf">
+                                    <group>
+                                        <field name="year"/>
+                                        <field name="month"/>
+                                    </group>
+                                    <group>
+                                        <field name="pf_amount"/>
+                                        <field name="cpf_amount"/>
+                                        <field name="total_pf_amount"/>
+                                    </group>
+                                </group>
+                            </form>
+                        </field>
+                    </group>
+                </page>
+
+            </xpath>
+            <xpath expr="//field[@name='reference']" position="before">
+                <field name="wppf_settlement_status" invisible="not wppf_settlement_status"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

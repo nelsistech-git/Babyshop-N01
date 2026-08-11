@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <record id="view_salary_advance_form" model="ir.ui.view">
+            <field name="name">salary.advance.form</field>
+            <field name="model">salary.advance</field>
+            <field name="arch" type="xml">
+                <form string="Salary Advance">
+                    <header>
+                        <button name="submit_to_manager" string="Submit" type="object" class="oe_highlight"
+                                invisible="state != 'draft'"/>
+                        <button name="approve_request" string="Approve" type="object" class="oe_highlight"
+                                groups="hr.group_hr_manager,hr.group_hr_user" invisible="state != 'submit'"/>
+                        <button name="approve_request_acc_dept" string="Approve" type="object" class="oe_highlight"
+                                groups="account.group_account_manager,account.group_account_user"
+                                invisible="state != 'waiting_approval'"/>
+                        <button name="cancel" string="Cancel" type="object"
+                                invisible="state not in ['draft','submit','waiting_approval']"/>
+                        <button name="reject" string="Reject" type="object" invisible="state != 'waiting_approval'"/>
+                        <field name="state" widget="statusbar"
+                               statusbar_visible="draft,submit,waiting_approval,approve,cancel,reject"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <b><button name="view_journal_entry" type="object" class="oe_stat_button"
+                                       icon="fa-external-link" string="Journal Entry" groups="hr.group_hr_manager"
+                                       invisible="state not in ['approve']"/></b>
+                        </div>
+                        <div class="oe_title oe_left">
+                            <h2>
+                                <field name="name" class="oe_inline" readonly="1"/>
+                            </h2>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="employee_id" readonly="state in ['submit','approve','cancel','reject']"
+                                       options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="user_work_location_id"
+                                       options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"
+                                       readonly="1" force_save="1"/>
+                                <field name="department"
+                                       options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"
+                                       readonly="1" force_save="1"/>
+                                <field name="emp_id_card_no" readonly="1" force_save="1"/>
+                                <field name="date" readonly="state in ['submit','approve','cancel','reject']"/>
+                                <field name="payslip_date" readonly="state in ['submit','approve','cancel','reject']"/>
+                                <field name="reason" readonly="state in ['submit','approve','cancel','reject']"/>
+                                <field name="exceed_condition"
+                                       readonly="state in ['submit','approve','cancel','reject']"
+                                       groups="hr.group_hr_manager,hr.group_hr_user" invisible="1"/>
+                                <field name="payslip_id" readonly="1" groups="hr.group_hr_manager,hr.group_hr_user"
+                                       force_save="1"/>
+                                <field name="is_deducted" readonly="1"/>
+                            </group>
+                            <group>
+                                <field name="employee_contract_id"
+                                       domain="[('employee_id','=',employee_id),('state','=','open')]" readonly="1"
+                                       options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"
+                                       groups="hr.group_hr_manager,hr.group_hr_user" force_save="1"/>
+                                <field name="gross_salary"
+                                       readonly="state in ['draft','submit','waiting_approval','approve','cancel','reject']"
+                                       groups="hr.group_hr_manager,hr.group_hr_user"/>
+                                <field name="salary_advance_settings" readonly="state in ['approve','cancel','reject']"
+                                       options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"
+                                       groups="hr.group_hr_manager,hr.group_hr_user" required="1"/>
+                                <field name="max_adv_amt"
+                                       readonly="state in ['draft','submit','waiting_approval','approve','cancel','reject']"/>
+                                <field name="advance" readonly="state in ['submit','approve','cancel','reject']"/>
+                                <field name="currency_id" readonly="state in ['submit','approve','cancel','reject']"
+                                       groups="base.group_multi_currency"
+                                       options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+                                <field name="company_id" readonly="1" groups="base.group_multi_currency"
+                                       options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"
+                                       force_save="1"/>
+                                <field name="credit" invisible="state == 'draft' and state == 'submit'"
+                                       readonly="state in ['approve','cancel','reject']"
+                                       options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"
+                                       groups="account.group_account_manager"/>
+                                <field name="debit" invisible="state == 'draft' and state == 'submit'"
+                                       readonly="state in ['approve','cancel','reject']"
+                                       options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"
+                                       groups="account.group_account_manager"/>
+                                <field name="journal" invisible="state == 'draft' and state == 'submit'"
+                                       readonly="state in ['approve','cancel','reject']"
+                                       options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"
+                                       groups="account.group_account_manager"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_salary_advance_tree">
+            <field name="name">salary.advance.tree</field>
+            <field name="model">salary.advance</field>
+            <field name="arch" type="xml">
+                <tree string="Salary Advance">
+                    <field name="name"/>
+                    <field name="employee_id"/>
+                    <field name="user_work_location_id"/>
+                    <field name="date"/>
+                    <field name="payslip_date"/>
+                    <field name="advance"/>
+                    <field name="state"/>
+                    <field name="is_deducted"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_salary_advance_filter" model="ir.ui.view">
+            <field name="name">salary.advance.select</field>
+            <field name="model">salary.advance</field>
+            <field name="arch" type="xml">
+                <search string="Search">
+                    <field name="name" string="Salary Advance" filter_domain="['|',('name','ilike',self)]"/>
+                    <field name="employee_id"/>
+                    <field name="emp_id_card_no" filter_domain="[('emp_id_card_no', '=', self)]"/>
+                    <field name="state"/>
+                    <field name="user_work_location_id"/>
+                    <field name="date"/>
+                    <field name="payslip_date"/>
+                    <field name="advance"/>
+                    <filter string="My Requests" domain="[('employee_id.user_id.id','=',uid)]"
+                            name="my_requests_filter"/>
+                    <filter domain="[('state', '=', 'draft')]" string="To Submit" name="to_report" help="New Requests"/>
+                    <filter domain="[('state','in',('submit','waiting_approval'))]" string="To Approve" name="submitted"
+                            help="Submitted Requests"/>
+                    <filter domain="[('state', '=', 'approve')]" string="Approved" name="approved"
+                            help="Approved Requests"/>
+                    <separator/>
+                    <filter string="Employee" name="employee_id" domain="[]" context="{'group_by':'employee_id'}"/>
+                    <filter name="State" string="State" domain="[]" context="{'group_by':'state'}"/>
+                    <filter string="Date" domain="[]" name="date" context="{'group_by':'date'}"/>
+                    <filter string="Payslip Date" domain="[]" name="payslip_date"
+                            context="{'group_by':'payslip_date'}"/>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_my_salary_advance" model="ir.actions.act_window">
+            <field name="name">Salary Advance</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">salary.advance</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="view_salary_advance_filter"/>
+            <field name="context">{'search_default_my_requests_filter': 1}</field>
+            <field name="domain">[('employee_id.user_id', '=', uid)]</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Create Requests.
+                </p>
+            </field>
+        </record>
+
+        <record id="action_my_salary_advance_request_approved" model="ir.actions.act_window">
+            <field name="name">Salary Advance</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">salary.advance</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="view_salary_advance_filter"/>
+            <field name="context">{'search_default_approved': 1}</field>
+            <field name="domain">[('employee_id.user_id', '=', uid)]</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Create Requests.
+                </p>
+            </field>
+        </record>
+
+        <record id="action_salary_advance_to_approve" model="ir.actions.act_window">
+            <field name="name">Salary Advance</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">salary.advance</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="view_salary_advance_filter"/>
+            <field name="context">{'search_default_submitted': 1}</field>
+            <field name="domain"></field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Create Requests.
+                </p>
+            </field>
+        </record>
+
+        <record id="ir_seq_hr_advance" model="ir.sequence">
+            <field name="name">Salary Advance Request</field>
+            <field name="code">salary.advance.seq</field>
+            <field name="prefix">SAR</field>
+            <field name="padding">5</field>
+            <field name="number_increment">1</field>
+            <field name="number_next_actual">1</field>
+            <field name="implementation">standard</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <menuitem id="dev_hr_loan.menu_main_employee_loan_main"
+                  groups="custom_common_settings.group_hr_loan_advance_root_menu" name="HR- Loan &amp; Advance"
+                  sequence="30"/>
+        <menuitem id="parent_menu_salary_advance" name="Salary Advance"
+                  parent="dev_hr_loan.menu_main_employee_loan_main" sequence="7"
+                  groups="hr.group_hr_user,group_salary_advance_requester"/>
+        <menuitem id="menu_my_salary_advance" action="action_my_salary_advance" parent="parent_menu_salary_advance"
+                  name="Request Salary Advance" sequence="1" groups="hr.group_hr_user,group_salary_advance_requester"/>
+        <menuitem id="menu_salary_advance" action="action_salary_advance_to_approve" parent="parent_menu_salary_advance"
+                  name="Salary Advance To Approve" sequence="2" groups="hr.group_hr_user"/>
+        <menuitem id="menu_my_salary_advance_approved" action="action_my_salary_advance_request_approved"
+                  parent="parent_menu_salary_advance" name="My Approved Salary Advance" sequence="3"
+                  groups="hr.group_hr_user"/>
+        <menuitem id="hr_advance_salary_expenses" name="Salary Advance"
+                  parent="hr_payroll.menu_root_hr_related_expenses"
+                  action="hr_salary_advance.action_salary_advance_to_approve" sequence="2"
+                  groups="account.group_account_manager"/>
+    </data>
+</odoo>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates xml:space="preserve">
+
+<t t-name="express_retail_pos.ExpressPosQuickCustomerDialog" owl="1">
+    <Dialog title="'Quick Add Customer'">
+        <div class="o_express_pos_quick_customer">
+            <!-- Mobile Number Field (Moved to Top) -->
+            <div class="mb-2">
+                <label>Mobile Number <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" t-model="state.mobile"
+                       inputmode="numeric" maxlength="11" placeholder="01XXXXXXXXX"/>
+            </div>
+
+            <!-- Name Field (Moved Below) -->
+            <div class="mb-2">
+                <label>Name <span class="text-muted">(optional)</span></label>
+                <input type="text" class="form-control" t-model="state.name"/>
+            </div>
+
+            <div class="text-danger small" t-if="state.error" t-esc="state.error"/>
+        </div>
+        <t t-set-slot="footer">
+            <button class="btn btn-primary" t-att-disabled="!canConfirm"
+                    t-on-click="onConfirmClick">Save and Select</button>
+            <button class="btn btn-secondary" t-on-click="() => this.props.close()">Cancel</button>
+        </t>
+    </Dialog>
+</t>
+
+</templates>

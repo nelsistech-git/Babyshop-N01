@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Conveyance Sheet Line — standalone tree view for One2many widget -->
+    <record id="conveyance_sheet_line_view_tree" model="ir.ui.view">
+        <field name="name">conveyance.sheet.line.tree</field>
+        <field name="model">conveyance.sheet.line</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom" string="Conveyance Lines">
+                <field name="date"/>
+                <field name="from_location"/>
+                <field name="to_location"/>
+                <field name="purpose"/>
+                <field name="transport"/>
+                <field name="customer_id"/>
+                <field name="conveyance_amount"/>
+                <field name="food_bill"/>
+                <field name="others_cost"/>
+                <field name="amount"/>
+                <field name="total_amount" readonly="1"/>
+                <field name="remarks"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Conveyance Sheet — Form View -->
+    <record id="conveyance_sheet_view_form" model="ir.ui.view">
+        <field name="name">conveyance.sheet.form</field>
+        <field name="model">conveyance.sheet</field>
+        <field name="arch" type="xml">
+            <form string="Conveyance Sheet">
+
+                <header>
+                    <button name="action_submit" string="Submit" type="object"
+                        class="btn-primary"
+                        invisible="state != 'draft'"/>
+                    <button name="action_approve_supervisor" string="Approved By" type="object"
+                        class="btn-success"
+                        groups="conveyance_expense.group_conveyance_supervisor"
+                        invisible="state != 'supervisor'"/>
+                    <button name="action_approve_vice_president" string="Management-Authorized By" type="object"
+                        class="btn-success"
+                        groups="conveyance_expense.group_conveyance_vice_president"
+                        invisible="state != 'vice_president'"/>
+                    <button name="action_approve_ceo" string="CFO" type="object"
+                        class="btn-success"
+                        groups="conveyance_expense.group_conveyance_ceo"
+                        invisible="state != 'ceo'"/>
+                    <button name="action_done" string="Mark as Done" type="object"
+                        class="btn-success"
+                        groups="conveyance_expense.group_conveyance_manager"
+                        invisible="state != 'posted'"/>
+                    <button name="action_refuse" string="Refuse" type="object"
+                        class="btn-danger"
+                        groups="conveyance_expense.group_conveyance_supervisor"
+                        invisible="state not in ('supervisor', 'vice_president', 'ceo')"/>
+                    <button name="action_reset_draft" string="Reset to Draft" type="object"
+                        class="btn-warning"
+                        groups="conveyance_expense.group_conveyance_manager"
+                        invisible="state not in ('refused', 'supervisor')"/>
+                    <button name="action_print_conveyance" string="Print" type="object"
+                        class="btn-secondary"
+                        icon="fa-print"/>
+                    <button name="action_view_vendor_bills" string="Vendor Bills" type="object"
+                        class="btn-secondary"
+                        invisible="vendor_bill_count == 0"/>
+                    <field name="state" widget="statusbar"
+                        statusbar_visible="draft,supervisor,vice_president,ceo,posted,done"/>
+                </header>
+
+                <sheet>
+                    <field name="vendor_bill_count" invisible="1"/>
+
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Employee Information">
+                            <field name="employee_id" required="1"/>
+                            <field name="designation"/>
+                        </group>
+                        <group string="Period">
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                            <field name="expense_id" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Details" name="details">
+                            <field name="line_ids"
+                                context="{'tree_view_ref': 'conveyance_expense.conveyance_sheet_line_view_tree'}"/>
+
+                            <group class="oe_subtotal_footer">
+                                <field
+                                    name="total_amount"
+                                    string="Total Amount (BDT)"
+                                    readonly="1"
+                                    widget="float"
+                                    digits="[12,2]"
+                                />
+                            </group>
+                        </page>
+                    </notebook>
+
+                </sheet>
+
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+
+            </form>
+        </field>
+    </record>
+
+    <!-- Conveyance Sheet — List View -->
+    <record id="conveyance_sheet_view_list" model="ir.ui.view">
+        <field name="name">conveyance.sheet.list</field>
+        <field name="model">conveyance.sheet</field>
+        <field name="arch" type="xml">
+            <tree string="Conveyance Sheets">
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="designation"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="total_amount" sum="Grand Total"/>
+                <field name="state" widget="badge"
+                    decoration-muted="state == 'draft'"
+                    decoration-warning="state in ('supervisor', 'vice_president', 'ceo')"
+                    decoration-success="state in ('posted', 'done')"
+                    decoration-danger="state == 'refused'"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Conveyance Sheet — Search View -->
+    <record id="conveyance_sheet_view_search" model="ir.ui.view">
+        <field name="name">conveyance.sheet.search</field>
+        <field name="model">conveyance.sheet</field>
+        <field name="arch" type="xml">
+            <search string="Search Conveyance Sheets">
+                <field name="name"/>
+                <field name="employee_id"/>
+                <filter string="Draft" name="draft" domain="[('state','=','draft')]"/>
+                <filter string="Approved By" name="supervisor" domain="[('state','=','supervisor')]"/>
+                <filter string="Management-Authorized By" name="vice_president" domain="[('state','=','vice_president')]"/>
+                <filter string="CFO" name="ceo" domain="[('state','=','ceo')]"/>
+                <filter string="Posted" name="posted" domain="[('state','=','posted')]"/>
+                <filter string="Done" name="done" domain="[('state','=','done')]"/>
+                <filter string="Refused" name="refused" domain="[('state','=','refused')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Employee" name="group_employee" context="{'group_by': 'employee_id'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action & Menu -->
+    <record id="action_conveyance_sheet" model="ir.actions.act_window">
+        <field name="name">Conveyance Sheets</field>
+        <field name="res_model">conveyance.sheet</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="conveyance_sheet_view_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No conveyance sheets found. Create one from an Expense.
+            </p>
+        </field>
+    </record>
+
+    <menuitem
+        id="menu_conveyance_sheet_root"
+        name="Conveyance"
+        parent="hr_expense.menu_hr_expense_root"
+        sequence="20"
+    />
+    <menuitem
+        id="menu_conveyance_sheet_list"
+        name="All Conveyance Sheets"
+        parent="menu_conveyance_sheet_root"
+        action="action_conveyance_sheet"
+        sequence="10"
+    />
+
+</odoo>

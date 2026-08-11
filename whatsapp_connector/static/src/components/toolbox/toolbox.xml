@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="chatroom.Toolbox" owl="1">
+        <div class="acrux_Toolbox o_Chatroom_composer d-flex flex-column w-100"
+            t-attf-class="{{ props.selectedConversation ? '' : 'd-none' }} {{ state.isSending ? 'o_chat_toolbox_sending' : '' }}"
+            t-att-aria-busy="state.isSending ? 'true' : 'false'"
+            t-ref="toolboxRef">
+            <div class="o_chat_toolbox_attachements acrux_mail_attachments_shell overflow-auto"
+                t-attf-class="{{ conversationMine }}">
+                <AttachmentList
+                    attachments="state.attachments"
+                    unlinkAttachment.bind="unlinkAttachment"
+                    imagesHeight="180"/>
+            </div>
+            <div class="o_chat_toolbox_message_quote" t-if="state.message">
+                <div class="o_chat_toolbox_message_quote_content">
+                    <Message message="state.message" noAction="true" />
+                </div>
+                <span class="o_chat_toolbox_close_message" t-on-click="() => this.env.chatBus.trigger('quoteMessage', null)">
+                    <svg viewBox="0 0 24 24" width="24" height="24" class="">
+                        <path fill="currentColor" d="M19.1 17.2l-5.3-5.3 5.3-5.3-1.8-1.8-5.3 5.4-5.3-5.3-1.8 1.7 5.3 5.3-5.3 5.3L6.7 19l5.3-5.3 5.3 5.3 1.8-1.8z" />
+                    </svg>
+                </span>
+            </div>
+            <div class="o_chat_snippet_chips d-flex flex-wrap gap-1 px-2 pb-1"
+                t-attf-class="{{ conversationMine }}"
+                t-if="snippetChips.length">
+                <button type="button" class="btn btn-sm btn-light border text-truncate o_chat_snippet_chip"
+                    t-foreach="snippetChips" t-as="answer" t-key="answer.id"
+                    t-att-title="getSnippetChipTitle(answer)"
+                    t-out="answer.name"
+                    t-on-click="() => this.insertSnippet(answer)" />
+            </div>
+            <Transition visible="state.showTraductor" name="'o-fade'" leaveDuration="200">
+                <div class="o_chat_toolbox_input d-flex align-items-center m-2"
+                    t-attf-class="{{ conversationMine }} {{ allowTranslate }}">
+                    <textarea class="o_input o_chat_toolbox_text_field p-0 o_chat_toolbox_text_translated"
+                        placeholder="Translate text..." t-ref="inputLangRef"
+                        t-on-paste="onPaste"
+                        t-on-keydown="onTranslateFieldKeydown"
+                        t-on-input="onInput" />
+                    <div class="o_chat_toolbox_lang_selector me-1"
+                        t-attf-class="{{ conversationMine }} {{ hasManyLangs }}" t-ref="langSelectorRef">
+                        <SelectMenu t-props="langProps" />
+                    </div>
+                    <button class="o_chat_button_translate o_chat_option_button"
+                        t-on-click="onTranslate" type="button"
+                        t-attf-class="{{ allowTranslate }}"
+                        title="Translate text">
+                        <i class="fa fa-language"/>
+                    </button>
+                </div>
+            </Transition>
+            <div class="o_chat_toolbox_button_box d-flex align-items-center flex-wrap gap-1 mx-2 py-1">
+                <div class="o_chat_toolbox_message_signing me-1 ms-2"
+                    t-attf-class="{{ conversationMine }} {{ allowSign }}"
+                    title="Sign">
+                    <CheckBox onChange.bind="updateSigning" value="props.user.signingActive"
+                        className="'o_field_boolean o_boolean_toggle form-switch d-inline-block'" />
+                </div>
+                <button class="o_chat_button_translate o_chat_option_button"
+                    t-on-click="onToggleTraductor" type="button"
+                    t-att-disabled="state.isSending"
+                    t-attf-class="{{ conversationMine }} {{ allowTranslate }} {{state.showTraductor and 'text-success' or ''}}"
+                    title="Show traductor">
+                    <i class="fa fa-language"/>
+                </button>
+                <div class="o_chat_option_button me-1"
+                    t-attf-class="{{ conversationMine }}" t-if="props.selectedConversation">
+                    <ActivityButton record="props.selectedConversation" />
+                </div>
+                <span class="flex-grow-1 min-w-0"/>
+                <button class="o_chat_button_emoji o_chat_option_button" type="button"
+                    t-attf-class="{{ conversationMine }}"
+                    t-on-click="toggleEmojis"
+                    t-att-disabled="state.isSending"
+                    t-ref="emojisBtnRef"
+                    title="Add Emojis">
+                    <i class="fa fa-smile-o"/>
+                </button>
+                <FileUploader multiUpload="true"
+                    fileUploadClass="conversationMine"
+                    onUploaded="(data) => { attachmentUploader.uploadData(data) }">
+                    <t t-set-slot="toggler">
+                        <button class="o_chat_button_add_attachment o_chat_option_button" type="button"
+                            t-attf-class="{{ conversationMine }}" t-ref="attachBtnRef"
+                            t-att-disabled="state.isSending"
+                            title="Attach files">
+                            <i class="fa fa-paperclip"/>
+                        </button>
+                    </t>
+                </FileUploader>
+                <div class="dropdown o_chat_toolbox_overflow"
+                    t-attf-class="{{ conversationMine }}">
+                    <button type="button" class="o_chat_option_button dropdown-toggle border-0 bg-transparent"
+                        data-bs-toggle="dropdown" data-bs-display="static"
+                        aria-expanded="false" title="More actions"
+                        t-att-disabled="state.isSending">
+                        <i class="fa fa-ellipsis-h"/>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm py-1">
+                        <li>
+                            <button type="button" class="dropdown-item d-flex align-items-center gap-2"
+                                tab-key="tab_conv_info" t-on-click="openTab">
+                                <i class="fa fa-info-circle fa-fw text-muted"/>
+                                <span>Conversation info</span>
+                            </button>
+                        </li>
+                        <li>
+                            <button type="button" class="dropdown-item d-flex align-items-center gap-2"
+                                tab-key="tab_partner" t-on-click="openTab">
+                                <i class="fa fa-vcard-o fa-fw text-muted"/>
+                                <span>Partner</span>
+                            </button>
+                        </li>
+                        <li><hr class="dropdown-divider my-1"/></li>
+                        <li>
+                            <button type="button" class="dropdown-item d-flex align-items-center gap-2"
+                                t-on-click="sendWizard">
+                                <i class="fa fa-copy fa-fw text-muted"/>
+                                <span>Send template</span>
+                            </button>
+                        </li>
+                        <li>
+                            <button type="button" class="dropdown-item d-flex align-items-center gap-2"
+                                t-on-click="delegateConversation">
+                                <i class="fa fa-chain-broken fa-fw text-muted"/>
+                                <span>Delegate conversation</span>
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+                <button class="btn btn-sm btn-success o_chat_toolbox_write px-3 py-1" type="button"
+                    t-attf-class="{{ conversationNotMine }}"
+                    t-att-disabled="state.isSending"
+                    t-on-click="blockClient">
+                    Attend
+                </button>
+                <button class="o_chat_toolbox_done btn btn-link p-1" type="button"
+                    t-attf-class="{{ conversationMine }}" title="Close"
+                    t-att-disabled="state.isSending"
+                    t-on-click="releaseClient"
+                    t-ref="releaseBtnRef">
+                    <i class="fa fa-sign-out"/>
+                </button>
+            </div>
+            <div class="o_chat_toolbox_input o_chat_toolbox_composer_row d-flex align-items-end mx-2 mb-2 gap-2"
+                t-attf-class="{{ conversationMine }}">
+                <textarea class="o_input o_chat_toolbox_text_field flex-grow-1 p-2"
+                    placeholder="Write something… (/help for shortcuts; Enter sends, Shift+Enter newline)" t-ref="inputRef"
+                    t-on-paste="onPaste"
+                    t-on-keydown="onComposerKeydown"
+                    t-on-input="onComposerInput" />
+                <button class="o_chat_toolbox_send btn btn-primary rounded-circle"
+                    t-on-click="sendMessage" type="button"
+                    t-att-disabled="state.isSending"
+                    t-ref="sendBtnRef"
+                    title="Send">
+                    <i class="fa fa-paper-plane-o"/>
+                </button>
+            </div>
+        </div>
+    </t>
+
+</templates>

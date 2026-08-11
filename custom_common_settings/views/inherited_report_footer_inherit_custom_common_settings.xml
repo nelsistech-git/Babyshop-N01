@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Added Custom Logo to Header External Layout Boxed -->
+        <template id="external_layout_boxed_inherit" inherit_id="web.external_layout_boxed">
+            <xpath expr="//div[@t-attf-class='footer o_boxed_footer o_company_#{company.id}_layout']" position="replace">
+                <div t-attf-class="footer o_boxed_footer o_company_#{company.id}_layout">
+                    <div class="text-center">
+                        <ul class="list-inline">
+<!--                            <li t-if="company.phone" class="list-inline-item">Mobile: <span class="o_force_ltr" t-field="company.phone"/></li>
+                            <li t-if="company.email" class="list-inline-item">Email: <span t-field="company.email"/></li>
+                            <li t-if="company.website" class="list-inline-item">Website: <span t-esc="(company.website).replace('http://', '').replace('https://', '')"/></li>-->
+                            <li t-if="company.vat" class="list-inline-item"><t t-esc="company.country_id.vat_label or 'Tax ID'"/>: <span t-field="company.vat"/></li>
+                        </ul>
+                        <div t-field="company.report_footer"/>
+                        <div t-if="report_type == 'pdf'">
+                            Page: <span class="page"/> / <span class="topage"/>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </template>
+    </data>
+</odoo>

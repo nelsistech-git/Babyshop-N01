@@ -1,0 +1,151 @@
+<odoo>
+	<!-- Views -->
+	<record id="view_employee_bonus_form" model="ir.ui.view">
+		<field name="name">Employee Bonus Form</field>
+		<field name="model">hr.employee.bonus</field>
+		<field name="arch" type="xml">
+			<form>
+				<header>
+					<button name="action_confirm" type="object" string="Confirm"
+							invisible="state != 'draft'" groups="hr.group_hr_user" class="oe_highlight"/>
+					<button name="action_cancel" type="object" string="Cancel"
+							invisible="state != 'confirmed'" groups="hr.group_hr_user"/>
+					<button name="action_draft" type="object" string="Set To Draft"
+							invisible="state != 'cancelled'" groups="base.group_system"/>
+					<button name="%(action_employee_bonus_payslip_wizard)d" string="Generate Payslip"
+							type="action" class="btn-primary" invisible="state != 'confirmed'"/>
+
+					<field name="state" widget="statusbar" readonly="1"/>
+				</header>
+				<sheet>
+					<group>
+						<group>
+							<field name="calculation_type" invisible="1" />
+							<field name="currency_id" invisible="1"/>
+								
+							<field name="bonus_type_id" required="1"
+								readonly="state != 'draft'" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+							<field name="percentage_from_settings" readonly="1" force_save="1" invisible="calculation_type != 'percentage'"/>
+							<field name="settings_type" readonly="1" force_save="1" invisible="not percentage_from_settings"/>
+
+
+							<field name="allowed_employee_type_ids" widget="many2many_tags" options="{'no_open':True,'no_create_edit':1}"/>
+
+							<field name="employee_id" required="1"
+								readonly="state != 'draft'" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}"/>
+							<field name="date" required="1"
+								readonly="state != 'draft'" />
+							<field name="based_on_type" readonly="1" force_save="1" string="Based On" invisible="calculation_type != 'percentage'"/>
+
+							<field name="amount_percentage" string="Amount"
+								invisible="calculation_type == 'percentage'" readonly="state != 'draft'" required="1"/> <!--,'required':[('calculation_type','=','fixed')]-->
+							<field name="amount_percentage"
+								string="(%)"
+								invisible="calculation_type !=  'percentage'" readonly="percentage_from_settings" required="1" force_save="1"/>
+							<field name="quantity" required="1"
+								readonly="state != 'draft'" />
+							<field name="reference" invisible="calculation_type == 'fixed'" readonly="1" force_save="1"/>
+							<field name="bonus_amount" force_save="1" readonly="1"
+								widget="monetary" options="{'currency_field': 'currency_id'}" />
+						</group>
+						<group>
+							<field name="user_work_location_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" readonly="1" force_save="1"/>
+							<field name="department_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" readonly="1" force_save="1"/>
+							<field name="job_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" readonly="1" force_save="1"/>
+							<field name="contract_id" options="{'no_open':True,'no_create':1,'no_create_edit':1, 'no_quick_create': True}" readonly="1" force_save="1"/>
+
+							<field name="initial_employment_date" readonly="1" force_save="1"/>
+							<field name="employee_type_id" readonly="1" force_save="1" options="{'no_open':True,'no_create_edit':1}"/>
+							<field name="gross_salary" readonly="1" force_save="1"/> <!--attrs="{'invisible':[('based_on_type','=','basic')]}"-->
+							<field name="basic_salary" readonly="1" force_save="1"/> <!--attrs="{'invisible':[('based_on_type','=','gross')]}"-->
+						</group>
+					</group>
+					<notebook>
+						<page string="Other Information">
+							<group>
+								<group>
+									<field name="note" readonly="state != 'draft'"/>
+									<field name="date_confirm" readonly="1"
+										invisible="state == 'draft'" />
+									 <field name="payslip_id" readonly="1"  />						
+									 <field name="is_paid" readonly="1"  />
+									 <field name="payment_date" readonly="1"  />
+								</group>
+								<group>
+									<field name="user_id" readonly="1" />
+									<field name="batch_emp_bonus_id" readonly="1"/>
+								</group>
+							</group>
+						</page>
+					</notebook>
+				</sheet>
+				<div class="oe_chatter">
+					<field name="message_follower_ids" widget="mail_followers"
+						groups="base.group_user" />
+					<field name="message_ids" widget="mail_thread" />
+				</div>
+			</form>
+		</field>
+	</record>
+
+	<record id="view_employee_bonus_tree" model="ir.ui.view">
+		<field name="name">Employee Bonus Tree</field>
+		<field name="model">hr.employee.bonus</field>
+		<field name="arch" type="xml">
+			<tree>
+				<field name="date" />
+				<field name="date_confirm" />
+				<field name="employee_id" />
+				<field name="user_work_location_id" />
+				<field name="department_id" />
+				<field name="job_id" />
+				<field name="bonus_type_id" />
+				<field name="reference" />
+				<field name="bonus_amount" />
+				<field name="batch_emp_bonus_id" />
+				<field name="user_id" />
+				<field name="state" />
+				<field name="is_paid" />
+			</tree>
+		</field>
+	</record>
+
+	<record id="view_employee_bonus_search" model="ir.ui.view">
+        <field name="name">employee.bonus.search</field>
+        <field name="model">hr.employee.bonus</field>
+        <field name="arch" type="xml">
+            <search string="Search Employee Bonus">
+                <field name="employee_id"/>
+                <field name="user_work_location_id"/>
+                <field name="department_id"/>
+				<field name="id_card_no" filter_domain="[('id_card_no', '=', self)]"/>
+				<field name="device_user_id" filter_domain="[('device_user_id', '=', self)]"/>
+				<filter string="Draft" name="state" domain="[('state', '=', 'draft')]"/>
+				<filter string="Confirm" name="state" domain="[('state', '=', 'confirmed')]"/>
+				<filter string="Paid" name="state" domain="[('state', '=', 'paid')]"/>
+				<filter string="Cancel" name="state" domain="[('state', '=', 'cancelled')]"/>
+				<group col="8" colspan="4" expand="0" string="Group By">
+                    <filter string="Employees" name="employee_id" context="{'group_by': 'employee_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+
+	<record id="action_employee_bonus" model="ir.actions.act_window">
+	    <field name="name">Employee Bonus</field>
+	    <field name="type">ir.actions.act_window</field>
+	    <field name="res_model">hr.employee.bonus</field>
+	    <field name="view_mode">tree,form</field>
+	</record>
+
+	<!--<menuitem id="menu_employee_bonus" name="Employee Bonus" parent="hr.menu_hr_root" groups="hr.group_hr_manager,hr_payroll.group_hr_payroll_manager"/>
+	<menuitem id="menu_employee_bonus_sub" name="Employee Bonus" sequence="1"
+		action="action_employee_bonus" parent="hr_employee_bonus.menu_employee_bonus" groups="hr.group_hr_manager,hr_payroll.group_hr_payroll_manager"/>-->
+
+
+	<menuitem id="menu_employee_bonus_sub_payroll" name="Employee Bonus" sequence="1"
+		action="action_employee_bonus" parent="hr_employee_bonus.menu_employee_bonus_payroll" groups="hr.group_hr_manager,hr_payroll.group_hr_payroll_manager"/>
+
+
+</odoo>

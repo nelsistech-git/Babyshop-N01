@@ -1,0 +1,246 @@
+from odoo import fields, models, _, api
+from odoo.exceptions import ValidationError
+from datetime import datetime
+
+try:
+    from odoo.tools.misc import xlsxwriter
+except ImportError:
+    from odoo.addons.helper import xlsxwriter
+
+import base64
+from io import BytesIO
+
+
+class ScrapReportWizard(models.TransientModel):
+    _name = "scrap.report.wizard"
+    _description = "Scrap Report"
+
+    file_data = fields.Binary('Scrap Report')
+    start_date = fields.Date(string='Start Date', required=True)
+    end_date = fields.Date(string='End Date',  required=True, default=fields.Date.context_today)
+    category_id = fields.Many2one('product.category', string='Product Category')
+    product_id = fields.Many2one('product.product', string='Product', help="Main Product",
+                                 domain="[('state', '=', 'approve'), ('product_tmpl_id.categ_id', 'child_of', category_id)]")
+    location_id = fields.Many2one('stock.location', string='Location', domain="[('usage', '=', 'internal'), ('state', '=', 'done')]")
+
+    @api.constrains('start_date', 'end_date')
+    def date_constrains(self):
+        for rec in self:
+            if rec.end_date < rec.start_date:
+                raise ValidationError(_('End date cannot be greater than the start date.'))
+
+    def scrap_report_excel(self):
+        start_date = self.start_date
+        end_date = self.end_date
+        category_id = self.category_id.id
+        product_id = self.product_id.id
+        location_id = self.location_id
+
+        # get data from sql
+        data = self.scrap_report_sql(start_date, end_date, category_id, product_id, location_id)
+
+        start_date = datetime.strptime(str(self.start_date), '%Y-%m-%d').strftime('%d-%b-%Y')
+        end_date = datetime.strptime(str(self.end_date), '%Y-%m-%d').strftime('%d-%b-%Y')
+
+        file_name = "Scrap Report (%s - %s).xlsx" % (start_date, end_date)
+        file_pointer = BytesIO()
+
+        workbook = xlsxwriter.Workbook(file_pointer)
+
+        # main header formatting
+        format0 = workbook.add_format({'font_size': 14, 'align': 'vcenter', 'bold': True})
+        format0.set_align('center')
+        format0.set_border()
+
+        # column header formatting
+        format1 = workbook.add_format({'font_size': 10, 'align': 'vcenter', 'bold': True})
+        format1.set_align('left')
+        format1.set_border()
+        format2 = workbook.add_format({'font_size': 10, 'align': 'vcenter', 'bold': True})
+        format2.set_align('center')
+        format2.set_border()
+        format3 = workbook.add_format({'font_size': 10, 'align': 'vcenter', 'bold': True})
+        format3.set_align('right')
+        format3.set_border()
+
+        # body formatting
+        format4 = workbook.add_format({'font_size': 10, 'align': 'vcenter'})
+        format4.set_align('left')
+        format4.set_border()
+        format5 = workbook.add_format({'font_size': 10, 'align': 'vcenter'})
+        format5.set_align('center')
+        format5.set_border()
+        format6 = workbook.add_format({'font_size': 10, 'align': 'vcenter'})
+        format6.set_align('right')
+        format6.set_border()
+
+        # grand total formatting
+        format7 = workbook.add_format({'font_size': 10, 'align': 'right', 'bold': True})
+        format7.set_border()
+
+        sheet = workbook.add_worksheet('Scrap Report')
+
+        total_scrap_qty = 0
+
+        if data['loc_name'] == 'All Locations':
+            sheet.merge_range(0, 0, 2, 2,
+                              "Scrap Report (%s - %s)" % (start_date, end_date), format0)
+
+            sheet.merge_range(3, 0, 3, 1, 'Category: {0}'.format(data['categ_name']), format1)
+            sheet.write(3, 2, 'Location: {0}'.format(data['loc_name']), format3)
+
+            sheet.write(4, 0, 'Location', format1)
+            sheet.write(4, 1, 'Product', format1)
+            sheet.write(4, 2, 'Scrap Qty', format3)
+
+            row = 5
+            col = 0
+
+            for rec in data['csr']:
+                if rec['scrap_qty'] != 0:
+                    sheet.write(row, col, rec['location_name'], format4)
+                    sheet.write(row, col + 1, rec['product_name'], format4)
+                    sheet.write(row, col + 2, round(rec['scrap_qty'], 3), format6)
+                    total_scrap_qty = total_scrap_qty + rec['scrap_qty']
+
+                    row = row + 1
+
+            final_row = row
+            final_col = 0
+            sheet.merge_range(final_row, final_col, final_row, final_col + 1, 'Total', format7)
+            sheet.write(final_row, final_col + 2, round(total_scrap_qty, 3), format7)
+
+        else:
+            sheet.merge_range(0, 0, 2, 1,
+                              "Scrap Report (%s - %s)" % (start_date, end_date), format0)
+
+            sheet.write(3, 0, 'Category: {0}'.format(data['categ_name']), format1)
+            sheet.write(3, 1, 'Location: {0}'.format(data['loc_name']), format3)
+
+            sheet.write(4, 0, 'Product', format1)
+            sheet.write(4, 1, 'Scrap Qty', format3)
+
+            row = 5
+            col = 0
+
+            for rec in data['csr']:
+                if rec['scrap_qty'] != 0:
+                    sheet.write(row, col, rec['product_name'], format4)
+                    sheet.write(row, col + 1, round(rec['scrap_qty'], 3), format6)
+                    total_scrap_qty = total_scrap_qty + rec['scrap_qty']
+
+                    row = row + 1
+
+            final_row = row
+            final_col = 0
+            sheet.write(final_row, final_col, 'Total', format7)
+            sheet.write(final_row, final_col + 1, round(total_scrap_qty, 3), format7)
+
+        workbook.close()
+        file_pointer.seek(0)
+        file_data = base64.b64encode(file_pointer.read())
+        self.write({'file_data': file_data})
+        file_pointer.close()
+
+        return {
+            'name': 'Scrap Report',
+            'type': 'ir.actions.act_url',
+            'url': '/web/content?model=scrap.report.wizard&field=file_data&id=%s&filename=%s' % (
+                self.id, file_name),
+            'target': 'self',
+        }
+
+    def scrap_report_html(self):
+        start_date = self.start_date
+        end_date = self.end_date
+        category_id = self.category_id.id
+        product_id = self.product_id.id
+        location_id = self.location_id
+
+        # get data from sql
+        data = self.scrap_report_sql(start_date, end_date, category_id, product_id, location_id)
+
+        return self.env.ref('custom_stock.scrap_report_html_id').with_context(
+            landscape=False).report_action(self, data=data)
+
+    def scrap_report_pdf(self):
+        start_date = self.start_date
+        end_date = self.end_date
+        category_id = self.category_id.id
+        product_id = self.product_id.id
+        location_id = self.location_id
+
+        # get data from sql
+        data = self.scrap_report_sql(start_date, end_date, category_id, product_id, location_id)
+        print(data)
+        return self.env.ref('custom_stock.scrap_report_id').with_context(
+            landscape=False).report_action(self, data=data)
+
+    def scrap_report_sql(self, start_date, end_date, category_id, product_id, location_id):
+        product_domain = [('state', '=', 'approve')]
+
+        if category_id and not product_id:
+            product_domain += [('product_tmpl_id.categ_id', 'child_of', category_id)]
+
+        if category_id and product_id:
+            product_domain += [('product_tmpl_id.categ_id', 'child_of', category_id), ('id', '=', product_id)]
+
+        product_ids = tuple(self.env['product.product'].search(product_domain).ids)
+
+        categ_name = ""
+
+        if category_id:
+            categ_name = self.category_id.name
+        else:
+            categ_name = "All Categories"
+
+        productFilter = ""
+        locationFilter = ""
+
+        if len(product_ids) > 1:
+            productFilter = "AND product_id IN {0}".format(product_ids)
+        else:
+            if len(product_ids) > 1:
+                productFilter = "AND product_id IN {0}".format(product_ids)
+            elif len(product_ids) == 1:
+                productFilter = "AND product_id = {0}".format(product_ids[0])
+            else:
+                raise ValidationError(_('No product(s) available.'))
+
+        if location_id:
+            locationFilter = "AND location_id = %s" % location_id.id
+            loc_name = location_id.name
+        else:
+            loc_name = "All Locations"
+
+        data_sql = """
+                    SELECT product_id, location_id, SUM(scrap_qty) AS scrap_qty
+                    FROM stock_scrap
+                    WHERE state='done'
+                    AND DATE(date_done) BETWEEN '{0}' AND '{1}'
+                    {2} {3}
+                    GROUP BY location_id, product_id
+                    ORDER BY location_id, product_id
+                   """.format(start_date, end_date, productFilter, locationFilter)
+
+        self.env.cr.execute(data_sql)
+        data_dict = self.env.cr.dictfetchall()
+
+        data_list = []
+
+        for data in data_dict:
+            vals = {
+                'location_name': self.env['stock.location'].search([('id', '=', data['location_id'])], limit=1).display_name,
+                'product_name': self.env['product.product'].search([('id', '=', data['product_id'])], limit=1).display_name,
+                'scrap_qty': data['scrap_qty'],
+            }
+            data_list.append(vals)
+
+        data = {
+            'model': "scrap.report.wizard",
+            'form': self.read()[0],
+            'csr': data_list,
+            'categ_name': categ_name,
+            'loc_name': loc_name,
+        }
+        return data

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Action for Office Vendors -->
+    <record id="action_office_vendor" model="ir.actions.act_window">
+        <field name="name">Office Vendors</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="domain">[('is_office_vendor', '=', True)]</field>
+        <field name="context">{'default_is_office_vendor': True}</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'kanban', 'view_id': ref('vendor_office_management.view_office_vendor_kanban')}),
+            (0, 0, {'view_mode': 'tree',   'view_id': ref('vendor_office_management.view_office_vendor_list')}),
+        ]"/>
+        <field name="search_view_id" ref="vendor_office_management.view_office_vendor_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No Office Vendors found
+            </p>
+            <p>
+                Create a new vendor and mark them as an Office Vendor.
+            </p>
+        </field>
+    </record>
+
+    <!-- Office Vendors menu item under Accounting > Vendors -->
+    <menuitem
+        id="menu_office_vendor"
+        name="Office Vendors"
+        action="vendor_office_management.action_office_vendor"
+        sequence="15"/>
+
+</odoo>

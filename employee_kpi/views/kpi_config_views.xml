@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_kpi_config_tree" model="ir.ui.view">
+        <field name="name">kpi.config.tree</field>
+        <field name="model">kpi.config</field>
+        <field name="arch" type="xml">
+            <tree string="KPI Configuration">
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="staff_id"/>
+                <field name="designation"/>
+                <field name="department_id"/>
+                <field name="date"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_kpi_config_form" model="ir.ui.view">
+        <field name="name">kpi.config.form</field>
+        <field name="model">kpi.config</field>
+        <field name="arch" type="xml">
+            <form string="KPI Configuration">
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+
+                    <group string="Employee Information">
+                        <group>
+                            <field name="employee_id"/>
+                            <field name="staff_id" readonly="1"/>
+                            <field name="designation" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="department_id" readonly="1"/>
+                            <field name="date"/>
+                            <field name="active"/>
+                            <!-- পুরনো field গুলো hide করা, database এ থাকবে -->
+                            <field name="date_from" invisible="1"/>
+                            <field name="date_to" invisible="1"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="KPI Tasks">
+                            <field name="task_line_ids">
+                                <tree editable="bottom" string="Tasks">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="task_name"/>
+                                    <field name="description" optional="show"/>
+                                    <field name="target_value"/>
+                                    <field name="uom" optional="show"/>
+                                </tree>
+                            </field>
+                        </page>
+
+                        <page string="Performance Rating Scale (L1–L5)">
+                            <group string="L1 — Unsatisfactory">
+                                <group>
+                                    <field name="l1_label"/>
+                                    <field name="l1_incentive"/>
+                                </group>
+                                <group>
+                                    <field name="l1_min"/>
+                                    <field name="l1_max"/>
+                                </group>
+                            </group>
+                            <group string="L2 — Below Expectations">
+                                <group>
+                                    <field name="l2_label"/>
+                                    <field name="l2_incentive"/>
+                                </group>
+                                <group>
+                                    <field name="l2_min"/>
+                                    <field name="l2_max"/>
+                                </group>
+                            </group>
+                            <group string="L3 — Meets Expectations">
+                                <group>
+                                    <field name="l3_label"/>
+                                    <field name="l3_incentive"/>
+                                </group>
+                                <group>
+                                    <field name="l3_min"/>
+                                    <field name="l3_max"/>
+                                </group>
+                            </group>
+                            <group string="L4 — Exceeds Expectations">
+                                <group>
+                                    <field name="l4_label"/>
+                                    <field name="l4_incentive"/>
+                                </group>
+                                <group>
+                                    <field name="l4_min"/>
+                                    <field name="l4_max"/>
+                                </group>
+                            </group>
+                            <group string="L5 — Outstanding">
+                                <group>
+                                    <field name="l5_label"/>
+                                    <field name="l5_incentive"/>
+                                </group>
+                                <group>
+                                    <field name="l5_min"/>
+                                    <field name="l5_max"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_kpi_config" model="ir.actions.act_window">
+        <field name="name">KPI Configuration</field>
+        <field name="res_model">kpi.config</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a KPI Configuration for an Employee!
+            </p>
+        </field>
+    </record>
+
+</odoo>

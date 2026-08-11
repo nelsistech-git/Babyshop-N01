@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_employee_confirmation_wizard_form" model="ir.ui.view">
+        <field name="name">employee.confirmation.wizard</field>
+        <field name="model">employee.confirmation.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Employee Confirmation">
+                <group>
+                    <group>
+                        <field name="start_date" required="1"/>
+                    </group>
+                    <group>
+                        <field name="end_date" required="1"/>
+                    </group>
+                </group>
+                <group string="Employee Information">
+                    <field name="employee_ids" nolabel="1">
+                        <tree create="false" default_order="name asc">
+                            <field name="name"/>
+                            <field name="job_id"/>
+                            <field name="id_card_no"/>
+                            <field name="initial_employment_date"/>
+                            <field name="date_of_confirmation"/>
+                        </tree>
+                    </field>
+                </group>
+                <footer>
+                    <button name="action_confirm" string="Confirm" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_employee_confirmation_wizard" model="ir.actions.act_window">
+            <field name="name">Employee Confirmation</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">employee.confirmation.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_employee_confirmation_wizard_form"/>
+            <field name="target">new</field>
+    </record>
+
+<!--    <menuitem-->
+<!--          name="Employee Confirmation"-->
+<!--          id="menu_employee_confirmation_wizard"-->
+<!--          parent="menu_hr_employee_settings_root"-->
+<!--          action="custom_hr_employee.action_employee_confirmation_wizard"-->
+<!--    />-->
+
+</odoo>

@@ -1,0 +1,111 @@
+<odoo>
+	<data>
+		<record id="current_stock_history_head_view_form" model="ir.ui.view">
+			<field name="name">current.stock.history.head.form</field>
+			<field name="model">current.stock.history.head</field>
+			<field name="arch" type="xml">
+				<form string="Stock Form">
+					<header>
+<!--						<field name="generate_flag" invisible="1" />-->
+						
+						<button name="generate_data_backup" type="object"
+							string="Generate Backup" class="oe_highlight"
+							groups="base.group_system"
+							attrs="{'invisible':['|',('date','=',False),('generate_flag','=',True)]}"/>
+							
+						<button name="action_current_stock_history_report" type="object"
+						        string="Stock Report" help="Current Stock Report"
+							    class="oe_highlight" />
+						
+						<button name="clear_stock_date" type="object"
+							string="Clear Data" class="oe_highlight"
+							groups="base.group_system"/>
+							
+						<!-- <button
+							name="(current_stock_history_head_upload_wizard_action)d"
+							type="action" string="Report"
+							groups="stock.group_stock_manager"
+							class="oe_highlight"
+							attrs="{'invisible':[('generate_flag','=',False)]}" /> -->
+
+					</header>
+
+					<sheet>
+						<group>
+							<group>
+								<field name="date" style="width:100px;"
+									attrs="{'readonly':[('generate_flag','=',True)]}" />
+								<field name="generate_flag" readonly="1"/>
+							</group>
+							<group></group>
+						</group>
+
+						<group colspan="12">
+							<separator string="Stock Details"
+								colspan="12"></separator>
+							<field name="history_ids" nolabel="1" readonly="1"
+								attrs="{'readonly':[('generate_flag','=',False)]}">
+								<tree create="false" delete="false" edit="false">
+									<field name="location_id"
+										options="{'no_open':True,'no_create':1,'no_create_edit':1}" readonly="1"/>
+									<field name="product_id" 
+										options="{'no_open':True,'no_create':1,'no_create_edit':1}" readonly="1"/>
+									<field name="product_tmpl_id"
+										options="{'no_open':True,'no_create':1,'no_create_edit':1}" readonly="1" />
+									<field name="product_uom_id"
+										options="{'no_open':True,'no_create':1,'no_create_edit':1}" readonly="1" />
+									<field name="in_date" readonly="1" />
+									<field name="quantity" digits="[12,2]"/>
+<!--									<field name="unit_cost" digits="[12,2]" />-->
+									<field name="unit_cost_quant" digits="[12,2]"/>
+<!--									<field name="unit_other_cost" digits="[12,2]"/>-->
+									<field name="unit_other_cost_quant" digits="[12,2]"/>
+									<field name="unit_sale_price" digits="[12,2]"/>
+								</tree>
+							</field>
+						</group>
+					</sheet>
+				</form>
+			</field>
+		</record>
+		
+		<record id="current_stock_history_head_view_tree" model="ir.ui.view">
+			<field name="name">current.stock.history.head.tree</field>
+			<field name="model">current.stock.history.head</field>
+			<field name="arch" type="xml">
+				<tree string="Stock Tree">
+					<field name="date" />
+					<field name="generate_flag" />
+					<field name="create_date" />
+				</tree>
+			</field>
+		</record>
+		
+		<record id="current_stock_history_head_view_search"
+			model="ir.ui.view">
+			<field name="name">current.stock.history.head.search</field>
+			<field name="model">current.stock.history.head</field>
+			<field name="arch" type="xml">
+				<search string="Search Stock">
+					<field name="date" />
+					<separator />
+				</search>
+			</field>
+		</record>
+
+		<record id="current_stock_history_head_list_action"
+			model="ir.actions.act_window">
+			<field name="name">Current Stock History</field>
+			<field name="res_model">current.stock.history.head</field>
+			<field name="view_mode">tree,form</field>
+			<field name="help" type="html">
+				<p class="oe_view_nocontent_create">Current Stock History
+				</p>
+			</field>
+		</record>
+		
+		<menuitem id="current_stock_history_head_menu"
+			name="Current Stock History" parent="custom_common_settings.root_planning_menu"
+			action="current_stock_history_head_list_action" sequence="25" />
+	</data>
+</odoo>

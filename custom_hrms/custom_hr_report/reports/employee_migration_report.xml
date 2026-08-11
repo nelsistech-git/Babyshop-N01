@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+	<data>
+
+        <record id="paperformat_employee_migration_report" model="report.paperformat">
+            <field name="name">Team Target Achievement Report Paperformat</field>
+            <field name="default" eval="True"/>
+            <field name="format">A4</field>
+            <field name="orientation">Landscape</field>
+            <field name="margin_top">25</field>
+            <field name="margin_bottom">20</field>
+            <field name="margin_left">5</field>
+            <field name="margin_right">5</field>
+            <field name="header_line" eval="False"/>
+            <field name="header_spacing">20</field>
+            <field name="dpi">110</field>
+        </record>
+
+
+        <record model="ir.actions.report" id="employee_migration_report_tmpl">
+            <field name="name">Employee Migration Report</field>
+            <field name="model">employee.migration.report.wizard</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">custom_hr_report.employee_migration_report_view</field>
+            <field name="report_file">custom_hr_report.employee_migration_report_view</field>
+            <field name="paperformat_id" ref="custom_hr_report.paperformat_employee_migration_report"/>
+        </record>
+
+		<template id="employee_migration_report_view">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <style type="text/css">
+                            table, th, tr, td{
+                                background: white !important;
+                                border: 1px solid black;
+                            }
+                        </style>
+                        <div class="oe_structure"/>
+                        <div>
+                            <h3 class="text-center head_font_color">
+                                <strong>
+                                    <span t-esc="form['company_id'][1]"/>
+                                    <br/>
+                                    Employee Migration Report -
+                                    <span t-esc="month"/> <span t-esc="year"/>
+                                    <br/>
+                                </strong>
+                            </h3>
+                        </div>
+                        <div class="row">
+                            <div class="col-4">
+                                <p style="color: #000; font-size: 15px;"><strong>Work/Job Location:</strong> <t t-esc="work_loc_name"/></p>
+                            </div>
+                            <div class="col-4 text-center">
+                                <p style="color: #000; font-size: 15px;">
+                                    <strong>Transfer Type: </strong>
+                                    <t t-if="transfer_company=='0'">
+                                        <span>Same Company</span>
+                                    </t>
+                                    <t t-elif="transfer_company=='1'">
+                                        <span>Other Company</span>
+                                    </t>
+                                    <t t-else="">
+                                        <span>All</span>
+                                    </t>
+                                </p>
+                            </div>
+                            <div class="col-4 text-right">
+                                <p style="color: #000; font-size: 15px;"><strong>Department Name:</strong>  <t t-esc="dept_name"/></p>
+                            </div>
+                        </div>
+                        <br/>
+                        <table style="border-collapse: collapse;width: 100%; margin-bottom: 2em;" class="table table-condensed">
+                            <thead>
+                                <t t-if="transfer_company=='all'">
+                                    <tr style="color: black !important;">
+                                        <th rowspan="2" class="text-center align-middle bg_color font_color">Sl.</th>
+                                        <th rowspan="2" class="text-left align-middle bg_color font_color">Type</th>
+                                        <th rowspan="2" class="text-left align-middle bg_color font_color">Employee ID No</th>
+                                        <th rowspan="2" class="text-left align-middle bg_color font_color">Employee Name</th>
+                                        <th colspan="4" class="text-center align-middle bg_color font_color">Previous Allocation</th>
+                                        <th colspan="4" class="text-center align-middle bg_color font_color">Same Company Transfer</th>
+                                        <th colspan="6" class="text-center align-middle bg_color font_color">Other Company Transfer</th>
+                                        <th rowspan="2" class="text-center align-middle bg_color font_color">Remarks</th>
+                                    </tr>
+
+                                    <tr style="color: black !important;">
+                                        <th class="text-left align-middle bg_color font_color">Previous Job/Work Location</th>
+                                        <th class="text-left align-middle bg_color font_color">Previous Department</th>
+                                        <th class="text-left align-middle bg_color font_color">Previous Designation</th>
+                                        <th class="text-left align-middle bg_color font_color">Previous Reporting Manager</th>
+
+                                        <th class="text-left align-middle bg_color font_color">Revised Job/Work Location</th>
+                                        <th class="text-left align-middle bg_color font_color">Revised Department</th>
+                                        <th class="text-left align-middle bg_color font_color">Revised Designation</th>
+                                        <th class="text-left align-middle bg_color font_color">Revised Reporting Manager</th>
+
+                                        <th class="text-left align-middle bg_color font_color">Previous Company Name</th>
+                                        <th class="text-left align-middle bg_color font_color">Revised Company Name</th>
+                                        <th class="text-left align-middle bg_color font_color">Revised Job/Work Location</th>
+                                        <th class="text-left align-middle bg_color font_color">Revised Department</th>
+                                        <th class="text-left align-middle bg_color font_color">Revised Designation</th>
+                                        <th class="text-left align-middle bg_color font_color">Revised Reporting Manager</th>
+                                    </tr>
+                                </t>
+                                <t t-else="">
+                                    <tr>
+                                        <th class="text-middle align-middle bg_color font_color">Sl.</th>
+                                        <th class="text-left align-middle bg_color font_color">Employee Name</th>
+                                        <th class="text-left align-middle bg_color font_color">Employee ID No</th>
+                                        <th t-if="transfer_company=='1'" class="text-left align-middle bg_color font_color">Previous Company Name</th>
+                                        <th class="text-left align-middle bg_color font_color">Previous Job/Work Location</th>
+                                        <th class="text-left align-middle bg_color font_color">Previous Department</th>
+                                        <th class="text-left align-middle bg_color font_color">Previous Designation</th>
+                                        <th class="text-left align-middle bg_color font_color">Previous Reporting Manager</th>
+                                        <th t-if="transfer_company=='0'" class="text-left align-middle bg_color font_color">Revised Job/Work Location</th>
+                                        <th t-if="transfer_company=='0'" class="text-left align-middle bg_color font_color">Revised Department</th>
+                                        <th t-if="transfer_company=='0'" class="text-left align-middle bg_color font_color">Revised Designation</th>
+                                        <th class="text-left align-middle bg_color font_color">Revised Reporting Manager</th>
+                                        <th t-if="transfer_company=='1'" class="text-left align-middle bg_color font_color">Revised Company Name</th>
+                                        <th t-if="transfer_company=='1'" class="text-left align-middle bg_color font_color">Revised Job/Work Location</th>
+                                        <th t-if="transfer_company=='1'" class="text-left align-middle bg_color font_color">Revised Department</th>
+                                        <th t-if="transfer_company=='1'" class="text-left align-middle bg_color font_color">Revised Designation</th>
+                                        <th t-if="transfer_company=='1'" class="text-left align-middle bg_color font_color">Revised Reporting Manager</th>
+                                        <th class="text-left align-middle bg_color font_color">Remarks</th>
+                                    </tr>
+                                </t>
+                            </thead>
+                            <tbody class="consumed_tbody">
+                                <t t-set="sl_no" t-value="1"/>
+                                <t t-foreach="csr" t-as="line">
+                                    <tr>
+                                        <td class="text-middle align-middle">
+                                            <span t-esc="sl_no"/>
+                                        </td>
+                                        <td class="text-left align-middle" t-if="transfer_company=='all'">
+                                            <t t-if="line['transfer_type']=='0'">
+                                                <span>Same Company</span>
+                                            </t>
+                                            <t t-if="line['transfer_type']=='1'">
+                                                <span>Other Company</span>
+                                            </t>
+                                        </td>
+                                        <td class="text-left align-middle">
+                                            <span t-esc="line['employee_name']"/>
+                                        </td>
+                                        <td class="text-left align-middle">
+                                            <span t-esc="line['id_card_no']"/>
+                                        </td>
+                                        <td class="text-left align-middle">
+                                            <span t-esc="line['from_loc_name']"/>
+                                        </td>
+                                        <td class="text-left align-middle">
+                                            <span t-esc="line['from_dept_name']"/>
+                                        </td>
+                                        <td class="text-left align-middle">
+                                            <span t-esc="line['from_job_pos_name']"/>
+                                        </td>
+                                        <td class="text-left align-middle">
+                                            <span t-esc="line['from_manager_name']"/>
+                                        </td>
+                                        <td class="text-left align-middle" t-if="transfer_company=='0' or transfer_company=='all'">
+                                            <span t-esc="line['to_loc_name']"/>
+                                        </td>
+                                        <td class="text-left align-middle" t-if="transfer_company=='0' or transfer_company=='all'">
+                                            <span t-esc="line['to_dept_name']"/>
+                                        </td>
+                                        <td class="text-left align-middle" t-if="transfer_company=='0' or transfer_company=='all'">
+                                            <span t-esc="line['to_job_pos_name']"/>
+                                        </td>
+                                        <td class="text-left align-middle" t-if="transfer_company=='0' or transfer_company=='all'">
+                                            <span t-esc="line['to_manager_name']"/>
+                                        </td>
+                                        <td class="text-left align-middle" t-if="transfer_company=='1' or transfer_company=='all'">
+                                            <span t-esc="line['company_name']"/>
+                                        </td>
+                                        <td class="text-left align-middle" t-if="transfer_company=='1' or transfer_company=='all'">
+                                            <span t-esc="line['other_company_name']"/>
+                                        </td>
+                                        <td class="text-left align-middle" t-if="transfer_company=='1' or transfer_company=='all'">
+                                            <span t-esc="line['other_company_job_location']"/>
+                                        </td>
+                                        <td class="text-left align-middle" t-if="transfer_company=='1' or transfer_company=='all'">
+                                            <span t-esc="line['other_company_dept_name']"/>
+                                        </td>
+                                        <td class="text-left align-middle" t-if="transfer_company=='1' or transfer_company=='all'">
+                                            <span t-esc="line['other_company_job_position']"/>
+                                        </td>
+                                        <td class="text-left align-middle" t-if="transfer_company=='1' or transfer_company=='all'">
+                                            <span t-esc="line['other_company_manager_name']"/>
+                                        </td>
+                                        <td class="text-left align-middle" style="border: 1px solid black;">
+                                            <span t-esc="line['note']"/>
+                                        </td>
+                                    </tr>
+                                    <t t-set="sl_no" t-value="sl_no + 1"/>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+		</template>
+	</data>
+</odoo>
