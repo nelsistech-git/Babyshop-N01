@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_report_baby_shop_stock_ledger" model="ir.actions.report">
+        <field name="name">Stock Ledger</field>
+        <field name="model">baby.shop.stock.ledger</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">baby_shop_reports.report_stock_ledger_document</field>
+        <field name="report_file">baby_shop_reports.report_stock_ledger_document</field>
+        <field name="binding_model_id" ref="model_baby_shop_stock_ledger"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'Stock Ledger - %s' % (object[0].date)</field>
+    </record>
+
+    <template id="report_stock_ledger_document">
+        <t t-call="web.html_container">
+            <t t-set="area_dates" t-value="sorted(set((l.area_name, l.date) for l in docs), key=lambda x: (x[0] or '', x[1]))"/>
+            <t t-foreach="area_dates" t-as="area_date">
+                <t t-set="area" t-value="area_date[0]"/>
+                <t t-set="rdate" t-value="area_date[1]"/>
+                <t t-set="lines" t-value="docs.filtered(lambda l: l.area_name == area and l.date == rdate)"/>
+                <div class="page">
+                    <table style="width:100%; text-align:center; border-collapse: collapse;">
+                        <tr><td style="font-weight:bold; font-size:14px;">Baby Shop: <t t-esc="area"/></td></tr>
+                        <tr><td style="font-weight:bold;">Stock Leadger</td></tr>
+                        <tr><td style="font-weight:bold;">Date-<t t-esc="rdate"/></td></tr>
+                    </table>
+                    <table class="table table-sm o_main_table" style="border:1px solid black; border-collapse:collapse; margin-top:8px;">
+                        <thead>
+                            <tr style="border:1px solid black;">
+                                <th rowspan="2" style="border:1px solid black;">Showroom name</th>
+                                <th rowspan="2" style="border:1px solid black;">Opening</th>
+                                <th colspan="4" style="border:1px solid black;">Received</th>
+                                <th colspan="5" style="border:1px solid black;">Issued</th>
+                                <th rowspan="2" style="border:1px solid black;">Balance</th>
+                            </tr>
+                            <tr style="border:1px solid black;">
+                                <th style="border:1px solid black;">Invoice No</th>
+                                <th style="border:1px solid black;">Invoice/Rcv Qty</th>
+                                <th style="border:1px solid black;">RCV From</th>
+                                <th style="border:1px solid black;">Total Qty</th>
+                                <th style="border:1px solid black;">Sales Qty</th>
+                                <th style="border:1px solid black;">Return invoice</th>
+                                <th style="border:1px solid black;">Return to</th>
+                                <th style="border:1px solid black;">Return qty</th>
+                                <th style="border:1px solid black;">Total Qty</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="lines" t-as="line" style="border:1px solid black;">
+                                <td style="border:1px solid black;"><t t-esc="line.showroom_id.name"/></td>
+                                <td style="border:1px solid black;"><t t-esc="line.opening_qty"/></td>
+                                <td style="border:1px solid black;"><t t-esc="line.invoice_no"/></td>
+                                <td style="border:1px solid black;"><t t-esc="line.invoice_rcv_qty"/></td>
+                                <td style="border:1px solid black;"><t t-esc="line.rcv_from"/></td>
+                                <td style="border:1px solid black;"><t t-esc="line.total_received_qty"/></td>
+                                <td style="border:1px solid black;"><t t-esc="line.sales_qty"/></td>
+                                <td style="border:1px solid black;"><t t-esc="line.return_invoice"/></td>
+                                <td style="border:1px solid black;"><t t-esc="line.return_to"/></td>
+                                <td style="border:1px solid black;"><t t-esc="line.return_qty"/></td>
+                                <td style="border:1px solid black;"><t t-esc="line.total_issued_qty"/></td>
+                                <td style="border:1px solid black;"><t t-esc="line.balance_qty"/></td>
+                            </tr>
+                            <tr style="border:1px solid black; font-weight:bold;">
+                                <td style="border:1px solid black;">Total</td>
+                                <td style="border:1px solid black;"><t t-esc="sum(lines.mapped('opening_qty'))"/></td>
+                                <td style="border:1px solid black;"></td>
+                                <td style="border:1px solid black;"><t t-esc="sum(lines.mapped('invoice_rcv_qty'))"/></td>
+                                <td style="border:1px solid black;"></td>
+                                <td style="border:1px solid black;"><t t-esc="sum(lines.mapped('total_received_qty'))"/></td>
+                                <td style="border:1px solid black;"><t t-esc="sum(lines.mapped('sales_qty'))"/></td>
+                                <td style="border:1px solid black;"></td>
+                                <td style="border:1px solid black;"></td>
+                                <td style="border:1px solid black;"><t t-esc="sum(lines.mapped('return_qty'))"/></td>
+                                <td style="border:1px solid black;"><t t-esc="sum(lines.mapped('total_issued_qty'))"/></td>
+                                <td style="border:1px solid black;"><t t-esc="sum(lines.mapped('balance_qty'))"/></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
+        </t>
+    </template>
+
+</odoo>

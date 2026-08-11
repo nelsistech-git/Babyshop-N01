@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_report_baby_shop_store_report" model="ir.actions.report">
+        <field name="name">Store Report</field>
+        <field name="model">baby.shop.store.report</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">baby_shop_reports.report_store_report_document</field>
+        <field name="report_file">baby_shop_reports.report_store_report_document</field>
+        <field name="binding_model_id" ref="model_baby_shop_store_report"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'Store Report - %s - %s' % (object.showroom_id.name, object.date)</field>
+    </record>
+
+    <template id="report_store_report_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <div class="page">
+                    <table style="width:100%; text-align:center; border-collapse: collapse;">
+                        <tr><td style="font-weight:bold; font-size:14px;">Accounts Report</td></tr>
+                        <tr><td style="font-weight:bold;">STORE REPORT</td></tr>
+                        <tr><td><t t-esc="o.showroom_id.name"/> — <t t-esc="o.date"/></td></tr>
+                    </table>
+
+                    <h5>TRACK SALE &amp; CUSTOMER</h5>
+                    <table class="table table-sm" style="border:1px solid black; border-collapse:collapse;">
+                        <thead>
+                            <tr style="border:1px solid black;">
+                                <th style="border:1px solid black;">Opening Balance</th>
+                                <th style="border:1px solid black;">Cash Sale City</th>
+                                <th style="border:1px solid black;">Card UCB</th>
+                                <th style="border:1px solid black;">Total Card Sale</th>
+                                <th style="border:1px solid black;">M Pay</th>
+                                <th style="border:1px solid black;">Total Sale</th>
+                                <th style="border:1px solid black;">Cash Received</th>
+                                <th style="border:1px solid black;">Total Expanse</th>
+                                <th style="border:1px solid black;">Total Vat</th>
+                                <th style="border:1px solid black;">Closing Balance</th>
+                                <th style="border:1px solid black;">Sale Qty</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border:1px solid black;">
+                                <td style="border:1px solid black;"><span t-field="o.opening_balance"/></td>
+                                <td style="border:1px solid black;"><span t-field="o.cash_sale_city"/></td>
+                                <td style="border:1px solid black;"><span t-field="o.card_ucb"/></td>
+                                <td style="border:1px solid black;"><span t-field="o.total_card_sale"/></td>
+                                <td style="border:1px solid black;"><span t-field="o.m_pay"/></td>
+                                <td style="border:1px solid black;"><span t-field="o.total_sale"/></td>
+                                <td style="border:1px solid black;"><span t-field="o.cash_received"/></td>
+                                <td style="border:1px solid black;"><span t-field="o.total_expense"/></td>
+                                <td style="border:1px solid black;"><span t-field="o.total_vat"/></td>
+                                <td style="border:1px solid black;"><span t-field="o.closing_balance"/></td>
+                                <td style="border:1px solid black;"><t t-esc="o.sale_qty"/></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <table class="table table-sm" style="border:1px solid black; border-collapse:collapse; margin-top:8px;">
+                        <thead>
+                            <tr style="border:1px solid black;">
+                                <th style="border:1px solid black;">Opening Balance</th>
+                                <th style="border:1px solid black;">Received Qty</th>
+                                <th style="border:1px solid black;">Return</th>
+                                <th style="border:1px solid black;">Sale Qty</th>
+                                <th style="border:1px solid black;">Closing Store</th>
+                                <th style="border:1px solid black;">GM Store</th>
+                                <th style="border:1px solid black;">MD Store</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border:1px solid black;">
+                                <td style="border:1px solid black;"><t t-esc="o.stock_opening_qty"/></td>
+                                <td style="border:1px solid black;"><t t-esc="o.received_qty"/></td>
+                                <td style="border:1px solid black;"><t t-esc="o.return_qty"/></td>
+                                <td style="border:1px solid black;"><t t-esc="o.stock_sale_qty"/></td>
+                                <td style="border:1px solid black;"><t t-esc="o.closing_store_qty"/></td>
+                                <td style="border:1px solid black;"><t t-esc="o.gm_store"/></td>
+                                <td style="border:1px solid black;"><t t-esc="o.md_store"/></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <table class="table table-sm" style="border:1px solid black; border-collapse:collapse; margin-top:8px;">
+                        <thead>
+                            <tr style="border:1px solid black;">
+                                <th colspan="2" style="border:1px solid black;">Oven Sale</th>
+                                <th colspan="2" style="border:1px solid black;">Knit Sale</th>
+                                <th style="border:1px solid black;">Customer In</th>
+                                <th style="border:1px solid black;">Purchase</th>
+                                <th style="border:1px solid black;">Not Purchase</th>
+                                <th style="border:1px solid black;">Pending bill name &amp; amount</th>
+                            </tr>
+                            <tr style="border:1px solid black;">
+                                <th style="border:1px solid black;">Amount</th>
+                                <th style="border:1px solid black;">Qty</th>
+                                <th style="border:1px solid black;">Amount</th>
+                                <th style="border:1px solid black;">Qty</th>
+                                <th style="border:1px solid black;"/>
+                                <th style="border:1px solid black;"/>
+                                <th style="border:1px solid black;"/>
+                                <th style="border:1px solid black;"/>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border:1px solid black;">
+                                <td style="border:1px solid black;"><span t-field="o.oven_sale_amount"/></td>
+                                <td style="border:1px solid black;"><t t-esc="o.oven_qty"/></td>
+                                <td style="border:1px solid black;"><span t-field="o.knit_sale_amount"/></td>
+                                <td style="border:1px solid black;"><t t-esc="o.knit_qty"/></td>
+                                <td style="border:1px solid black;"><t t-esc="o.customer_in"/></td>
+                                <td style="border:1px solid black;"><t t-esc="o.purchase"/></td>
+                                <td style="border:1px solid black;"><t t-esc="o.not_purchase"/></td>
+                                <td style="border:1px solid black;">
+                                    <t t-esc="o.pending_bill_name"/>
+                                    <span t-if="o.pending_bill_amount" t-field="o.pending_bill_amount"/>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h5 style="margin-top:12px;">DAILY TARGET</h5>
+                    <table class="table table-sm" style="border:1px solid black; border-collapse:collapse;">
+                        <thead>
+                            <tr style="border:1px solid black;">
+                                <th style="border:1px solid black;">Today's Target [TK]</th>
+                                <th style="border:1px solid black;">Achieved In Tk</th>
+                                <th style="border:1px solid black;">%</th>
+                                <th style="border:1px solid black;">Not Achieved %</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border:1px solid black;">
+                                <td style="border:1px solid black;"><span t-field="o.daily_target"/></td>
+                                <td style="border:1px solid black;"><span t-field="o.achieved_amount"/></td>
+                                <td style="border:1px solid black;"><t t-esc="round(o.achieved_percent)"/>%</td>
+                                <td style="border:1px solid black;"><t t-esc="round(o.not_achieved_percent)"/>%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
+        </t>
+    </template>
+
+</odoo>

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_baby_shop_bank_expense_tree" model="ir.ui.view">
+        <field name="name">baby.shop.bank.expense.tree</field>
+        <field name="model">baby.shop.bank.expense</field>
+        <field name="arch" type="xml">
+            <tree string="Bank Expense Report" editable="bottom" default_order="date desc, sale_team_id">
+                <field name="date"/>
+                <field name="sale_team_id"/>
+                <field name="showroom_id"/>
+                <field name="opening_balance" sum="Total"/>
+                <field name="cash_sales" sum="Total"/>
+                <field name="card_sales_city" sum="Total"/>
+                <field name="card_sales_ucb" sum="Total"/>
+                <field name="total_sales" sum="Total"/>
+                <field name="total_sales_with_opening" sum="Total"/>
+                <field name="bank_deposit" sum="Total"/>
+                <field name="bank_name"/>
+                <field name="card_sales_expense" sum="Total"/>
+                <field name="showroom_expenses" sum="Total"/>
+                <field name="head_office_expenses" sum="Total"/>
+                <field name="total_expenses" sum="Total"/>
+                <field name="closing_balance" sum="Total"/>
+                <field name="today_bank_deposit" sum="Total"/>
+                <field name="today_bank_name"/>
+                <field name="net_closing" sum="Total"/>
+                <field name="currency_id" column_invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_baby_shop_bank_expense_form" model="ir.ui.view">
+        <field name="name">baby.shop.bank.expense.form</field>
+        <field name="model">baby.shop.bank.expense</field>
+        <field name="arch" type="xml">
+            <form string="Bank Expense Report Line">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="date"/>
+                            <field name="sale_team_id"/>
+                            <field name="showroom_id"/>
+                        </group>
+                        <group>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Income">
+                            <group>
+                                <field name="opening_balance"/>
+                                <field name="cash_sales"/>
+                                <field name="card_sales_city"/>
+                                <field name="card_sales_ucb"/>
+                                <field name="total_card_sales" readonly="1"/>
+                                <field name="total_sales" readonly="1"/>
+                                <field name="total_sales_with_opening" readonly="1"/>
+                                <field name="bank_deposit"/>
+                                <field name="bank_name"/>
+                            </group>
+                        </page>
+                        <page string="Expenses">
+                            <group>
+                                <field name="card_sales_expense"/>
+                                <field name="showroom_expenses"/>
+                                <field name="head_office_expenses"/>
+                                <field name="total_expenses" readonly="1"/>
+                                <field name="closing_balance" readonly="1"/>
+                                <field name="today_bank_deposit"/>
+                                <field name="today_bank_name"/>
+                                <field name="net_closing" readonly="1"/>
+                            </group>
+                        </page>
+                        <page string="Note">
+                            <field name="note"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_baby_shop_bank_expense_search" model="ir.ui.view">
+        <field name="name">baby.shop.bank.expense.search</field>
+        <field name="model">baby.shop.bank.expense</field>
+        <field name="arch" type="xml">
+            <search string="Bank Expense Report">
+                <field name="date"/>
+                <field name="sale_team_id"/>
+                <field name="showroom_id"/>
+                <filter string="Today" name="today" domain="[('date','=', context_today().strftime('%Y-%m-%d'))]"/>
+                <group expand="1" string="Group By">
+                    <filter string="Sale Team" name="group_team" context="{'group_by':'sale_team_id'}"/>
+                    <filter string="Date" name="group_date" context="{'group_by':'date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_baby_shop_bank_expense" model="ir.actions.act_window">
+        <field name="name">Bank Expense Report</field>
+        <field name="res_model">baby.shop.bank.expense</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_baby_shop_bank_expense_search"/>
+        <field name="context">{'search_default_today': 1, 'search_default_group_team': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Add today's showroom-wise cash / card sales, bank deposit and expenses.
+            </p>
+        </field>
+    </record>
+
+</odoo>

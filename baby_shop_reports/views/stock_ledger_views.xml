@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_baby_shop_stock_ledger_tree" model="ir.ui.view">
+        <field name="name">baby.shop.stock.ledger.tree</field>
+        <field name="model">baby.shop.stock.ledger</field>
+        <field name="arch" type="xml">
+            <tree string="Stock Ledger" editable="bottom" default_order="date desc, area_name">
+                <field name="date"/>
+                <field name="area_name"/>
+                <field name="showroom_id"/>
+                <field name="opening_qty" sum="Total"/>
+                <field name="invoice_no"/>
+                <field name="invoice_rcv_qty" sum="Total"/>
+                <field name="rcv_from"/>
+                <field name="total_received_qty" sum="Total"/>
+                <field name="sales_qty" sum="Total"/>
+                <field name="return_invoice"/>
+                <field name="return_to"/>
+                <field name="return_qty" sum="Total"/>
+                <field name="total_issued_qty" sum="Total"/>
+                <field name="balance_qty" sum="Total"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_baby_shop_stock_ledger_form" model="ir.ui.view">
+        <field name="name">baby.shop.stock.ledger.form</field>
+        <field name="model">baby.shop.stock.ledger</field>
+        <field name="arch" type="xml">
+            <form string="Stock Ledger Line">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="date"/>
+                            <field name="area_name"/>
+                            <field name="showroom_id"/>
+                        </group>
+                    </group>
+                    <group string="Received">
+                        <field name="opening_qty"/>
+                        <field name="invoice_no"/>
+                        <field name="invoice_rcv_qty"/>
+                        <field name="rcv_from"/>
+                        <field name="total_received_qty" readonly="1"/>
+                    </group>
+                    <group string="Issued">
+                        <field name="sales_qty"/>
+                        <field name="return_invoice"/>
+                        <field name="return_to"/>
+                        <field name="return_qty"/>
+                        <field name="total_issued_qty" readonly="1"/>
+                    </group>
+                    <group>
+                        <field name="balance_qty" readonly="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_baby_shop_stock_ledger_search" model="ir.ui.view">
+        <field name="name">baby.shop.stock.ledger.search</field>
+        <field name="model">baby.shop.stock.ledger</field>
+        <field name="arch" type="xml">
+            <search string="Stock Ledger">
+                <field name="date"/>
+                <field name="area_name"/>
+                <field name="showroom_id"/>
+                <filter string="Today" name="today" domain="[('date','=', context_today().strftime('%Y-%m-%d'))]"/>
+                <group expand="1" string="Group By">
+                    <filter string="Area" name="group_area" context="{'group_by':'area_name'}"/>
+                    <filter string="Date" name="group_date" context="{'group_by':'date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_baby_shop_stock_ledger" model="ir.actions.act_window">
+        <field name="name">Stock Ledger</field>
+        <field name="res_model">baby.shop.stock.ledger</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_baby_shop_stock_ledger_search"/>
+        <field name="context">{'search_default_today': 1, 'search_default_group_area': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Add today's showroom-wise stock received / issued figures.
+            </p>
+        </field>
+    </record>
+
+</odoo>

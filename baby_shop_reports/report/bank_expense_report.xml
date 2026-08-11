@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_report_baby_shop_bank_expense" model="ir.actions.report">
+        <field name="name">Bank Expense Report</field>
+        <field name="model">baby.shop.bank.expense</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">baby_shop_reports.report_bank_expense_document</field>
+        <field name="report_file">baby_shop_reports.report_bank_expense_document</field>
+        <field name="binding_model_id" ref="model_baby_shop_bank_expense"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'Bank Expense Report - %s' % (object[0].date)</field>
+    </record>
+
+    <template id="report_bank_expense_document">
+        <t t-call="web.html_container">
+            <!-- Group the selected lines by Sale Team + Date, one page per group,
+                 exactly like the original 'SALE TEAM-XX <name>' sheets. -->
+            <t t-set="team_dates" t-value="sorted(set((l.sale_team_id, l.date) for l in docs), key=lambda x: (x[0].name or '', x[1]))"/>
+            <t t-foreach="team_dates" t-as="team_date">
+                <t t-set="team" t-value="team_date[0]"/>
+                <t t-set="rdate" t-value="team_date[1]"/>
+                <t t-set="lines" t-value="docs.filtered(lambda l: l.sale_team_id == team and l.date == rdate)"/>
+                <div class="page">
+                    <table style="width:100%; text-align:center; border-collapse: collapse;">
+                        <tr><td style="font-weight:bold; font-size:14px;">BABY SHOP LTD</td></tr>
+                        <tr><td style="font-weight:bold;">BANK EXPENCE REPORT</td></tr>
+                        <tr><td style="font-weight:bold;">SALE TEAM - <t t-esc="team.name"/></td></tr>
+                    </table>
+                    <table class="table table-sm o_main_table" style="border:1px solid black; border-collapse:collapse; margin-top:8px;">
+                        <thead>
+                            <tr style="border:1px solid black;">
+                                <th rowspan="2" style="border:1px solid black;">SL NO</th>
+                                <th rowspan="2" style="border:1px solid black;">SHOW ROOM NAME</th>
+                                <th rowspan="2" style="border:1px solid black;">OPENING BALANCE</th>
+                                <th colspan="4" style="border:1px solid black;">INCOME</th>
+                                <th colspan="7" style="border:1px solid black;">EXPENSES</th>
+                                <th rowspan="2" style="border:1px solid black;">
+                                    DATE: <t t-esc="rdate"/>
+                                </th>
+                            </tr>
+                            <tr style="border:1px solid black;">
+                                <th style="border:1px solid black;">CASH SALES</th>
+                                <th style="border:1px solid black;">CARD SALES CITY</th>
+                                <th style="border:1px solid black;">CARD SALES UCB</th>
+                                <th style="border:1px solid black;">TOTAL SALES WITH OPENING</th>
+                                <th style="border:1px solid black;">BANK DEPOSIT / BANK NAME</th>
+                                <th style="border:1px solid black;">CARD SALES</th>
+                                <th style="border:1px solid black;">SHOW ROOM EXPENSES</th>
+                                <th style="border:1px solid black;">HEAD OFFICE</th>
+                                <th style="border:1px solid black;">TOTAL EXPENSES</th>
+                                <th style="border:1px solid black;">CLOSING BALANCE</th>
+                                <th style="border:1px solid black;">TODAY BANK DEPOSIT / BANK NAME</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-set="sl" t-value="0"/>
+                            <tr t-foreach="lines" t-as="line" style="border:1px solid black;">
+                                <t t-set="sl" t-value="sl + 1"/>
+                                <td style="border:1px solid black;"><t t-esc="sl"/></td>
+                                <td style="border:1px solid black;"><t t-esc="line.showroom_id.name"/></td>
+                                <td style="border:1px solid black;"><span t-field="line.opening_balance"/></td>
+                                <td style="border:1px solid black;"><span t-field="line.cash_sales"/></td>
+                                <td style="border:1px solid black;"><span t-field="line.card_sales_city"/></td>
+                                <td style="border:1px solid black;"><span t-field="line.card_sales_ucb"/></td>
+                                <td style="border:1px solid black;"><span t-field="line.total_sales_with_opening"/></td>
+                                <td style="border:1px solid black;">
+                                    <span t-field="line.bank_deposit"/> / <t t-esc="line.bank_name"/>
+                                </td>
+                                <td style="border:1px solid black;"><span t-field="line.card_sales_expense"/></td>
+                                <td style="border:1px solid black;"><span t-field="line.showroom_expenses"/></td>
+                                <td style="border:1px solid black;"><span t-field="line.head_office_expenses"/></td>
+                                <td style="border:1px solid black;"><span t-field="line.total_expenses"/></td>
+                                <td style="border:1px solid black;"><span t-field="line.closing_balance"/></td>
+                                <td style="border:1px solid black;">
+                                    <span t-field="line.today_bank_deposit"/> / <t t-esc="line.today_bank_name"/>
+                                </td>
+                            </tr>
+                            <tr style="border:1px solid black; font-weight:bold;">
+                                <td colspan="2" style="border:1px solid black;">TOTAL</td>
+                                <td style="border:1px solid black;"><t t-esc="sum(lines.mapped('opening_balance'))"/></td>
+                                <td style="border:1px solid black;"><t t-esc="sum(lines.mapped('cash_sales'))"/></td>
+                                <td style="border:1px solid black;"><t t-esc="sum(lines.mapped('card_sales_city'))"/></td>
+                                <td style="border:1px solid black;"><t t-esc="sum(lines.mapped('card_sales_ucb'))"/></td>
+                                <td style="border:1px solid black;"><t t-esc="sum(lines.mapped('total_sales_with_opening'))"/></td>
+                                <td style="border:1px solid black;"><t t-esc="sum(lines.mapped('bank_deposit'))"/></td>
+                                <td style="border:1px solid black;"><t t-esc="sum(lines.mapped('card_sales_expense'))"/></td>
+                                <td style="border:1px solid black;"><t t-esc="sum(lines.mapped('showroom_expenses'))"/></td>
+                                <td style="border:1px solid black;"><t t-esc="sum(lines.mapped('head_office_expenses'))"/></td>
+                                <td style="border:1px solid black;"><t t-esc="sum(lines.mapped('total_expenses'))"/></td>
+                                <td style="border:1px solid black;"><t t-esc="sum(lines.mapped('closing_balance'))"/></td>
+                                <td style="border:1px solid black;"><t t-esc="sum(lines.mapped('today_bank_deposit'))"/></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
+        </t>
+    </template>
+
+</odoo>

@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_baby_shop_store_report_tree" model="ir.ui.view">
+        <field name="name">baby.shop.store.report.tree</field>
+        <field name="model">baby.shop.store.report</field>
+        <field name="arch" type="xml">
+            <tree string="Store Report" default_order="date desc, showroom_id">
+                <field name="date"/>
+                <field name="showroom_id"/>
+                <field name="total_sale" sum="Total"/>
+                <field name="sale_qty" sum="Total"/>
+                <field name="customer_in" sum="Total"/>
+                <field name="daily_target" sum="Total"/>
+                <field name="achieved_amount" sum="Total"/>
+                <field name="achieved_percent" avg="Avg %"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_baby_shop_store_report_form" model="ir.ui.view">
+        <field name="name">baby.shop.store.report.form</field>
+        <field name="model">baby.shop.store.report</field>
+        <field name="arch" type="xml">
+            <form string="Store Report">
+                <sheet>
+                    <group>
+                        <field name="date"/>
+                        <field name="showroom_id"/>
+                    </group>
+                    <notebook>
+                        <page string="Accounts Report">
+                            <group>
+                                <group>
+                                    <field name="opening_balance"/>
+                                    <field name="cash_sale_city"/>
+                                    <field name="card_ucb"/>
+                                    <field name="total_card_sale" readonly="1"/>
+                                    <field name="m_pay"/>
+                                    <field name="total_sale" readonly="1"/>
+                                </group>
+                                <group>
+                                    <field name="cash_received"/>
+                                    <field name="total_expense"/>
+                                    <field name="total_vat"/>
+                                    <field name="closing_balance" readonly="1"/>
+                                    <field name="sale_qty"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Track Sale &amp; Customer">
+                            <group>
+                                <group>
+                                    <field name="stock_opening_qty"/>
+                                    <field name="received_qty"/>
+                                    <field name="return_qty"/>
+                                    <field name="stock_sale_qty"/>
+                                    <field name="closing_store_qty" readonly="1"/>
+                                    <field name="gm_store"/>
+                                    <field name="md_store"/>
+                                </group>
+                                <group>
+                                    <field name="oven_sale_amount"/>
+                                    <field name="oven_qty"/>
+                                    <field name="knit_sale_amount"/>
+                                    <field name="knit_qty"/>
+                                    <field name="customer_in"/>
+                                    <field name="purchase"/>
+                                    <field name="not_purchase"/>
+                                    <field name="pending_bill_name"/>
+                                    <field name="pending_bill_amount"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Daily Target">
+                            <group>
+                                <field name="daily_target"/>
+                                <field name="achieved_amount"/>
+                                <field name="achieved_percent" readonly="1"/>
+                                <field name="not_achieved_percent" readonly="1"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_baby_shop_store_report_search" model="ir.ui.view">
+        <field name="name">baby.shop.store.report.search</field>
+        <field name="model">baby.shop.store.report</field>
+        <field name="arch" type="xml">
+            <search string="Store Report">
+                <field name="date"/>
+                <field name="showroom_id"/>
+                <filter string="Today" name="today" domain="[('date','=', context_today().strftime('%Y-%m-%d'))]"/>
+                <group expand="1" string="Group By">
+                    <filter string="Show Room" name="group_showroom" context="{'group_by':'showroom_id'}"/>
+                    <filter string="Date" name="group_date" context="{'group_by':'date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_baby_shop_store_report" model="ir.actions.act_window">
+        <field name="name">Store Report</field>
+        <field name="res_model">baby.shop.store.report</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_baby_shop_store_report_search"/>
+        <field name="context">{'search_default_today': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Add today's store report: sales, target, customers and stock movement.
+            </p>
+        </field>
+    </record>
+
+</odoo>
