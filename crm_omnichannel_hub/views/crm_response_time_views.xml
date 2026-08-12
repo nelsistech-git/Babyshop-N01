@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_crm_response_time_search" model="ir.ui.view">
+        <field name="name">crm.response.time.search</field>
+        <field name="model">crm.response.time</field>
+        <field name="arch" type="xml">
+            <search string="Search Agent Performance">
+                <field name="agent_id"/>
+                <field name="channel_id"/>
+                <filter string="Today" name="filter_today"
+                        domain="[('response_date', '&gt;=', context_today().strftime('%Y-%m-%d 00:00:00'))]"/>
+                <filter string="This Week" name="filter_this_week"
+                        domain="[('response_date', '&gt;=', (context_today() - datetime.timedelta(days=context_today().weekday())).strftime('%Y-%m-%d 00:00:00'))]"/>
+                <filter string="This Month" name="filter_this_month"
+                        domain="[('response_date', '&gt;=', context_today().strftime('%Y-%m-01 00:00:00'))]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Agent" name="groupby_agent" context="{'group_by': 'agent_id'}"/>
+                    <filter string="Channel" name="groupby_channel" context="{'group_by': 'channel_id'}"/>
+                    <filter string="Response Date" name="groupby_response_date" date="response_date"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_crm_response_time_tree" model="ir.ui.view">
+        <field name="name">crm.response.time.tree</field>
+        <field name="model">crm.response.time</field>
+        <field name="arch" type="xml">
+            <tree string="Agent Response Time" default_order="response_date desc">
+                <field name="response_date"/>
+                <field name="agent_id"/>
+                <field name="channel_id"/>
+                <field name="waiting_since"/>
+                <field name="response_seconds" sum="Total Seconds"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_crm_response_time_pivot" model="ir.ui.view">
+        <field name="name">crm.response.time.pivot</field>
+        <field name="model">crm.response.time</field>
+        <field name="arch" type="xml">
+            <pivot string="Agent Performance">
+                <field name="agent_id" type="row"/>
+                <field name="channel_id" type="col"/>
+                <field name="response_seconds" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_crm_response_time_graph" model="ir.ui.view">
+        <field name="name">crm.response.time.graph</field>
+        <field name="model">crm.response.time</field>
+        <field name="arch" type="xml">
+            <graph string="Agent Performance" type="bar">
+                <field name="agent_id"/>
+                <field name="response_seconds" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_crm_response_time" model="ir.actions.act_window">
+        <field name="name">Agent Performance</field>
+        <field name="res_model">crm.response.time</field>
+        <field name="view_mode">tree,pivot,graph</field>
+        <field name="search_view_id" ref="view_crm_response_time_search"/>
+    </record>
+
+</odoo>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_crm_lead_form_omni_inherit" model="ir.ui.view">
+        <field name="name">crm.lead.form.omni.inherit</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_chat_sessions" type="object" class="oe_stat_button"
+                        icon="fa-comments" invisible="chat_session_count == 0">
+                    <field name="chat_session_count" widget="statinfo" string="Conversations"/>
+                </button>
+                <button name="action_view_call_logs" type="object" class="oe_stat_button"
+                        icon="fa-phone" invisible="call_log_count == 0">
+                    <field name="call_log_count" widget="statinfo" string="Calls"/>
+                </button>
+                <button name="action_view_communications" type="object" class="oe_stat_button"
+                        icon="fa-history" invisible="communication_count == 0">
+                    <field name="communication_count" widget="statinfo" string="Communications"/>
+                </button>
+            </xpath>
+
+            <xpath expr="//field[@name='phone']" position="after">
+                <button name="action_click_to_call" type="object"
+                        string="Click to Call" icon="fa-phone" class="btn-link"
+                        invisible="not phone"/>
+            </xpath>
+
+            <xpath expr="//notebook" position="inside">
+                <page string="Omni-Channel" name="omni_channel">
+                    <group>
+                        <group string="Channel Identifiers">
+                            <field name="facebook_id"/>
+                            <field name="instagram_id"/>
+                            <field name="whatsapp_number"/>
+                            <field name="call_number"/>
+                        </group>
+                    </group>
+                    <separator string="Communication Timeline"/>
+                    <field name="communication_ids" readonly="1">
+                        <tree default_order="date desc">
+                            <field name="date"/>
+                            <field name="comm_type"/>
+                            <field name="subject"/>
+                            <field name="channel_id"/>
+                            <field name="agent_id"/>
+                            <field name="state"/>
+                            <field name="tag_ids" widget="many2many_tags" optional="hide"/>
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
+
+        </field>
+    </record>
+
+
+
+</odoo>

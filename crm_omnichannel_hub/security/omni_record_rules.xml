@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <!-- crm.chat.session -->
+        <record id="rule_chat_session_agent" model="ir.rule">
+            <field name="name">Chat Session: Agent sees only own</field>
+            <field name="model_id" ref="model_crm_chat_session"/>
+            <field name="domain_force">[('agent_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_omni_agent'))]"/>
+        </record>
+
+        <record id="rule_chat_session_supervisor" model="ir.rule">
+            <field name="name">Chat Session: Supervisor sees team</field>
+            <field name="model_id" ref="model_crm_chat_session"/>
+            <field name="domain_force">['|', ('team_id.member_ids', 'in', [user.id]), ('team_id.user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_omni_supervisor'))]"/>
+        </record>
+
+        <record id="rule_chat_session_manager" model="ir.rule">
+            <field name="name">Chat Session: Manager sees all</field>
+            <field name="model_id" ref="model_crm_chat_session"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_omni_manager'))]"/>
+        </record>
+
+        <!-- crm.communication -->
+        <record id="rule_communication_agent" model="ir.rule">
+            <field name="name">Communication: Agent sees only own</field>
+            <field name="model_id" ref="model_crm_communication"/>
+            <field name="domain_force">[('agent_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_omni_agent'))]"/>
+        </record>
+
+        <record id="rule_communication_manager" model="ir.rule">
+            <field name="name">Communication: Supervisor/Manager see all</field>
+            <field name="model_id" ref="model_crm_communication"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_omni_supervisor'))]"/>
+        </record>
+
+        <!-- crm.chat.message -->
+        <record id="rule_chat_message_agent" model="ir.rule">
+            <field name="name">Chat Message: Agent sees only own session's messages</field>
+            <field name="model_id" ref="model_crm_chat_message"/>
+            <field name="domain_force">[('session_id.agent_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_omni_agent'))]"/>
+        </record>
+
+        <record id="rule_chat_message_manager" model="ir.rule">
+            <field name="name">Chat Message: Supervisor/Manager see all</field>
+            <field name="model_id" ref="model_crm_chat_message"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_omni_supervisor'))]"/>
+        </record>
+
+        <!-- crm.call.log -->
+        <record id="rule_call_log_agent" model="ir.rule">
+            <field name="name">Call Log: Agent sees only own</field>
+            <field name="model_id" ref="model_crm_call_log"/>
+            <field name="domain_force">[('agent_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_omni_agent'))]"/>
+        </record>
+
+        <record id="rule_call_log_supervisor" model="ir.rule">
+            <field name="name">Call Log: Supervisor sees team</field>
+            <field name="model_id" ref="model_crm_call_log"/>
+            <field name="domain_force">['|', ('team_id.member_ids', 'in', [user.id]), ('team_id.user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_omni_supervisor'))]"/>
+        </record>
+
+        <record id="rule_call_log_manager" model="ir.rule">
+            <field name="name">Call Log: Manager sees all</field>
+            <field name="model_id" ref="model_crm_call_log"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_omni_manager'))]"/>
+        </record>
+
+        <!-- crm.call.recording (permission-based access to recordings) -->
+        <record id="rule_call_recording_agent" model="ir.rule">
+            <field name="name">Call Recording: Agent sees only own calls' recordings</field>
+            <field name="model_id" ref="model_crm_call_recording"/>
+            <field name="domain_force">[('call_id.agent_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_omni_agent'))]"/>
+        </record>
+
+        <record id="rule_call_recording_manager" model="ir.rule">
+            <field name="name">Call Recording: Supervisor/Manager see all</field>
+            <field name="model_id" ref="model_crm_call_recording"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_omni_supervisor'))]"/>
+        </record>
+
+        <!-- crm.response.time (performance data - supervisors/managers only, agents see own) -->
+        <record id="rule_response_time_agent" model="ir.rule">
+            <field name="name">Response Time: Agent sees only own</field>
+            <field name="model_id" ref="model_crm_response_time"/>
+            <field name="domain_force">[('agent_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_omni_agent'))]"/>
+        </record>
+
+        <record id="rule_response_time_manager" model="ir.rule">
+            <field name="name">Response Time: Supervisor/Manager see all</field>
+            <field name="model_id" ref="model_crm_response_time"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_omni_supervisor'))]"/>
+        </record>
+
+    </data>
+</odoo>

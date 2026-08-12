@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_crm_assignment_rule_tree" model="ir.ui.view">
+        <field name="name">crm.assignment.rule.tree</field>
+        <field name="model">crm.assignment.rule</field>
+        <field name="arch" type="xml">
+            <tree string="Assignment Rules">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="rule_type"/>
+                <field name="channel_ids" widget="many2many_tags" optional="hide"/>
+                <field name="team_id" optional="hide"/>
+                <field name="target_agent_ids" widget="many2many_tags" optional="hide"/>
+                <field name="active" widget="boolean_toggle"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_crm_assignment_rule_form" model="ir.ui.view">
+        <field name="name">crm.assignment.rule.form</field>
+        <field name="model">crm.assignment.rule</field>
+        <field name="arch" type="xml">
+            <form string="Assignment Rule">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="rule_type"/>
+                            <field name="sequence"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="channel_ids" widget="many2many_tags"/>
+                            <field name="team_id"/>
+                            <field name="target_agent_ids" widget="many2many_tags"/>
+                        </group>
+                    </group>
+                    <group string="Keyword Match" invisible="rule_type != 'keyword'">
+                        <field name="keywords" placeholder="refund, cancel, urgent"/>
+                    </group>
+                    <group string="VIP Customer" invisible="rule_type != 'vip'">
+                        <field name="vip_tag_id"/>
+                    </group>
+                    <group string="Working Hours Window" invisible="rule_type != 'working_hours'">
+                        <field name="weekdays" placeholder="0,1,2,3,4 (Monday=0 .. Sunday=6, empty = every day)"/>
+                        <field name="start_hour"/>
+                        <field name="end_hour"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_crm_assignment_rule" model="ir.actions.act_window">
+        <field name="name">Assignment Rules</field>
+        <field name="res_model">crm.assignment.rule</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No assignment rules yet - new conversations and calls will use
+                plain round-robin across all Omni-Channel Agents.
+            </p>
+        </field>
+    </record>
+
+</odoo>

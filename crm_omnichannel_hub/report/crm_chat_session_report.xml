@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_report_crm_chat_session" model="ir.actions.report">
+        <field name="name">Conversation Transcript</field>
+        <field name="model">crm.chat.session</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">crm_omnichannel_hub.report_crm_chat_session_document</field>
+        <field name="report_file">crm_omnichannel_hub.report_crm_chat_session_document</field>
+        <field name="binding_model_id" ref="model_crm_chat_session"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'Conversation - %s' % (object.display_name)</field>
+    </record>
+
+    <template id="report_crm_chat_session_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Conversation Transcript</h2>
+                        <table class="table table-sm" style="margin-top: 16px;">
+                            <tr>
+                                <td><strong>Customer</strong></td>
+                                <td><span t-field="o.partner_id.name"/><span t-if="not o.partner_id" t-esc="o.partner_name"/></td>
+                                <td><strong>Channel</strong></td>
+                                <td><span t-field="o.channel_id.name"/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Agent</strong></td>
+                                <td><span t-field="o.agent_id.name"/></td>
+                                <td><strong>Status</strong></td>
+                                <td><span t-field="o.state"/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>CRM Lead</strong></td>
+                                <td><span t-field="o.lead_id.name"/></td>
+                                <td><strong>Last Message</strong></td>
+                                <td><span t-field="o.last_message_date"/></td>
+                            </tr>
+                        </table>
+
+                        <h4 style="margin-top: 20px;">Messages</h4>
+                        <table class="table table-sm table-bordered">
+                            <thead>
+                                <tr><th style="width: 15%;">Date</th><th style="width: 15%;">From</th><th>Message</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="o.message_line_ids" t-as="msg">
+                                    <td><span t-field="msg.message_date"/></td>
+                                    <td>
+                                        <span t-if="msg.direction == 'in'">Customer</span>
+                                        <span t-if="msg.direction == 'out'">Agent</span>
+                                        <span t-if="msg.direction == 'note'">Internal Note</span>
+                                    </td>
+                                    <td><span t-field="msg.body"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <p t-if="not o.message_line_ids" class="text-muted">No messages recorded for this conversation.</p>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

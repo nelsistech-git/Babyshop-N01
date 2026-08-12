@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- LIST VIEW -->
+    <record id="view_crm_chat_session_tree" model="ir.ui.view">
+        <field name="name">crm.chat.session.tree</field>
+        <field name="model">crm.chat.session</field>
+        <field name="arch" type="xml">
+            <tree string="Conversations" decoration-bf="is_unread"
+                  decoration-danger="sla_status == 'red'"
+                  decoration-warning="sla_status == 'yellow'">
+
+                <field name="is_unread" column_invisible="True"/>
+                <field name="last_message_date"/>
+                <field name="display_name" string="Customer"/>
+                <field name="channel_id"/>
+                <field name="agent_id"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'new'"
+                       decoration-success="state == 'open'"
+                       decoration-warning="state == 'pending'"
+                       decoration-muted="state in ('closed', 'spam')"/>
+                <field name="priority" widget="priority"/>
+                <field name="sla_status" widget="badge"
+                       decoration-success="sla_status == 'green'"
+                       decoration-warning="sla_status == 'yellow'"
+                       decoration-danger="sla_status == 'red'"/>
+                <field name="tag_ids" widget="many2many_tags" optional="hide"/>
+                <field name="last_message_preview" optional="show"/>
+                <field name="unread_count"/>
+                <field name="lead_id" optional="hide"/>
+                <field name="customer_rating" optional="hide"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- KANBAN VIEW (Unified Inbox) -->
+    <record id="view_crm_chat_session_kanban" model="ir.ui.view">
+        <field name="name">crm.chat.session.kanban</field>
+        <field name="model">crm.chat.session</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_small_column" default_group_by="state">
+                <field name="display_name"/>
+                <field name="channel_id"/>
+                <field name="state"/>
+                <field name="priority"/>
+                <field name="sla_status"/>
+                <field name="is_unread"/>
+                <field name="unread_count"/>
+                <field name="last_message_preview"/>
+                <field name="last_message_date"/>
+                <field name="agent_id"/>
+                <field name="tag_ids"/>
+                <templates>
+                    <t t-name="card">
+                        <div t-attf-class="oe_kanban_card oe_kanban_global_click #{record.is_unread.raw_value ? 'fw-bold' : ''}">
+                            <div class="o_kanban_record_top">
+                                <div class="o_kanban_record_headings">
+                                    <strong class="o_kanban_record_title">
+                                        <span t-esc="record.display_name.value"/>
+                                    </strong>
+                                    <span class="badge rounded-pill ms-1" t-esc="record.channel_id.value"/>
+                                </div>
+                                <span t-if="record.unread_count.raw_value" class="badge bg-primary rounded-pill">
+                                    <t t-esc="record.unread_count.value"/>
+                                </span>
+                            </div>
+                            <div class="text-muted text-truncate">
+                                <t t-esc="record.last_message_preview.value"/>
+                            </div>
+                            <div class="o_kanban_record_bottom mt-2">
+                                <div class="oe_kanban_bottom_left">
+                                    <field name="priority" widget="priority"/>
+                                    <span t-if="record.sla_status.raw_value == 'red'" class="badge bg-danger ms-1">SLA Breached</span>
+                                    <span t-if="record.sla_status.raw_value == 'yellow'" class="badge bg-warning ms-1">At Risk</span>
+                                    <span t-if="record.sla_status.raw_value == 'green'" class="badge bg-success ms-1">On Time</span>
+                                </div>
+                                <div class="oe_kanban_bottom_right">
+                                    <field name="agent_id" widget="many2one_avatar_user"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- FORM VIEW -->
+    <record id="view_crm_chat_session_form" model="ir.ui.view">
+        <field name="name">crm.chat.session.form</field>
+        <field name="model">crm.chat.session</field>
+        <field name="arch" type="xml">
+            <form string="Conversation">
+                <header>
+                    <button name="action_mark_read" type="object" string="Mark Read"
+                            invisible="not is_unread" class="btn-secondary"/>
+                    <button name="action_close" type="object" string="Close"
+                            invisible="state == 'closed'" class="btn-secondary"/>
+                    <button name="action_reopen" type="object" string="Reopen"
+                            invisible="state != 'closed'" class="btn-secondary"/>
+                    <button name="action_mark_spam" type="object" string="Mark Spam"
+                            invisible="state == 'spam'" class="btn-secondary"/>
+                    <button name="action_request_csat" type="object" string="Request Feedback"
+                            invisible="not partner_id or customer_rating" class="btn-secondary"/>
+                    <field name="state" widget="statusbar" statusbar_visible="new,open,pending,closed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <field name="lead_id" invisible="1"/>
+                        <button name="action_view_lead" type="object" class="oe_stat_button" icon="fa-address-card"
+                                invisible="not lead_id">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">View</span>
+                                <span class="o_stat_text">CRM Lead</span>
+                            </div>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="display_name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group string="Customer">
+                            <field name="partner_id"/>
+                            <field name="partner_name"/>
+                            <field name="partner_phone"/>
+                            <field name="partner_email"/>
+                            <field name="external_identifier"/>
+                        </group>
+                        <group string="Routing">
+                            <field name="channel_id"/>
+                            <field name="agent_id"/>
+                            <field name="team_id"/>
+                            <field name="priority" widget="priority"/>
+                            <field name="tag_ids" widget="many2many_tags"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="SLA">
+                            <field name="sla_id"/>
+                            <field name="sla_status" widget="badge"
+                                   decoration-success="sla_status == 'green'"
+                                   decoration-warning="sla_status == 'yellow'"
+                                   decoration-danger="sla_status == 'red'"/>
+                            <field name="waiting_since"/>
+                            <field name="first_response_deadline"/>
+                            <field name="first_response_date"/>
+                        </group>
+                        <group string="Status">
+                            <field name="is_unread"/>
+                            <field name="unread_count"/>
+                            <field name="last_message_date"/>
+                        </group>
+                        <group string="Customer Satisfaction">
+                            <field name="customer_rating"/>
+                            <field name="customer_feedback"/>
+                            <field name="csat_requested_date" readonly="1"/>
+                            <field name="csat_submitted_date" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Conversation">
+                            <field name="message_line_ids" mode="list" context="{'default_session_id': id}">
+                                <tree editable="bottom" default_order="message_date asc"
+                                      decoration-info="direction == 'in'"
+                                      decoration-success="direction == 'out'"
+                                      decoration-muted="direction == 'note'">
+                                    <field name="message_date"/>
+                                    <field name="direction"/>
+                                    <field name="message_type"/>
+                                    <field name="body"/>
+                                    <field name="agent_id" optional="hide"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- SEARCH VIEW -->
+    <record id="view_crm_chat_session_search" model="ir.ui.view">
+        <field name="name">crm.chat.session.search</field>
+        <field name="model">crm.chat.session</field>
+        <field name="arch" type="xml">
+            <search string="Search Conversations">
+                <field name="display_name" string="Customer"/>
+                <field name="partner_phone" string="Phone"/>
+                <field name="lead_id" string="Lead"/>
+                <field name="message_line_ids" string="Message" filter_domain="[('message_line_ids.body', 'ilike', self)]"/>
+                <field name="agent_id"/>
+                <field name="channel_id"/>
+                <field name="tag_ids"/>
+                <separator/>
+                <filter string="Unread" name="filter_unread" domain="[('is_unread', '=', True)]"/>
+                <filter string="Read" name="filter_read" domain="[('is_unread', '=', False)]"/>
+                <filter string="Assigned to Me" name="filter_assigned_me" domain="[('agent_id', '=', uid)]"/>
+                <filter string="Unassigned" name="filter_unassigned" domain="[('agent_id', '=', False)]"/>
+                <separator/>
+                <filter string="Closed" name="filter_closed" domain="[('state', '=', 'closed')]"/>
+                <filter string="Spam" name="filter_spam" domain="[('state', '=', 'spam')]"/>
+                <filter string="Open" name="filter_open" domain="[('state', 'in', ('new', 'open', 'pending'))]"/>
+                <separator/>
+                <filter string="High Priority" name="filter_high_priority" domain="[('priority', 'in', ('2', '3'))]"/>
+                <separator/>
+                <filter string="Today" name="filter_today"
+                        domain="[('last_message_date', '&gt;=', context_today().strftime('%Y-%m-%d 00:00:00'))]"/>
+                <filter string="Yesterday" name="filter_yesterday"
+                        domain="[('last_message_date', '&gt;=', (context_today() - datetime.timedelta(days=1)).strftime('%Y-%m-%d 00:00:00')),
+                                 ('last_message_date', '&lt;', context_today().strftime('%Y-%m-%d 00:00:00'))]"/>
+                <filter string="This Week" name="filter_this_week"
+                        domain="[('last_message_date', '&gt;=', (context_today() - datetime.timedelta(days=context_today().weekday())).strftime('%Y-%m-%d 00:00:00'))]"/>
+                <separator/>
+                <filter string="SLA Breached" name="filter_sla_red" domain="[('sla_status', '=', 'red')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Channel" name="groupby_channel" context="{'group_by': 'channel_id'}"/>
+                    <filter string="Agent" name="groupby_agent" context="{'group_by': 'agent_id'}"/>
+                    <filter string="Status" name="groupby_state" context="{'group_by': 'state'}"/>
+                    <filter string="SLA Status" name="groupby_sla" context="{'group_by': 'sla_status'}"/>
+                    <filter string="Last Message Date" name="groupby_last_message_date" date="last_message_date"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ACTION -->
+    <record id="action_crm_chat_session" model="ir.actions.act_window">
+        <field name="name">Unified Inbox</field>
+        <field name="res_model">crm.chat.session</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="search_view_id" ref="view_crm_chat_session_search"/>
+        <field name="context">{'search_default_filter_open': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No conversations yet.
+            </p>
+            <p>
+                Conversations from Facebook, Instagram, WhatsApp and IP Calling will
+                appear here automatically once the corresponding connector module is
+                installed and configured.
+            </p>
+        </field>
+    </record>
+
+</odoo>

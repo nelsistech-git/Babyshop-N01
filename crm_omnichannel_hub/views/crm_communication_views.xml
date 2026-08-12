@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_crm_communication_search" model="ir.ui.view">
+        <field name="name">crm.communication.search</field>
+        <field name="model">crm.communication</field>
+        <field name="arch" type="xml">
+            <search string="Search Communications">
+                <field name="subject"/>
+                <field name="partner_id"/>
+                <field name="agent_id"/>
+                <field name="channel_id"/>
+                <field name="lead_id"/>
+                <separator/>
+                <filter string="Chat" name="filter_chat" domain="[('comm_type', '=', 'chat')]"/>
+                <filter string="Call" name="filter_call" domain="[('comm_type', '=', 'call')]"/>
+                <separator/>
+                <filter string="Today" name="filter_today"
+                        domain="[('date', '&gt;=', context_today().strftime('%Y-%m-%d 00:00:00'))]"/>
+                <filter string="This Week" name="filter_this_week"
+                        domain="[('date', '&gt;=', (context_today() - datetime.timedelta(days=context_today().weekday())).strftime('%Y-%m-%d 00:00:00'))]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Type" name="groupby_comm_type" context="{'group_by': 'comm_type'}"/>
+                    <filter string="Channel" name="groupby_channel" context="{'group_by': 'channel_id'}"/>
+                    <filter string="Agent" name="groupby_agent" context="{'group_by': 'agent_id'}"/>
+                    <filter string="Date" name="groupby_date" date="date"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_crm_communication_tree" model="ir.ui.view">
+        <field name="name">crm.communication.tree</field>
+        <field name="model">crm.communication</field>
+        <field name="arch" type="xml">
+            <tree string="Communication Timeline" default_order="date desc">
+                <field name="date"/>
+                <field name="comm_type"/>
+                <field name="subject"/>
+                <field name="partner_id"/>
+                <field name="channel_id"/>
+                <field name="agent_id"/>
+                <field name="state"/>
+                <field name="priority" widget="priority"/>
+                <field name="tag_ids" widget="many2many_tags" optional="hide"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_crm_communication_form" model="ir.ui.view">
+        <field name="name">crm.communication.form</field>
+        <field name="model">crm.communication</field>
+        <field name="arch" type="xml">
+            <form string="Communication">
+                <sheet>
+                    <group>
+                        <field name="subject"/>
+                        <field name="comm_type"/>
+                        <field name="lead_id"/>
+                        <field name="partner_id"/>
+                        <field name="channel_id"/>
+                        <field name="agent_id"/>
+                        <field name="session_id"/>
+                        <field name="state"/>
+                        <field name="priority" widget="priority"/>
+                        <field name="tag_ids" widget="many2many_tags"/>
+                        <field name="date"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_crm_communication_pivot" model="ir.ui.view">
+        <field name="name">crm.communication.pivot</field>
+        <field name="model">crm.communication</field>
+        <field name="arch" type="xml">
+            <pivot string="Communication Report">
+                <field name="channel_id" type="row"/>
+                <field name="comm_type" type="col"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_crm_communication" model="ir.actions.act_window">
+        <field name="name">Communication Timeline</field>
+        <field name="res_model">crm.communication</field>
+        <field name="view_mode">tree,pivot,form</field>
+        <field name="search_view_id" ref="view_crm_communication_search"/>
+    </record>
+
+</odoo>

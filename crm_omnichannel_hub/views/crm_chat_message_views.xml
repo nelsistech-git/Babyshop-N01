@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_crm_chat_message_tree" model="ir.ui.view">
+        <field name="name">crm.chat.message.tree</field>
+        <field name="model">crm.chat.message</field>
+        <field name="arch" type="xml">
+            <tree string="Messages" default_order="message_date asc" editable="bottom"
+                  decoration-muted="direction == 'note'"
+                  decoration-info="direction == 'in'"
+                  decoration-success="direction == 'out'">
+                <field name="message_date"/>
+                <field name="direction"/>
+                <field name="message_type"/>
+                <field name="body"/>
+                <field name="agent_id" optional="hide"/>
+                <field name="attachment_ids" widget="many2many_tags" optional="hide"/>
+                <field name="is_read" optional="hide"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_crm_chat_message_form" model="ir.ui.view">
+        <field name="name">crm.chat.message.form</field>
+        <field name="model">crm.chat.message</field>
+        <field name="arch" type="xml">
+            <form string="Message">
+                <sheet>
+                    <group>
+                        <field name="session_id"/>
+                        <field name="direction"/>
+                        <field name="message_type"/>
+                        <field name="author_id"/>
+                        <field name="agent_id"/>
+                        <field name="message_date"/>
+                    </group>
+                    <field name="body"/>
+                    <field name="attachment_ids" widget="many2many_tags"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+</odoo>

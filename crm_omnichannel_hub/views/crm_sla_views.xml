@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_crm_sla_tree" model="ir.ui.view">
+        <field name="name">crm.sla.tree</field>
+        <field name="model">crm.sla</field>
+        <field name="arch" type="xml">
+            <tree string="SLA Policies">
+                <field name="name"/>
+                <field name="channel_ids" widget="many2many_tags"/>
+                <field name="green_minutes"/>
+                <field name="yellow_minutes"/>
+                <field name="red_minutes"/>
+                <field name="active" widget="boolean_toggle"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_crm_sla_form" model="ir.ui.view">
+        <field name="name">crm.sla.form</field>
+        <field name="model">crm.sla</field>
+        <field name="arch" type="xml">
+            <form string="SLA Policy">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="channel_ids" widget="many2many_tags"/>
+                        <field name="active"/>
+                    </group>
+                    <group string="Response Thresholds (minutes)">
+                        <field name="green_minutes"/>
+                        <field name="yellow_minutes"/>
+                        <field name="red_minutes"/>
+                    </group>
+                    <group string="Escalation">
+                        <field name="escalate_user_ids" widget="many2many_tags"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_crm_sla" model="ir.actions.act_window">
+        <field name="name">SLA Policies</field>
+        <field name="res_model">crm.sla</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

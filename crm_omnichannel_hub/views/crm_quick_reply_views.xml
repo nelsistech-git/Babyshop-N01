@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_crm_quick_reply_tree" model="ir.ui.view">
+        <field name="name">crm.quick.reply.tree</field>
+        <field name="model">crm.quick.reply</field>
+        <field name="arch" type="xml">
+            <tree string="Quick Replies">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="title"/>
+                <field name="channel_ids" widget="many2many_tags"/>
+                <field name="active" widget="boolean_toggle"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_crm_quick_reply_form" model="ir.ui.view">
+        <field name="name">crm.quick.reply.form</field>
+        <field name="model">crm.quick.reply</field>
+        <field name="arch" type="xml">
+            <form string="Quick Reply">
+                <sheet>
+                    <group>
+                        <field name="name" placeholder="/thanks"/>
+                        <field name="title"/>
+                        <field name="channel_ids" widget="many2many_tags"/>
+                        <field name="active"/>
+                    </group>
+                    <field name="message" placeholder="Message text sent to the customer..."/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_crm_quick_reply" model="ir.actions.act_window">
+        <field name="name">Quick Replies</field>
+        <field name="res_model">crm.quick.reply</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

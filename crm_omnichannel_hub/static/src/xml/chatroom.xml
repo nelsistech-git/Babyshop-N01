@@ -1,0 +1,346 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="crm_omnichannel_hub.OmniChatRoom">
+        <div class="o_omni_chatroom">
+
+            <!-- ================= LEFT: conversation list ================= -->
+            <div class="o_omni_chat_sidebar">
+                <div class="o_omni_chat_sidebar_header">
+                    <h5 class="mb-2">Chat Room</h5>
+                    <button class="btn btn-sm btn-link p-0 mb-2" t-on-click="openListView">
+                        <i class="fa fa-list me-1"/>List / Kanban view
+                    </button>
+                    <input type="text" class="form-control form-control-sm mb-2"
+                           placeholder="Search conversation, contact..."
+                           t-on-input="onSearchInput"/>
+                    <select class="form-select form-select-sm mb-2"
+                            t-on-change="(ev) => this.setChannelFilter(ev.target.value === 'all' ? 'all' : parseInt(ev.target.value))">
+                        <option value="all">All Channels</option>
+                        <t t-foreach="state.channels" t-as="ch" t-key="ch.id">
+                            <option t-att-value="ch.id" t-esc="ch.name"/>
+                        </t>
+                    </select>
+                    <div class="o_omni_filter_tabs">
+                        <button t-attf-class="btn btn-sm {{ state.filter === 'open' ? 'btn-primary' : 'btn-outline-secondary' }}"
+                                t-on-click="() => this.setFilter('open')">Open</button>
+                        <button t-attf-class="btn btn-sm {{ state.filter === 'unread' ? 'btn-primary' : 'btn-outline-secondary' }}"
+                                t-on-click="() => this.setFilter('unread')">Unread</button>
+                        <button t-attf-class="btn btn-sm {{ state.filter === 'mine' ? 'btn-primary' : 'btn-outline-secondary' }}"
+                                t-on-click="() => this.setFilter('mine')">Mine</button>
+                        <button t-attf-class="btn btn-sm {{ state.filter === 'starred' ? 'btn-primary' : 'btn-outline-secondary' }}"
+                                t-on-click="() => this.setFilter('starred')">
+                            <i class="fa fa-star"/>
+                        </button>
+                        <button t-attf-class="btn btn-sm {{ state.filter === 'closed' ? 'btn-primary' : 'btn-outline-secondary' }}"
+                                t-on-click="() => this.setFilter('closed')">Closed</button>
+                    </div>
+                </div>
+
+                <div class="o_omni_chat_list">
+                    <div t-if="state.loadingSessions" class="text-muted text-center p-3">Loading…</div>
+                    <div t-elif="!state.sessions.length" class="text-muted text-center p-3">No conversations.</div>
+                    <t t-foreach="state.sessions" t-as="session" t-key="session.id">
+                        <div t-attf-class="o_omni_chat_list_item {{ state.selectedSession and state.selectedSession.id === session.id ? 'active' : '' }} {{ session.is_unread ? 'unread' : '' }}"
+                             t-on-click="() => this.selectSession(session)">
+                            <div class="o_omni_avatar_wrap">
+                                <div class="o_omni_avatar" t-esc="initials(session.display_name)"/>
+                                <i t-attf-class="fa {{ channelIcon(session.channel_code) }} o_omni_channel_badge {{ channelIconClass(session.channel_code) }}"/>
+                            </div>
+                            <div class="o_omni_chat_list_body">
+                                <div class="d-flex justify-content-between">
+                                    <span class="o_omni_chat_list_name">
+                                        <i t-if="session.is_starred" class="fa fa-star text-warning me-1"/>
+                                        <t t-esc="session.display_name"/>
+                                    </span>
+                                    <span class="o_omni_chat_list_time" t-esc="formatTime(session.last_message_date)"/>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="o_omni_chat_list_preview" t-esc="session.last_message_preview"/>
+                                    <span t-if="session.unread_count" class="badge bg-primary rounded-pill ms-1"
+                                          t-esc="session.unread_count"/>
+                                </div>
+                                <div class="o_omni_chat_list_meta">
+                                    <span t-if="session.sla_status === 'red'" class="badge bg-danger">SLA</span>
+                                    <span t-if="session.sla_status === 'yellow'" class="badge bg-warning">SLA</span>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </div>
+
+                <div class="o_omni_active_channels_bar">
+                    <t t-foreach="state.channels" t-as="ch" t-key="ch.id">
+                        <div t-attf-class="o_omni_channel_pill {{ channelIconClass(ch.code) }}"
+                             t-on-click="() => this.setChannelFilter(ch.id)" t-att-title="ch.name">
+                            <i t-attf-class="fa {{ channelIcon(ch.code) }}"/>
+                            <span t-esc="ch.count"/>
+                        </div>
+                    </t>
+                </div>
+            </div>
+
+            <!-- ================= CENTER: active conversation ================= -->
+            <div class="o_omni_chat_main">
+
+                <div t-if="!state.selectedSession" class="o_omni_chat_empty">
+                    <i class="fa fa-comments-o fa-3x mb-3"/>
+                    <p>Select a conversation to start chatting.</p>
+                </div>
+
+                <t t-else="">
+                    <div class="o_omni_chat_header">
+                        <div class="o_omni_avatar_wrap">
+                            <div class="o_omni_avatar" t-esc="initials(state.selectedSession.display_name)"/>
+                            <i t-attf-class="fa {{ channelIcon(state.selectedSession.channel_code) }} o_omni_channel_badge {{ channelIconClass(state.selectedSession.channel_code) }}"/>
+                        </div>
+                        <div class="flex-grow-1 ms-2">
+                            <div class="fw-bold" t-esc="state.selectedSession.display_name"/>
+                            <div class="o_omni_chat_header_status">
+                                <span t-if="state.selectedSession.channel_id" t-esc="state.selectedSession.channel_id[1]"/>
+                                <span class="o_omni_state_pill" t-esc="state.selectedSession.state"/>
+                            </div>
+                        </div>
+                        <div class="o_omni_chat_header_actions">
+                            <button t-attf-class="btn btn-sm btn-icon me-1 {{ state.selectedSession.is_starred ? 'text-warning' : '' }}"
+                                    title="Star" t-on-click="toggleStar">
+                                <i class="fa fa-star"/>
+                            </button>
+                            <button class="btn btn-sm btn-icon me-1" title="Email" t-on-click="openMailto">
+                                <i class="fa fa-envelope-o"/>
+                            </button>
+                            <button class="btn btn-sm btn-icon me-1" title="Contact Info" t-on-click="toggleInfoPanel">
+                                <i class="fa fa-info-circle"/>
+                            </button>
+                            <button class="btn btn-sm btn-icon me-2" title="Attach" t-on-click="triggerFilePicker">
+                                <i class="fa fa-paperclip"/>
+                            </button>
+                            <button t-if="!state.selectedSession.lead_id" class="btn btn-sm btn-primary me-1"
+                                    t-on-click="convertToLead">Convert to Lead</button>
+                            <button t-else="" class="btn btn-sm btn-outline-primary me-1" t-on-click="openLead">
+                                View Lead
+                            </button>
+                            <button t-if="state.selectedSession.state !== 'closed'" class="btn btn-sm btn-outline-secondary me-1"
+                                    t-on-click="closeConversation">Close</button>
+                            <button t-else="" class="btn btn-sm btn-outline-secondary me-1"
+                                    t-on-click="reopenConversation">Reopen</button>
+                            <button class="btn btn-sm btn-outline-danger" t-on-click="markSpam">Spam</button>
+                        </div>
+                    </div>
+
+                    <div t-if="state.selectedSession.lead_id" class="o_omni_linked_banner">
+                        <i class="fa fa-info-circle me-1"/>
+                        This conversation is linked with Odoo &#8212;
+                        Lead: <strong t-esc="state.selectedSession.lead_id[1]"/>
+                        (ID: <t t-esc="state.selectedSession.lead_id[0]"/>)
+                    </div>
+
+                    <div class="o_omni_chat_messages">
+                        <div t-if="state.loadingMessages" class="text-muted text-center p-3">Loading…</div>
+                        <t t-foreach="messagesWithDividers" t-as="msg" t-key="msg.id">
+                            <div t-if="msg.isDivider" class="o_omni_date_divider">
+                                <span t-esc="msg.label"/>
+                            </div>
+                            <div t-else="" t-attf-class="o_omni_bubble_row {{ msg.direction === 'out' ? 'out' : (msg.direction === 'note' ? 'note' : 'in') }}">
+                                <div class="o_omni_bubble">
+                                    <div t-esc="msg.body"/>
+                                    <div class="o_omni_bubble_time">
+                                        <t t-esc="formatTime(msg.message_date)"/>
+                                        <i t-if="messageTickIcon(msg)" t-attf-class="fa {{ messageTickIcon(msg) }} ms-1"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                        <div t-ref="messagesEnd"/>
+                    </div>
+
+                    <div class="o_omni_chat_composer">
+                        <div class="o_omni_composer_tabs">
+                            <button t-attf-class="btn btn-sm {{ state.composerMode === 'reply' ? 'active' : '' }}"
+                                    t-on-click="() => this.setComposerMode('reply')">Reply</button>
+                            <button t-attf-class="btn btn-sm {{ state.composerMode === 'note' ? 'active' : '' }}"
+                                    t-on-click="() => this.setComposerMode('note')">Note</button>
+                        </div>
+
+                        <div t-if="state.showQuickReplies" class="o_omni_quick_reply_panel">
+                            <div t-if="!state.quickReplies.length" class="text-muted p-2">No quick replies configured.</div>
+                            <div t-foreach="state.quickReplies" t-as="qr" t-key="qr.id"
+                                 class="o_omni_quick_reply_item" t-on-click="() => this.applyQuickReply(qr)">
+                                <strong t-esc="qr.title"/>
+                                <div class="text-muted small text-truncate" t-esc="qr.message"/>
+                            </div>
+                        </div>
+
+                        <div t-if="state.showEmojiPicker" class="o_omni_emoji_panel">
+                            <span t-foreach="emojiList" t-as="emoji" t-key="emoji_index"
+                                  class="o_omni_emoji_item" t-on-click="() => this.insertEmoji(emoji)" t-esc="emoji"/>
+                        </div>
+
+                        <input type="file" class="d-none" t-ref="fileInput" t-on-change="onFileSelected"/>
+
+                        <div class="d-flex align-items-end gap-2">
+                            <button class="btn btn-outline-secondary" t-on-click="triggerFilePicker" title="Attach file">
+                                <i t-if="!state.attaching" class="fa fa-paperclip"/>
+                                <i t-else="" class="fa fa-spinner fa-spin"/>
+                            </button>
+                            <button class="btn btn-outline-secondary" t-on-click="triggerFilePicker" title="Attach image">
+                                <i class="fa fa-picture-o"/>
+                            </button>
+                            <button class="btn btn-outline-secondary" disabled="disabled" title="Voice message - not available in this version">
+                                <i class="fa fa-microphone"/>
+                            </button>
+                            <button class="btn btn-outline-secondary" t-on-click="toggleEmojiPicker" title="Emoji">
+                                <i class="fa fa-smile-o"/>
+                            </button>
+                            <button class="btn btn-outline-secondary" t-on-click="toggleQuickReplies" title="Quick Replies">
+                                <i class="fa fa-bolt"/>
+                            </button>
+                            <textarea class="form-control" rows="1"
+                                      t-att-placeholder="state.composerMode === 'note' ? 'Write an internal note…' : 'Type a message…'"
+                                      t-model="state.composerText"
+                                      t-on-keydown="onComposerKeydown"/>
+                            <button class="btn btn-primary" t-on-click="sendMessage" t-att-disabled="state.sending">
+                                <i class="fa fa-paper-plane"/>
+                            </button>
+                        </div>
+                    </div>
+                </t>
+            </div>
+
+            <!-- ================= RIGHT: contextual info panel ================= -->
+            <div t-if="state.selectedSession and state.showInfoPanel" class="o_omni_info_panel">
+                <div class="o_omni_info_tabs">
+                    <button t-attf-class="{{ state.infoTab === 'info' ? 'active' : '' }}"
+                            t-on-click="() => this.setInfoTab('info')">Info</button>
+                    <button t-attf-class="{{ state.infoTab === 'crm' ? 'active' : '' }}"
+                            t-on-click="() => this.setInfoTab('crm')">CRM</button>
+                    <button t-attf-class="{{ state.infoTab === 'sales' ? 'active' : '' }}"
+                            t-on-click="() => this.setInfoTab('sales')">Sales</button>
+                    <button t-attf-class="{{ state.infoTab === 'inventory' ? 'active' : '' }}"
+                            t-on-click="() => this.setInfoTab('inventory')">Deliveries</button>
+                    <button t-attf-class="{{ state.infoTab === 'history' ? 'active' : '' }}"
+                            t-on-click="() => this.setInfoTab('history')">History</button>
+                </div>
+
+                <div class="o_omni_info_body">
+                    <div t-if="state.loadingContext" class="text-muted text-center p-3">Loading…</div>
+                    <div t-elif="!state.partnerContext" class="text-muted text-center p-3">
+                        No linked contact for this conversation yet.
+                    </div>
+
+                    <t t-elif="state.infoTab === 'info'">
+                        <div class="o_omni_info_card">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <strong>Contact Information</strong>
+                                <a href="#" class="small" t-on-click.prevent="openPartner">Edit</a>
+                            </div>
+                            <div class="o_omni_info_row"><span>Name</span><span t-esc="state.partnerContext.contact.name"/></div>
+                            <div class="o_omni_info_row"><span>Email</span><span t-esc="state.partnerContext.contact.email or '-'"/></div>
+                            <div class="o_omni_info_row"><span>Phone</span><span t-esc="state.partnerContext.contact.phone or '-'"/></div>
+                            <div class="o_omni_info_row"><span>City</span><span t-esc="state.partnerContext.contact.city or '-'"/></div>
+                            <div class="o_omni_info_row"><span>Country</span><span t-esc="state.partnerContext.contact.country or '-'"/></div>
+                            <div class="o_omni_info_row">
+                                <span>Type</span>
+                                <span t-esc="state.partnerContext.contact.is_company ? 'Company' : 'Individual'"/>
+                            </div>
+                            <div class="mt-2">
+                                <span t-if="state.partnerContext.contact.is_customer" class="badge bg-success me-1">Customer</span>
+                                <span t-if="state.partnerContext.contact.is_vendor" class="badge bg-info">Vendor</span>
+                            </div>
+                        </div>
+
+                        <div t-if="state.partnerContext.lead" class="o_omni_info_card">
+                            <strong>Linked CRM Lead</strong>
+                            <div class="o_omni_info_row"><span>Name</span><span t-esc="state.partnerContext.lead.name"/></div>
+                            <div class="o_omni_info_row"><span>Stage</span><span t-esc="state.partnerContext.lead.stage or '-'"/></div>
+                            <button class="btn btn-sm btn-outline-primary mt-1"
+                                    t-on-click="() => this.openRecord('crm.lead', state.partnerContext.lead.id)">
+                                Open Lead
+                            </button>
+                        </div>
+
+                        <div t-if="state.partnerContext.invoices.available and state.partnerContext.invoices.items.length" class="o_omni_info_card">
+                            <strong>Recent Invoices</strong>
+                            <t t-foreach="state.partnerContext.invoices.items.slice(0, 5)" t-as="inv" t-key="inv.id">
+                                <div class="o_omni_list_row" t-on-click="() => this.openRecord('account.move', inv.id)">
+                                    <span t-esc="inv.name"/>
+                                    <span t-esc="formatNumber(inv.amount_total)"/>
+                                    <span t-esc="inv.payment_state"/>
+                                </div>
+                            </t>
+                        </div>
+                    </t>
+
+                    <t t-elif="state.infoTab === 'crm'">
+                        <div t-if="!state.partnerContext.lead" class="text-muted p-2">No CRM lead linked yet.</div>
+                        <div t-else="" class="o_omni_info_card">
+                            <div class="o_omni_info_row"><span>Lead</span><span t-esc="state.partnerContext.lead.name"/></div>
+                            <div class="o_omni_info_row"><span>Stage</span><span t-esc="state.partnerContext.lead.stage or '-'"/></div>
+                            <div class="o_omni_info_row"><span>Type</span><span t-esc="state.partnerContext.lead.type"/></div>
+                            <div class="o_omni_info_row"><span>Expected Revenue</span><span t-esc="formatNumber(state.partnerContext.lead.expected_revenue)"/></div>
+                            <div class="o_omni_info_row"><span>Probability</span><span t-esc="state.partnerContext.lead.probability + '%'"/></div>
+                            <div class="o_omni_info_row"><span>Source</span><span t-esc="state.partnerContext.lead.source or '-'"/></div>
+                            <button class="btn btn-sm btn-outline-primary mt-2"
+                                    t-on-click="() => this.openRecord('crm.lead', state.partnerContext.lead.id)">
+                                Open Lead
+                            </button>
+                        </div>
+                    </t>
+
+                    <t t-elif="state.infoTab === 'sales'">
+                        <div t-if="!state.partnerContext.sales.available" class="text-muted p-2">
+                            Sales app is not installed.
+                        </div>
+                        <div t-elif="!state.partnerContext.sales.orders.length" class="text-muted p-2">
+                            No sales orders for this contact yet.
+                        </div>
+                        <t t-else="">
+                            <div t-foreach="state.partnerContext.sales.orders" t-as="so" t-key="so.id"
+                                 class="o_omni_list_row" t-on-click="() => this.openRecord('sale.order', so.id)">
+                                <span t-esc="so.name"/>
+                                <span t-esc="formatNumber(so.amount_total)"/>
+                                <span t-esc="so.state"/>
+                            </div>
+                        </t>
+                    </t>
+
+                    <t t-elif="state.infoTab === 'inventory'">
+                        <div t-if="!state.partnerContext.deliveries.available" class="text-muted p-2">
+                            Inventory app is not installed.
+                        </div>
+                        <div t-elif="!state.partnerContext.deliveries.items.length" class="text-muted p-2">
+                            No deliveries for this contact yet.
+                        </div>
+                        <t t-else="">
+                            <div t-foreach="state.partnerContext.deliveries.items" t-as="d" t-key="d.id"
+                                 class="o_omni_list_row" t-on-click="() => this.openRecord('stock.picking', d.id)">
+                                <span t-esc="d.name"/>
+                                <span t-esc="d.state"/>
+                                <span t-esc="formatDate(d.scheduled_date)"/>
+                            </div>
+                        </t>
+                    </t>
+
+                    <t t-elif="state.infoTab === 'history'">
+                        <div t-if="!state.partnerContext.history.length" class="text-muted p-2">
+                            No prior communication history.
+                        </div>
+                        <t t-else="">
+                            <div t-foreach="state.partnerContext.history" t-as="h" t-key="h.id" class="o_omni_history_row">
+                                <i t-attf-class="fa {{ h.comm_type === 'call' ? 'fa-phone' : 'fa-comment' }} me-2"/>
+                                <div class="flex-grow-1">
+                                    <div t-esc="h.subject"/>
+                                    <div class="text-muted small">
+                                        <t t-esc="formatDate(h.date)"/>
+                                        <span t-if="h.agent"> · <t t-esc="h.agent"/></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </t>
+                </div>
+            </div>
+        </div>
+    </t>
+
+</templates>

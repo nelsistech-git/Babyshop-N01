@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="crm_omnichannel_hub.OmniDashboard">
+        <div class="o_omni_dashboard p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 t-esc="title"/>
+                <button class="btn btn-secondary" t-on-click="onRefresh">
+                    <i class="fa fa-refresh me-1"/>Refresh
+                </button>
+            </div>
+
+            <div t-if="state.loading" class="text-muted">Loading dashboard…</div>
+            <div t-elif="state.error" class="alert alert-danger">
+                Unable to load dashboard data. Please try refreshing.
+            </div>
+
+            <div t-else="">
+
+                <!-- EXECUTIVE -->
+                <t t-if="type === 'executive'">
+                    <div class="o_omni_kpi_row d-flex flex-wrap gap-3">
+                        <div class="o_omni_kpi_card card p-3 flex-grow-1">
+                            <div class="text-muted">Today's Leads</div>
+                            <div class="fs-2 fw-bold" t-esc="state.data.today_leads"/>
+                        </div>
+                        <div class="o_omni_kpi_card card p-3 flex-grow-1">
+                            <div class="text-muted">Today's Conversations</div>
+                            <div class="fs-2 fw-bold" t-esc="state.data.today_chats"/>
+                        </div>
+                        <div class="o_omni_kpi_card card p-3 flex-grow-1">
+                            <div class="text-muted">Today's Calls</div>
+                            <div class="fs-2 fw-bold" t-esc="state.data.today_calls"/>
+                        </div>
+                        <div class="o_omni_kpi_card card p-3 flex-grow-1">
+                            <div class="text-muted">Missed Calls Today</div>
+                            <div class="fs-2 fw-bold text-danger" t-esc="state.data.today_missed_calls"/>
+                        </div>
+                        <div class="o_omni_kpi_card card p-3 flex-grow-1">
+                            <div class="text-muted">Won Today</div>
+                            <div class="fs-2 fw-bold text-success" t-esc="state.data.today_won"/>
+                        </div>
+                        <div class="o_omni_kpi_card card p-3 flex-grow-1">
+                            <div class="text-muted">Lost Today</div>
+                            <div class="fs-2 fw-bold text-danger" t-esc="state.data.today_lost"/>
+                        </div>
+                        <div class="o_omni_kpi_card card p-3 flex-grow-1">
+                            <div class="text-muted">Conversion Rate</div>
+                            <div class="fs-2 fw-bold" t-esc="state.data.conversion_rate"/>%
+                        </div>
+                        <div class="o_omni_kpi_card card p-3 flex-grow-1">
+                            <div class="text-muted">Revenue Won Today</div>
+                            <div class="fs-2 fw-bold" t-esc="state.data.today_revenue_won"/>
+                        </div>
+                        <div class="o_omni_kpi_card card p-3 flex-grow-1">
+                            <div class="text-muted">Avg. CSAT (out of 5)</div>
+                            <div class="fs-2 fw-bold" t-esc="state.data.avg_csat"/>
+                        </div>
+                    </div>
+                    <div class="o_omni_kpi_row d-flex flex-wrap gap-3 mt-3">
+                        <div class="o_omni_kpi_card card p-3 flex-grow-1">
+                            <div class="text-muted">Open Conversations</div>
+                            <div class="fs-3 fw-bold" t-esc="state.data.open_conversations"/>
+                        </div>
+                        <div class="o_omni_kpi_card card p-3 flex-grow-1">
+                            <div class="text-muted">SLA Breaches</div>
+                            <div class="fs-3 fw-bold text-danger" t-esc="state.data.sla_breaches"/>
+                        </div>
+                        <div class="o_omni_kpi_card card p-3 flex-grow-1">
+                            <div class="text-muted">Total Conversations</div>
+                            <div class="fs-3 fw-bold" t-esc="state.data.total_conversations"/>
+                        </div>
+                    </div>
+                    <h4 class="mt-4">Today's Conversations by Channel</h4>
+                    <table class="table table-sm table-bordered">
+                        <thead><tr><th>Channel</th><th>Conversations</th></tr></thead>
+                        <tbody>
+                            <t t-foreach="Object.keys(state.data.channel_breakdown)" t-as="ch" t-key="ch">
+                                <tr>
+                                    <td t-esc="ch"/>
+                                    <td t-esc="state.data.channel_breakdown[ch]"/>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </t>
+
+                <!-- MANAGER -->
+                <t t-if="type === 'manager'">
+                    <div class="o_omni_kpi_row d-flex flex-wrap gap-3">
+                        <div class="o_omni_kpi_card card p-3 flex-grow-1">
+                            <div class="text-muted">Online Agents</div>
+                            <div class="fs-2 fw-bold" t-esc="state.data.agent_count"/>
+                        </div>
+                        <div class="o_omni_kpi_card card p-3 flex-grow-1">
+                            <div class="text-muted">Waiting Chats</div>
+                            <div class="fs-2 fw-bold" t-esc="state.data.waiting_chats"/>
+                        </div>
+                        <div class="o_omni_kpi_card card p-3 flex-grow-1">
+                            <div class="text-muted">SLA Breaches</div>
+                            <div class="fs-2 fw-bold text-danger" t-esc="state.data.sla_breaches"/>
+                        </div>
+                    </div>
+                    <h4 class="mt-4">Team Leaderboard</h4>
+                    <table class="table table-sm table-striped">
+                        <thead>
+                            <tr>
+                                <th>Agent</th>
+                                <th>Assigned</th>
+                                <th>Open</th>
+                                <th>Closed</th>
+                                <th>Avg. Response (s)</th>
+                                <th>Calls</th>
+                                <th>Missed Calls</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="state.data.leaderboard" t-as="row" t-key="row.id">
+                                <tr>
+                                    <td t-esc="row.name"/>
+                                    <td t-esc="row.assigned"/>
+                                    <td t-esc="row.open"/>
+                                    <td t-esc="row.closed"/>
+                                    <td t-esc="row.avg_response"/>
+                                    <td t-esc="row.calls"/>
+                                    <td t-esc="row.missed_calls"/>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </t>
+
+                <!-- AGENT -->
+                <t t-if="type === 'agent'">
+                    <div class="o_omni_kpi_row d-flex flex-wrap gap-3">
+                        <div class="o_omni_kpi_card card p-3 flex-grow-1">
+                            <div class="text-muted">Unread</div>
+                            <div class="fs-2 fw-bold" t-esc="state.data.unread"/>
+                        </div>
+                        <div class="o_omni_kpi_card card p-3 flex-grow-1">
+                            <div class="text-muted">Pending</div>
+                            <div class="fs-2 fw-bold" t-esc="state.data.pending"/>
+                        </div>
+                        <div class="o_omni_kpi_card card p-3 flex-grow-1">
+                            <div class="text-muted">Today's Chats</div>
+                            <div class="fs-2 fw-bold" t-esc="state.data.today_chats"/>
+                        </div>
+                        <div class="o_omni_kpi_card card p-3 flex-grow-1">
+                            <div class="text-muted">Open</div>
+                            <div class="fs-2 fw-bold" t-esc="state.data.open"/>
+                        </div>
+                        <div class="o_omni_kpi_card card p-3 flex-grow-1">
+                            <div class="text-muted">Closed</div>
+                            <div class="fs-2 fw-bold" t-esc="state.data.closed"/>
+                        </div>
+                        <div class="o_omni_kpi_card card p-3 flex-grow-1">
+                            <div class="text-muted">SLA Breaches</div>
+                            <div class="fs-2 fw-bold text-danger" t-esc="state.data.sla_breaches"/>
+                        </div>
+                        <div class="o_omni_kpi_card card p-3 flex-grow-1">
+                            <div class="text-muted">Avg. Response (s)</div>
+                            <div class="fs-2 fw-bold" t-esc="state.data.avg_response"/>
+                        </div>
+                        <div class="o_omni_kpi_card card p-3 flex-grow-1">
+                            <div class="text-muted">Calls</div>
+                            <div class="fs-2 fw-bold" t-esc="state.data.calls"/>
+                        </div>
+                        <div class="o_omni_kpi_card card p-3 flex-grow-1">
+                            <div class="text-muted">Missed Calls</div>
+                            <div class="fs-2 fw-bold text-danger" t-esc="state.data.missed_calls"/>
+                        </div>
+                    </div>
+                </t>
+
+            </div>
+        </div>
+    </t>
+
+</templates>
