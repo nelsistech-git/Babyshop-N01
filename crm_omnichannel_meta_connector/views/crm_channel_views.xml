@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_crm_channel_form_meta_inherit" model="ir.ui.view">
+        <field name="name">crm.channel.form.meta.inherit</field>
+        <field name="model">crm.channel</field>
+        <field name="inherit_id" ref="crm_omnichannel_hub.view_crm_channel_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group" position="after">
+
+                <group name="webhook_group" string="Webhook" invisible="code not in ('facebook', 'instagram', 'whatsapp')">
+                    <field name="webhook_url" readonly="1"/>
+                    <field name="verify_token"/>
+                    <field name="app_secret" password="True"/>
+                </group>
+
+                <group name="facebook_group" string="Facebook Messenger" invisible="code != 'facebook'">
+                    <field name="meta_page_id"/>
+                    <field name="page_access_token" password="True"/>
+                </group>
+
+                <group name="instagram_group" string="Instagram" invisible="code != 'instagram'">
+                    <field name="meta_ig_account_id"/>
+                    <field name="page_access_token" password="True"/>
+                    <div class="text-muted" colspan="2">
+                        Instagram DMs are sent using the same Page Access Token as
+                        Messenger (the IG account must be linked to the Facebook Page).
+                    </div>
+                </group>
+
+                <group name="whatsapp_group" string="WhatsApp" invisible="code != 'whatsapp'">
+                    <field name="whatsapp_phone_number_id"/>
+                    <field name="whatsapp_business_account_id"/>
+                    <field name="whatsapp_access_token" password="True"/>
+                </group>
+
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
