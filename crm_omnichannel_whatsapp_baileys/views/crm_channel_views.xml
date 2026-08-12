@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_crm_channel_form_baileys_inherit" model="ir.ui.view">
+        <field name="name">crm.channel.form.baileys.inherit</field>
+        <field name="model">crm.channel</field>
+        <field name="inherit_id" ref="crm_omnichannel_meta_connector.view_crm_channel_form_meta_inherit"/>
+        <field name="arch" type="xml">
+
+            <!-- Connection ribbon -->
+            <xpath expr="//form/sheet" position="inside">
+                <widget name="web_ribbon" title="Connected" bg_color="text-bg-success"
+                        invisible="not (code == 'whatsapp' and whatsapp_provider == 'baileys' and baileys_connection_state == 'connected')"/>
+                <widget name="web_ribbon" title="Waiting for QR" bg_color="text-bg-warning"
+                        invisible="not (code == 'whatsapp' and whatsapp_provider == 'baileys' and baileys_connection_state == 'qr_pending')"/>
+            </xpath>
+
+            <!-- Let the user pick the WhatsApp provider before the Webhook group -->
+            <xpath expr="//group[@name='webhook_group']" position="before">
+                <group string="WhatsApp Provider" invisible="code != 'whatsapp'">
+                    <field name="whatsapp_provider" widget="radio"/>
+                </group>
+            </xpath>
+
+            <!-- Hide the Cloud API webhook group when Baileys is selected -->
+            <xpath expr="//group[@name='webhook_group']" position="attributes">
+                <attribute name="invisible">code not in ('facebook', 'instagram') and not (code == 'whatsapp' and whatsapp_provider == 'cloud_api')</attribute>
+            </xpath>
+
+            <!-- Hide the Cloud API WhatsApp group when Baileys is selected -->
+            <xpath expr="//group[@name='whatsapp_group']" position="attributes">
+                <attribute name="invisible">code != 'whatsapp' or whatsapp_provider != 'cloud_api'</attribute>
+            </xpath>
+
+            <!-- Add Baileys connection fields after the original WhatsApp group -->
+            <xpath expr="//group[@name='whatsapp_group']" position="after">
+                <group string="Baileys Bridge Connection" invisible="code != 'whatsapp' or whatsapp_provider != 'baileys'">
+                    <field name="baileys_base_url" placeholder="https://wa-bridge.yourdomain.com"/>
+                    <field name="baileys_session_id"/>
+                    <field name="baileys_api_key" password="True"/>
+                    <field name="baileys_webhook_url" readonly="1"/>
+                </group>
+                <group string="Status" invisible="code != 'whatsapp' or whatsapp_provider != 'baileys'">
+                    <field name="baileys_connection_state" readonly="1"/>
+                    <field name="baileys_connected_number" readonly="1"/>
+                    <field name="baileys_last_seen" readonly="1"/>
+                </group>
+                <group string="Pair Device" invisible="code != 'whatsapp' or whatsapp_provider != 'baileys'" colspan="2">
+                    <field name="baileys_qr_image" widget="image" nolabel="1"
+                           invisible="baileys_connection_state != 'qr_pending' or not baileys_qr_image"
+                           options="{'size': [220, 220]}"/>
+                    <div class="text-muted" colspan="2">
+                        Click "Start Pairing", then open WhatsApp on the phone you
+                        want to connect &#8594; Linked Devices &#8594; Link a Device,
+                        and scan the QR code that appears here (refresh the form if
+                        it doesn't show up right away).
+                    </div>
+                </group>
+                <div class="mt-2" invisible="code != 'whatsapp' or whatsapp_provider != 'baileys'">
+                    <button name="action_baileys_start_pairing" type="object"
+                            string="Start Pairing" class="btn-primary me-2"/>
+                    <button name="action_baileys_refresh_status" type="object"
+                            string="Refresh Status" class="btn-secondary me-2"/>
+                    <button name="action_baileys_logout" type="object"
+                            string="Log Out / Unpair" class="btn-secondary"
+                            confirm="Unpair this WhatsApp number from the bridge?"/>
+                </div>
+            </xpath>
+
+        </field>
+    </record>
+
+</odoo>

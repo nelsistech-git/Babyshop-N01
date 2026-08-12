@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_users_form_voip_inherit" model="ir.ui.view">
+        <field name="name">res.users.form.voip.inherit</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="VoIP" name="voip">
+                    <group>
+                        <group string="Extension">
+                            <field name="voip_extension"/>
+                            <field name="voip_sip_auth_username"/>
+                            <field name="voip_sip_secret" password="True"/>
+                        </group>
+                        <group string="Options">
+                            <field name="voip_call_from_another_device"/>
+                            <field name="voip_external_device_number"
+                                   invisible="not voip_call_from_another_device"/>
+                            <field name="voip_reject_incoming_calls"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

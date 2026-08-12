@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_crm_channel_form_asterisk_inherit" model="ir.ui.view">
+        <field name="name">crm.channel.form.asterisk.inherit</field>
+        <field name="model">crm.channel</field>
+        <field name="inherit_id" ref="crm_omnichannel_hub.view_crm_channel_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group" position="after">
+                <group string="Asterisk Manager Interface (AMI)" invisible="code != 'call'">
+                    <field name="ami_host" placeholder="pbx.yourdomain.com"/>
+                    <field name="ami_port"/>
+                    <field name="ami_username"/>
+                    <field name="ami_secret" password="True"/>
+                    <field name="ami_context"/>
+                    <field name="ami_trunk"/>
+                </group>
+                <group string="SIP / WebRTC (Agent Softphone)" invisible="code != 'call'">
+                    <field name="sip_domain" placeholder="rolsippbx.race.net.bd"/>
+                    <field name="sip_websocket_url" placeholder="wss://rolsippbx.race.net.bd:8089/ws"/>
+                    <field name="voip_environment"/>
+                </group>
+                <group string="Live Event Webhook (give to ami_bridge.py)" invisible="code != 'call'">
+                    <field name="ami_webhook_url" readonly="1"/>
+                    <field name="ami_webhook_secret" password="True"/>
+                </group>
+                <div class="mt-2" invisible="code != 'call'">
+                    <button name="action_test_ami_connection" type="object"
+                            string="Test AMI Connection" class="btn-secondary"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
