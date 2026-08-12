@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_connect" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.connect.center</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base_setup.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <!-- Changed targeting from the removed 'settings' div directly to 'form' -->
+            <xpath expr="//form" position="inside">
+
+                <app name="crm_omnichannel_connect_center" string="Omnichannel Connections">
+
+                    <!-- Dashboard Link -->
+                    <block>
+                        <button name="%(crm_omnichannel_connect_center.action_connect_dashboard)d"
+                                type="action"
+                                string="Open Connections Dashboard"
+                                class="btn-primary"
+                                icon="fa-plug"/>
+                    </block>
+
+                    <!-- WhatsApp Settings -->
+                    <block title="WhatsApp (QR pairing)">
+                        <setting string="Bridge URL" help="Base URL of your running bridge/server.js">
+                            <field name="connect_baileys_default_url" placeholder="https://wa-bridge.yourdomain.com"/>
+                        </setting>
+                        <setting string="Bridge API Key">
+                            <field name="connect_baileys_default_api_key" password="True"/>
+                            <div class="mt-2">
+                                <button name="action_test_baileys_bridge" type="object" string="Test Bridge Connection"
+                                        class="btn-link" icon="fa-plug"/>
+                            </div>
+                        </setting>
+                    </block>
+
+                    <!-- Meta / Facebook Settings -->
+                    <block title="Facebook / Instagram (OAuth Page connect)">
+                        <setting string="Meta App ID">
+                            <field name="connect_meta_app_id"/>
+                        </setting>
+                        <setting string="Meta App Secret">
+                            <field name="connect_meta_app_secret" password="True"/>
+                            <div class="mt-2">
+                                <button name="action_test_meta_credentials" type="object" string="Test Credentials"
+                                        class="btn-link" icon="fa-plug"/>
+                            </div>
+                        </setting>
+                        <setting>
+                            <div class="text-muted mb-3">
+                                One-time step in Meta App Dashboard &gt; Webhooks - paste these two values there:
+                            </div>
+
+                            <label for="connect_meta_webhook_url" string="Webhook Callback URL"/>
+                            <field name="connect_meta_webhook_url" readonly="1" class="w-100 mb-2"/>
+
+                            <label for="connect_meta_verify_token" string="Verify Token"/>
+                            <field name="connect_meta_verify_token" readonly="1" class="w-100 mb-2"/>
+
+                            <label for="connect_meta_oauth_redirect_uri"
+                                   string="OAuth Redirect URI (also add under Facebook Login &gt; Settings)"/>
+                            <field name="connect_meta_oauth_redirect_uri" readonly="1" class="w-100"/>
+                        </setting>
+                    </block>
+
+                    <!-- VoIP Settings -->
+                    <block title="VoIP (Asterisk AMI)">
+                        <setting string="AMI Host">
+                            <field name="connect_ami_default_host" placeholder="pbx.yourdomain.com"/>
+
+                            <label for="connect_ami_default_port" string="AMI Port" class="mt-2"/>
+                            <field name="connect_ami_default_port"/>
+                        </setting>
+                        <setting string="AMI Credentials">
+                            <label for="connect_ami_default_username" string="AMI Username"/>
+                            <field name="connect_ami_default_username"/>
+
+                            <label for="connect_ami_default_secret" string="AMI Secret" class="mt-2"/>
+                            <field name="connect_ami_default_secret" password="True"/>
+
+                            <div class="mt-2">
+                                <button name="action_test_ami_credentials" type="object" string="Test AMI Login"
+                                        class="btn-link" icon="fa-plug"/>
+                            </div>
+                        </setting>
+                        <setting string="AMI Bridge Health URL"
+                                 help="Where ami_bridge.py's built-in health endpoint listens">
+                            <field name="connect_ami_bridge_health_url" placeholder="http://localhost:8088"/>
+                            <div class="mt-2">
+                                <button name="action_test_ami_bridge_health" type="object" string="Test Event Bridge"
+                                        class="btn-link" icon="fa-plug"/>
+                            </div>
+                        </setting>
+                        <setting string="Call Event Webhook URL" help="Give this to ami_bridge.py as ODOO_WEBHOOK_URL">
+                            <field name="connect_ami_webhook_url" readonly="1"/>
+                        </setting>
+                    </block>
+
+                </app>
+            </xpath>
+        </field>
+    </record>
+</odoo>

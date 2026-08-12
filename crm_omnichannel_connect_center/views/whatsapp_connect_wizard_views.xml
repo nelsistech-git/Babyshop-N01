@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_whatsapp_connect_wizard_form" model="ir.ui.view">
+        <field name="name">whatsapp.connect.wizard.form</field>
+        <field name="model">whatsapp.connect.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Connect a WhatsApp Number">
+                <field name="channel_id" invisible="1"/>
+                <group invisible="channel_id">
+                    <field name="name" placeholder="e.g. Sales WhatsApp"/>
+                    <field name="bridge_base_url"/>
+                    <field name="bridge_api_key" password="True"/>
+                    <field name="session_id"/>
+                </group>
+                <group invisible="not channel_id">
+                    <field name="connection_state" invisible="1"/>
+                    <field name="qr_image" invisible="1"/>
+                    <field name="connected_number" invisible="1"/>
+                    <widget name="wa_qr_live"/>
+                </group>
+                <footer>
+                    <button name="action_start_pairing" type="object" string="Start Pairing"
+                            class="btn-primary" invisible="channel_id"/>
+                    <button name="action_start_pairing" type="object" string="Re-generate QR"
+                            class="btn-secondary" invisible="not channel_id"/>
+                    <button name="action_done" type="object" string="Done" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_whatsapp_connect_wizard" model="ir.actions.act_window">
+        <field name="name">Add WhatsApp Number</field>
+        <field name="res_model">whatsapp.connect.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

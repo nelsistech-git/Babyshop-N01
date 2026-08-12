@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_crm_channel_connect_tree" model="ir.ui.view">
+        <field name="name">crm.channel.connect.tree</field>
+        <field name="model">crm.channel</field>
+        <field name="arch" type="xml">
+            <tree string="Connections" create="0" decoration-muted="connect_status_color == 'muted'">
+                <field name="connect_status_color" column_invisible="True"/>
+                <field name="icon" string="" widget="badge" optional="show"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="account_identifier" string="Account"/>
+                <field name="connect_status_label" widget="badge"
+                       decoration-success="connect_status_color == 'success'"
+                       decoration-warning="connect_status_color == 'warning'"
+                       decoration-danger="connect_status_color == 'danger'"/>
+                <button name="action_test_connection" type="object" string="Test Connection" icon="fa-plug"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_connect_dashboard" model="ir.actions.act_window">
+        <field name="name">Connections</field>
+        <field name="res_model">crm.channel</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_crm_channel_connect_tree"/>
+        <field name="domain">[('code', 'in', ['whatsapp', 'facebook', 'instagram', 'call'])]</field>
+        <field name="context">{'search_default_filter_connectable': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No channels yet.</p>
+            <p>Use "Add WhatsApp Number", "Connect Facebook Pages" or "Add Calling Line" above to add your first
+                channel.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_facebook_connect" model="ir.actions.client">
+        <field name="name">Connect Facebook Pages</field>
+        <field name="tag">fb_connect_dashboard</field>
+    </record>
+</odoo>

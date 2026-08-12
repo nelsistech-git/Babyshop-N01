@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_voip_connect_wizard_form" model="ir.ui.view">
+        <field name="name">voip.connect.wizard.form</field>
+        <field name="model">voip.connect.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Add Calling Line">
+                <field name="channel_id" invisible="1"/>
+                <field name="result_success" invisible="1"/>
+                <group>
+                    <field name="name"/>
+                </group>
+                <group string="Asterisk Manager Interface (AMI)">
+                    <field name="ami_host" placeholder="pbx.yourdomain.com"/>
+                    <field name="ami_port"/>
+                    <field name="ami_username"/>
+                    <field name="ami_secret" password="True"/>
+                    <field name="ami_context"/>
+                    <field name="ami_trunk"/>
+                </group>
+                <group string="SIP / WebRTC (agent softphone)">
+                    <field name="sip_domain"/>
+                    <field name="sip_websocket_url" placeholder="wss://..."/>
+                    <field name="voip_environment"/>
+                </group>
+                <group string="Event Bridge">
+                    <field name="ami_webhook_secret" password="True"/>
+                    <div class="text-muted" colspan="2">
+                        Run ami_bridge.py with this as ODOO_WEBHOOK_SECRET - see BRIDGE_SETUP.md.
+                    </div>
+                </group>
+                <div class="alert alert-success" role="alert"
+                     invisible="not result_message or not result_success">
+                    <field name="result_message" readonly="1" nolabel="1"/>
+                </div>
+                <div class="alert alert-danger" role="alert"
+                     invisible="not result_message or result_success">
+                    <field name="result_message" readonly="1" nolabel="1"/>
+                </div>
+                <footer>
+                    <button name="action_test_and_connect" type="object" string="Test &amp; Connect"
+                            class="btn-primary"/>
+                    <button name="action_done" type="object" string="Done" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_voip_connect_wizard" model="ir.actions.act_window">
+        <field name="name">Add Calling Line</field>
+        <field name="res_model">voip.connect.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

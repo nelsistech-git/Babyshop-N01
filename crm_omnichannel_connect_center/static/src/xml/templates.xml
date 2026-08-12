@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="crm_omnichannel_connect_center.WaQrLive">
+        <div class="text-center o_wa_qr_live">
+            <img t-if="qrSrc" t-att-src="qrSrc" class="o_wa_qr_image border rounded p-2"
+                 style="width:220px;height:220px;"/>
+            <div t-elif="connectionState == 'connected'" class="p-4">
+                <i class="fa fa-check-circle text-success fa-3x"/>
+            </div>
+            <div t-else="" class="p-4 text-muted">
+                <i class="fa fa-spinner fa-spin fa-2x"/>
+            </div>
+            <div class="mt-2 fw-bold" t-esc="state.statusText"/>
+            <div t-if="connectedNumber" class="text-muted">Paired number: <t t-esc="connectedNumber"/></div>
+        </div>
+    </t>
+
+    <t t-name="crm_omnichannel_connect_center.FacebookConnect">
+        <div class="o_fb_connect_dashboard p-4" style="max-width: 640px;">
+            <h2><i class="fa fa-facebook-square me-2"/>Connect Facebook Pages</h2>
+            <p class="text-muted">
+                Log in with the Facebook account that manages your Page(s). Each Page can then be
+                connected with one click - the Page Access Token and webhook subscription are set
+                up automatically.
+            </p>
+
+            <div t-if="!state.appId" class="alert alert-warning">
+                Set the Meta App ID in Settings &gt; Omnichannel &gt; Connections first.
+            </div>
+
+            <div t-if="state.error" class="alert alert-danger" t-esc="state.error"/>
+
+            <button t-if="state.appId and !state.pages" class="btn btn-primary"
+                    t-on-click="onLoginClick" t-att-disabled="!state.sdkReady or state.loading">
+                <i class="fa fa-facebook me-1"/>
+                <t t-if="state.loading">Connecting...</t>
+                <t t-else="">Log in with Facebook</t>
+            </button>
+
+            <div t-if="state.pages" class="list-group mt-3">
+                <div t-if="!state.pages.length" class="text-muted">
+                    No Pages found for this account - make sure you're an admin of the Page in Facebook Business Settings.
+                </div>
+                <div t-foreach="state.pages" t-as="page" t-key="page.id"
+                     class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong t-esc="page.name"/>
+                        <div t-if="page.instagram_username" class="text-muted small">
+                            <i class="fa fa-instagram me-1"/>@<t t-esc="page.instagram_username"/> will also be connected
+                        </div>
+                    </div>
+                    <button class="btn btn-sm"
+                            t-att-class="page.connected ? 'btn-success' : 'btn-outline-primary'"
+                            t-att-disabled="page.connecting or page.connected"
+                            t-on-click="() => this.onConnectPage(page)">
+                        <t t-if="page.connected">Connected <i class="fa fa-check"/></t>
+                        <t t-elif="page.connecting">Connecting...</t>
+                        <t t-else="">Connect</t>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </t>
+
+</templates>
