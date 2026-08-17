@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_real_estate_project_budget_tree" model="ir.ui.view">
+        <field name="name">real.estate.project.budget.tree</field>
+        <field name="model">real.estate.project.budget</field>
+        <field name="arch" type="xml">
+            <tree string="Project Budgets" decoration-success="state=='active'" decoration-muted="state=='closed'">
+                <field name="name"/>
+                <field name="project_id"/>
+                <field name="fiscal_year"/>
+                <field name="total_budget"/>
+                <field name="total_committed"/>
+                <field name="total_actual"/>
+                <field name="total_remaining"/>
+                <field name="utilization_percentage" widget="percentage"/>
+                <field name="state" widget="badge"
+                       decoration-success="state in ('approved','active')"
+                       decoration-warning="state in ('draft','submitted')"
+                       decoration-muted="state=='closed'"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_real_estate_project_budget_form" model="ir.ui.view">
+        <field name="name">real.estate.project.budget.form</field>
+        <field name="model">real.estate.project.budget</field>
+        <field name="arch" type="xml">
+            <form string="Project Budget">
+                <header>
+                    <button name="action_submit" type="object" string="Submit"
+                            class="oe_highlight" invisible="state != 'draft'"/>
+                    <button name="action_approve" type="object" string="Approve"
+                            class="oe_highlight" invisible="state != 'submitted'"/>
+                    <button name="action_activate" type="object" string="Activate"
+                            class="oe_highlight" invisible="state != 'approved'"/>
+                    <button name="action_close" type="object" string="Close"
+                            invisible="state not in ('active','approved')"/>
+                    <button name="action_reset_to_draft" type="object" string="Reset to Draft"
+                            invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,active"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="project_id" required="1"/>
+                            <field name="fiscal_year"/>
+                            <field name="budget_date"/>
+                            <field name="budget_manager_id"/>
+                        </group>
+                        <group>
+                            <field name="total_budget" readonly="1"/>
+                            <field name="total_committed" readonly="1"/>
+                            <field name="total_actual" readonly="1"/>
+                            <field name="total_remaining" readonly="1"/>
+                            <field name="utilization_percentage" widget="percentage" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Budget Allocations">
+                            <field name="allocation_ids">
+                                <tree editable="bottom">
+                                    <field name="project_id" column_invisible="True"/>
+                                    <field name="budget_head"/>
+                                    <field name="building_id"/>
+                                    <field name="work_package_id"/>
+                                    <field name="allocated_amount"/>
+                                    <field name="committed_amount" readonly="1"/>
+                                    <field name="actual_amount" readonly="1"/>
+                                    <field name="remaining_amount" readonly="1"/>
+                                    <field name="utilization_percentage" widget="percentage" readonly="1"/>
+                                    <field name="allow_overspend"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Notes">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_real_estate_project_budget_search" model="ir.ui.view">
+        <field name="name">real.estate.project.budget.search</field>
+        <field name="model">real.estate.project.budget</field>
+        <field name="arch" type="xml">
+            <search string="Search Project Budgets">
+                <field name="name"/>
+                <field name="project_id"/>
+                <group expand="0" string="Group By">
+                    <filter string="Project" name="group_project" context="{'group_by': 'project_id'}"/>
+                    <filter string="State" name="group_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_real_estate_project_budget" model="ir.actions.act_window">
+        <field name="name">Project Budgets</field>
+        <field name="res_model">real.estate.project.budget</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_real_estate_project_budget_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first Project Budget</p>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_real_estate_qc_inspection_tree" model="ir.ui.view">
+        <field name="name">real.estate.qc.inspection.tree</field>
+        <field name="model">real.estate.qc.inspection</field>
+        <field name="arch" type="xml">
+            <tree string="QC Inspections" decoration-success="result=='passed'" decoration-danger="result=='failed'" decoration-warning="result in ('pending','conditional')">
+                <field name="name"/>
+                <field name="project_id"/>
+                <field name="unit_id"/>
+                <field name="inspection_type"/>
+                <field name="inspector_id"/>
+                <field name="inspection_date"/>
+                <field name="result" widget="badge"
+                       decoration-success="result=='passed'"
+                       decoration-danger="result=='failed'"
+                       decoration-warning="result in ('pending','conditional')"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_real_estate_qc_inspection_form" model="ir.ui.view">
+        <field name="name">real.estate.qc.inspection.form</field>
+        <field name="model">real.estate.qc.inspection</field>
+        <field name="arch" type="xml">
+            <form string="QC Inspection">
+                <header>
+                    <button name="action_recommend_result" type="object" string="Recommend Result"
+                            class="oe_highlight"/>
+                    <button name="action_mark_passed" type="object" string="Mark Passed"/>
+                    <button name="action_mark_failed" type="object" string="Mark Failed"/>
+                    <button name="action_mark_conditional" type="object" string="Mark Conditional"/>
+                    <field name="result" widget="statusbar" statusbar_visible="pending,passed,failed,conditional"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="%(action_real_estate_defect)d" type="action"
+                                class="oe_stat_button" icon="fa-exclamation-triangle"
+                                context="{'default_qc_inspection_id': id, 'default_project_id': project_id,
+                                          'default_unit_id': unit_id, 'default_building_id': building_id}">
+                            <field name="defect_count" widget="statinfo" string="Defects"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="project_id" required="1"/>
+                            <field name="building_id"/>
+                            <field name="unit_id"/>
+                            <field name="work_package_id"/>
+                        </group>
+                        <group>
+                            <field name="inspection_type"/>
+                            <field name="inspector_id"/>
+                            <field name="inspection_date"/>
+                            <field name="checklist_template_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Checklist">
+                            <field name="line_ids">
+                                <tree editable="bottom">
+                                    <field name="item_name"/>
+                                    <field name="description"/>
+                                    <field name="result" widget="badge"
+                                           decoration-success="result=='pass'"
+                                           decoration-danger="result=='fail'"
+                                           decoration-muted="result=='na'"/>
+                                    <field name="remarks"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Remarks &amp; Photos">
+                            <field name="remarks"/>
+                            <field name="attachment_ids" widget="many2many_binary"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_real_estate_qc_inspection_search" model="ir.ui.view">
+        <field name="name">real.estate.qc.inspection.search</field>
+        <field name="model">real.estate.qc.inspection</field>
+        <field name="arch" type="xml">
+            <search string="Search QC Inspections">
+                <field name="name"/>
+                <field name="project_id"/>
+                <field name="unit_id"/>
+                <filter string="Failed" name="filter_failed" domain="[('result','=','failed')]"/>
+                <filter string="Passed" name="filter_passed" domain="[('result','=','passed')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Project" name="group_project" context="{'group_by': 'project_id'}"/>
+                    <filter string="Result" name="group_result" context="{'group_by': 'result'}"/>
+                    <filter string="Inspection Type" name="group_type" context="{'group_by': 'inspection_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_real_estate_qc_inspection" model="ir.actions.act_window">
+        <field name="name">QC Inspections</field>
+        <field name="res_model">real.estate.qc.inspection</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_real_estate_qc_inspection_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first QC Inspection</p>
+        </field>
+    </record>
+
+</odoo>

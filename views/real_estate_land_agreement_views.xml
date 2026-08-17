@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_real_estate_land_agreement_tree" model="ir.ui.view">
+        <field name="name">real.estate.land.agreement.tree</field>
+        <field name="model">real.estate.land.agreement</field>
+        <field name="arch" type="xml">
+            <tree string="Land Agreements" decoration-success="state=='active'" decoration-muted="state in ('expired','terminated')">
+                <field name="name"/>
+                <field name="land_id"/>
+                <field name="agreement_type"/>
+                <field name="agreement_date"/>
+                <field name="developer_share_percentage"/>
+                <field name="land_owner_share_percentage"/>
+                <field name="state" widget="badge"
+                       decoration-success="state in ('approved','active')"
+                       decoration-warning="state in ('draft','legal_review','management_review')"
+                       decoration-muted="state in ('expired','terminated')"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_real_estate_land_agreement_form" model="ir.ui.view">
+        <field name="name">real.estate.land.agreement.form</field>
+        <field name="model">real.estate.land.agreement</field>
+        <field name="arch" type="xml">
+            <form string="Land Agreement">
+                <header>
+                    <button name="action_submit_legal_review" type="object" string="Submit for Legal Review"
+                            class="oe_highlight" invisible="state != 'draft'"/>
+                    <button name="action_submit_management_review" type="object" string="Submit for Management Review"
+                            class="oe_highlight" invisible="state != 'legal_review'"/>
+                    <button name="action_approve" type="object" string="Approve"
+                            class="oe_highlight" invisible="state != 'management_review'"/>
+                    <button name="action_activate" type="object" string="Activate"
+                            class="oe_highlight" invisible="state != 'approved'"/>
+                    <button name="action_expire" type="object" string="Mark Expired"
+                            invisible="state != 'active'"/>
+                    <button name="action_terminate" type="object" string="Terminate"
+                            invisible="state not in ('approved','active')"/>
+                    <button name="action_reset_to_draft" type="object" string="Reset to Draft"
+                            invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,legal_review,management_review,approved,active"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="agreement_type"/>
+                            <field name="agreement_date"/>
+                            <field name="land_id" required="1"/>
+                            <field name="land_owner_ids" widget="many2many_tags"/>
+                        </group>
+                        <group>
+                            <field name="start_date"/>
+                            <field name="end_date"/>
+                            <field name="total_land_area"/>
+                            <field name="project_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Shares &amp; Consideration">
+                            <group>
+                                <group>
+                                    <field name="developer_share_percentage"/>
+                                    <field name="land_owner_share_percentage"/>
+                                </group>
+                                <group>
+                                    <field name="cash_consideration"/>
+                                    <field name="registration_cost"/>
+                                    <field name="development_cost"/>
+                                </group>
+                            </group>
+                            <field name="flat_unit_consideration" placeholder="Describe flat/unit sharing terms..."/>
+                            <field name="revenue_sharing_notes" placeholder="Describe revenue sharing terms..."/>
+                        </page>
+                        <page string="Legal Terms">
+                            <field name="legal_terms"/>
+                        </page>
+                        <page string="Documents">
+                            <field name="attachment_ids" widget="many2many_binary"/>
+                        </page>
+                        <page string="Notes">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_real_estate_land_agreement_search" model="ir.ui.view">
+        <field name="name">real.estate.land.agreement.search</field>
+        <field name="model">real.estate.land.agreement</field>
+        <field name="arch" type="xml">
+            <search string="Search Land Agreements">
+                <field name="name"/>
+                <field name="land_id"/>
+                <field name="land_owner_ids"/>
+                <filter string="Draft" name="filter_draft" domain="[('state','=','draft')]"/>
+                <filter string="Active" name="filter_active" domain="[('state','=','active')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Agreement Type" name="group_type" context="{'group_by': 'agreement_type'}"/>
+                    <filter string="Land" name="group_land" context="{'group_by': 'land_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_real_estate_land_agreement" model="ir.actions.act_window">
+        <field name="name">Land Agreements</field>
+        <field name="res_model">real.estate.land.agreement</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_real_estate_land_agreement_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first Land Agreement
+            </p>
+            <p>Manage joint venture, purchase, lease and development agreements with land owners.</p>
+        </field>
+    </record>
+
+</odoo>

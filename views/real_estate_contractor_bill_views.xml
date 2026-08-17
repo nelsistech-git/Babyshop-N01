@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_real_estate_contractor_bill_tree" model="ir.ui.view">
+        <field name="name">real.estate.contractor.bill.tree</field>
+        <field name="model">real.estate.contractor.bill</field>
+        <field name="arch" type="xml">
+            <tree string="Contractor Work Certificates" decoration-success="state=='paid'">
+                <field name="name"/>
+                <field name="contractor_id"/>
+                <field name="project_id"/>
+                <field name="period_start"/>
+                <field name="period_end"/>
+                <field name="net_amount"/>
+                <field name="state" widget="badge"
+                       decoration-success="state=='paid'"
+                       decoration-info="state=='accounts'"
+                       decoration-warning="state in ('draft','submitted','engineer_review','pm_approval')"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_real_estate_contractor_bill_form" model="ir.ui.view">
+        <field name="name">real.estate.contractor.bill.form</field>
+        <field name="model">real.estate.contractor.bill</field>
+        <field name="arch" type="xml">
+            <form string="Contractor Work Certificate">
+                <header>
+                    <button name="action_submit" type="object" string="Submit" class="oe_highlight"
+                            invisible="state != 'draft'"/>
+                    <button name="action_engineer_review" type="object" string="Engineer Review" class="oe_highlight"
+                            invisible="state != 'submitted'"/>
+                    <button name="action_pm_approve" type="object" string="PM Approve" class="oe_highlight"
+                            invisible="state != 'engineer_review'"/>
+                    <button name="action_send_to_accounts" type="object" string="Send to Accounts" class="oe_highlight"
+                            invisible="state != 'pm_approval'"/>
+                    <button name="action_mark_paid" type="object" string="Mark Paid" class="oe_highlight"
+                            invisible="state != 'accounts'"/>
+                    <button name="action_reset_to_draft" type="object" string="Reset to Draft"
+                            invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,submitted,engineer_review,pm_approval,accounts,paid"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="contractor_id" required="1"/>
+                            <field name="project_id" readonly="1"/>
+                            <field name="work_package_id"/>
+                        </group>
+                        <group>
+                            <field name="period_start"/>
+                            <field name="period_end"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="planned_quantity"/>
+                            <field name="completed_quantity"/>
+                            <field name="approved_quantity"/>
+                            <field name="rate"/>
+                        </group>
+                        <group>
+                            <field name="gross_amount" readonly="1"/>
+                            <field name="retention_amount" readonly="1"/>
+                            <field name="advance_adjustment"/>
+                            <field name="deduction"/>
+                            <field name="net_amount" readonly="1" class="fw-bold"/>
+                        </group>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_real_estate_contractor_bill" model="ir.actions.act_window">
+        <field name="name">Contractor Work Certificates</field>
+        <field name="res_model">real.estate.contractor.bill</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first Contractor Work Certificate</p>
+        </field>
+    </record>
+
+</odoo>

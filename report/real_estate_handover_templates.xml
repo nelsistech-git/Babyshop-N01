@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_real_estate_handover_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2 class="text-center">Property Handover Certificate</h2>
+                        <p class="text-center text-muted">
+                            Certificate No: <span t-field="o.name"/>
+                            &#8226; Handover Date: <span t-field="o.handover_date"/>
+                        </p>
+                        <hr/>
+
+                        <div class="row mt-3">
+                            <div class="col-6">
+                                <strong>Company</strong>
+                                <p>
+                                    <span t-field="o.company_id.name"/><br/>
+                                    <span t-field="o.company_id.street"/><br/>
+                                    <span t-field="o.company_id.city"/>
+                                </p>
+                            </div>
+                            <div class="col-6">
+                                <strong>Customer</strong>
+                                <p>
+                                    <span t-field="o.customer_id.name"/><br/>
+                                    <span t-field="o.customer_id.mobile"/><br/>
+                                    <span t-field="o.customer_id.email"/>
+                                </p>
+                            </div>
+                        </div>
+
+                        <table class="table table-sm mt-3">
+                            <tbody>
+                                <tr>
+                                    <td><strong>Project</strong></td>
+                                    <td><span t-field="o.project_id.project_name"/></td>
+                                    <td><strong>Building</strong></td>
+                                    <td><span t-field="o.building_id.building_name"/></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Unit</strong></td>
+                                    <td><span t-field="o.unit_id.name"/></td>
+                                    <td><strong>Area</strong></td>
+                                    <td><span t-field="o.unit_id.saleable_area"/> sqft</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Agreement Number</strong></td>
+                                    <td><span t-field="o.sale_agreement_id.name"/></td>
+                                    <td><strong>Handover Date</strong></td>
+                                    <td><span t-field="o.handover_date"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4 class="mt-4">Meter Details</h4>
+                        <table class="table table-sm">
+                            <tbody>
+                                <tr>
+                                    <td><strong>Electricity Meter</strong></td>
+                                    <td><span t-field="o.electricity_meter_number"/></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Water Meter</strong></td>
+                                    <td><span t-field="o.water_meter_number"/></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Gas Meter</strong></td>
+                                    <td><span t-field="o.gas_meter_number"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4 class="mt-4">Keys &amp; Parking</h4>
+                        <table class="table table-sm">
+                            <tbody>
+                                <tr>
+                                    <td><strong>Keys Delivered</strong></td>
+                                    <td><span t-field="o.keys_delivered"/></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Parking</strong></td>
+                                    <td><span t-field="o.parking_slot"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4 class="mt-4">Handover Checklist</h4>
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Item</th>
+                                    <th>Delivered / Confirmed</th>
+                                    <th>Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="o.checklist_line_ids" t-as="line">
+                                    <td><span t-field="line.item_name"/></td>
+                                    <td>
+                                        <span t-if="line.is_checked">Yes</span>
+                                        <span t-else="">No</span>
+                                    </td>
+                                    <td><span t-field="line.remarks"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <p t-if="o.remarks">
+                            <strong>Remarks:</strong> <span t-field="o.remarks"/>
+                        </p>
+
+                        <div class="row mt-5">
+                            <div class="col-6 text-center">
+                                <div style="border-top: 1px solid #000; margin-top: 60px;">
+                                    Customer Signature
+                                </div>
+                                <p t-if="o.customer_signed_date">
+                                    Date: <span t-field="o.customer_signed_date"/>
+                                </p>
+                            </div>
+                            <div class="col-6 text-center">
+                                <div style="border-top: 1px solid #000; margin-top: 60px;">
+                                    <span t-field="o.company_representative_id.name"/> - Company Representative
+                                </div>
+                                <p t-if="o.company_signed_date">
+                                    Date: <span t-field="o.company_signed_date"/>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

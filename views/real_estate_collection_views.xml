@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_real_estate_collection_tree" model="ir.ui.view">
+        <field name="name">real.estate.collection.tree</field>
+        <field name="model">real.estate.collection</field>
+        <field name="arch" type="xml">
+            <tree string="Payment Collections" decoration-success="state=='confirmed'" decoration-muted="state=='cancelled'">
+                <field name="name"/>
+                <field name="customer_id"/>
+                <field name="unit_id"/>
+                <field name="installment_id"/>
+                <field name="payment_date"/>
+                <field name="amount"/>
+                <field name="payment_method"/>
+                <field name="state" widget="badge"
+                       decoration-success="state=='confirmed'"
+                       decoration-warning="state=='draft'"
+                       decoration-muted="state=='cancelled'"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_real_estate_collection_form" model="ir.ui.view">
+        <field name="name">real.estate.collection.form</field>
+        <field name="model">real.estate.collection</field>
+        <field name="arch" type="xml">
+            <form string="Payment Collection">
+                <header>
+                    <button name="action_confirm" type="object" string="Confirm" class="oe_highlight"
+                            invisible="state != 'draft'"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                            invisible="state == 'cancelled'"/>
+                    <button name="action_reset_to_draft" type="object" string="Reset to Draft"
+                            invisible="state != 'cancelled'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="customer_id" required="1"/>
+                            <field name="sale_agreement_id"/>
+                            <field name="installment_id"/>
+                            <field name="rental_agreement_id"/>
+                            <field name="rent_schedule_id"/>
+                            <field name="project_id" readonly="1"/>
+                            <field name="unit_id" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="payment_date"/>
+                            <field name="amount"/>
+                            <field name="payment_method"/>
+                            <field name="allow_overpayment"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="bank" invisible="payment_method not in ('bank','cheque')"/>
+                            <field name="cheque_number" invisible="payment_method != 'cheque'"/>
+                        </group>
+                        <group>
+                            <field name="transaction_id" invisible="payment_method not in ('mobile_banking','online_transfer','payment_gateway')"/>
+                            <field name="reference"/>
+                            <field name="collector_id"/>
+                        </group>
+                    </group>
+                    <field name="attachment_ids" widget="many2many_binary"/>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_real_estate_collection_search" model="ir.ui.view">
+        <field name="name">real.estate.collection.search</field>
+        <field name="model">real.estate.collection</field>
+        <field name="arch" type="xml">
+            <search string="Search Payment Collections">
+                <field name="name"/>
+                <field name="customer_id"/>
+                <field name="unit_id"/>
+                <filter string="Confirmed" name="filter_confirmed" domain="[('state','=','confirmed')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Project" name="group_project" context="{'group_by': 'project_id'}"/>
+                    <filter string="Payment Method" name="group_method" context="{'group_by': 'payment_method'}"/>
+                    <filter string="State" name="group_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_real_estate_collection" model="ir.actions.act_window">
+        <field name="name">Payment Collections</field>
+        <field name="res_model">real.estate.collection</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_real_estate_collection_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first Payment Collection</p>
+        </field>
+    </record>
+
+</odoo>

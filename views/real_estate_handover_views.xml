@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_real_estate_handover_tree" model="ir.ui.view">
+        <field name="name">real.estate.handover.tree</field>
+        <field name="model">real.estate.handover</field>
+        <field name="arch" type="xml">
+            <tree string="Handovers" decoration-success="state in ('handed_over','completed')">
+                <field name="name"/>
+                <field name="unit_id"/>
+                <field name="customer_id"/>
+                <field name="handover_date"/>
+                <field name="outstanding_balance"/>
+                <field name="state" widget="badge"
+                       decoration-success="state in ('handed_over','completed')"
+                       decoration-warning="state not in ('handed_over','completed')"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_real_estate_handover_form" model="ir.ui.view">
+        <field name="name">real.estate.handover.form</field>
+        <field name="model">real.estate.handover</field>
+        <field name="arch" type="xml">
+            <form string="Handover">
+                <header>
+                    <button name="action_request" type="object" string="Request Handover" class="oe_highlight"
+                            invisible="state != 'draft'"/>
+                    <button name="action_financial_clearance" type="object" string="Financial Clearance" class="oe_highlight"
+                            invisible="state != 'handover_requested'"/>
+                    <button name="action_qc_clearance" type="object" string="QC Clearance" class="oe_highlight"
+                            invisible="state != 'financial_clearance'"/>
+                    <button name="action_documentation_clearance" type="object" string="Documentation Clearance" class="oe_highlight"
+                            invisible="state != 'qc_clearance'"/>
+                    <button name="action_final_inspection" type="object" string="Final Inspection" class="oe_highlight"
+                            invisible="state != 'documentation_clearance'"/>
+                    <button name="action_approve" type="object" string="Approve" class="oe_highlight"
+                            invisible="state != 'final_inspection'"/>
+                    <button name="action_handover" type="object" string="Mark Handed Over" class="oe_highlight"
+                            invisible="state != 'approved'"/>
+                    <button name="action_complete" type="object" string="Complete"
+                            invisible="state != 'handed_over'"/>
+                    <button name="action_reset_to_draft" type="object" string="Reset to Draft"
+                            invisible="state == 'draft'"/>
+                    <button name="action_print_certificate" type="object" string="Print Certificate"
+                            invisible="state not in ('handed_over','completed')"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,handover_requested,financial_clearance,qc_clearance,documentation_clearance,final_inspection,approved,handed_over,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="%(action_real_estate_warranty)d" type="action"
+                                class="oe_stat_button" icon="fa-wrench"
+                                context="{'default_unit_id': unit_id, 'default_handover_id': id}">
+                            <field name="warranty_count" widget="statinfo" string="Warranty Claims"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="unit_id" required="1"/>
+                            <field name="project_id" readonly="1"/>
+                            <field name="building_id" readonly="1"/>
+                            <field name="sale_agreement_id"/>
+                            <field name="customer_id" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="handover_date"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Financial Clearance">
+                            <group>
+                                <group>
+                                    <field name="total_price" readonly="1"/>
+                                    <field name="total_paid" readonly="1"/>
+                                    <field name="approved_adjustment"/>
+                                    <field name="outstanding_balance" readonly="1" class="fw-bold"/>
+                                </group>
+                                <group>
+                                    <field name="financial_cleared" readonly="1"/>
+                                    <field name="financial_override"/>
+                                    <field name="financial_override_reason" invisible="not financial_override"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="QC Clearance">
+                            <group>
+                                <field name="open_critical_defect_count" readonly="1"/>
+                                <field name="final_qc_passed" readonly="1"/>
+                                <field name="qc_cleared" readonly="1"/>
+                            </group>
+                            <div class="text-muted">
+                                Requires zero open Critical defects on this unit and at least
+                                one Final QC Inspection with a Passed result.
+                            </div>
+                        </page>
+                        <page string="Documentation Clearance">
+                            <group>
+                                <field name="doc_agreement_signed"/>
+                                <field name="doc_customer_documents"/>
+                                <field name="doc_payment_records"/>
+                                <field name="doc_legal_documents"/>
+                                <field name="documentation_cleared" readonly="1"/>
+                            </group>
+                        </page>
+                        <page string="Handover Checklist">
+                            <field name="checklist_line_ids">
+                                <tree editable="bottom">
+                                    <field name="item_name"/>
+                                    <field name="is_checked"/>
+                                    <field name="remarks"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Certificate Details">
+                            <group>
+                                <group>
+                                    <field name="keys_delivered"/>
+                                    <field name="parking_slot"/>
+                                </group>
+                                <group>
+                                    <field name="electricity_meter_number"/>
+                                    <field name="water_meter_number"/>
+                                    <field name="gas_meter_number"/>
+                                </group>
+                            </group>
+                            <field name="remarks"/>
+                        </page>
+                        <page string="Signatures">
+                            <group>
+                                <group>
+                                    <field name="customer_signed"/>
+                                    <field name="customer_signed_date"/>
+                                </group>
+                                <group>
+                                    <field name="company_representative_id"/>
+                                    <field name="company_signed"/>
+                                    <field name="company_signed_date"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Warranty">
+                            <group>
+                                <field name="warranty_period_months"/>
+                                <field name="warranty_expiry_date" readonly="1"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_real_estate_handover_search" model="ir.ui.view">
+        <field name="name">real.estate.handover.search</field>
+        <field name="model">real.estate.handover</field>
+        <field name="arch" type="xml">
+            <search string="Search Handovers">
+                <field name="name"/>
+                <field name="unit_id"/>
+                <field name="customer_id"/>
+                <group expand="0" string="Group By">
+                    <filter string="Project" name="group_project" context="{'group_by': 'project_id'}"/>
+                    <filter string="State" name="group_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_real_estate_handover" model="ir.actions.act_window">
+        <field name="name">Handovers</field>
+        <field name="res_model">real.estate.handover</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_real_estate_handover_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first Handover</p>
+        </field>
+    </record>
+
+</odoo>

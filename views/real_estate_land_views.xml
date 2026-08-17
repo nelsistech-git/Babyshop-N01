@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_real_estate_land_tree" model="ir.ui.view">
+        <field name="name">real.estate.land.tree</field>
+        <field name="model">real.estate.land</field>
+        <field name="arch" type="xml">
+            <tree string="Lands" decoration-success="state=='active'" decoration-muted="state=='released'">
+                <field name="name"/>
+                <field name="land_name"/>
+                <field name="district"/>
+                <field name="area"/>
+                <field name="area_uom"/>
+                <field name="total_ownership_percentage" widget="percentage"/>
+                <field name="legal_verification"/>
+                <field name="state" widget="badge"
+                       decoration-success="state in ('verified','active')"
+                       decoration-warning="state in ('draft','under_verification')"
+                       decoration-info="state=='under_agreement'"
+                       decoration-muted="state=='released'"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_real_estate_land_kanban" model="ir.ui.view">
+        <field name="name">real.estate.land.kanban</field>
+        <field name="model">real.estate.land</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile">
+                <field name="land_name"/>
+                <field name="state"/>
+                <field name="area"/>
+                <field name="area_uom"/>
+                <field name="total_ownership_percentage"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click p-2">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <strong><t t-esc="record.land_name.value"/></strong>
+                                <span t-attf-class="badge rounded-pill #{record.state.raw_value == 'active' ? 'text-bg-success' : record.state.raw_value == 'released' ? 'text-bg-secondary' : 'text-bg-warning'}">
+                                    <t t-esc="record.state.value"/>
+                                </span>
+                            </div>
+                            <div class="text-muted">
+                                <t t-esc="record.area.value"/> <t t-esc="record.area_uom.value"/>
+                            </div>
+                            <div>
+                                <i class="fa fa-users"/> Ownership: <t t-esc="record.total_ownership_percentage.value"/>%
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_real_estate_land_form" model="ir.ui.view">
+        <field name="name">real.estate.land.form</field>
+        <field name="model">real.estate.land</field>
+        <field name="arch" type="xml">
+            <form string="Land">
+                <header>
+                    <button name="action_submit_verification" type="object" string="Submit for Verification"
+                            class="oe_highlight" invisible="state != 'draft'"/>
+                    <button name="action_verify" type="object" string="Mark Verified"
+                            class="oe_highlight" invisible="state != 'under_verification'"/>
+                    <button name="action_mark_under_agreement" type="object" string="Under Agreement"
+                            invisible="state != 'verified'"/>
+                    <button name="action_activate" type="object" string="Activate"
+                            class="oe_highlight" invisible="state not in ('verified','under_agreement')"/>
+                    <button name="action_release" type="object" string="Release"
+                            invisible="state not in ('active','allocated')"/>
+                    <button name="action_reset_to_draft" type="object" string="Reset to Draft"
+                            invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,under_verification,verified,under_agreement,active"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_agreements" type="object" class="oe_stat_button" icon="fa-file-text-o">
+                            <field name="agreement_count" widget="statinfo" string="Agreements"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" readonly="1"/></h1>
+                        <h2><field name="land_name" placeholder="e.g. North Block Plot"/></h2>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="location"/>
+                            <field name="district"/>
+                            <field name="upazila"/>
+                            <field name="address"/>
+                        </group>
+                        <group>
+                            <field name="area"/>
+                            <field name="area_uom"/>
+                            <field name="total_ownership_percentage" widget="percentage"/>
+                            <field name="project_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Ownership">
+                            <field name="ownership_line_ids">
+                                <tree editable="bottom">
+                                    <field name="owner_id"/>
+                                    <field name="ownership_percentage"/>
+                                </tree>
+                            </field>
+                            <div class="text-muted mt-2">
+                                Total ownership must equal 100% before the land can be verified or activated.
+                            </div>
+                        </page>
+                        <page string="Legal Details">
+                            <group>
+                                <group>
+                                    <field name="deed_number"/>
+                                    <field name="khatian_number"/>
+                                    <field name="dag_number"/>
+                                </group>
+                                <group>
+                                    <field name="mouza"/>
+                                    <field name="jl_number"/>
+                                    <field name="registration_date"/>
+                                </group>
+                            </group>
+                            <group>
+                                <group>
+                                    <field name="mutation_status"/>
+                                    <field name="tax_status"/>
+                                </group>
+                                <group>
+                                    <field name="legal_verification"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Documents">
+                            <field name="attachment_ids" widget="many2many_binary"/>
+                        </page>
+                        <page string="Notes">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_real_estate_land_search" model="ir.ui.view">
+        <field name="name">real.estate.land.search</field>
+        <field name="model">real.estate.land</field>
+        <field name="arch" type="xml">
+            <search string="Search Lands">
+                <field name="name"/>
+                <field name="land_name"/>
+                <field name="district"/>
+                <field name="deed_number"/>
+                <filter string="Draft" name="filter_draft" domain="[('state','=','draft')]"/>
+                <filter string="Verified" name="filter_verified" domain="[('state','=','verified')]"/>
+                <filter string="Active" name="filter_active" domain="[('state','=','active')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="District" name="group_district" context="{'group_by': 'district'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_real_estate_land" model="ir.actions.act_window">
+        <field name="name">Lands</field>
+        <field name="res_model">real.estate.land</field>
+        <field name="view_mode">tree,kanban,form</field>
+        <field name="search_view_id" ref="view_real_estate_land_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first Land record
+            </p>
+            <p>Track land parcels, ownership shares and legal verification status.</p>
+        </field>
+    </record>
+
+</odoo>

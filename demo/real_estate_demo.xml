@@ -1,0 +1,993 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Contacts for the two demo land owners -->
+        <record id="demo_partner_land_owner_1" model="res.partner">
+            <field name="name">Md. Abdul Karim</field>
+            <field name="street">House 12, Road 5, Dhanmondi</field>
+            <field name="city">Dhaka</field>
+            <field name="phone">+880-2-9551234</field>
+            <field name="mobile">+8801711000111</field>
+            <field name="email">abdul.karim@example.com</field>
+        </record>
+
+        <record id="demo_partner_land_owner_2" model="res.partner">
+            <field name="name">Fatema Begum</field>
+            <field name="street">House 45, Road 11, Banani</field>
+            <field name="city">Dhaka</field>
+            <field name="phone">+880-2-9887654</field>
+            <field name="mobile">+8801811000222</field>
+            <field name="email">fatema.begum@example.com</field>
+        </record>
+
+        <record id="demo_land_owner_1" model="real.estate.land.owner">
+            <field name="partner_id" ref="demo_partner_land_owner_1"/>
+            <field name="ownership_type">individual</field>
+            <field name="nid_passport">1985674123456</field>
+            <field name="status">active</field>
+            <field name="bank_name">Dutch-Bangla Bank Ltd.</field>
+            <field name="bank_account_name">Md. Abdul Karim</field>
+            <field name="bank_account_number">1012345678901</field>
+        </record>
+
+        <record id="demo_land_owner_2" model="real.estate.land.owner">
+            <field name="partner_id" ref="demo_partner_land_owner_2"/>
+            <field name="ownership_type">individual</field>
+            <field name="nid_passport">1990123456789</field>
+            <field name="status">active</field>
+            <field name="bank_name">Islami Bank Bangladesh Ltd.</field>
+            <field name="bank_account_name">Fatema Begum</field>
+            <field name="bank_account_number">2098765432101</field>
+        </record>
+
+        <!-- Land: 10 Bigha parcel, jointly owned 70/30 -->
+        <record id="demo_land_1" model="real.estate.land">
+            <field name="land_name">ABC Residence Site - North Block</field>
+            <field name="location">Bashundhara, Dhaka</field>
+            <field name="district">Dhaka</field>
+            <field name="upazila">Vatara</field>
+            <field name="area">10.0</field>
+            <field name="area_uom">bigha</field>
+            <field name="deed_number">DEED-2024-8871</field>
+            <field name="khatian_number">KH-441</field>
+            <field name="dag_number">DAG-2201</field>
+            <field name="mouza">Bashundhara Mouza</field>
+            <field name="jl_number">JL-15</field>
+            <field name="registration_date" eval="'2024-01-15'"/>
+            <field name="mutation_status">completed</field>
+            <field name="tax_status">paid</field>
+        </record>
+
+        <record id="demo_land_ownership_1" model="real.estate.land.ownership">
+            <field name="land_id" ref="demo_land_1"/>
+            <field name="owner_id" ref="demo_land_owner_1"/>
+            <field name="ownership_percentage">70.0</field>
+        </record>
+
+        <record id="demo_land_ownership_2" model="real.estate.land.ownership">
+            <field name="land_id" ref="demo_land_1"/>
+            <field name="owner_id" ref="demo_land_owner_2"/>
+            <field name="ownership_percentage">30.0</field>
+        </record>
+
+        <!-- Development / Joint Venture Agreement -->
+        <record id="demo_land_agreement_1" model="real.estate.land.agreement">
+            <field name="agreement_type">joint_venture</field>
+            <field name="agreement_date" eval="'2024-02-01'"/>
+            <field name="land_id" ref="demo_land_1"/>
+            <field name="land_owner_ids" eval="[(6, 0, [ref('demo_land_owner_1'), ref('demo_land_owner_2')])]"/>
+            <field name="start_date" eval="'2024-02-01'"/>
+            <field name="end_date" eval="'2028-02-01'"/>
+            <field name="developer_share_percentage">70.0</field>
+            <field name="land_owner_share_percentage">30.0</field>
+            <field name="cash_consideration">5000000</field>
+            <field name="registration_cost">300000</field>
+            <field name="development_cost">45000000</field>
+            <field name="flat_unit_consideration">Land owners to receive 30 units out of 100 total constructed units, proportional to their ownership share.</field>
+        </record>
+
+        <!-- ==================== PHASE 2: PROJECT STRUCTURE ==================== -->
+
+        <record id="demo_project_1" model="real.estate.project">
+            <field name="project_name">ABC Residence</field>
+            <field name="project_type">apartment</field>
+            <field name="land_id" ref="demo_land_1"/>
+            <field name="land_agreement_id" ref="demo_land_agreement_1"/>
+            <field name="location">Bashundhara, Dhaka</field>
+            <field name="address">Plot 14, Road 3, Bashundhara R/A, Dhaka</field>
+            <field name="start_date" eval="'2024-03-01'"/>
+            <field name="planned_completion_date" eval="'2027-03-01'"/>
+            <field name="construction_area">180000</field>
+            <field name="saleable_area">150000</field>
+            <field name="state">construction</field>
+        </record>
+
+        <!-- COMMENTED-OUT 2026-08-15 by agent: these records used NEW xmlids
+             (demo_land_1_project_link / demo_agreement_1_project_link), so Odoo tried to
+             CREATE new records and failed (real.estate.land.land_name is required => NotNullViolation).
+             Replaced below with the ORIGINAL xmlids so Odoo UPDATEs demo_land_1 /
+             demo_land_agreement_1 with their project_id instead. -->
+        <!-- <record id="demo_land_1_project_link" model="real.estate.land">
+            <field name="project_id" ref="demo_project_1"/>
+        </record>
+
+        <record id="demo_agreement_1_project_link" model="real.estate.land.agreement">
+            <field name="project_id" ref="demo_project_1"/>
+        </record> -->
+
+        <record id="demo_land_1" model="real.estate.land">
+            <field name="project_id" ref="demo_project_1"/>
+        </record>
+
+        <record id="demo_land_agreement_1" model="real.estate.land.agreement">
+            <field name="project_id" ref="demo_project_1"/>
+        </record>
+
+        <record id="demo_building_a" model="real.estate.building">
+            <field name="name">BLD-A</field>
+            <field name="building_name">Tower A</field>
+            <field name="project_id" ref="demo_project_1"/>
+            <field name="building_type">residential</field>
+            <field name="total_floors">12</field>
+        </record>
+
+        <record id="demo_building_b" model="real.estate.building">
+            <field name="name">BLD-B</field>
+            <field name="building_name">Tower B</field>
+            <field name="project_id" ref="demo_project_1"/>
+            <field name="building_type">residential</field>
+            <field name="total_floors">10</field>
+        </record>
+
+        <!-- Floors: Tower A ground + 9 typical floors (10+ floors total across demo) -->
+        <record id="demo_floor_a_0" model="real.estate.floor">
+            <field name="floor_name">Ground Floor</field>
+            <field name="floor_number">0</field>
+            <field name="building_id" ref="demo_building_a"/>
+        </record>
+        <record id="demo_floor_a_1" model="real.estate.floor">
+            <field name="floor_name">Floor 1</field>
+            <field name="floor_number">1</field>
+            <field name="building_id" ref="demo_building_a"/>
+        </record>
+        <record id="demo_floor_a_2" model="real.estate.floor">
+            <field name="floor_name">Floor 2</field>
+            <field name="floor_number">2</field>
+            <field name="building_id" ref="demo_building_a"/>
+        </record>
+        <record id="demo_floor_a_3" model="real.estate.floor">
+            <field name="floor_name">Floor 3</field>
+            <field name="floor_number">3</field>
+            <field name="building_id" ref="demo_building_a"/>
+        </record>
+        <record id="demo_floor_a_4" model="real.estate.floor">
+            <field name="floor_name">Floor 4</field>
+            <field name="floor_number">4</field>
+            <field name="building_id" ref="demo_building_a"/>
+        </record>
+        <record id="demo_floor_a_5" model="real.estate.floor">
+            <field name="floor_name">Floor 5</field>
+            <field name="floor_number">5</field>
+            <field name="building_id" ref="demo_building_a"/>
+        </record>
+        <record id="demo_floor_b_0" model="real.estate.floor">
+            <field name="floor_name">Ground Floor</field>
+            <field name="floor_number">0</field>
+            <field name="building_id" ref="demo_building_b"/>
+        </record>
+        <record id="demo_floor_b_1" model="real.estate.floor">
+            <field name="floor_name">Floor 1</field>
+            <field name="floor_number">1</field>
+            <field name="building_id" ref="demo_building_b"/>
+        </record>
+        <record id="demo_floor_b_2" model="real.estate.floor">
+            <field name="floor_name">Floor 2</field>
+            <field name="floor_number">2</field>
+            <field name="building_id" ref="demo_building_b"/>
+        </record>
+        <record id="demo_floor_b_3" model="real.estate.floor">
+            <field name="floor_name">Floor 3</field>
+            <field name="floor_number">3</field>
+            <field name="building_id" ref="demo_building_b"/>
+        </record>
+
+        <!-- Units: Tower A, floors 1-5, 2 units each (10 units) + Tower B floors 1-3, 2 each (6 units)
+             + Tower A Ground: 2 shops = 22 units total, exceeding the 20+ unit demo requirement -->
+        <record id="demo_unit_a_g01" model="real.estate.unit">
+            <field name="name">A-G01</field>
+            <field name="floor_id" ref="demo_floor_a_0"/>
+            <field name="unit_type">shop</field>
+            <field name="area">450</field>
+            <field name="saleable_area">450</field>
+            <field name="pricing_method">per_sqft</field>
+            <field name="price_per_sqft">15000</field>
+            <field name="status">available</field>
+        </record>
+        <record id="demo_unit_a_g02" model="real.estate.unit">
+            <field name="name">A-G02</field>
+            <field name="floor_id" ref="demo_floor_a_0"/>
+            <field name="unit_type">shop</field>
+            <field name="area">400</field>
+            <field name="saleable_area">400</field>
+            <field name="pricing_method">per_sqft</field>
+            <field name="price_per_sqft">15000</field>
+            <field name="status">available</field>
+        </record>
+
+        <record id="demo_unit_a_101" model="real.estate.unit">
+            <field name="name">A-101</field>
+            <field name="floor_id" ref="demo_floor_a_1"/>
+            <field name="unit_type">apartment</field>
+            <field name="area">1500</field>
+            <field name="saleable_area">1500</field>
+            <field name="bedrooms">3</field>
+            <field name="bathrooms">3</field>
+            <field name="facing">south</field>
+            <field name="pricing_method">per_sqft</field>
+            <field name="price_per_sqft">8000</field>
+            <field name="status">sold</field>
+        </record>
+        <record id="demo_unit_a_102" model="real.estate.unit">
+            <field name="name">A-102</field>
+            <field name="floor_id" ref="demo_floor_a_1"/>
+            <field name="unit_type">apartment</field>
+            <field name="area">1350</field>
+            <field name="saleable_area">1350</field>
+            <field name="bedrooms">3</field>
+            <field name="bathrooms">2</field>
+            <field name="facing">north</field>
+            <field name="pricing_method">per_sqft</field>
+            <field name="price_per_sqft">8000</field>
+            <field name="status">available</field>
+        </record>
+        <record id="demo_unit_a_201" model="real.estate.unit">
+            <field name="name">A-201</field>
+            <field name="floor_id" ref="demo_floor_a_2"/>
+            <field name="unit_type">apartment</field>
+            <field name="area">1500</field>
+            <field name="saleable_area">1500</field>
+            <field name="bedrooms">3</field>
+            <field name="bathrooms">3</field>
+            <field name="facing">south</field>
+            <field name="pricing_method">per_sqft</field>
+            <field name="price_per_sqft">8100</field>
+            <field name="status">booked</field>
+        </record>
+        <record id="demo_unit_a_202" model="real.estate.unit">
+            <field name="name">A-202</field>
+            <field name="floor_id" ref="demo_floor_a_2"/>
+            <field name="unit_type">apartment</field>
+            <field name="area">1350</field>
+            <field name="saleable_area">1350</field>
+            <field name="bedrooms">3</field>
+            <field name="bathrooms">2</field>
+            <field name="facing">north</field>
+            <field name="pricing_method">per_sqft</field>
+            <field name="price_per_sqft">8100</field>
+            <field name="status">available</field>
+        </record>
+        <record id="demo_unit_a_301" model="real.estate.unit">
+            <field name="name">A-301</field>
+            <field name="floor_id" ref="demo_floor_a_3"/>
+            <field name="unit_type">apartment</field>
+            <field name="area">1500</field>
+            <field name="saleable_area">1500</field>
+            <field name="bedrooms">3</field>
+            <field name="bathrooms">3</field>
+            <field name="pricing_method">per_sqft</field>
+            <field name="price_per_sqft">8200</field>
+            <field name="status">reserved</field>
+        </record>
+        <record id="demo_unit_a_302" model="real.estate.unit">
+            <field name="name">A-302</field>
+            <field name="floor_id" ref="demo_floor_a_3"/>
+            <field name="unit_type">apartment</field>
+            <field name="area">1350</field>
+            <field name="saleable_area">1350</field>
+            <field name="bedrooms">3</field>
+            <field name="bathrooms">2</field>
+            <field name="pricing_method">per_sqft</field>
+            <field name="price_per_sqft">8200</field>
+            <field name="status">available</field>
+        </record>
+        <record id="demo_unit_a_401" model="real.estate.unit">
+            <field name="name">A-401</field>
+            <field name="floor_id" ref="demo_floor_a_4"/>
+            <field name="unit_type">apartment</field>
+            <field name="area">1500</field>
+            <field name="saleable_area">1500</field>
+            <field name="bedrooms">3</field>
+            <field name="bathrooms">3</field>
+            <field name="pricing_method">per_sqft</field>
+            <field name="price_per_sqft">8300</field>
+            <field name="status">available</field>
+        </record>
+        <record id="demo_unit_a_402" model="real.estate.unit">
+            <field name="name">A-402</field>
+            <field name="floor_id" ref="demo_floor_a_4"/>
+            <field name="unit_type">apartment</field>
+            <field name="area">1350</field>
+            <field name="saleable_area">1350</field>
+            <field name="bedrooms">3</field>
+            <field name="bathrooms">2</field>
+            <field name="pricing_method">per_sqft</field>
+            <field name="price_per_sqft">8300</field>
+            <field name="status">available</field>
+        </record>
+        <record id="demo_unit_a_501" model="real.estate.unit">
+            <field name="name">A-501</field>
+            <field name="floor_id" ref="demo_floor_a_5"/>
+            <field name="unit_type">penthouse</field>
+            <field name="area">2400</field>
+            <field name="saleable_area">2400</field>
+            <field name="bedrooms">4</field>
+            <field name="bathrooms">4</field>
+            <field name="pricing_method">per_sqft</field>
+            <field name="price_per_sqft">9500</field>
+            <field name="status">available</field>
+        </record>
+
+        <record id="demo_unit_b_101" model="real.estate.unit">
+            <field name="name">B-101</field>
+            <field name="floor_id" ref="demo_floor_b_1"/>
+            <field name="unit_type">apartment</field>
+            <field name="area">1200</field>
+            <field name="saleable_area">1200</field>
+            <field name="bedrooms">2</field>
+            <field name="bathrooms">2</field>
+            <field name="pricing_method">per_sqft</field>
+            <field name="price_per_sqft">7500</field>
+            <field name="status">available</field>
+        </record>
+        <record id="demo_unit_b_102" model="real.estate.unit">
+            <field name="name">B-102</field>
+            <field name="floor_id" ref="demo_floor_b_1"/>
+            <field name="unit_type">apartment</field>
+            <field name="area">1100</field>
+            <field name="saleable_area">1100</field>
+            <field name="bedrooms">2</field>
+            <field name="bathrooms">2</field>
+            <field name="pricing_method">per_sqft</field>
+            <field name="price_per_sqft">7500</field>
+            <field name="status">sold</field>
+        </record>
+        <record id="demo_unit_b_201" model="real.estate.unit">
+            <field name="name">B-201</field>
+            <field name="floor_id" ref="demo_floor_b_2"/>
+            <field name="unit_type">apartment</field>
+            <field name="area">1200</field>
+            <field name="saleable_area">1200</field>
+            <field name="bedrooms">2</field>
+            <field name="bathrooms">2</field>
+            <field name="pricing_method">per_sqft</field>
+            <field name="price_per_sqft">7600</field>
+            <field name="status">available</field>
+        </record>
+        <record id="demo_unit_b_202" model="real.estate.unit">
+            <field name="name">B-202</field>
+            <field name="floor_id" ref="demo_floor_b_2"/>
+            <field name="unit_type">apartment</field>
+            <field name="area">1100</field>
+            <field name="saleable_area">1100</field>
+            <field name="bedrooms">2</field>
+            <field name="bathrooms">2</field>
+            <field name="pricing_method">per_sqft</field>
+            <field name="price_per_sqft">7600</field>
+            <field name="status">available</field>
+        </record>
+        <record id="demo_unit_b_301" model="real.estate.unit">
+            <field name="name">B-301</field>
+            <field name="floor_id" ref="demo_floor_b_3"/>
+            <field name="unit_type">apartment</field>
+            <field name="area">1200</field>
+            <field name="saleable_area">1200</field>
+            <field name="bedrooms">2</field>
+            <field name="bathrooms">2</field>
+            <field name="pricing_method">per_sqft</field>
+            <field name="price_per_sqft">7700</field>
+            <field name="status">available</field>
+        </record>
+        <record id="demo_unit_b_302" model="real.estate.unit">
+            <field name="name">B-302</field>
+            <field name="floor_id" ref="demo_floor_b_3"/>
+            <field name="unit_type">apartment</field>
+            <field name="area">1100</field>
+            <field name="saleable_area">1100</field>
+            <field name="bedrooms">2</field>
+            <field name="bathrooms">2</field>
+            <field name="pricing_method">per_sqft</field>
+            <field name="price_per_sqft">7700</field>
+            <field name="status">available</field>
+        </record>
+
+        <record id="demo_unit_b_g01" model="real.estate.unit">
+            <field name="name">B-G01</field>
+            <field name="floor_id" ref="demo_floor_b_0"/>
+            <field name="unit_type">shop</field>
+            <field name="area">380</field>
+            <field name="saleable_area">380</field>
+            <field name="pricing_method">per_sqft</field>
+            <field name="price_per_sqft">14000</field>
+            <field name="status">available</field>
+        </record>
+        <record id="demo_unit_b_g02" model="real.estate.unit">
+            <field name="name">B-G02</field>
+            <field name="floor_id" ref="demo_floor_b_0"/>
+            <field name="unit_type">shop</field>
+            <field name="area">360</field>
+            <field name="saleable_area">360</field>
+            <field name="pricing_method">per_sqft</field>
+            <field name="price_per_sqft">14000</field>
+            <field name="status">available</field>
+        </record>
+        <record id="demo_unit_b_g03" model="real.estate.unit">
+            <field name="name">B-G03</field>
+            <field name="floor_id" ref="demo_floor_b_0"/>
+            <field name="unit_type">office</field>
+            <field name="area">500</field>
+            <field name="saleable_area">500</field>
+            <field name="pricing_method">per_sqft</field>
+            <field name="price_per_sqft">13000</field>
+            <field name="status">available</field>
+        </record>
+
+        <!-- Sample additional charges on the flagship unit -->
+        <record id="demo_unit_a101_charge_parking" model="real.estate.unit.charge">
+            <field name="unit_id" ref="demo_unit_a_101"/>
+            <field name="charge_type">parking</field>
+            <field name="description">1 dedicated parking space</field>
+            <field name="amount">500000</field>
+        </record>
+        <record id="demo_unit_a101_charge_utility" model="real.estate.unit.charge">
+            <field name="unit_id" ref="demo_unit_a_101"/>
+            <field name="charge_type">utility</field>
+            <field name="description">Gas + Electricity connection</field>
+            <field name="amount">150000</field>
+        </record>
+
+        <!-- ==================== PHASE 3: CONSTRUCTION ==================== -->
+
+        <!-- Demo products used on BOQ / Requisition lines -->
+        <record id="demo_product_cement" model="product.product">
+            <field name="name">Cement OPC 50kg Bag</field>
+            <field name="type">consu</field>
+            <field name="uom_id" ref="uom.product_uom_unit"/>
+            <field name="uom_po_id" ref="uom.product_uom_unit"/>
+            <field name="standard_price">650</field>
+        </record>
+        <record id="demo_product_steel_rod" model="product.product">
+            <field name="name">Steel Rod 12mm (per kg)</field>
+            <field name="type">consu</field>
+            <field name="uom_id" ref="uom.product_uom_kgm"/>
+            <field name="uom_po_id" ref="uom.product_uom_kgm"/>
+            <field name="standard_price">95</field>
+        </record>
+
+        <!-- Project Budget: matches the 45,000,000 development cost in the land agreement -->
+        <record id="demo_project_budget_1" model="real.estate.project.budget">
+            <field name="project_id" ref="demo_project_1"/>
+            <field name="fiscal_year">2024-2027</field>
+            <field name="budget_date" eval="'2024-03-01'"/>
+            <field name="budget_manager_id" ref="base.user_admin"/>
+            <field name="state">active</field>
+        </record>
+
+        <record id="demo_budget_alloc_civil" model="real.estate.budget.allocation">
+            <field name="budget_id" ref="demo_project_budget_1"/>
+            <field name="budget_head">civil</field>
+            <field name="allocated_amount">15000000</field>
+            <field name="committed_amount">2500000</field>
+            <field name="actual_amount">1800000</field>
+        </record>
+        <record id="demo_budget_alloc_electrical" model="real.estate.budget.allocation">
+            <field name="budget_id" ref="demo_project_budget_1"/>
+            <field name="budget_head">electrical</field>
+            <field name="allocated_amount">3000000</field>
+        </record>
+        <record id="demo_budget_alloc_plumbing" model="real.estate.budget.allocation">
+            <field name="budget_id" ref="demo_project_budget_1"/>
+            <field name="budget_head">plumbing</field>
+            <field name="allocated_amount">2000000</field>
+        </record>
+        <record id="demo_budget_alloc_interior" model="real.estate.budget.allocation">
+            <field name="budget_id" ref="demo_project_budget_1"/>
+            <field name="budget_head">interior</field>
+            <field name="allocated_amount">5000000</field>
+        </record>
+        <record id="demo_budget_alloc_contractor" model="real.estate.budget.allocation">
+            <field name="budget_id" ref="demo_project_budget_1"/>
+            <field name="budget_head">contractor</field>
+            <field name="allocated_amount">10000000</field>
+        </record>
+        <record id="demo_budget_alloc_materials" model="real.estate.budget.allocation">
+            <field name="budget_id" ref="demo_project_budget_1"/>
+            <field name="budget_head">materials</field>
+            <field name="allocated_amount">8000000</field>
+            <field name="committed_amount">325000</field>
+        </record>
+        <record id="demo_budget_alloc_marketing" model="real.estate.budget.allocation">
+            <field name="budget_id" ref="demo_project_budget_1"/>
+            <field name="budget_head">marketing</field>
+            <field name="allocated_amount">1500000</field>
+        </record>
+        <record id="demo_budget_alloc_admin" model="real.estate.budget.allocation">
+            <field name="budget_id" ref="demo_project_budget_1"/>
+            <field name="budget_head">administration</field>
+            <field name="allocated_amount">500000</field>
+        </record>
+
+        <!-- Contractor -->
+        <record id="demo_partner_contractor_1" model="res.partner">
+            <field name="name">Rahman Construction Ltd.</field>
+            <field name="is_company">True</field>
+            <field name="city">Dhaka</field>
+            <field name="phone">+880-2-8801234</field>
+            <field name="email">info@rahmanconstruction.example.com</field>
+        </record>
+        <record id="demo_contractor_1" model="real.estate.contractor">
+            <field name="partner_id" ref="demo_partner_contractor_1"/>
+            <field name="trade">civil</field>
+            <field name="project_id" ref="demo_project_1"/>
+            <field name="contract_value">10000000</field>
+            <field name="advance_percentage">20</field>
+            <field name="retention_percentage">5</field>
+            <field name="start_date" eval="'2024-03-15'"/>
+            <field name="end_date" eval="'2026-12-31'"/>
+            <field name="status">active</field>
+        </record>
+
+        <!-- Work Package hierarchy: Construction > Foundation / Structure / Brick Work -->
+        <record id="demo_wp_construction" model="real.estate.work.package">
+            <field name="work_name">Construction</field>
+            <field name="project_id" ref="demo_project_1"/>
+            <field name="status">in_progress</field>
+        </record>
+        <record id="demo_wp_foundation" model="real.estate.work.package">
+            <field name="work_name">Foundation</field>
+            <field name="project_id" ref="demo_project_1"/>
+            <field name="parent_id" ref="demo_wp_construction"/>
+            <field name="contractor_id" ref="demo_contractor_1"/>
+            <field name="planned_quantity">100</field>
+            <field name="completed_quantity">100</field>
+            <field name="rate">50000</field>
+            <field name="status">completed</field>
+        </record>
+        <record id="demo_wp_structure" model="real.estate.work.package">
+            <field name="work_name">Structure (Column/Beam/Slab)</field>
+            <field name="project_id" ref="demo_project_1"/>
+            <field name="parent_id" ref="demo_wp_construction"/>
+            <field name="contractor_id" ref="demo_contractor_1"/>
+            <field name="planned_quantity">100</field>
+            <field name="completed_quantity">70</field>
+            <field name="rate">80000</field>
+            <field name="status">in_progress</field>
+        </record>
+        <record id="demo_wp_brickwork" model="real.estate.work.package">
+            <field name="work_name">Brick Work</field>
+            <field name="project_id" ref="demo_project_1"/>
+            <field name="parent_id" ref="demo_wp_construction"/>
+            <field name="planned_quantity">100</field>
+            <field name="completed_quantity">40</field>
+            <field name="rate">30000</field>
+            <field name="status">in_progress</field>
+        </record>
+
+        <!-- Contractor Work Certificate for completed Foundation work -->
+        <record id="demo_contractor_bill_1" model="real.estate.contractor.bill">
+            <field name="contractor_id" ref="demo_contractor_1"/>
+            <field name="work_package_id" ref="demo_wp_foundation"/>
+            <field name="period_start" eval="'2024-03-15'"/>
+            <field name="period_end" eval="'2024-05-30'"/>
+            <field name="planned_quantity">100</field>
+            <field name="completed_quantity">100</field>
+            <field name="approved_quantity">100</field>
+            <field name="rate">50000</field>
+            <field name="advance_adjustment">1000000</field>
+            <field name="state">accounts</field>
+        </record>
+
+        <!-- BOQ for the overall Construction work package -->
+        <record id="demo_boq_1" model="real.estate.boq">
+            <field name="project_id" ref="demo_project_1"/>
+            <field name="work_package_id" ref="demo_wp_construction"/>
+            <field name="date" eval="'2024-03-05'"/>
+            <field name="state">approved</field>
+        </record>
+        <record id="demo_boq_line_cement" model="real.estate.boq.line">
+            <field name="boq_id" ref="demo_boq_1"/>
+            <field name="product_id" ref="demo_product_cement"/>
+            <field name="description">Cement OPC 50kg Bag</field>
+            <field name="quantity">5000</field>
+            <field name="uom_id" ref="uom.product_uom_unit"/>
+            <field name="estimated_rate">650</field>
+            <field name="approved_rate">650</field>
+            <field name="actual_quantity">1800</field>
+        </record>
+        <record id="demo_boq_line_steel" model="real.estate.boq.line">
+            <field name="boq_id" ref="demo_boq_1"/>
+            <field name="product_id" ref="demo_product_steel_rod"/>
+            <field name="description">Steel Rod 12mm</field>
+            <field name="quantity">20000</field>
+            <field name="uom_id" ref="uom.product_uom_kgm"/>
+            <field name="estimated_rate">95</field>
+            <field name="approved_rate">95</field>
+            <field name="actual_quantity">7500</field>
+        </record>
+
+        <!-- Material Requisition -->
+        <record id="demo_requisition_1" model="real.estate.requisition">
+            <field name="project_id" ref="demo_project_1"/>
+            <field name="building_id" ref="demo_building_a"/>
+            <field name="work_package_id" ref="demo_wp_foundation"/>
+            <field name="site">Tower A Site Office</field>
+            <field name="requester_id" ref="base.user_admin"/>
+            <field name="request_date" eval="'2024-04-01'"/>
+            <field name="required_date" eval="'2024-04-05'"/>
+            <field name="priority">high</field>
+            <field name="budget_allocation_id" ref="demo_budget_alloc_materials"/>
+            <field name="reason">Foundation concrete pour scheduled for next week.</field>
+            <field name="state">submitted</field>
+        </record>
+        <record id="demo_requisition_line_cement" model="real.estate.requisition.line">
+            <field name="requisition_id" ref="demo_requisition_1"/>
+            <field name="product_id" ref="demo_product_cement"/>
+            <field name="description">Cement OPC 50kg Bag</field>
+            <field name="quantity">500</field>
+            <field name="uom_id" ref="uom.product_uom_unit"/>
+            <field name="estimated_rate">650</field>
+        </record>
+
+        <!-- Site Daily Report -->
+        <record id="demo_site_report_1" model="real.estate.site.report">
+            <field name="date" eval="'2024-05-20'"/>
+            <field name="project_id" ref="demo_project_1"/>
+            <field name="building_id" ref="demo_building_a"/>
+            <field name="engineer_id" ref="base.user_admin"/>
+            <field name="weather">sunny</field>
+            <field name="workers_present">45</field>
+            <field name="contractor_id" ref="demo_contractor_1"/>
+            <field name="work_completed">Column casting completed for Floor 3, formwork started for Floor 4.</field>
+            <field name="materials_used">180 bags cement, 4.2 tons steel rod.</field>
+            <field name="equipment_used">Tower crane, concrete mixer, vibrator.</field>
+            <field name="progress">42.5</field>
+        </record>
+
+        <!-- ==================== PHASE 4: QC ==================== -->
+
+        <record id="demo_qc_checklist_civil" model="real.estate.qc.checklist.template">
+            <field name="name">Civil - Foundation Stage</field>
+            <field name="category">civil</field>
+        </record>
+        <record id="demo_qc_checklist_civil_line_1" model="real.estate.qc.checklist.template.line">
+            <field name="template_id" ref="demo_qc_checklist_civil"/>
+            <field name="sequence">10</field>
+            <field name="item_name">Foundation</field>
+            <field name="description">Depth and reinforcement as per structural drawing</field>
+        </record>
+        <record id="demo_qc_checklist_civil_line_2" model="real.estate.qc.checklist.template.line">
+            <field name="template_id" ref="demo_qc_checklist_civil"/>
+            <field name="sequence">20</field>
+            <field name="item_name">Column</field>
+            <field name="description">Vertical alignment and concrete grade</field>
+        </record>
+        <record id="demo_qc_checklist_civil_line_3" model="real.estate.qc.checklist.template.line">
+            <field name="template_id" ref="demo_qc_checklist_civil"/>
+            <field name="sequence">30</field>
+            <field name="item_name">Beam</field>
+        </record>
+        <record id="demo_qc_checklist_civil_line_4" model="real.estate.qc.checklist.template.line">
+            <field name="template_id" ref="demo_qc_checklist_civil"/>
+            <field name="sequence">40</field>
+            <field name="item_name">Slab</field>
+        </record>
+        <record id="demo_qc_checklist_civil_line_5" model="real.estate.qc.checklist.template.line">
+            <field name="template_id" ref="demo_qc_checklist_civil"/>
+            <field name="sequence">50</field>
+            <field name="item_name">Brick Work</field>
+        </record>
+        <record id="demo_qc_checklist_civil_line_6" model="real.estate.qc.checklist.template.line">
+            <field name="template_id" ref="demo_qc_checklist_civil"/>
+            <field name="sequence">60</field>
+            <field name="item_name">Plaster</field>
+        </record>
+        <record id="demo_qc_checklist_civil_line_7" model="real.estate.qc.checklist.template.line">
+            <field name="template_id" ref="demo_qc_checklist_civil"/>
+            <field name="sequence">70</field>
+            <field name="item_name">Flooring</field>
+        </record>
+
+        <record id="demo_qc_checklist_electrical" model="real.estate.qc.checklist.template">
+            <field name="name">Electrical - Rough-in Stage</field>
+            <field name="category">electrical</field>
+        </record>
+        <record id="demo_qc_checklist_electrical_line_1" model="real.estate.qc.checklist.template.line">
+            <field name="template_id" ref="demo_qc_checklist_electrical"/>
+            <field name="sequence">10</field>
+            <field name="item_name">Wiring</field>
+        </record>
+        <record id="demo_qc_checklist_electrical_line_2" model="real.estate.qc.checklist.template.line">
+            <field name="template_id" ref="demo_qc_checklist_electrical"/>
+            <field name="sequence">20</field>
+            <field name="item_name">DB (Distribution Board)</field>
+        </record>
+        <record id="demo_qc_checklist_electrical_line_3" model="real.estate.qc.checklist.template.line">
+            <field name="template_id" ref="demo_qc_checklist_electrical"/>
+            <field name="sequence">30</field>
+            <field name="item_name">Switch</field>
+        </record>
+        <record id="demo_qc_checklist_electrical_line_4" model="real.estate.qc.checklist.template.line">
+            <field name="template_id" ref="demo_qc_checklist_electrical"/>
+            <field name="sequence">40</field>
+            <field name="item_name">Socket</field>
+        </record>
+        <record id="demo_qc_checklist_electrical_line_5" model="real.estate.qc.checklist.template.line">
+            <field name="template_id" ref="demo_qc_checklist_electrical"/>
+            <field name="sequence">50</field>
+            <field name="item_name">Earthing</field>
+        </record>
+        <record id="demo_qc_checklist_electrical_line_6" model="real.estate.qc.checklist.template.line">
+            <field name="template_id" ref="demo_qc_checklist_electrical"/>
+            <field name="sequence">60</field>
+            <field name="item_name">Load</field>
+        </record>
+
+        <!-- QC Inspection: Foundation work, all items passed -->
+        <record id="demo_qc_inspection_1" model="real.estate.qc.inspection">
+            <field name="project_id" ref="demo_project_1"/>
+            <field name="building_id" ref="demo_building_a"/>
+            <field name="work_package_id" ref="demo_wp_foundation"/>
+            <field name="inspection_type">civil</field>
+            <field name="inspector_id" ref="base.user_admin"/>
+            <field name="inspection_date" eval="'2024-05-28'"/>
+            <field name="checklist_template_id" ref="demo_qc_checklist_civil"/>
+            <field name="result">passed</field>
+            <field name="remarks">Foundation work meets structural drawing specifications.</field>
+        </record>
+        <record id="demo_qc_inspection_1_line_1" model="real.estate.qc.inspection.line">
+            <field name="inspection_id" ref="demo_qc_inspection_1"/>
+            <field name="item_name">Foundation</field>
+            <field name="result">pass</field>
+        </record>
+        <record id="demo_qc_inspection_1_line_2" model="real.estate.qc.inspection.line">
+            <field name="inspection_id" ref="demo_qc_inspection_1"/>
+            <field name="item_name">Column</field>
+            <field name="result">pass</field>
+        </record>
+
+        <!-- A medium-severity defect raised on unit A-101 -->
+        <record id="demo_defect_1" model="real.estate.defect">
+            <field name="project_id" ref="demo_project_1"/>
+            <field name="building_id" ref="demo_building_a"/>
+            <field name="unit_id" ref="demo_unit_a_101"/>
+            <field name="description">Minor hairline crack observed on the balcony plaster finish.</field>
+            <field name="severity">medium</field>
+            <field name="assigned_user_id" ref="base.user_admin"/>
+            <field name="due_date" eval="'2024-06-15'"/>
+            <field name="status">assigned</field>
+        </record>
+
+        <!-- ==================== PHASE 5: SALES ==================== -->
+
+        <record id="demo_customer_1" model="res.partner">
+            <field name="name">Kamal Hossain</field>
+            <field name="street">House 8, Road 27, Gulshan-1</field>
+            <field name="city">Dhaka</field>
+            <field name="phone">+880-2-9861234</field>
+            <field name="mobile">+8801911223344</field>
+            <field name="email">kamal.hossain@example.com</field>
+            <field name="customer_type">individual</field>
+            <field name="nid_passport">1978234567890</field>
+            <field name="profession">Businessman</field>
+            <field name="emergency_contact_name">Nasrin Hossain</field>
+            <field name="emergency_contact_phone">+8801911998877</field>
+        </record>
+
+        <record id="demo_customer_2" model="res.partner">
+            <field name="name">Nasrin Akter</field>
+            <field name="street">House 22, Road 9, Uttara</field>
+            <field name="city">Dhaka</field>
+            <field name="mobile">+8801711556677</field>
+            <field name="email">nasrin.akter@example.com</field>
+            <field name="customer_type">individual</field>
+            <field name="profession">Physician</field>
+        </record>
+
+        <!-- Booking + Sale Agreement flow completed for unit A-101 -->
+        <record id="demo_booking_1" model="real.estate.booking">
+            <field name="customer_id" ref="demo_customer_1"/>
+            <field name="unit_id" ref="demo_unit_a_101"/>
+            <field name="salesperson_id" ref="base.user_admin"/>
+            <field name="booking_date" eval="'2024-06-01'"/>
+            <field name="sale_price">12000000</field>
+            <field name="additional_charges">650000</field>
+            <field name="booking_amount">1000000</field>
+            <field name="payment_method">bank</field>
+            <field name="state">confirmed</field>
+        </record>
+
+        <record id="demo_sale_agreement_1" model="real.estate.sale.agreement">
+            <field name="customer_id" ref="demo_customer_1"/>
+            <field name="unit_id" ref="demo_unit_a_101"/>
+            <field name="booking_id" ref="demo_booking_1"/>
+            <field name="agreement_date" eval="'2024-06-20'"/>
+            <field name="total_price">12650000</field>
+            <field name="booking_amount">1000000</field>
+            <field name="down_payment">2000000</field>
+            <field name="installment_amount">296000</field>
+            <field name="number_of_installments">36</field>
+            <field name="frequency">monthly</field>
+            <field name="handover_date" eval="'2027-06-01'"/>
+            <field name="state">active</field>
+        </record>
+
+        <!-- A second, in-progress booking (no agreement yet) for unit A-201 -->
+        <record id="demo_booking_2" model="real.estate.booking">
+            <field name="customer_id" ref="demo_customer_2"/>
+            <field name="unit_id" ref="demo_unit_a_201"/>
+            <field name="salesperson_id" ref="base.user_admin"/>
+            <field name="booking_date" eval="'2024-07-10'"/>
+            <field name="sale_price">12150000</field>
+            <field name="booking_amount">500000</field>
+            <field name="payment_method">mobile_banking</field>
+            <field name="state">confirmed</field>
+        </record>
+
+        <!-- ==================== PHASE 6: INSTALLMENT &amp; COLLECTION ==================== -->
+
+        <!-- Installment Plan for the completed A-101 sale.
+             Financeable amount = 12,650,000 - 2,000,000 - 1,000,000 = 9,650,000
+             over 36 monthly installments (~268,056 each). Only the first
+             3 lines are seeded here as an illustrative sample; use
+             'Generate Schedule' on a fresh plan to produce all 36. -->
+        <record id="demo_installment_plan_1" model="real.estate.installment.plan">
+            <field name="sale_agreement_id" ref="demo_sale_agreement_1"/>
+            <field name="plan_type">equal</field>
+            <field name="frequency">monthly</field>
+            <field name="number_of_installments">36</field>
+            <field name="start_date" eval="'2024-07-01'"/>
+            <field name="grace_period_days">5</field>
+            <field name="late_fee_type">percentage</field>
+            <field name="late_fee_value">2.0</field>
+            <field name="state">active</field>
+        </record>
+        <record id="demo_installment_1_1" model="real.estate.installment">
+            <field name="plan_id" ref="demo_installment_plan_1"/>
+            <field name="installment_number">1</field>
+            <field name="due_date" eval="'2024-07-01'"/>
+            <field name="amount">268056</field>
+            <field name="status">paid</field>
+        </record>
+        <record id="demo_installment_1_2" model="real.estate.installment">
+            <field name="plan_id" ref="demo_installment_plan_1"/>
+            <field name="installment_number">2</field>
+            <field name="due_date" eval="'2024-08-01'"/>
+            <field name="amount">268056</field>
+            <field name="status">paid</field>
+        </record>
+        <record id="demo_installment_1_3" model="real.estate.installment">
+            <field name="plan_id" ref="demo_installment_plan_1"/>
+            <field name="installment_number">3</field>
+            <field name="due_date" eval="'2024-09-01'"/>
+            <field name="amount">268056</field>
+            <field name="status">overdue</field>
+        </record>
+
+        <record id="demo_collection_1" model="real.estate.collection">
+            <field name="customer_id" ref="demo_customer_1"/>
+            <field name="sale_agreement_id" ref="demo_sale_agreement_1"/>
+            <field name="installment_id" ref="demo_installment_1_1"/>
+            <field name="payment_date" eval="'2024-07-03'"/>
+            <field name="amount">268056</field>
+            <field name="payment_method">bank</field>
+            <field name="bank">Dutch-Bangla Bank Ltd.</field>
+            <field name="reference">A-101 Installment 1</field>
+            <field name="collector_id" ref="base.user_admin"/>
+            <field name="state">confirmed</field>
+        </record>
+        <record id="demo_collection_2" model="real.estate.collection">
+            <field name="customer_id" ref="demo_customer_1"/>
+            <field name="sale_agreement_id" ref="demo_sale_agreement_1"/>
+            <field name="installment_id" ref="demo_installment_1_2"/>
+            <field name="payment_date" eval="'2024-08-02'"/>
+            <field name="amount">268056</field>
+            <field name="payment_method">bank</field>
+            <field name="bank">Dutch-Bangla Bank Ltd.</field>
+            <field name="reference">A-101 Installment 2</field>
+            <field name="collector_id" ref="base.user_admin"/>
+            <field name="state">confirmed</field>
+        </record>
+
+        <!-- ==================== PHASE 7: RENTAL ==================== -->
+
+        <record id="demo_tenant_1" model="res.partner">
+            <field name="name">Farhana Islam</field>
+            <field name="street">Flat 5B, House 30, Baridhara</field>
+            <field name="city">Dhaka</field>
+            <field name="mobile">+8801611334455</field>
+            <field name="email">farhana.islam@example.com</field>
+            <field name="customer_type">individual</field>
+            <field name="profession">University Lecturer</field>
+        </record>
+
+        <record id="demo_rental_agreement_1" model="real.estate.rental.agreement">
+            <field name="tenant_id" ref="demo_tenant_1"/>
+            <field name="unit_id" ref="demo_unit_a_501"/>
+            <field name="start_date" eval="'2024-08-01'"/>
+            <field name="end_date" eval="'2025-07-31'"/>
+            <field name="monthly_rent">150000</field>
+            <field name="service_charge">5000</field>
+            <field name="utility_charge">3000</field>
+            <field name="security_deposit">300000</field>
+            <field name="payment_day">5</field>
+            <field name="status">active</field>
+        </record>
+
+        <!-- Reflect the active rental on the unit's status (Phase 2 demo
+             set it to Available; the rental agreement now supersedes that) -->
+        <record id="demo_unit_a_501" model="real.estate.unit">
+            <field name="status">rented</field>
+        </record>
+
+        <record id="demo_rent_schedule_1" model="real.estate.rent.schedule">
+            <field name="rental_agreement_id" ref="demo_rental_agreement_1"/>
+            <field name="due_date" eval="'2024-08-05'"/>
+            <field name="amount">158000</field>
+            <field name="status">paid</field>
+        </record>
+        <record id="demo_rent_schedule_2" model="real.estate.rent.schedule">
+            <field name="rental_agreement_id" ref="demo_rental_agreement_1"/>
+            <field name="due_date" eval="'2024-09-05'"/>
+            <field name="amount">158000</field>
+            <field name="status">due</field>
+        </record>
+
+        <record id="demo_rent_collection_1" model="real.estate.collection">
+            <field name="customer_id" ref="demo_tenant_1"/>
+            <field name="rental_agreement_id" ref="demo_rental_agreement_1"/>
+            <field name="rent_schedule_id" ref="demo_rent_schedule_1"/>
+            <field name="payment_date" eval="'2024-08-04'"/>
+            <field name="amount">158000</field>
+            <field name="payment_method">bank</field>
+            <field name="bank">BRAC Bank Ltd.</field>
+            <field name="reference">A-501 August Rent</field>
+            <field name="collector_id" ref="base.user_admin"/>
+            <field name="state">confirmed</field>
+        </record>
+
+        <!-- ==================== PHASE 8: HANDOVER ==================== -->
+
+        <!-- An in-progress handover for the A-101 sale. Deliberately left
+             in 'draft' since only 2 of 36 installments have been paid so
+             far in the demo data - Financial Clearance would (correctly)
+             block it, which is exactly the guard working as intended. -->
+        <record id="demo_handover_1" model="real.estate.handover">
+            <field name="unit_id" ref="demo_unit_a_101"/>
+            <field name="sale_agreement_id" ref="demo_sale_agreement_1"/>
+            <field name="handover_date" eval="'2027-06-01'"/>
+            <field name="keys_delivered">2 sets (main door + balcony)</field>
+            <field name="parking_slot">B2-15</field>
+            <field name="electricity_meter_number">EM-10234</field>
+            <field name="water_meter_number">WM-88231</field>
+            <field name="gas_meter_number">GM-55120</field>
+        </record>
+
+        <!-- ==================== PHASE 9: WARRANTY ==================== -->
+
+        <!-- Illustrative warranty claim. Since demo_handover_1 above is
+             intentionally left in Draft (see Phase 8 note), warranty
+             expiry cannot yet be computed - this record demonstrates the
+             claim workflow itself rather than a real post-handover case. -->
+        <record id="demo_warranty_1" model="real.estate.warranty">
+            <field name="customer_id" ref="demo_customer_1"/>
+            <field name="unit_id" ref="demo_unit_a_101"/>
+            <field name="handover_id" ref="demo_handover_1"/>
+            <field name="category">paint</field>
+            <field name="description">Paint peeling near the balcony door frame.</field>
+            <field name="reported_date" eval="'2024-06-10'"/>
+            <field name="assigned_user_id" ref="base.user_admin"/>
+            <field name="status">assigned</field>
+        </record>
+
+    </data>
+</odoo>

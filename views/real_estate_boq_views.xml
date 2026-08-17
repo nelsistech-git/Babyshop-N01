@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_real_estate_boq_tree" model="ir.ui.view">
+        <field name="name">real.estate.boq.tree</field>
+        <field name="model">real.estate.boq</field>
+        <field name="arch" type="xml">
+            <tree string="BOQ" decoration-success="state=='approved'">
+                <field name="name"/>
+                <field name="project_id"/>
+                <field name="work_package_id"/>
+                <field name="total_estimated_amount"/>
+                <field name="total_approved_amount"/>
+                <field name="total_actual_amount"/>
+                <field name="state" widget="badge"
+                       decoration-success="state in ('approved','closed')"
+                       decoration-warning="state in ('draft','submitted')"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_real_estate_boq_form" model="ir.ui.view">
+        <field name="name">real.estate.boq.form</field>
+        <field name="model">real.estate.boq</field>
+        <field name="arch" type="xml">
+            <form string="Bill of Quantities">
+                <header>
+                    <button name="action_submit" type="object" string="Submit"
+                            class="oe_highlight" invisible="state != 'draft'"/>
+                    <button name="action_approve" type="object" string="Approve"
+                            class="oe_highlight" invisible="state != 'submitted'"/>
+                    <button name="action_close" type="object" string="Close"
+                            invisible="state != 'approved'"/>
+                    <button name="action_reset_to_draft" type="object" string="Reset to Draft"
+                            invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,closed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="project_id" required="1"/>
+                            <field name="work_package_id"/>
+                        </group>
+                        <group>
+                            <field name="date"/>
+                        </group>
+                    </group>
+                    <field name="line_ids">
+                        <tree editable="bottom">
+                            <field name="product_id"/>
+                            <field name="description"/>
+                            <field name="quantity"/>
+                            <field name="uom_id"/>
+                            <field name="estimated_rate"/>
+                            <field name="estimated_amount" readonly="1"/>
+                            <field name="approved_rate"/>
+                            <field name="approved_amount" readonly="1"/>
+                            <field name="actual_quantity"/>
+                            <field name="actual_amount" readonly="1"/>
+                            <field name="variance_amount" readonly="1"/>
+                        </tree>
+                    </field>
+                    <group class="oe_subtotal_footer oe_right">
+                        <field name="total_estimated_amount" readonly="1"/>
+                        <field name="total_approved_amount" readonly="1"/>
+                        <field name="total_actual_amount" readonly="1"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_real_estate_boq_search" model="ir.ui.view">
+        <field name="name">real.estate.boq.search</field>
+        <field name="model">real.estate.boq</field>
+        <field name="arch" type="xml">
+            <search string="Search BOQ">
+                <field name="name"/>
+                <field name="project_id"/>
+                <group expand="0" string="Group By">
+                    <filter string="Project" name="group_project" context="{'group_by': 'project_id'}"/>
+                    <filter string="State" name="group_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_real_estate_boq" model="ir.actions.act_window">
+        <field name="name">Bill of Quantities</field>
+        <field name="res_model">real.estate.boq</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_real_estate_boq_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first BOQ</p>
+        </field>
+    </record>
+
+</odoo>

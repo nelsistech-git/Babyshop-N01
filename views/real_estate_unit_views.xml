@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_real_estate_unit_tree" model="ir.ui.view">
+        <field name="name">real.estate.unit.tree</field>
+        <field name="model">real.estate.unit</field>
+        <field name="arch" type="xml">
+            <tree string="Units" decoration-success="status=='available'" decoration-warning="status in ('reserved','booked')" decoration-danger="status=='sold'" decoration-muted="status=='cancelled'">
+                <field name="name"/>
+                <field name="project_id"/>
+                <field name="building_id"/>
+                <field name="floor_number"/>
+                <field name="unit_type"/>
+                <field name="saleable_area"/>
+                <field name="final_price" widget="monetary"/>
+                <field name="status" widget="badge"
+                       decoration-success="status=='available'"
+                       decoration-warning="status in ('reserved','booked')"
+                       decoration-danger="status=='sold'"
+                       decoration-info="status in ('under_construction','ready')"
+                       decoration-muted="status in ('cancelled','blocked')"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_real_estate_unit_kanban" model="ir.ui.view">
+        <field name="name">real.estate.unit.kanban</field>
+        <field name="model">real.estate.unit</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile" default_group_by="status">
+                <field name="name"/>
+                <field name="project_id"/>
+                <field name="building_id"/>
+                <field name="unit_type"/>
+                <field name="saleable_area"/>
+                <field name="bedrooms"/>
+                <field name="bathrooms"/>
+                <field name="final_price"/>
+                <field name="currency_id"/>
+                <field name="status"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <!-- COMMENTED-OUT 2026-08-15 by agent: `record.status.raw_value in ('booked','reserved')` is invalid JS in t-attf (comma-operator => TypeError "Cannot use 'in' operator to search for 'booked' in reserved"). Replaced with array .includes(). -->
+                        <!-- <div class="oe_kanban_card oe_kanban_global_click p-2"
+                             t-attf-style="border-left: 4px solid #{record.status.raw_value == 'available' ? '#28a745' : record.status.raw_value == 'sold' ? '#dc3545' : record.status.raw_value in ('booked','reserved') ? '#ffc107' : '#6c757d'};"> -->
+                        <div class="oe_kanban_card oe_kanban_global_click p-2"
+                             t-attf-style="border-left: 4px solid #{record.status.raw_value == 'available' ? '#28a745' : record.status.raw_value == 'sold' ? '#dc3545' : ['booked','reserved'].includes(record.status.raw_value) ? '#ffc107' : '#6c757d'};">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <strong>Unit <t t-esc="record.name.value"/></strong>
+                                <!-- COMMENTED-OUT 2026-08-15 by agent: same invalid JS `in` as above; replaced with array .includes(). -->
+                                <!-- <span t-attf-class="badge rounded-pill #{record.status.raw_value == 'available' ? 'text-bg-success' : record.status.raw_value == 'sold' ? 'text-bg-danger' : record.status.raw_value in ('booked','reserved') ? 'text-bg-warning' : 'text-bg-secondary'}"> -->
+                                <span t-attf-class="badge rounded-pill #{record.status.raw_value == 'available' ? 'text-bg-success' : record.status.raw_value == 'sold' ? 'text-bg-danger' : ['booked','reserved'].includes(record.status.raw_value) ? 'text-bg-warning' : 'text-bg-secondary'}">
+                                    <t t-esc="record.status.value"/>
+                                </span>
+                            </div>
+                            <div class="text-muted">
+                                <t t-esc="record.project_id.value"/> &#8226; <t t-esc="record.building_id.value"/>
+                            </div>
+                            <div class="mt-1">
+                                <t t-esc="record.saleable_area.value"/> sqft
+                                <t t-if="record.bedrooms.raw_value"> &#8226; <t t-esc="record.bedrooms.value"/> Bed</t>
+                                <t t-if="record.bathrooms.raw_value"> &#8226; <t t-esc="record.bathrooms.value"/> Bath</t>
+                            </div>
+                            <div class="mt-1 fw-bold">
+                                <field name="final_price" widget="monetary"/>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_real_estate_unit_form" model="ir.ui.view">
+        <field name="name">real.estate.unit.form</field>
+        <field name="model">real.estate.unit</field>
+        <field name="arch" type="xml">
+            <form string="Property Unit">
+                <header>
+                    <button name="action_set_available" type="object" string="Set Available"
+                            invisible="status == 'available'"/>
+                    <button name="action_set_under_construction" type="object" string="Under Construction"
+                            invisible="status == 'under_construction'"/>
+                    <button name="action_set_ready" type="object" string="Mark Ready"
+                            invisible="status == 'ready'"/>
+                    <button name="action_set_blocked" type="object" string="Block Unit"
+                            invisible="status == 'blocked'"/>
+                    <field name="status" widget="statusbar"
+                           statusbar_visible="available,under_construction,ready,booked,sold"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="%(action_real_estate_qc_inspection)d" type="action"
+                                class="oe_stat_button" icon="fa-check-square-o"
+                                context="{'default_unit_id': id, 'default_project_id': project_id}">
+                            <field name="qc_inspection_count" widget="statinfo" string="QC Inspections"/>
+                        </button>
+                        <button name="%(action_real_estate_defect)d" type="action"
+                                class="oe_stat_button" icon="fa-exclamation-triangle"
+                                context="{'default_unit_id': id, 'default_project_id': project_id}">
+                            <field name="defect_count" widget="statinfo" string="Defects"/>
+                        </button>
+                        <button name="%(action_real_estate_booking)d" type="action"
+                                class="oe_stat_button" icon="fa-bookmark"
+                                context="{'default_unit_id': id}">
+                            <field name="booking_count" widget="statinfo" string="Bookings"/>
+                        </button>
+                        <button name="%(action_real_estate_sale_agreement)d" type="action"
+                                class="oe_stat_button" icon="fa-handshake-o"
+                                context="{'default_unit_id': id}">
+                            <field name="sale_agreement_count" widget="statinfo" string="Sale Agreements"/>
+                        </button>
+                        <button name="%(action_real_estate_installment_plan)d" type="action"
+                                class="oe_stat_button" icon="fa-calendar-check-o">
+                            <field name="installment_plan_count" widget="statinfo" string="Installment Plans"/>
+                        </button>
+                        <button name="%(action_real_estate_collection)d" type="action"
+                                class="oe_stat_button" icon="fa-money">
+                            <field name="collection_count" widget="statinfo" string="Payments"/>
+                        </button>
+                        <button name="%(action_real_estate_rental_agreement)d" type="action"
+                                class="oe_stat_button" icon="fa-key"
+                                context="{'default_unit_id': id}">
+                            <field name="rental_agreement_count" widget="statinfo" string="Rentals"/>
+                        </button>
+                        <button name="%(action_real_estate_handover)d" type="action"
+                                class="oe_stat_button" icon="fa-flag-checkered"
+                                context="{'default_unit_id': id}">
+                            <field name="handover_count" widget="statinfo" string="Handovers"/>
+                        </button>
+                        <button name="%(action_real_estate_warranty)d" type="action"
+                                class="oe_stat_button" icon="fa-wrench"
+                                context="{'default_unit_id': id}">
+                            <field name="warranty_count" widget="statinfo" string="Warranty Claims"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="e.g. A-1203"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="floor_id" required="1"/>
+                            <field name="building_id" readonly="1"/>
+                            <field name="block_id" readonly="1"/>
+                            <field name="project_id" readonly="1"/>
+                            <field name="unit_type"/>
+                            <field name="facing"/>
+                        </group>
+                        <group>
+                            <field name="area"/>
+                            <field name="saleable_area"/>
+                            <field name="usable_area"/>
+                            <field name="balcony_area"/>
+                            <field name="bedrooms"/>
+                            <field name="bathrooms"/>
+                            <field name="parking_count"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Pricing">
+                            <group>
+                                <group>
+                                    <field name="pricing_method"/>
+                                    <field name="price_per_sqft" invisible="pricing_method != 'per_sqft'"/>
+                                    <field name="fixed_base_price" invisible="pricing_method != 'fixed'"/>
+                                    <field name="base_price" readonly="1"/>
+                                </group>
+                                <group>
+                                    <field name="additional_charges_total" readonly="1"/>
+                                    <field name="discount"/>
+                                    <field name="final_price" readonly="1" class="fw-bold"/>
+                                    <field name="currency_id" invisible="1"/>
+                                </group>
+                            </group>
+                            <field name="charge_line_ids">
+                                <tree editable="bottom">
+                                    <field name="charge_type"/>
+                                    <field name="description"/>
+                                    <field name="amount"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Ownership Split">
+                            <group>
+                                <field name="owner_share_percentage"/>
+                                <field name="developer_share_percentage"/>
+                            </group>
+                        </page>
+                        <page string="Documents">
+                            <field name="attachment_ids" widget="many2many_binary"/>
+                        </page>
+                        <page string="Notes">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_real_estate_unit_search" model="ir.ui.view">
+        <field name="name">real.estate.unit.search</field>
+        <field name="model">real.estate.unit</field>
+        <field name="arch" type="xml">
+            <search string="Search Units">
+                <field name="name"/>
+                <field name="project_id"/>
+                <field name="building_id"/>
+                <filter string="Available" name="filter_available" domain="[('status','=','available')]"/>
+                <filter string="Booked" name="filter_booked" domain="[('status','=','booked')]"/>
+                <filter string="Sold" name="filter_sold" domain="[('status','=','sold')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                    <filter string="Project" name="group_project" context="{'group_by': 'project_id'}"/>
+                    <filter string="Building" name="group_building" context="{'group_by': 'building_id'}"/>
+                    <filter string="Unit Type" name="group_type" context="{'group_by': 'unit_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_real_estate_unit" model="ir.actions.act_window">
+        <field name="name">Units</field>
+        <field name="res_model">real.estate.unit</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="search_view_id" ref="view_real_estate_unit_search"/>
+        <field name="context">{'search_default_group_status': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first Unit</p>
+            <p>Units belong to a Floor, which belongs to a Building (and optionally a Block), which belongs to a Project.</p>
+        </field>
+    </record>
+
+</odoo>

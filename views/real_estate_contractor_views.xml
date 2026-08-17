@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_real_estate_contractor_tree" model="ir.ui.view">
+        <field name="name">real.estate.contractor.tree</field>
+        <field name="model">real.estate.contractor</field>
+        <field name="arch" type="xml">
+            <tree string="Contractors" decoration-success="status=='active'" decoration-muted="status in ('completed','terminated')">
+                <field name="contract_number"/>
+                <field name="partner_id"/>
+                <field name="trade"/>
+                <field name="project_id"/>
+                <field name="contract_value"/>
+                <field name="status" widget="badge"
+                       decoration-success="status=='active'"
+                       decoration-warning="status=='draft'"
+                       decoration-muted="status in ('completed','terminated')"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_real_estate_contractor_form" model="ir.ui.view">
+        <field name="name">real.estate.contractor.form</field>
+        <field name="model">real.estate.contractor</field>
+        <field name="arch" type="xml">
+            <form string="Contractor">
+                <header>
+                    <button name="action_activate" type="object" string="Activate" class="oe_highlight"
+                            invisible="status != 'draft'"/>
+                    <button name="action_complete" type="object" string="Complete"
+                            invisible="status != 'active'"/>
+                    <button name="action_terminate" type="object" string="Terminate"
+                            invisible="status not in ('draft','active')"/>
+                    <field name="status" widget="statusbar" statusbar_visible="draft,active,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_bills" type="object" class="oe_stat_button" icon="fa-file-text-o">
+                            <field name="bill_count" widget="statinfo" string="Bills"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="contract_number"/>
+                        <h1><field name="contract_number" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="partner_id" required="1"/>
+                            <field name="trade"/>
+                            <field name="project_id"/>
+                        </group>
+                        <group>
+                            <field name="contract_value"/>
+                            <field name="advance_percentage"/>
+                            <field name="retention_percentage"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="start_date"/>
+                            <field name="end_date"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Work Packages">
+                            <field name="work_package_ids" readonly="1">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="work_name"/>
+                                    <field name="status"/>
+                                    <field name="progress" widget="progressbar"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Documents">
+                            <field name="attachment_ids" widget="many2many_binary"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_real_estate_contractor_search" model="ir.ui.view">
+        <field name="name">real.estate.contractor.search</field>
+        <field name="model">real.estate.contractor</field>
+        <field name="arch" type="xml">
+            <search string="Search Contractors">
+                <field name="partner_id"/>
+                <field name="contract_number"/>
+                <field name="project_id"/>
+                <group expand="0" string="Group By">
+                    <filter string="Trade" name="group_trade" context="{'group_by': 'trade'}"/>
+                    <filter string="Project" name="group_project" context="{'group_by': 'project_id'}"/>
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_real_estate_contractor" model="ir.actions.act_window">
+        <field name="name">Contractors</field>
+        <field name="res_model">real.estate.contractor</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_real_estate_contractor_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first Contractor</p>
+        </field>
+    </record>
+
+</odoo>

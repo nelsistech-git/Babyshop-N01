@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_real_estate_floor_tree" model="ir.ui.view">
+        <field name="name">real.estate.floor.tree</field>
+        <field name="model">real.estate.floor</field>
+        <field name="arch" type="xml">
+            <tree string="Floors">
+                <field name="floor_number"/>
+                <field name="floor_name"/>
+                <field name="building_id"/>
+                <field name="block_id"/>
+                <field name="unit_count"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_real_estate_floor_form" model="ir.ui.view">
+        <field name="name">real.estate.floor.form</field>
+        <field name="model">real.estate.floor</field>
+        <field name="arch" type="xml">
+            <form string="Floor">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_units" type="object" class="oe_stat_button" icon="fa-home">
+                            <field name="unit_count" widget="statinfo" string="Units"/>
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="floor_name"/>
+                            <field name="floor_number"/>
+                            <field name="name" placeholder="Optional code"/>
+                        </group>
+                        <group>
+                            <field name="building_id" required="1"/>
+                            <field name="block_id"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_real_estate_floor_search" model="ir.ui.view">
+        <field name="name">real.estate.floor.search</field>
+        <field name="model">real.estate.floor</field>
+        <field name="arch" type="xml">
+            <search string="Search Floors">
+                <field name="floor_name"/>
+                <field name="building_id"/>
+                <group expand="0" string="Group By">
+                    <filter string="Building" name="group_building" context="{'group_by': 'building_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_real_estate_floor" model="ir.actions.act_window">
+        <field name="name">Floors</field>
+        <field name="res_model">real.estate.floor</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_real_estate_floor_search"/>
+    </record>
+
+</odoo>
