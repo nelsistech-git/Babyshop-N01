@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_gc_status_history_tree" model="ir.ui.view">
+        <field name="name">gc.erm.status.history.tree</field>
+        <field name="model">gc.erm.status.history</field>
+        <field name="arch" type="xml">
+            <tree string="Status History" create="false" edit="false" delete="false"
+                  default_order="change_date desc">
+                <field name="change_date" widget="datetime"/>
+                <field name="document_model_label" string="Type"/>
+                <field name="document_ref" string="Document"/>
+                <field name="old_state_label" string="From"/>
+                <field name="new_state_label" string="To" decoration-bf="1"/>
+                <field name="user_id" widget="many2one_avatar_user"/>
+                <field name="comment" optional="show"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                <button name="action_open_document" type="object" icon="fa-external-link"
+                        title="Open the document" string="Open"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_gc_status_history_form" model="ir.ui.view">
+        <field name="name">gc.erm.status.history.form</field>
+        <field name="model">gc.erm.status.history</field>
+        <field name="arch" type="xml">
+            <form string="Status Change" create="false" edit="false">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_document" type="object"
+                                class="oe_stat_button" icon="fa-external-link">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Open</span>
+                                <span class="o_stat_text">Document</span>
+                            </div>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="document_ref" readonly="1"/></h1>
+                        <h4><field name="document_model_label" readonly="1"/></h4>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="old_state_label" string="From"/>
+                            <field name="new_state_label" string="To"/>
+                        </group>
+                        <group>
+                            <field name="user_id" widget="many2one_avatar_user"/>
+                            <field name="change_date"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <group string="Comment">
+                        <field name="comment" nolabel="1"/>
+                    </group>
+                    <group string="Technical" groups="base.group_no_one">
+                        <field name="model_name"/>
+                        <field name="res_id"/>
+                        <field name="old_state"/>
+                        <field name="new_state"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_gc_status_history_search" model="ir.ui.view">
+        <field name="name">gc.erm.status.history.search</field>
+        <field name="model">gc.erm.status.history</field>
+        <field name="arch" type="xml">
+            <search string="Audit Trail">
+                <field name="document_ref"/>
+                <field name="user_id"/>
+                <field name="new_state_label"/>
+                <filter name="filter_today" string="Today"
+                        domain="[('change_date', '&gt;=', datetime.datetime.combine(context_today(), datetime.time(0,0,0)))]"/>
+                <filter name="filter_week" string="Last 7 Days"
+                        domain="[('change_date', '&gt;=', (context_today() - relativedelta(days=7)).strftime('%Y-%m-%d 00:00:00'))]"/>
+                <separator/>
+                <filter name="filter_mine" string="My Changes" domain="[('user_id', '=', uid)]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_model" string="Document Type"
+                            context="{'group_by': 'document_model_label'}"/>
+                    <filter name="group_user" string="Changed By" context="{'group_by': 'user_id'}"/>
+                    <filter name="group_state" string="New State"
+                            context="{'group_by': 'new_state_label'}"/>
+                    <filter name="group_date" string="Date" context="{'group_by': 'change_date:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_gc_status_history" model="ir.actions.act_window">
+        <field name="name">Audit Trail</field>
+        <field name="res_model">gc.erm.status.history</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_gc_status_history_search"/>
+        <field name="context">{'create': False, 'edit': False}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No status change recorded yet</p>
+            <p>Every controlled workflow transition is logged here with its author,
+               timestamp and comment.</p>
+        </field>
+    </record>
+
+</odoo>

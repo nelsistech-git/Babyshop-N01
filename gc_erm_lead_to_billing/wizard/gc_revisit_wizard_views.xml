@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_gc_revisit_wizard_form" model="ir.ui.view">
+        <field name="name">gc.erm.revisit.wizard.form</field>
+        <field name="model">gc.erm.revisit.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Request Revisit">
+                <div class="alert alert-warning" role="alert">
+                    The current installation report is preserved and a new visit is
+                    created for the assigned engineer.
+                </div>
+                <group>
+                    <group>
+                        <field name="installation_id" readonly="1"/>
+                        <field name="work_order_id" readonly="1"/>
+                        <field name="partner_id" readonly="1"/>
+                    </group>
+                    <group>
+                        <field name="next_visit_date"/>
+                        <field name="team_id" options="{'no_create': True}"/>
+                        <field name="engineer_id" widget="many2one_avatar_user"/>
+                    </group>
+                </group>
+                <group string="Reason">
+                    <field name="reason" nolabel="1"
+                           placeholder="Why could the installation not be completed?"/>
+                </group>
+                <group string="Required Action">
+                    <field name="required_action" nolabel="1"
+                           placeholder="What must be done on the next visit?"/>
+                </group>
+                <footer>
+                    <button name="action_create_revisit" type="object"
+                            string="Create Revisit" class="btn-primary" data-hotkey="q"/>
+                    <button string="Discard" class="btn-secondary" special="cancel"
+                            data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_purchase_order_form_gc_erm" model="ir.ui.view">
+        <field name="name">purchase.order.form.gc.erm</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_ref']" position="after">
+                <field name="gc_procurement_id" readonly="1"
+                       invisible="not gc_procurement_id"
+                       groups="gc_erm_lead_to_billing.group_gc_erm_user"/>
+                <field name="gc_work_order_id" readonly="1"
+                       invisible="not gc_work_order_id"
+                       groups="gc_erm_lead_to_billing.group_gc_erm_user"/>
+                <field name="gc_customer_id" readonly="1"
+                       invisible="not gc_customer_id"
+                       groups="gc_erm_lead_to_billing.group_gc_erm_user"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_purchase_order_tree_gc_erm" model="ir.ui.view">
+        <field name="name">purchase.order.tree.gc.erm</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_tree"/>
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="gc_customer_id" string="End Customer" optional="hide"
+                       groups="gc_erm_lead_to_billing.group_gc_erm_user"/>
+                <field name="gc_work_order_id" optional="hide"
+                       groups="gc_erm_lead_to_billing.group_gc_erm_user"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>

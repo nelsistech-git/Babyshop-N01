@@ -1,0 +1,403 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_gc_survey_form" model="ir.ui.view">
+        <field name="name">gc.erm.survey.form</field>
+        <field name="model">gc.erm.survey</field>
+        <field name="arch" type="xml">
+            <form string="Survey">
+                <header>
+                    <button name="action_open_assign_wizard" type="object" string="Assign"
+                            class="btn-primary" invisible="state not in ('draft', 'assigned')"/>
+                    <button name="action_start" type="object" string="Start Survey"
+                            class="btn-primary" invisible="state != 'assigned'"/>
+                    <button name="action_create_boq" type="object" string="Prepare BOQ"
+                            class="btn-primary"
+                            invisible="state not in ('in_progress', 'completed')"
+                            groups="gc_erm_lead_to_billing.group_gc_technical_user"/>
+                    <button name="action_complete" type="object" string="Complete Survey"
+                            invisible="state != 'in_progress'"
+                            confirm="Complete the technical survey? The feasibility must be recorded."/>
+                    <button name="action_create_technical_report" type="object"
+                            string="Technical Report" class="btn-primary"
+                            invisible="state != 'completed'"/>
+                    <button name="action_reset_draft" type="object" string="Reset to Draft"
+                            invisible="state in ('draft', 'submitted')"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                            invisible="state in ('cancelled', 'submitted')"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,assigned,in_progress,completed,submitted"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_lead" type="object" class="oe_stat_button"
+                                icon="fa-bullseye">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Lead</span>
+                            </div>
+                        </button>
+                        <button name="action_view_boqs" type="object" class="oe_stat_button"
+                                icon="fa-list-alt" invisible="boq_count == 0">
+                            <field name="boq_count" widget="statinfo" string="BOQ"/>
+                        </button>
+                        <button name="action_view_technical_reports" type="object"
+                                class="oe_stat_button" icon="fa-file-text-o"
+                                invisible="technical_report_count == 0">
+                            <field name="technical_report_count" widget="statinfo" string="Reports"/>
+                        </button>
+                        <button name="action_view_proposals" type="object" class="oe_stat_button"
+                                icon="fa-handshake-o" invisible="proposal_count == 0">
+                            <field name="proposal_count" widget="statinfo" string="Proposals"/>
+                        </button>
+                    </div>
+
+                    <widget name="web_ribbon" title="Submitted" bg_color="text-bg-success"
+                            invisible="state != 'submitted'"/>
+                    <widget name="web_ribbon" title="Cancelled" bg_color="text-bg-danger"
+                            invisible="state != 'cancelled'"/>
+                    <widget name="web_ribbon" title="Overdue" bg_color="text-bg-danger"
+                            invisible="not is_overdue"/>
+
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+
+                    <group>
+                        <group string="Client Information">
+                            <field name="lead_id" readonly="1" options="{'no_open': False}"/>
+                            <field name="lead_state" invisible="1"/>
+                            <field name="partner_id" options="{'no_quick_create': True}"/>
+                            <field name="contact_id" options="{'no_quick_create': True}"/>
+                            <field name="salesperson_id" widget="many2one_avatar_user"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="is_overdue" invisible="1"/>
+                        </group>
+                        <group string="Assignment">
+                            <field name="team_id"/>
+                            <field name="engineer_id" widget="many2one_avatar_user"/>
+                            <field name="survey_date"/>
+                            <field name="deadline"
+                                   decoration-danger="is_overdue"/>
+                            <field name="priority" widget="priority"/>
+                            <field name="sla_state" widget="badge"
+                                   decoration-success="sla_state == 'on_time'"
+                                   decoration-warning="sla_state == 'at_risk'"
+                                   decoration-danger="sla_state == 'overdue'"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Required Service" name="service">
+                            <field name="service_line_ids"
+                                   readonly="state in ('completed', 'submitted', 'cancelled')">
+                                <tree editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="service_id" options="{'no_create': True}"/>
+                                    <field name="product_id" optional="show"/>
+                                    <field name="quantity" string="Qty / Links"/>
+                                    <field name="uom_id" groups="uom.group_uom" optional="hide"/>
+                                    <field name="bandwidth"/>
+                                    <field name="remarks" optional="show"/>
+                                </tree>
+                            </field>
+                            <group>
+                                <group>
+                                    <field name="expected_golive_date"/>
+                                    <field name="contract_duration"/>
+                                </group>
+                                <group>
+                                    <field name="service_location"/>
+                                </group>
+                            </group>
+                            <separator string="Requirement Note"/>
+                            <field name="requirement_note" readonly="1"/>
+                        </page>
+
+                        <page string="Contact &amp; Location" name="contact_location">
+                            <group>
+                                <group string="Contact Details">
+                                    <field name="contact_person"/>
+                                    <field name="contact_designation"/>
+                                    <field name="contact_phone" widget="phone"/>
+                                    <field name="contact_phone_alt" widget="phone"/>
+                                    <field name="contact_email" widget="email"/>
+                                </group>
+                                <group string="Location">
+                                    <field name="street"/>
+                                    <field name="street2"/>
+                                    <field name="city"/>
+                                    <field name="district"/>
+                                    <field name="area"/>
+                                    <field name="zip_code"/>
+                                    <field name="state_id" options="{'no_open': True}"/>
+                                    <field name="country_id" options="{'no_open': True}"/>
+                                    <field name="gps_latitude"/>
+                                    <field name="gps_longitude"/>
+                                    <field name="map_url" widget="url" readonly="1"
+                                           text="Open in map" invisible="not map_url"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Technical Survey" name="technical"
+                              groups="gc_erm_lead_to_billing.group_gc_technical_user">
+                            <group>
+                                <group string="Site Availability">
+                                    <field name="network_availability"/>
+                                    <field name="bandwidth_availability"/>
+                                    <field name="fiber_availability"/>
+                                    <field name="power_availability"/>
+                                    <field name="rack_availability"/>
+                                </group>
+                                <group string="Network">
+                                    <field name="existing_isp"/>
+                                    <field name="nearest_pop"/>
+                                    <field name="distance_from_pop"/>
+                                    <field name="installation_complexity"/>
+                                </group>
+                            </group>
+                            <group string="Existing Network">
+                                <field name="existing_network" nolabel="1"
+                                       placeholder="Describe the existing network at the site..."/>
+                            </group>
+                            <group string="Equipment Requirement">
+                                <field name="equipment_requirement" nolabel="1"
+                                       placeholder="List the equipment needed..."/>
+                            </group>
+                            <group string="Technical Remarks">
+                                <field name="technical_remarks" nolabel="1"/>
+                            </group>
+                        </page>
+
+                        <page string="Feasibility" name="feasibility"
+                              groups="gc_erm_lead_to_billing.group_gc_technical_user">
+                            <group>
+                                <field name="feasibility"
+                                       required="state in ('completed', 'submitted')"/>
+                                <field name="feasibility_reason"
+                                       invisible="feasibility != 'not_feasible'"
+                                       required="feasibility == 'not_feasible'"/>
+                                <field name="feasibility_conditions"
+                                       invisible="feasibility != 'conditional'"
+                                       required="feasibility == 'conditional'"/>
+                                <field name="investigation_note"
+                                       invisible="feasibility != 'investigate'"
+                                       required="feasibility == 'investigate'"/>
+                            </group>
+                        </page>
+
+                        <page string="Additional Information" name="additional">
+                            <group>
+                                <field name="special_requirements"/>
+                                <field name="remarks"/>
+                                <field name="note"/>
+                            </group>
+                            <separator string="Attachments (LOI, Layout, Location Map)"/>
+                            <field name="attachment_ids" widget="many2many_binary"/>
+                        </page>
+
+                        <page string="Audit" name="audit">
+                            <group>
+                                <group>
+                                    <field name="assigned_date"/>
+                                    <field name="completed_date"/>
+                                </group>
+                                <group>
+                                    <field name="submitted_by_id"/>
+                                    <field name="submitted_date"/>
+                                </group>
+                            </group>
+                            <field name="status_history_ids" readonly="1">
+                                <tree>
+                                    <field name="change_date"/>
+                                    <field name="old_state_label" string="From"/>
+                                    <field name="new_state_label" string="To"/>
+                                    <field name="user_id"/>
+                                    <field name="comment"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_gc_survey_tree" model="ir.ui.view">
+        <field name="name">gc.erm.survey.tree</field>
+        <field name="model">gc.erm.survey</field>
+        <field name="arch" type="xml">
+            <tree string="Surveys" sample="1"
+                  decoration-muted="state == 'cancelled'"
+                  decoration-danger="is_overdue"
+                  decoration-success="state in ('completed', 'submitted')">
+                <field name="priority" widget="priority" nolabel="1"/>
+                <field name="name"/>
+                <field name="lead_id" optional="show"/>
+                <field name="partner_id"/>
+                <field name="district" optional="show"/>
+                <field name="engineer_id" widget="many2one_avatar_user" optional="show"/>
+                <field name="team_id" optional="hide"/>
+                <field name="survey_date" optional="show"/>
+                <field name="deadline" optional="show"/>
+                <field name="feasibility" widget="badge" optional="show"
+                       decoration-success="feasibility == 'feasible'"
+                       decoration-warning="feasibility in ('conditional', 'investigate')"
+                       decoration-danger="feasibility == 'not_feasible'"/>
+                <field name="is_overdue" column_invisible="True"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                <field name="state" widget="badge"
+                       decoration-info="state in ('draft', 'assigned', 'in_progress')"
+                       decoration-success="state in ('completed', 'submitted')"
+                       decoration-danger="state == 'cancelled'"/>
+                <field name="activity_ids" widget="list_activity" optional="show"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_gc_survey_kanban" model="ir.ui.view">
+        <field name="name">gc.erm.survey.kanban</field>
+        <field name="model">gc.erm.survey</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" class="o_kanban_small_column" sample="1"
+                    quick_create="false">
+                <field name="state"/>
+                <field name="is_overdue"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click o_gc_kanban_card">
+                            <div class="o_kanban_record_top mb-0">
+                                <div class="o_kanban_record_headings">
+                                    <strong class="o_gc_kanban_title"><field name="partner_id"/></strong>
+                                    <small class="text-muted d-block"><field name="name"/></small>
+                                </div>
+                                <field name="priority" widget="priority"/>
+                            </div>
+                            <div class="o_kanban_record_body o_gc_kanban_meta">
+                                <div t-if="record.service_location.raw_value">
+                                    <i class="fa fa-map-marker me-1" title="Location"/><field name="service_location"/>
+                                </div>
+                                <div t-if="record.deadline.raw_value">
+                                    <i class="fa fa-calendar me-1" title="Date"/><field name="deadline"/>
+                                </div>
+                                <div t-if="record.feasibility.raw_value">
+                                    <i class="fa fa-check-circle me-1" title="Feasibility"/><field name="feasibility"/>
+                                </div>
+                            </div>
+                            <div class="o_kanban_record_bottom">
+                                <div class="oe_kanban_bottom_left">
+                                    <field name="activity_ids" widget="kanban_activity"/>
+                                    <span class="badge rounded-pill text-bg-danger ms-1"
+                                          t-if="record.is_overdue.raw_value">Overdue</span>
+                                </div>
+                                <div class="oe_kanban_bottom_right">
+                                    <field name="engineer_id" widget="many2one_avatar_user"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_gc_survey_search" model="ir.ui.view">
+        <field name="name">gc.erm.survey.search</field>
+        <field name="model">gc.erm.survey</field>
+        <field name="arch" type="xml">
+            <search string="Surveys">
+                <field name="name"
+                       filter_domain="['|', '|', ('name', 'ilike', self), ('partner_id', 'ilike', self), ('lead_id', 'ilike', self)]"/>
+                <field name="partner_id"/>
+                <field name="engineer_id"/>
+                <field name="team_id"/>
+                <field name="district"/>
+                <filter name="filter_mine" string="My Surveys" domain="[('engineer_id', '=', uid)]"/>
+                <filter name="filter_my_sales" string="My Customers"
+                        domain="[('salesperson_id', '=', uid)]"/>
+                <separator/>
+                <filter name="filter_pending" string="Pending"
+                        domain="[('state', 'in', ('draft', 'assigned'))]"/>
+                <filter name="filter_progress" string="In Progress"
+                        domain="[('state', '=', 'in_progress')]"/>
+                <filter name="filter_completed" string="Completed"
+                        domain="[('state', 'in', ('completed', 'submitted'))]"/>
+                <separator/>
+                <filter name="filter_overdue" string="Overdue" domain="[('is_overdue', '=', True)]"/>
+                <filter name="filter_feasible" string="Feasible"
+                        domain="[('feasibility', '=', 'feasible')]"/>
+                <filter name="filter_not_feasible" string="Not Feasible"
+                        domain="[('feasibility', '=', 'not_feasible')]"/>
+                <filter name="filter_no_costing" string="Pending Costing"
+                        domain="[('state', '=', 'completed'), ('boq_ids', '=', False)]"/>
+                <separator/>
+                <filter name="filter_survey_date" string="Survey Date" date="survey_date"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_engineer" string="Engineer" context="{'group_by': 'engineer_id'}"/>
+                    <filter name="group_team" string="Team" context="{'group_by': 'team_id'}"/>
+                    <filter name="group_feasibility" string="Feasibility"
+                            context="{'group_by': 'feasibility'}"/>
+                    <filter name="group_partner" string="Client" context="{'group_by': 'partner_id'}"/>
+                    <filter name="group_district" string="District" context="{'group_by': 'district'}"/>
+                    <filter name="group_month" string="Survey Month"
+                            context="{'group_by': 'survey_date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_gc_survey_calendar" model="ir.ui.view">
+        <field name="name">gc.erm.survey.calendar</field>
+        <field name="model">gc.erm.survey</field>
+        <field name="arch" type="xml">
+            <calendar string="Survey Planning" date_start="survey_date" color="engineer_id"
+                      mode="month">
+                <field name="partner_id"/>
+                <field name="engineer_id"/>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="view_gc_survey_pivot" model="ir.ui.view">
+        <field name="name">gc.erm.survey.pivot</field>
+        <field name="model">gc.erm.survey</field>
+        <field name="arch" type="xml">
+            <pivot string="Survey Analysis" sample="1">
+                <field name="engineer_id" type="row"/>
+                <field name="feasibility" type="col"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_gc_survey" model="ir.actions.act_window">
+        <field name="name">Surveys</field>
+        <field name="res_model">gc.erm.survey</field>
+        <field name="view_mode">kanban,tree,form,calendar,pivot</field>
+        <field name="search_view_id" ref="view_gc_survey_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No survey yet</p>
+            <p>Surveys are generated from an approved lead and inherit its customer,
+               contact, location and service requirement.</p>
+        </field>
+    </record>
+
+    <record id="action_gc_survey_my" model="ir.actions.act_window">
+        <field name="name">My Surveys</field>
+        <field name="res_model">gc.erm.survey</field>
+        <field name="view_mode">kanban,tree,form,calendar</field>
+        <field name="search_view_id" ref="view_gc_survey_search"/>
+        <field name="domain">[('engineer_id', '=', uid), ('state', 'not in', ('cancelled',))]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No survey assigned to you</p>
+        </field>
+    </record>
+
+</odoo>

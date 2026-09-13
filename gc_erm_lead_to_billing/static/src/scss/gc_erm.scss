@@ -1,0 +1,83 @@
+// ---------------------------------------------------------------------------
+// Grameen Cybernet ERM - light UI polish on top of the standard Odoo 17 look.
+// Everything below reuses Odoo's own CSS variables so the module follows the
+// active theme (light/dark, colour palette) instead of hard-coding colours.
+// ---------------------------------------------------------------------------
+
+// SRS 53 - state colour coding, applied as subtle badges in list views.
+.o_list_view {
+    .o_gc_state_badge {
+        font-weight: 500;
+        letter-spacing: .01em;
+    }
+}
+
+// KPI tiles used by the ERM dashboards (SRS 47 - 52).
+.o_gc_kpi_card {
+    border: 1px solid var(--border-color, #dee2e6);
+    border-radius: .5rem;
+    padding: .75rem 1rem;
+    background: var(--o-view-background-color, #fff);
+    transition: box-shadow .15s ease-in-out, transform .15s ease-in-out;
+
+    &:hover {
+        box-shadow: 0 .25rem .5rem rgba(0, 0, 0, .08);
+        transform: translateY(-1px);
+    }
+
+    .o_gc_kpi_value {
+        font-size: 1.5rem;
+        font-weight: 600;
+        line-height: 1.2;
+    }
+
+    .o_gc_kpi_label {
+        font-size: .8125rem;
+        color: var(--o-gray-600, #6c757d);
+        text-transform: uppercase;
+        letter-spacing: .03em;
+    }
+}
+
+// Compact, readable BOQ / costing grids.
+.o_gc_costing_table {
+    .o_list_number {
+        font-variant-numeric: tabular-nums;
+    }
+}
+
+// Highlight the internal-cost block so it is never confused with the
+// customer facing selling price.
+.o_gc_cost_block {
+    background: var(--o-gray-100, #f8f9fa);
+    border-left: 3px solid var(--o-gray-400, #ced4da);
+    padding: .5rem .75rem;
+    border-radius: .25rem;
+}
+
+// SLA indicators.
+.o_gc_sla {
+    &.o_gc_sla_overdue { color: var(--danger, #d9534f); font-weight: 600; }
+    &.o_gc_sla_at_risk { color: var(--warning, #f0ad4e); font-weight: 600; }
+    &.o_gc_sla_on_time { color: var(--success, #28a745); }
+}
+
+// Kanban cards of the ERM documents.
+.o_kanban_view .o_gc_kanban_card {
+    .o_gc_kanban_title {
+        font-weight: 600;
+    }
+
+    .o_gc_kanban_meta {
+        color: var(--o-gray-600, #6c757d);
+        font-size: .8125rem;
+    }
+}
+
+// Make the installation checklist scannable on a tablet in the field.
+.o_gc_checklist {
+    .o_data_row td {
+        padding-top: .4rem;
+        padding-bottom: .4rem;
+    }
+}

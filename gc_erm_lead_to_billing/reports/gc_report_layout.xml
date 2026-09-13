@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- SRS 58 - shared header / footer used by every ERM printable
+         document, on top of the standard Odoo external layout. -->
+
+    <template id="gc_report_header">
+        <div class="row mb-3 pb-2" style="border-bottom: 2px solid #17479e;">
+            <div class="col-7">
+                <img t-if="doc.company_id.logo" t-att-src="image_data_uri(doc.company_id.logo)"
+                     style="max-height: 60px; max-width: 220px;" alt="Company logo"/>
+                <div class="mt-2">
+                    <strong style="font-size: 14px;" t-out="doc.company_id.name">Company</strong>
+                    <div style="font-size: 11px; color: #666;">
+                        <span t-field="doc.company_id.partner_id"
+                              t-options='{"widget": "contact", "fields": ["address", "phone", "email"], "no_marker": true}'/>
+                    </div>
+                </div>
+            </div>
+            <div class="col-5 text-end">
+                <h4 class="mb-1" style="color: #17479e;" t-out="gc_title">Document</h4>
+                <table class="table table-sm table-borderless mb-0"
+                       style="font-size: 11px;">
+                    <tr>
+                        <td class="text-end pe-2"><strong>Document No.</strong></td>
+                        <td class="text-end" style="width: 45%;" t-out="doc.name">GC-000001</td>
+                    </tr>
+                    <tr>
+                        <td class="text-end pe-2"><strong>Date</strong></td>
+                        <td class="text-end" t-out="gc_date">01/01/2026</td>
+                    </tr>
+                    <tr t-if="gc_partner">
+                        <td class="text-end pe-2"><strong>Customer</strong></td>
+                        <td class="text-end" t-out="gc_partner.name">Customer</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </template>
+
+    <template id="gc_report_footer">
+        <div class="mt-4 pt-2" style="border-top: 1px solid #dee2e6; font-size: 10px; color: #777;">
+            <div class="row">
+                <div class="col-4">
+                    Generated on
+                    <span t-out="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y %H:%M')">
+                        01/01/2026 00:00
+                    </span>
+                </div>
+                <div class="col-4 text-center">
+                    Grameen Cybernet ERM
+                </div>
+                <div class="col-4 text-end">
+                    Page <span class="page"/> / <span class="topage"/>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Reusable customer / site block.
+         The address is rendered field by field on purpose: ``t-field`` only
+         accepts a "record.field" path, and the customer here is a template
+         variable that changes from one document to the next. -->
+    <template id="gc_report_customer_block">
+        <div class="row mb-3">
+            <div class="col-6">
+                <strong>Customer</strong>
+                <div t-if="gc_partner">
+                    <div t-out="gc_partner.name">Customer</div>
+                    <div t-if="gc_partner.street" t-out="gc_partner.street">Street</div>
+                    <div t-if="gc_partner.street2" t-out="gc_partner.street2"/>
+                    <div>
+                        <span t-if="gc_partner.city" t-out="gc_partner.city">City</span>
+                        <span t-if="gc_partner.zip" t-out="gc_partner.zip"/>
+                        <span t-if="gc_partner.state_id" t-out="gc_partner.state_id.name"/>
+                    </div>
+                    <div t-if="gc_partner.country_id" t-out="gc_partner.country_id.name"/>
+                    <div t-if="gc_partner.phone">
+                        Phone: <span t-out="gc_partner.phone">+880</span>
+                    </div>
+                    <div t-if="gc_partner.email">
+                        Email: <span t-out="gc_partner.email">mail</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6" t-if="gc_site">
+                <strong>Site</strong>
+                <div t-out="gc_site">Site address</div>
+            </div>
+        </div>
+    </template>
+
+</odoo>

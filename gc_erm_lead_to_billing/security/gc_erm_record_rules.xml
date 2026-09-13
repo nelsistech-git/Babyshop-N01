@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <!-- ==============================================================
+             SRS 69 - Multi company. Global rules are ANDed with the group
+             rules below, so a user never sees another company's documents.
+             ============================================================== -->
+        <record id="rule_gc_lead_company" model="ir.rule">
+            <field name="name">GC Lead: multi-company</field>
+            <field name="model_id" ref="model_gc_erm_lead"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="rule_gc_survey_company" model="ir.rule">
+            <field name="name">GC Survey: multi-company</field>
+            <field name="model_id" ref="model_gc_erm_survey"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="rule_gc_boq_company" model="ir.rule">
+            <field name="name">GC BOQ: multi-company</field>
+            <field name="model_id" ref="model_gc_erm_boq"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="rule_gc_technical_report_company" model="ir.rule">
+            <field name="name">GC Technical Report: multi-company</field>
+            <field name="model_id" ref="model_gc_erm_technical_report"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="rule_gc_proposal_company" model="ir.rule">
+            <field name="name">GC Proposal: multi-company</field>
+            <field name="model_id" ref="model_gc_erm_proposal"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="rule_gc_work_order_company" model="ir.rule">
+            <field name="name">GC Work Order: multi-company</field>
+            <field name="model_id" ref="model_gc_erm_work_order"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="rule_gc_procurement_company" model="ir.rule">
+            <field name="name">GC Procurement Request: multi-company</field>
+            <field name="model_id" ref="model_gc_erm_procurement_request"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="rule_gc_installation_company" model="ir.rule">
+            <field name="name">GC Installation: multi-company</field>
+            <field name="model_id" ref="model_gc_erm_installation"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="rule_gc_service_catalog_company" model="ir.rule">
+            <field name="name">GC Service Catalog: multi-company</field>
+            <field name="model_id" ref="model_gc_erm_service_catalog"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="rule_gc_team_company" model="ir.rule">
+            <field name="name">GC Team: multi-company</field>
+            <field name="model_id" ref="model_gc_erm_team"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="rule_gc_approval_matrix_company" model="ir.rule">
+            <field name="name">GC Approval Matrix: multi-company</field>
+            <field name="model_id" ref="model_gc_erm_approval_matrix"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <!-- ==============================================================
+             SRS 68 - Sales User sees its own leads / surveys / proposals.
+             Group rules are ORed, so the HOD rule below widens this.
+             ============================================================== -->
+        <record id="rule_gc_lead_salesperson" model="ir.rule">
+            <field name="name">GC Lead: own records (Sales User)</field>
+            <field name="model_id" ref="model_gc_erm_lead"/>
+            <field name="groups" eval="[(4, ref('group_gc_sales_user'))]"/>
+            <field name="domain_force">['|', '|', ('salesperson_id', '=', user.id), ('create_uid', '=', user.id), ('team_id.member_ids', 'in', [user.id])]</field>
+        </record>
+
+        <record id="rule_gc_lead_hod" model="ir.rule">
+            <field name="name">GC Lead: all department records (Sales HOD)</field>
+            <field name="model_id" ref="model_gc_erm_lead"/>
+            <field name="groups" eval="[(4, ref('group_gc_sales_hod')), (4, ref('group_gc_management')), (4, ref('group_gc_erm_admin'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
+        <record id="rule_gc_lead_other_departments" model="ir.rule">
+            <field name="name">GC Lead: read access for other departments</field>
+            <field name="model_id" ref="model_gc_erm_lead"/>
+            <field name="groups" eval="[(4, ref('group_gc_technical_user')), (4, ref('group_gc_implementation_user')), (4, ref('group_gc_accounts_user'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
+        <!-- ==================================================== -->
+        <record id="rule_gc_survey_salesperson" model="ir.rule">
+            <field name="name">GC Survey: own records (Sales User)</field>
+            <field name="model_id" ref="model_gc_erm_survey"/>
+            <field name="groups" eval="[(4, ref('group_gc_sales_user'))]"/>
+            <field name="domain_force">['|', '|', ('salesperson_id', '=', user.id), ('create_uid', '=', user.id), ('lead_id.salesperson_id', '=', user.id)]</field>
+        </record>
+
+        <record id="rule_gc_survey_engineer" model="ir.rule">
+            <field name="name">GC Survey: assigned surveys (Technical User)</field>
+            <field name="model_id" ref="model_gc_erm_survey"/>
+            <field name="groups" eval="[(4, ref('group_gc_technical_user'))]"/>
+            <field name="domain_force">['|', '|', ('engineer_id', '=', user.id), ('team_id.member_ids', 'in', [user.id]), ('team_id.leader_id', '=', user.id)]</field>
+        </record>
+
+        <record id="rule_gc_survey_manager" model="ir.rule">
+            <field name="name">GC Survey: all records (managers)</field>
+            <field name="model_id" ref="model_gc_erm_survey"/>
+            <field name="groups" eval="[(4, ref('group_gc_technical_manager')), (4, ref('group_gc_sales_hod')), (4, ref('group_gc_management')), (4, ref('group_gc_erm_admin')), (4, ref('group_gc_implementation_user'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
+        <!-- ==================================================== -->
+        <record id="rule_gc_boq_technical" model="ir.rule">
+            <field name="name">GC BOQ: technical scope</field>
+            <field name="model_id" ref="model_gc_erm_boq"/>
+            <field name="groups" eval="[(4, ref('group_gc_technical_user'))]"/>
+            <field name="domain_force">['|', '|', ('prepared_by_id', '=', user.id), ('create_uid', '=', user.id), ('survey_id.engineer_id', '=', user.id)]</field>
+        </record>
+
+        <record id="rule_gc_boq_all" model="ir.rule">
+            <field name="name">GC BOQ: all records</field>
+            <field name="model_id" ref="model_gc_erm_boq"/>
+            <field name="groups" eval="[(4, ref('group_gc_technical_manager')), (4, ref('group_gc_sales_user')), (4, ref('group_gc_sales_hod')), (4, ref('group_gc_implementation_user')), (4, ref('group_gc_inventory_user')), (4, ref('group_gc_purchase_user')), (4, ref('group_gc_management')), (4, ref('group_gc_erm_admin'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
+        <!-- ==================================================== -->
+        <record id="rule_gc_technical_report_engineer" model="ir.rule">
+            <field name="name">GC Technical Report: own reports (Technical User)</field>
+            <field name="model_id" ref="model_gc_erm_technical_report"/>
+            <field name="groups" eval="[(4, ref('group_gc_technical_user'))]"/>
+            <field name="domain_force">['|', '|', ('engineer_id', '=', user.id), ('create_uid', '=', user.id), ('survey_id.engineer_id', '=', user.id)]</field>
+        </record>
+
+        <record id="rule_gc_technical_report_all" model="ir.rule">
+            <field name="name">GC Technical Report: all records</field>
+            <field name="model_id" ref="model_gc_erm_technical_report"/>
+            <field name="groups" eval="[(4, ref('group_gc_technical_manager')), (4, ref('group_gc_sales_user')), (4, ref('group_gc_sales_hod')), (4, ref('group_gc_implementation_user')), (4, ref('group_gc_management')), (4, ref('group_gc_erm_admin'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
+        <!-- ==================================================== -->
+        <record id="rule_gc_proposal_salesperson" model="ir.rule">
+            <field name="name">GC Proposal: own proposals (Sales User)</field>
+            <field name="model_id" ref="model_gc_erm_proposal"/>
+            <field name="groups" eval="[(4, ref('group_gc_sales_user'))]"/>
+            <field name="domain_force">['|', ('salesperson_id', '=', user.id), ('create_uid', '=', user.id)]</field>
+        </record>
+
+        <record id="rule_gc_proposal_all" model="ir.rule">
+            <field name="name">GC Proposal: all records</field>
+            <field name="model_id" ref="model_gc_erm_proposal"/>
+            <field name="groups" eval="[(4, ref('group_gc_sales_hod')), (4, ref('group_gc_technical_user')), (4, ref('group_gc_technical_manager')), (4, ref('group_gc_implementation_user')), (4, ref('group_gc_accounts_user')), (4, ref('group_gc_management')), (4, ref('group_gc_erm_admin'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
+        <!-- ==================================================== -->
+        <record id="rule_gc_work_order_implementation" model="ir.rule">
+            <field name="name">GC Work Order: assigned work orders</field>
+            <field name="model_id" ref="model_gc_erm_work_order"/>
+            <field name="groups" eval="[(4, ref('group_gc_implementation_user'))]"/>
+            <field name="domain_force">['|', '|', '|', '|', ('engineer_id', '=', user.id), ('manager_id', '=', user.id), ('team_leader_id', '=', user.id), ('technician_ids', 'in', [user.id]), ('team_id.member_ids', 'in', [user.id])]</field>
+        </record>
+
+        <record id="rule_gc_work_order_all" model="ir.rule">
+            <field name="name">GC Work Order: all records</field>
+            <field name="model_id" ref="model_gc_erm_work_order"/>
+            <field name="groups" eval="[(4, ref('group_gc_sales_user')), (4, ref('group_gc_sales_hod')), (4, ref('group_gc_technical_user')), (4, ref('group_gc_technical_manager')), (4, ref('group_gc_inventory_user')), (4, ref('group_gc_purchase_user')), (4, ref('group_gc_accounts_user')), (4, ref('group_gc_management')), (4, ref('group_gc_erm_admin'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
+        <!-- ==================================================== -->
+        <record id="rule_gc_installation_engineer" model="ir.rule">
+            <field name="name">GC Installation: assigned installations</field>
+            <field name="model_id" ref="model_gc_erm_installation"/>
+            <field name="groups" eval="[(4, ref('group_gc_implementation_user'))]"/>
+            <field name="domain_force">['|', '|', '|', ('engineer_id', '=', user.id), ('technician_ids', 'in', [user.id]), ('team_id.member_ids', 'in', [user.id]), ('create_uid', '=', user.id)]</field>
+        </record>
+
+        <record id="rule_gc_installation_all" model="ir.rule">
+            <field name="name">GC Installation: all records</field>
+            <field name="model_id" ref="model_gc_erm_installation"/>
+            <field name="groups" eval="[(4, ref('group_gc_technical_manager')), (4, ref('group_gc_technical_user')), (4, ref('group_gc_sales_user')), (4, ref('group_gc_sales_hod')), (4, ref('group_gc_inventory_user')), (4, ref('group_gc_accounts_user')), (4, ref('group_gc_management')), (4, ref('group_gc_erm_admin'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
+        <!-- ==================================================== -->
+        <record id="rule_gc_procurement_all" model="ir.rule">
+            <field name="name">GC Procurement Request: all records</field>
+            <field name="model_id" ref="model_gc_erm_procurement_request"/>
+            <field name="groups" eval="[(4, ref('group_gc_purchase_user')), (4, ref('group_gc_inventory_user')), (4, ref('group_gc_implementation_user')), (4, ref('group_gc_sales_user')), (4, ref('group_gc_sales_hod')), (4, ref('group_gc_technical_user')), (4, ref('group_gc_technical_manager')), (4, ref('group_gc_accounts_user')), (4, ref('group_gc_management')), (4, ref('group_gc_erm_admin'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Demo teams -->
+        <record id="demo_team_technical" model="gc.erm.team">
+            <field name="name">Dhaka Technical Team</field>
+            <field name="code">DTT</field>
+            <field name="team_type">technical</field>
+            <field name="leader_id" ref="base.user_admin"/>
+            <field name="member_ids" eval="[(6, 0, [ref('base.user_admin')])]"/>
+        </record>
+
+        <record id="demo_team_implementation" model="gc.erm.team">
+            <field name="name">Dhaka Implementation Team</field>
+            <field name="code">DIT</field>
+            <field name="team_type">implementation</field>
+            <field name="leader_id" ref="base.user_admin"/>
+            <field name="member_ids" eval="[(6, 0, [ref('base.user_admin')])]"/>
+        </record>
+
+        <!-- Demo network products -->
+        <record id="demo_product_router" model="product.product">
+            <field name="name">Enterprise Router (demo)</field>
+            <field name="default_code">GC-RTR-01</field>
+            <field name="type">product</field>
+            <field name="standard_price">40000.00</field>
+            <field name="list_price">55000.00</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="True"/>
+        </record>
+
+        <record id="demo_product_switch" model="product.product">
+            <field name="name">24-Port Switch (demo)</field>
+            <field name="default_code">GC-SW-01</field>
+            <field name="type">product</field>
+            <field name="standard_price">18000.00</field>
+            <field name="list_price">25000.00</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="True"/>
+        </record>
+
+        <record id="demo_product_sfp" model="product.product">
+            <field name="name">SFP Module 1G (demo)</field>
+            <field name="default_code">GC-SFP-01</field>
+            <field name="type">product</field>
+            <field name="standard_price">3500.00</field>
+            <field name="list_price">5000.00</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="True"/>
+        </record>
+
+        <record id="demo_product_fiber" model="product.product">
+            <field name="name">Fiber Optic Cable per metre (demo)</field>
+            <field name="default_code">GC-FBR-01</field>
+            <field name="type">product</field>
+            <field name="standard_price">30.00</field>
+            <field name="list_price">45.00</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="True"/>
+        </record>
+
+        <record id="demo_product_installation" model="product.product">
+            <field name="name">Installation Service (demo)</field>
+            <field name="default_code">GC-INST-01</field>
+            <field name="type">service</field>
+            <field name="standard_price">5000.00</field>
+            <field name="list_price">8000.00</field>
+            <field name="invoice_policy">order</field>
+            <field name="sale_ok" eval="True"/>
+        </record>
+
+        <!-- Demo customer -->
+        <record id="demo_partner_customer" model="res.partner">
+            <field name="name">Demo Textiles Ltd</field>
+            <field name="is_company" eval="True"/>
+            <field name="email">info@demo-textiles.example.com</field>
+            <field name="phone">+880 2 55000000</field>
+            <field name="street">Plot 12, Road 5</field>
+            <field name="city">Dhaka</field>
+            <field name="gc_district">Dhaka</field>
+            <field name="gc_area">Gulshan 1</field>
+            <field name="gc_latitude">23.7806</field>
+            <field name="gc_longitude">90.4152</field>
+            <field name="gc_customer_type">corporate</field>
+            <field name="customer_rank">1</field>
+        </record>
+
+        <record id="demo_partner_contact" model="res.partner">
+            <field name="name">Kamrul Hasan</field>
+            <field name="parent_id" ref="demo_partner_customer"/>
+            <field name="function">Head of IT</field>
+            <field name="email">kamrul@demo-textiles.example.com</field>
+            <field name="phone">+880 1711 000000</field>
+        </record>
+
+        <record id="demo_partner_vendor" model="res.partner">
+            <field name="name">Demo Network Supplies</field>
+            <field name="is_company" eval="True"/>
+            <field name="supplier_rank">1</field>
+            <field name="email">sales@demo-supplies.example.com</field>
+        </record>
+
+        <!-- Demo lead, ready to be submitted -->
+        <record id="demo_lead_01" model="gc.erm.lead">
+            <field name="partner_id" ref="demo_partner_customer"/>
+            <field name="contact_id" ref="demo_partner_contact"/>
+            <field name="salesperson_id" ref="base.user_admin"/>
+            <field name="lead_date" eval="time.strftime('%Y-%m-%d')"/>
+            <field name="expected_revenue">450000</field>
+            <field name="description" type="html">
+                <p>Customer requires a 20 Mbps dedicated internet link for their
+                   head office, plus a redundant link for the factory.</p>
+            </field>
+            <field name="contact_person">Kamrul Hasan</field>
+            <field name="contact_designation">Head of IT</field>
+            <field name="contact_phone">+880 1711 000000</field>
+            <field name="contact_email">kamrul@demo-textiles.example.com</field>
+            <field name="street">Plot 12, Road 5</field>
+            <field name="city">Dhaka</field>
+            <field name="district">Dhaka</field>
+            <field name="area">Gulshan 1</field>
+            <field name="gps_latitude">23.7806</field>
+            <field name="gps_longitude">90.4152</field>
+            <field name="service_location">Head office, 6th floor server room</field>
+            <field name="contract_duration">24</field>
+            <field name="priority">2</field>
+        </record>
+
+        <record id="demo_lead_01_line_01" model="gc.erm.lead.line">
+            <field name="lead_id" ref="demo_lead_01"/>
+            <field name="service_id" ref="gc_service_internet"/>
+            <field name="quantity">1</field>
+            <field name="bandwidth">20 Mbps dedicated</field>
+        </record>
+
+        <record id="demo_lead_01_line_02" model="gc.erm.lead.line">
+            <field name="lead_id" ref="demo_lead_01"/>
+            <field name="service_id" ref="gc_service_data"/>
+            <field name="quantity">1</field>
+            <field name="bandwidth">10 Mbps P2P to factory</field>
+        </record>
+
+    </data>
+</odoo>

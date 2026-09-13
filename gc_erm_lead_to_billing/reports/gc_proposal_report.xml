@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="report_gc_proposal_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-set="gc_title" t-value="'COMMERCIAL PROPOSAL'"/>
+                <t t-set="gc_date" t-value="doc.proposal_date"/>
+                <t t-set="gc_partner" t-value="doc.partner_id"/>
+                <t t-set="gc_site" t-value="doc.survey_id.service_location"/>
+                <t t-call="web.internal_layout">
+                    <div class="page">
+                        <t t-call="gc_erm_lead_to_billing.gc_report_header"/>
+                        <t t-call="gc_erm_lead_to_billing.gc_report_customer_block"/>
+
+                        <table class="table table-sm">
+                            <tr>
+                                <td style="width:25%"><strong>Proposal Version</strong></td>
+                                <td t-out="doc.version">1</td>
+                                <td style="width:25%"><strong>Valid Until</strong></td>
+                                <td t-out="doc.validity_date or '-'">-</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Salesperson</strong></td>
+                                <td t-out="doc.salesperson_id.name">Salesperson</td>
+                                <td><strong>Payment Terms</strong></td>
+                                <td t-out="doc.payment_term_id.name or '-'">-</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Contract Duration</strong></td>
+                                <td><span t-out="doc.contract_duration">12</span> months</td>
+                                <td><strong>Expected Go-Live</strong></td>
+                                <td t-out="doc.expected_golive_date or '-'">-</td>
+                            </tr>
+                        </table>
+
+                        <div t-if="doc.technical_scope" class="mt-3">
+                            <h5 style="color:#17479e;">Technical Scope</h5>
+                            <div t-field="doc.technical_scope"/>
+                        </div>
+                        <div t-if="doc.commercial_scope" class="mt-3">
+                            <h5 style="color:#17479e;">Commercial Scope</h5>
+                            <div t-field="doc.commercial_scope"/>
+                        </div>
+
+                        <h5 class="mt-3" style="color:#17479e;">Pricing</h5>
+                        <table class="table table-sm table-bordered">
+                            <thead style="background:#f2f4f8;">
+                                <tr>
+                                    <th style="width:4%">#</th>
+                                    <th>Description</th>
+                                    <th class="text-end" style="width:10%">Qty</th>
+                                    <th style="width:10%">UoM</th>
+                                    <th class="text-end" style="width:15%">Unit Price</th>
+                                    <th class="text-end" style="width:9%">Disc.%</th>
+                                    <th class="text-end" style="width:17%">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="doc.line_ids" t-as="line">
+                                    <td t-out="line_index + 1">1</td>
+                                    <td t-out="line.name or line.product_id.display_name">Item</td>
+                                    <td class="text-end" t-out="line.quantity">1</td>
+                                    <td t-out="line.uom_id.name or ''"/>
+                                    <td class="text-end" t-out="line.price_unit"
+                                        t-options='{"widget": "monetary", "display_currency": doc.currency_id}'>0.00</td>
+                                    <td class="text-end" t-out="line.discount">0</td>
+                                    <td class="text-end" t-out="line.price_subtotal"
+                                        t-options='{"widget": "monetary", "display_currency": doc.currency_id}'>0.00</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="row justify-content-end">
+                            <div class="col-5">
+                                <table class="table table-sm">
+                                    <tr t-if="doc.amount_discount">
+                                        <td><strong>Discount</strong></td>
+                                        <td class="text-end" t-out="doc.amount_discount"
+                                            t-options='{"widget": "monetary", "display_currency": doc.currency_id}'>0.00</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Untaxed Amount</strong></td>
+                                        <td class="text-end" t-out="doc.amount_untaxed"
+                                            t-options='{"widget": "monetary", "display_currency": doc.currency_id}'>0.00</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Taxes</strong></td>
+                                        <td class="text-end" t-out="doc.amount_tax"
+                                            t-options='{"widget": "monetary", "display_currency": doc.currency_id}'>0.00</td>
+                                    </tr>
+                                    <tr style="border-top:2px solid #17479e;">
+                                        <td><strong>Total</strong></td>
+                                        <td class="text-end">
+                                            <strong t-out="doc.amount_total"
+                                                    t-options='{"widget": "monetary", "display_currency": doc.currency_id}'>0.00</strong>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div t-if="doc.terms_conditions" class="mt-3">
+                            <h5 style="color:#17479e;">Terms &amp; Conditions</h5>
+                            <div t-field="doc.terms_conditions"/>
+                        </div>
+                        <div t-if="doc.remarks" class="mt-3">
+                            <h5 style="color:#17479e;">Remarks</h5>
+                            <p t-out="doc.remarks"/>
+                        </div>
+
+                        <div class="row mt-5">
+                            <div class="col-6">
+                                <div style="border-top:1px solid #333; padding-top:4px;">
+                                    For <span t-out="doc.company_id.name">Company</span><br/>
+                                    <span t-out="doc.salesperson_id.name">Salesperson</span>
+                                </div>
+                            </div>
+                            <div class="col-6 text-end">
+                                <div style="border-top:1px solid #333; padding-top:4px;">
+                                    Accepted by
+                                    <span t-out="doc.partner_id.name">Customer</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <t t-call="gc_erm_lead_to_billing.gc_report_footer"/>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

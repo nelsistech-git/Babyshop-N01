@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_sale_order_form_gc_erm" model="ir.ui.view">
+        <field name="name">sale.order.form.gc.erm</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_gc_view_work_orders" type="object"
+                        class="oe_stat_button" icon="fa-wrench"
+                        invisible="gc_work_order_count == 0"
+                        groups="gc_erm_lead_to_billing.group_gc_erm_user">
+                    <field name="gc_work_order_count" widget="statinfo" string="Work Orders"/>
+                </button>
+            </xpath>
+
+            <xpath expr="//header" position="inside">
+                <button name="action_gc_create_work_order" type="object"
+                        string="Create Work Order" class="btn-primary"
+                        invisible="state != 'sale' or gc_work_order_count &gt; 0"
+                        groups="gc_erm_lead_to_billing.group_gc_erm_user"/>
+            </xpath>
+
+            <xpath expr="//field[@name='client_order_ref']" position="after">
+                <field name="gc_proposal_id" readonly="1"
+                       invisible="not gc_proposal_id"
+                       groups="gc_erm_lead_to_billing.group_gc_erm_user"/>
+                <field name="gc_lead_id" readonly="1" invisible="not gc_lead_id"
+                       groups="gc_erm_lead_to_billing.group_gc_erm_user"/>
+                <field name="gc_survey_id" readonly="1" invisible="not gc_survey_id"
+                       groups="gc_erm_lead_to_billing.group_gc_erm_user"/>
+                <field name="gc_boq_id" readonly="1" invisible="not gc_boq_id"
+                       groups="gc_erm_lead_to_billing.group_gc_erm_user"/>
+                <field name="gc_is_erm_order" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_sale_order_tree_gc_erm" model="ir.ui.view">
+        <field name="name">sale.order.tree.gc.erm</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_tree"/>
+        <field name="arch" type="xml">
+            <field name="name" position="after">
+                <field name="gc_proposal_id" optional="hide"
+                       groups="gc_erm_lead_to_billing.group_gc_erm_user"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_sale_order_filter_gc_erm" model="ir.ui.view">
+        <field name="name">sale.order.search.gc.erm</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+        <field name="arch" type="xml">
+            <filter name="my_sale_orders_filter" position="after">
+                <separator/>
+                <filter name="filter_gc_erm" string="From ERM"
+                        domain="[('gc_is_erm_order', '=', True)]"
+                        groups="gc_erm_lead_to_billing.group_gc_erm_user"/>
+            </filter>
+        </field>
+    </record>
+
+</odoo>

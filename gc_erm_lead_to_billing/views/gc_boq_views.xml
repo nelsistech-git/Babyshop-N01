@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_gc_boq_form" model="ir.ui.view">
+        <field name="name">gc.erm.boq.form</field>
+        <field name="model">gc.erm.boq</field>
+        <field name="arch" type="xml">
+            <form string="Bill of Quantities">
+                <header>
+                    <button name="action_confirm" type="object" string="Confirm"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_recompute_prices" type="object"
+                            string="Re-apply Margin" invisible="state != 'draft'"
+                            help="Applies the header margin method to every line."/>
+                    <button name="action_create_revision" type="object"
+                            string="Create Revision" class="btn-primary"
+                            invisible="state not in ('confirmed', 'locked')"
+                            groups="gc_erm_lead_to_billing.group_gc_technical_user"
+                            confirm="This supersedes the current version and creates version N+1. Continue?"/>
+                    <button name="action_reset_draft" type="object" string="Reset to Draft"
+                            invisible="state != 'confirmed'"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                            invisible="state in ('cancelled', 'revised', 'locked')"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,confirmed,locked"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_revisions" type="object"
+                                class="oe_stat_button" icon="fa-code-fork"
+                                invisible="revision_count == 0">
+                            <field name="revision_count" widget="statinfo" string="Revisions"/>
+                        </button>
+                    </div>
+
+                    <widget name="web_ribbon" title="Locked" bg_color="text-bg-info"
+                            invisible="state != 'locked'"/>
+                    <widget name="web_ribbon" title="Superseded" bg_color="text-bg-warning"
+                            invisible="state != 'revised'"/>
+                    <widget name="web_ribbon" title="Cancelled" bg_color="text-bg-danger"
+                            invisible="state != 'cancelled'"/>
+
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                            <span class="ms-2 text-muted">v<field name="version" readonly="1" class="oe_inline"/></span>
+                        </h1>
+                    </div>
+
+                    <div class="alert alert-info" role="alert" invisible="state != 'locked'">
+                        This costing is locked because the technical report has been
+                        submitted. Use <strong>Create Revision</strong> to change it; the
+                        current version stays available for audit.
+                    </div>
+
+                    <group>
+                        <group string="Reference">
+                            <field name="survey_id" options="{'no_create': True}"/>
+                            <field name="lead_id" readonly="1"/>
+                            <field name="partner_id" options="{'no_quick_create': True}"/>
+                            <field name="revision_of_id" readonly="1"
+                                   invisible="not revision_of_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="currency_id" groups="base.group_multi_currency"/>
+                        </group>
+                        <group string="Costing Method (SRS 18)">
+                            <field name="prepared_by_id" widget="many2one_avatar_user"/>
+                            <field name="prepared_date"/>
+                            <field name="margin_method"/>
+                            <field name="margin_value"/>
+                            <field name="global_discount"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="BOQ Lines" name="lines">
+                            <field name="line_ids" class="o_gc_costing_table"
+                                   readonly="state != 'draft'">
+                                <tree editable="bottom" limit="200">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="currency_id" column_invisible="True"/>
+                                    <field name="company_id" column_invisible="True"/>
+                                    <field name="partner_id" column_invisible="True"/>
+                                    <field name="product_id" options="{'no_create': True}"/>
+                                    <field name="name"/>
+                                    <field name="quantity"/>
+                                    <field name="uom_id" groups="uom.group_uom" optional="show"/>
+                                    <field name="unit_cost"/>
+                                    <field name="material_cost" readonly="1" optional="show"/>
+                                    <field name="installation_cost" optional="show"/>
+                                    <field name="transport_cost" optional="show"/>
+                                    <field name="other_cost" optional="hide"/>
+                                    <field name="line_cost" readonly="1" sum="Internal Cost"/>
+                                    <field name="use_header_margin" optional="hide"
+                                           widget="boolean_toggle"/>
+                                    <field name="margin_method" optional="hide"
+                                           readonly="use_header_margin"/>
+                                    <field name="margin_value" optional="hide"
+                                           readonly="use_header_margin"/>
+                                    <field name="margin_amount" readonly="1" optional="show"
+                                           sum="Margin"/>
+                                    <field name="sales_price" optional="show"
+                                           digits="[16, 2]"/>
+                                    <field name="discount" optional="show"/>
+                                    <field name="tax_ids" widget="many2many_tags" optional="show"
+                                           options="{'no_create': True}"/>
+                                    <field name="price_subtotal" readonly="1" sum="Subtotal"/>
+                                    <field name="line_margin_pct" readonly="1" optional="hide"/>
+                                    <field name="remarks" optional="hide"/>
+                                </tree>
+                            </field>
+
+                            <group class="mt-3">
+                                <group class="o_gc_cost_block" string="Internal Cost (not shown to the customer)">
+                                    <field name="total_material_cost"/>
+                                    <field name="total_installation_cost"/>
+                                    <field name="total_transport_cost"/>
+                                    <field name="total_other_cost"/>
+                                    <field name="total_cost" class="fw-bold"/>
+                                </group>
+                                <group class="oe_subtotal_footer" string="Selling Price">
+                                    <field name="total_margin"/>
+                                    <field name="total_discount"/>
+                                    <field name="amount_untaxed" widget="monetary"/>
+                                    <field name="amount_tax" widget="monetary"/>
+                                    <div class="oe_subtotal_footer_separator">
+                                        <label for="amount_total"/>
+                                    </div>
+                                    <field name="amount_total" nolabel="1" class="oe_subtotal_footer_separator"
+                                           widget="monetary"/>
+                                    <field name="margin_percentage" widget="percentage"
+                                           string="Margin %"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Notes" name="notes">
+                            <field name="note" placeholder="Costing assumptions, exclusions..."/>
+                        </page>
+
+                        <page string="Audit" name="audit">
+                            <field name="status_history_ids" readonly="1">
+                                <tree>
+                                    <field name="change_date"/>
+                                    <field name="old_state_label" string="From"/>
+                                    <field name="new_state_label" string="To"/>
+                                    <field name="user_id"/>
+                                    <field name="comment"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_gc_boq_tree" model="ir.ui.view">
+        <field name="name">gc.erm.boq.tree</field>
+        <field name="model">gc.erm.boq</field>
+        <field name="arch" type="xml">
+            <tree string="Bills of Quantities" sample="1"
+                  decoration-muted="state in ('cancelled', 'revised')"
+                  decoration-info="state == 'locked'"
+                  decoration-success="state == 'confirmed'">
+                <field name="name"/>
+                <field name="version"/>
+                <field name="survey_id" optional="show"/>
+                <field name="partner_id"/>
+                <field name="prepared_by_id" widget="many2one_avatar_user" optional="show"/>
+                <field name="prepared_date" optional="show"/>
+                <field name="line_count" string="Lines" optional="hide"/>
+                <field name="total_cost" sum="Total Cost"/>
+                <field name="amount_untaxed" sum="Untaxed" optional="show"/>
+                <field name="amount_total" sum="Total" optional="show"/>
+                <field name="margin_percentage" string="Margin %" optional="show"/>
+                <field name="currency_id" column_invisible="True"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-success="state in ('confirmed', 'locked')"
+                       decoration-danger="state == 'cancelled'"
+                       decoration-warning="state == 'revised'"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_gc_boq_search" model="ir.ui.view">
+        <field name="name">gc.erm.boq.search</field>
+        <field name="model">gc.erm.boq</field>
+        <field name="arch" type="xml">
+            <search string="BOQ">
+                <field name="name"
+                       filter_domain="['|', ('name', 'ilike', self), ('partner_id', 'ilike', self)]"/>
+                <field name="partner_id"/>
+                <field name="survey_id"/>
+                <field name="prepared_by_id"/>
+                <filter name="filter_mine" string="Prepared by Me"
+                        domain="[('prepared_by_id', '=', uid)]"/>
+                <separator/>
+                <filter name="filter_draft" string="Draft" domain="[('state', '=', 'draft')]"/>
+                <filter name="filter_confirmed" string="Confirmed"
+                        domain="[('state', '=', 'confirmed')]"/>
+                <filter name="filter_locked" string="Locked" domain="[('state', '=', 'locked')]"/>
+                <filter name="filter_current" string="Current Versions"
+                        domain="[('state', '!=', 'revised')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_partner" string="Customer" context="{'group_by': 'partner_id'}"/>
+                    <filter name="group_prepared" string="Prepared By"
+                            context="{'group_by': 'prepared_by_id'}"/>
+                    <filter name="group_date" string="Prepared Month"
+                            context="{'group_by': 'prepared_date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_gc_boq_pivot" model="ir.ui.view">
+        <field name="name">gc.erm.boq.pivot</field>
+        <field name="model">gc.erm.boq</field>
+        <field name="arch" type="xml">
+            <pivot string="Costing Analysis" sample="1">
+                <field name="partner_id" type="row"/>
+                <field name="total_cost" type="measure"/>
+                <field name="amount_untaxed" type="measure"/>
+                <field name="total_margin" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_gc_boq" model="ir.actions.act_window">
+        <field name="name">Bills of Quantities</field>
+        <field name="res_model">gc.erm.boq</field>
+        <field name="view_mode">tree,form,pivot</field>
+        <field name="search_view_id" ref="view_gc_boq_search"/>
+        <field name="context">{'search_default_filter_current': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No BOQ yet</p>
+            <p>A BOQ is prepared from a technical survey. It computes the internal
+               cost, applies the configured margin and produces the selling price.</p>
+        </field>
+    </record>
+
+</odoo>

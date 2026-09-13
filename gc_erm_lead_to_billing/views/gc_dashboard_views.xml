@@ -1,0 +1,403 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ==================================================================
+         SRS 47 - 52: department dashboards.
+         Built entirely from native Odoo views (kanban / list / pivot /
+         graph) assembled on a `board.board` page, so there is no custom
+         JavaScript to maintain across Odoo updates.
+         ================================================================== -->
+
+    <!-- =============== KPI actions: SALES (SRS 48) =================== -->
+    <record id="action_gc_kpi_lead_pipeline" model="ir.actions.act_window">
+        <field name="name">Leads by Stage</field>
+        <field name="res_model">gc.erm.lead</field>
+        <field name="view_mode">graph,pivot,list</field>
+        <field name="view_id" ref="view_gc_lead_graph"/>
+        <field name="context">{'graph_measure': 'expected_revenue', 'group_by': ['state']}</field>
+    </record>
+
+    <record id="action_gc_kpi_lead_by_salesperson" model="ir.actions.act_window">
+        <field name="name">Leads by Salesperson</field>
+        <field name="res_model">gc.erm.lead</field>
+        <field name="view_mode">pivot,graph,list</field>
+        <field name="view_id" ref="view_gc_lead_pivot"/>
+    </record>
+
+    <record id="action_gc_kpi_lead_pending" model="ir.actions.act_window">
+        <field name="name">Pending Lead Approval</field>
+        <field name="res_model">gc.erm.lead</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('state', '=', 'hod_approval')]</field>
+    </record>
+
+    <record id="action_gc_kpi_proposal_value" model="ir.actions.act_window">
+        <field name="name">Proposal Value</field>
+        <field name="res_model">gc.erm.proposal</field>
+        <field name="view_mode">graph,pivot,list</field>
+        <field name="view_id" ref="view_gc_proposal_graph"/>
+    </record>
+
+    <record id="action_gc_kpi_proposal_pending" model="ir.actions.act_window">
+        <field name="name">Proposals Awaiting Approval</field>
+        <field name="res_model">gc.erm.proposal</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('state', '=', 'hod_approval')]</field>
+    </record>
+
+    <record id="action_gc_kpi_proposal_won_lost" model="ir.actions.act_window">
+        <field name="name">Won / Lost Proposals</field>
+        <field name="res_model">gc.erm.proposal</field>
+        <field name="view_mode">pivot,graph</field>
+        <field name="view_id" ref="view_gc_proposal_pivot"/>
+        <field name="domain">[('state', 'in', ('accepted', 'refused', 'rejected'))]</field>
+    </record>
+
+    <!-- ============= KPI actions: TECHNICAL (SRS 49) ================= -->
+    <record id="action_gc_kpi_survey_pending" model="ir.actions.act_window">
+        <field name="name">Pending Surveys</field>
+        <field name="res_model">gc.erm.survey</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('state', 'in', ('draft', 'assigned', 'in_progress'))]</field>
+    </record>
+
+    <record id="action_gc_kpi_survey_overdue" model="ir.actions.act_window">
+        <field name="name">Overdue Surveys</field>
+        <field name="res_model">gc.erm.survey</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('is_overdue', '=', True)]</field>
+    </record>
+
+    <record id="action_gc_kpi_survey_feasibility" model="ir.actions.act_window">
+        <field name="name">Feasibility Analysis</field>
+        <field name="res_model">gc.erm.survey</field>
+        <field name="view_mode">pivot,graph,list</field>
+        <field name="view_id" ref="view_gc_survey_pivot"/>
+    </record>
+
+    <record id="action_gc_kpi_costing_pending" model="ir.actions.act_window">
+        <field name="name">Pending Costing</field>
+        <field name="res_model">gc.erm.survey</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('state', '=', 'completed'), ('boq_ids', '=', False)]</field>
+    </record>
+
+    <record id="action_gc_kpi_report_pending" model="ir.actions.act_window">
+        <field name="name">Pending Technical Reports</field>
+        <field name="res_model">gc.erm.technical.report</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('state', 'in', ('draft', 'review'))]</field>
+    </record>
+
+    <record id="action_gc_kpi_costing_analysis" model="ir.actions.act_window">
+        <field name="name">Costing Analysis</field>
+        <field name="res_model">gc.erm.boq</field>
+        <field name="view_mode">pivot,list</field>
+        <field name="view_id" ref="view_gc_boq_pivot"/>
+        <field name="domain">[('state', '!=', 'revised')]</field>
+    </record>
+
+    <!-- =========== KPI actions: IMPLEMENTATION (SRS 50) ============== -->
+    <record id="action_gc_kpi_wo_open" model="ir.actions.act_window">
+        <field name="name">Active Work Orders</field>
+        <field name="res_model">gc.erm.work.order</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('state', 'not in', ('completed', 'cancelled'))]</field>
+    </record>
+
+    <record id="action_gc_kpi_wo_delayed" model="ir.actions.act_window">
+        <field name="name">Delayed Work Orders</field>
+        <field name="res_model">gc.erm.work.order</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('is_delayed', '=', True)]</field>
+    </record>
+
+    <record id="action_gc_kpi_wo_by_team" model="ir.actions.act_window">
+        <field name="name">Work Orders by Team</field>
+        <field name="res_model">gc.erm.work.order</field>
+        <field name="view_mode">pivot,graph,list</field>
+        <field name="view_id" ref="view_gc_work_order_pivot"/>
+    </record>
+
+    <record id="action_gc_kpi_installation_pending" model="ir.actions.act_window">
+        <field name="name">Installations In Progress</field>
+        <field name="res_model">gc.erm.installation</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('state', 'in', ('draft', 'in_progress', 'submitted'))]</field>
+    </record>
+
+    <record id="action_gc_kpi_revisit" model="ir.actions.act_window">
+        <field name="name">Revisits</field>
+        <field name="res_model">gc.erm.installation</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">['|', ('state', '=', 'revisit'), ('result', 'in', ('failed', 'revisit'))]</field>
+    </record>
+
+    <record id="action_gc_kpi_engineer_performance" model="ir.actions.act_window">
+        <field name="name">Engineer Performance</field>
+        <field name="res_model">gc.erm.installation</field>
+        <field name="view_mode">pivot,graph,list</field>
+        <field name="view_id" ref="view_gc_installation_pivot"/>
+    </record>
+
+    <!-- ============== KPI actions: INVENTORY (SRS 51) ================ -->
+    <record id="action_gc_kpi_material_pending" model="ir.actions.act_window">
+        <field name="name">Material Pending</field>
+        <field name="res_model">gc.erm.work.order</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('material_state', '=', 'shortage')]</field>
+    </record>
+
+    <record id="action_gc_kpi_procurement_open" model="ir.actions.act_window">
+        <field name="name">Procurement Pending</field>
+        <field name="res_model">gc.erm.procurement.request</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('state', 'not in', ('received', 'cancelled'))]</field>
+    </record>
+
+    <record id="action_gc_kpi_delivery_pending" model="ir.actions.act_window">
+        <field name="name">Deliveries to Process</field>
+        <field name="res_model">stock.picking</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('gc_work_order_id', '!=', False), ('picking_type_code', '=', 'outgoing'), ('state', 'not in', ('done', 'cancel'))]</field>
+    </record>
+
+    <!-- ================ KPI actions: FINANCE (SRS 52) ================ -->
+    <record id="action_gc_kpi_billing_ready" model="ir.actions.act_window">
+        <field name="name">Billing Ready</field>
+        <field name="res_model">gc.erm.work.order</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('billing_ready', '=', True), ('state', '!=', 'cancelled')]</field>
+    </record>
+
+    <record id="action_gc_kpi_invoice_draft" model="ir.actions.act_window">
+        <field name="name">Draft ERM Invoices</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('gc_is_erm_invoice', '=', True), ('move_type', '=', 'out_invoice'), ('state', '=', 'draft')]</field>
+    </record>
+
+    <record id="action_gc_kpi_invoice_overdue" model="ir.actions.act_window">
+        <field name="name">Overdue Invoices</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('gc_is_overdue', '=', True)]</field>
+    </record>
+
+    <record id="action_gc_kpi_revenue" model="ir.actions.act_window">
+        <field name="name">Revenue</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">pivot,graph,list</field>
+        <field name="domain">[('gc_is_erm_invoice', '=', True), ('move_type', '=', 'out_invoice'), ('state', '=', 'posted')]</field>
+    </record>
+
+    <!-- ==================================================================
+         DASHBOARD PAGES
+         ================================================================== -->
+
+    <record id="board_gc_management_form" model="ir.ui.view">
+        <field name="name">gc.erm.board.management</field>
+        <field name="model">board.board</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Management Dashboard">
+                <board style="2-1">
+                    <column>
+                        <action name="%(action_gc_kpi_lead_pipeline)d"
+                                string="Leads by Stage" view_mode="graph"/>
+                        <action name="%(action_gc_kpi_proposal_value)d"
+                                string="Proposal Value" view_mode="graph"/>
+                        <action name="%(action_gc_kpi_wo_by_team)d"
+                                string="Work Orders by Team" view_mode="pivot"/>
+                        <action name="%(action_gc_kpi_revenue)d"
+                                string="Revenue" view_mode="graph"/>
+                    </column>
+                    <column>
+                        <action name="%(action_gc_kpi_lead_pending)d"
+                                string="Pending Lead Approval" view_mode="list"/>
+                        <action name="%(action_gc_kpi_proposal_pending)d"
+                                string="Proposals Awaiting Approval" view_mode="list"/>
+                        <action name="%(action_gc_kpi_material_pending)d"
+                                string="Material Pending" view_mode="list"/>
+                        <action name="%(action_gc_kpi_billing_ready)d"
+                                string="Billing Ready" view_mode="list"/>
+                        <action name="%(action_gc_kpi_invoice_overdue)d"
+                                string="Overdue Invoices" view_mode="list"/>
+                    </column>
+                </board>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_gc_board_management" model="ir.actions.act_window">
+        <field name="name">Management Dashboard</field>
+        <field name="res_model">board.board</field>
+        <field name="view_mode">form</field>
+        <field name="usage">menu</field>
+        <field name="view_id" ref="board_gc_management_form"/>
+    </record>
+
+    <record id="board_gc_sales_form" model="ir.ui.view">
+        <field name="name">gc.erm.board.sales</field>
+        <field name="model">board.board</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Sales Dashboard">
+                <board style="1-1">
+                    <column>
+                        <action name="%(action_gc_kpi_lead_pipeline)d"
+                                string="Leads by Stage" view_mode="graph"/>
+                        <action name="%(action_gc_kpi_lead_by_salesperson)d"
+                                string="Leads by Salesperson" view_mode="pivot"/>
+                    </column>
+                    <column>
+                        <action name="%(action_gc_kpi_proposal_value)d"
+                                string="Proposal Value" view_mode="graph"/>
+                        <action name="%(action_gc_kpi_proposal_won_lost)d"
+                                string="Won / Lost" view_mode="pivot"/>
+                    </column>
+                </board>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_gc_board_sales" model="ir.actions.act_window">
+        <field name="name">Sales Dashboard</field>
+        <field name="res_model">board.board</field>
+        <field name="view_mode">form</field>
+        <field name="usage">menu</field>
+        <field name="view_id" ref="board_gc_sales_form"/>
+    </record>
+
+    <record id="board_gc_technical_form" model="ir.ui.view">
+        <field name="name">gc.erm.board.technical</field>
+        <field name="model">board.board</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Technical Dashboard">
+                <board style="1-1">
+                    <column>
+                        <action name="%(action_gc_kpi_survey_pending)d"
+                                string="Pending Surveys" view_mode="list"/>
+                        <action name="%(action_gc_kpi_survey_overdue)d"
+                                string="Overdue Surveys" view_mode="list"/>
+                        <action name="%(action_gc_kpi_costing_pending)d"
+                                string="Pending Costing" view_mode="list"/>
+                    </column>
+                    <column>
+                        <action name="%(action_gc_kpi_survey_feasibility)d"
+                                string="Feasibility" view_mode="pivot"/>
+                        <action name="%(action_gc_kpi_report_pending)d"
+                                string="Pending Reports" view_mode="list"/>
+                        <action name="%(action_gc_kpi_costing_analysis)d"
+                                string="Costing Analysis" view_mode="pivot"/>
+                    </column>
+                </board>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_gc_board_technical" model="ir.actions.act_window">
+        <field name="name">Technical Dashboard</field>
+        <field name="res_model">board.board</field>
+        <field name="view_mode">form</field>
+        <field name="usage">menu</field>
+        <field name="view_id" ref="board_gc_technical_form"/>
+    </record>
+
+    <record id="board_gc_implementation_form" model="ir.ui.view">
+        <field name="name">gc.erm.board.implementation</field>
+        <field name="model">board.board</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Implementation Dashboard">
+                <board style="1-1">
+                    <column>
+                        <action name="%(action_gc_kpi_wo_open)d"
+                                string="Active Work Orders" view_mode="list"/>
+                        <action name="%(action_gc_kpi_wo_delayed)d"
+                                string="Delayed" view_mode="list"/>
+                        <action name="%(action_gc_kpi_revisit)d"
+                                string="Revisits" view_mode="list"/>
+                    </column>
+                    <column>
+                        <action name="%(action_gc_kpi_installation_pending)d"
+                                string="Installations In Progress" view_mode="list"/>
+                        <action name="%(action_gc_kpi_engineer_performance)d"
+                                string="Engineer Performance" view_mode="pivot"/>
+                    </column>
+                </board>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_gc_board_implementation" model="ir.actions.act_window">
+        <field name="name">Implementation Dashboard</field>
+        <field name="res_model">board.board</field>
+        <field name="view_mode">form</field>
+        <field name="usage">menu</field>
+        <field name="view_id" ref="board_gc_implementation_form"/>
+    </record>
+
+    <record id="board_gc_inventory_form" model="ir.ui.view">
+        <field name="name">gc.erm.board.inventory</field>
+        <field name="model">board.board</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Inventory Dashboard">
+                <board style="1-1">
+                    <column>
+                        <action name="%(action_gc_kpi_material_pending)d"
+                                string="Material Shortage" view_mode="list"/>
+                        <action name="%(action_gc_kpi_delivery_pending)d"
+                                string="Deliveries to Process" view_mode="list"/>
+                    </column>
+                    <column>
+                        <action name="%(action_gc_kpi_procurement_open)d"
+                                string="Procurement Pending" view_mode="list"/>
+                    </column>
+                </board>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_gc_board_inventory" model="ir.actions.act_window">
+        <field name="name">Inventory Dashboard</field>
+        <field name="res_model">board.board</field>
+        <field name="view_mode">form</field>
+        <field name="usage">menu</field>
+        <field name="view_id" ref="board_gc_inventory_form"/>
+    </record>
+
+    <record id="board_gc_finance_form" model="ir.ui.view">
+        <field name="name">gc.erm.board.finance</field>
+        <field name="model">board.board</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Finance Dashboard">
+                <board style="1-1">
+                    <column>
+                        <action name="%(action_gc_kpi_billing_ready)d"
+                                string="Billing Ready" view_mode="list"/>
+                        <action name="%(action_gc_kpi_invoice_draft)d"
+                                string="Draft Invoices" view_mode="list"/>
+                    </column>
+                    <column>
+                        <action name="%(action_gc_kpi_invoice_overdue)d"
+                                string="Overdue Invoices" view_mode="list"/>
+                        <action name="%(action_gc_kpi_revenue)d"
+                                string="Revenue" view_mode="graph"/>
+                    </column>
+                </board>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_gc_board_finance" model="ir.actions.act_window">
+        <field name="name">Finance Dashboard</field>
+        <field name="res_model">board.board</field>
+        <field name="view_mode">form</field>
+        <field name="usage">menu</field>
+        <field name="view_id" ref="board_gc_finance_form"/>
+    </record>
+
+</odoo>

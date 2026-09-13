@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="report_gc_technical_report_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-set="gc_title" t-value="'TECHNICAL REPORT'"/>
+                <t t-set="gc_date" t-value="doc.report_date"/>
+                <t t-set="gc_partner" t-value="doc.partner_id"/>
+                <t t-set="gc_site" t-value="doc.survey_id.service_location"/>
+                <t t-call="web.internal_layout">
+                    <div class="page">
+                        <t t-call="gc_erm_lead_to_billing.gc_report_header"/>
+                        <t t-call="gc_erm_lead_to_billing.gc_report_customer_block"/>
+
+                        <table class="table table-sm">
+                            <tr>
+                                <td style="width:25%"><strong>Survey</strong></td>
+                                <td t-out="doc.survey_id.name">GC-SUR-00001</td>
+                                <td style="width:25%"><strong>Survey Date</strong></td>
+                                <td t-out="doc.survey_date or '-'">-</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Engineer</strong></td>
+                                <td t-out="doc.engineer_id.name">Engineer</td>
+                                <td><strong>Feasibility</strong></td>
+                                <td>
+                                    <strong t-out="dict(doc._fields['feasibility'].selection).get(doc.feasibility, '-')">
+                                        Feasible
+                                    </strong>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Implementation Timeline</strong></td>
+                                <td t-out="doc.implementation_timeline or '-'">-</td>
+                                <td><strong>Estimated Duration</strong></td>
+                                <td><span t-out="doc.implementation_days">0</span> days</td>
+                            </tr>
+                        </table>
+
+                        <div t-if="doc.technical_findings" class="mt-3">
+                            <h5 style="color:#17479e;">Technical Findings</h5>
+                            <div t-field="doc.technical_findings"/>
+                        </div>
+
+                        <div t-if="doc.required_equipment" class="mt-3">
+                            <h5 style="color:#17479e;">Required Equipment</h5>
+                            <p t-out="doc.required_equipment"/>
+                        </div>
+
+                        <div t-if="doc.boq_id" class="mt-3">
+                            <h5 style="color:#17479e;">Bill of Quantities</h5>
+                            <table class="table table-sm table-bordered">
+                                <thead style="background:#f2f4f8;">
+                                    <tr>
+                                        <th>Description</th>
+                                        <th class="text-end" style="width:12%">Qty</th>
+                                        <th class="text-end" style="width:18%">Unit Price</th>
+                                        <th class="text-end" style="width:20%">Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="doc.boq_id.line_ids" t-as="line">
+                                        <td t-out="line.name or line.product_id.display_name">Item</td>
+                                        <td class="text-end" t-out="line.quantity">1</td>
+                                        <td class="text-end" t-out="line.sales_price"
+                                            t-options='{"widget": "float", "precision": 2}'>0.00</td>
+                                        <td class="text-end" t-out="line.price_subtotal"
+                                            t-options='{"widget": "monetary", "display_currency": doc.currency_id}'>0.00</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="row justify-content-end">
+                                <div class="col-5">
+                                    <table class="table table-sm">
+                                        <tr>
+                                            <td><strong>Untaxed</strong></td>
+                                            <td class="text-end" t-out="doc.amount_untaxed"
+                                                t-options='{"widget": "monetary", "display_currency": doc.currency_id}'>0.00</td>
+                                        </tr>
+                                        <tr style="border-top:2px solid #17479e;">
+                                            <td><strong>Total</strong></td>
+                                            <td class="text-end">
+                                                <strong t-out="doc.amount_total"
+                                                        t-options='{"widget": "monetary", "display_currency": doc.currency_id}'>0.00</strong>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div t-if="doc.installation_scope" class="mt-3">
+                            <h5 style="color:#17479e;">Installation Scope</h5>
+                            <div t-field="doc.installation_scope"/>
+                        </div>
+                        <div t-if="doc.technical_risks" class="mt-3">
+                            <h5 style="color:#17479e;">Technical Risks</h5>
+                            <p t-out="doc.technical_risks"/>
+                        </div>
+                        <div t-if="doc.recommendations" class="mt-3">
+                            <h5 style="color:#17479e;">Recommendations</h5>
+                            <div t-field="doc.recommendations"/>
+                        </div>
+
+                        <div class="row mt-5">
+                            <div class="col-6">
+                                <div style="border-top:1px solid #333; padding-top:4px;">
+                                    Prepared by: <span t-out="doc.engineer_id.name">Engineer</span>
+                                </div>
+                            </div>
+                            <div class="col-6 text-end">
+                                <div style="border-top:1px solid #333; padding-top:4px;">
+                                    Reviewed by:
+                                    <span t-out="doc.reviewed_by_id.name or '________'">-</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <t t-call="gc_erm_lead_to_billing.gc_report_footer"/>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

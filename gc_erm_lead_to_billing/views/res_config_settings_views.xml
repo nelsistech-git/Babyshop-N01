@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="res_config_settings_view_form_gc_erm" model="ir.ui.view">
+        <field name="name">res.config.settings.form.gc.erm</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app data-string="Grameen Cybernet ERM" string="Grameen Cybernet ERM"
+                     name="gc_erm_lead_to_billing"
+                     groups="gc_erm_lead_to_billing.group_gc_erm_admin">
+
+                    <block title="Workflow Security" name="gc_workflow_security">
+                        <setting id="gc_setting_segregation"
+                                 string="Segregation of Duties"
+                                 help="Prevent a user from approving a document they created or submitted.">
+                            <field name="gc_segregation_of_duties"/>
+                        </setting>
+                        <setting id="gc_setting_tech_review"
+                                 string="Technical Manager Review"
+                                 help="Require a Technical Manager approval before the technical report reaches Sales.">
+                            <field name="gc_technical_review_required"/>
+                        </setting>
+                        <setting id="gc_setting_auto_wo"
+                                 string="Auto-create Work Order"
+                                 help="Create the work order automatically when an ERM sales order is confirmed.">
+                            <field name="gc_auto_create_work_order"/>
+                        </setting>
+                    </block>
+
+                    <block title="Costing" name="gc_costing">
+                        <setting id="gc_setting_margin" string="Default Margin"
+                                 help="Applied to new BOQ lines. Each BOQ can override it.">
+                            <div class="content-group mt-2">
+                                <div class="row">
+                                    <label for="gc_default_margin_method" class="col-lg-4 o_light_label"/>
+                                    <field name="gc_default_margin_method"/>
+                                </div>
+                                <div class="row">
+                                    <label for="gc_default_margin_value" class="col-lg-4 o_light_label"/>
+                                    <field name="gc_default_margin_value"/>
+                                </div>
+                            </div>
+                        </setting>
+                    </block>
+
+                    <block title="Commercial" name="gc_commercial">
+                        <setting id="gc_setting_validity" string="Proposal Validity"
+                                 help="Default number of days a proposal stays valid.">
+                            <field name="gc_proposal_validity_days"/> days
+                        </setting>
+                    </block>
+
+                    <block title="Service Level Agreements" name="gc_sla">
+                        <setting id="gc_setting_sla" string="Stage Durations (days)"
+                                 help="Used to compute the SLA deadline and the At Risk / Overdue indicators.">
+                            <div class="content-group mt-2">
+                                <div class="row">
+                                    <label for="gc_sla_lead_days" class="col-lg-6 o_light_label"/>
+                                    <field name="gc_sla_lead_days"/>
+                                </div>
+                                <div class="row">
+                                    <label for="gc_sla_survey_days" class="col-lg-6 o_light_label"/>
+                                    <field name="gc_sla_survey_days"/>
+                                </div>
+                                <div class="row">
+                                    <label for="gc_sla_technical_report_days" class="col-lg-6 o_light_label"/>
+                                    <field name="gc_sla_technical_report_days"/>
+                                </div>
+                                <div class="row">
+                                    <label for="gc_sla_proposal_days" class="col-lg-6 o_light_label"/>
+                                    <field name="gc_sla_proposal_days"/>
+                                </div>
+                                <div class="row">
+                                    <label for="gc_sla_implementation_days" class="col-lg-6 o_light_label"/>
+                                    <field name="gc_sla_implementation_days"/>
+                                </div>
+                                <div class="row">
+                                    <label for="gc_sla_procurement_days" class="col-lg-6 o_light_label"/>
+                                    <field name="gc_sla_procurement_days"/>
+                                </div>
+                                <div class="row">
+                                    <label for="gc_sla_installation_days" class="col-lg-6 o_light_label"/>
+                                    <field name="gc_sla_installation_days"/>
+                                </div>
+                                <div class="row">
+                                    <label for="gc_sla_billing_days" class="col-lg-6 o_light_label"/>
+                                    <field name="gc_sla_billing_days"/>
+                                </div>
+                            </div>
+                        </setting>
+                    </block>
+
+                    <block title="Master Data" name="gc_master_data">
+                        <setting id="gc_setting_catalog" string="Service Catalog"
+                                 help="Services, survey and installation requirements, billing policies.">
+                            <button name="action_gc_open_service_catalog" type="object"
+                                    string="Open Service Catalog" class="btn-link"
+                                    icon="fa-arrow-right"/>
+                        </setting>
+                        <setting id="gc_setting_matrix" string="Approval Matrix"
+                                 help="Amount based approval thresholds per document type.">
+                            <button name="action_gc_open_approval_matrix" type="object"
+                                    string="Open Approval Matrix" class="btn-link"
+                                    icon="fa-arrow-right"/>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_gc_erm_config_settings" model="ir.actions.act_window">
+        <field name="name">ERM Settings</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module': 'gc_erm_lead_to_billing'}</field>
+    </record>
+
+</odoo>

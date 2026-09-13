@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="report_gc_lead_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-set="gc_title" t-value="'LEAD SUMMARY'"/>
+                <t t-set="gc_date" t-value="doc.lead_date"/>
+                <t t-set="gc_partner" t-value="doc.partner_id"/>
+                <t t-set="gc_site" t-value="doc.service_location or doc.street"/>
+                <t t-call="web.internal_layout">
+                    <div class="page">
+                        <t t-call="gc_erm_lead_to_billing.gc_report_header"/>
+                        <t t-call="gc_erm_lead_to_billing.gc_report_customer_block"/>
+
+                        <table class="table table-sm">
+                            <tr>
+                                <td style="width:25%"><strong>Salesperson</strong></td>
+                                <td t-out="doc.salesperson_id.name">Salesperson</td>
+                                <td style="width:25%"><strong>Status</strong></td>
+                                <td t-out="dict(doc._fields['state'].selection).get(doc.state)">Draft</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Sales Team</strong></td>
+                                <td t-out="doc.team_id.name or '-'">Team</td>
+                                <td><strong>Priority</strong></td>
+                                <td t-out="dict(doc._fields['priority'].selection).get(doc.priority)">Normal</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Expected Revenue</strong></td>
+                                <td t-out="doc.expected_revenue"
+                                    t-options='{"widget": "monetary", "display_currency": doc.currency_id}'>0.00</td>
+                                <td><strong>Expected Closing</strong></td>
+                                <td t-out="doc.date_deadline or '-'">-</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Contract Duration</strong></td>
+                                <td><span t-out="doc.contract_duration">12</span> months</td>
+                                <td><strong>Expected Go-Live</strong></td>
+                                <td t-out="doc.expected_golive_date or '-'">-</td>
+                            </tr>
+                        </table>
+
+                        <h5 class="mt-3" style="color:#17479e;">Contact</h5>
+                        <table class="table table-sm">
+                            <tr>
+                                <td style="width:25%"><strong>Contact Person</strong></td>
+                                <td t-out="doc.contact_person or '-'">-</td>
+                                <td style="width:25%"><strong>Designation</strong></td>
+                                <td t-out="doc.contact_designation or '-'">-</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Phone</strong></td>
+                                <td t-out="doc.contact_phone or '-'">-</td>
+                                <td><strong>Email</strong></td>
+                                <td t-out="doc.contact_email or '-'">-</td>
+                            </tr>
+                        </table>
+
+                        <h5 class="mt-3" style="color:#17479e;">Requested Services</h5>
+                        <table class="table table-sm table-bordered">
+                            <thead style="background:#f2f4f8;">
+                                <tr>
+                                    <th>Service</th>
+                                    <th class="text-end">Qty / Links</th>
+                                    <th>Bandwidth</th>
+                                    <th>Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="doc.service_line_ids" t-as="line">
+                                    <td t-out="line.service_id.display_name">Service</td>
+                                    <td class="text-end" t-out="line.quantity">1</td>
+                                    <td t-out="line.bandwidth or '-'">-</td>
+                                    <td t-out="line.remarks or ''"/>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h5 class="mt-3" style="color:#17479e;">Location</h5>
+                        <table class="table table-sm">
+                            <tr>
+                                <td style="width:25%"><strong>Address</strong></td>
+                                <td t-out="doc.street or '-'">-</td>
+                                <td style="width:25%"><strong>District / Area</strong></td>
+                                <td>
+                                    <span t-out="doc.district or '-'">-</span> /
+                                    <span t-out="doc.area or '-'">-</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>GPS</strong></td>
+                                <td colspan="3">
+                                    <span t-out="doc.gps_latitude">0</span>,
+                                    <span t-out="doc.gps_longitude">0</span>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <div t-if="doc.description" class="mt-3">
+                            <h5 style="color:#17479e;">Requirement</h5>
+                            <div t-field="doc.description"/>
+                        </div>
+
+                        <div class="mt-4" t-if="doc.approved_by_id or doc.rejected_by_id">
+                            <h5 style="color:#17479e;">Approval</h5>
+                            <table class="table table-sm">
+                                <tr>
+                                    <td style="width:25%"><strong>Submitted By</strong></td>
+                                    <td t-out="doc.submitted_by_id.name or '-'">-</td>
+                                    <td style="width:25%"><strong>On</strong></td>
+                                    <td t-out="doc.submitted_date or '-'">-</td>
+                                </tr>
+                                <tr t-if="doc.approved_by_id">
+                                    <td><strong>Approved By</strong></td>
+                                    <td t-out="doc.approved_by_id.name">-</td>
+                                    <td><strong>On</strong></td>
+                                    <td t-out="doc.approved_date">-</td>
+                                </tr>
+                                <tr t-if="doc.rejected_by_id">
+                                    <td><strong>Rejected By</strong></td>
+                                    <td t-out="doc.rejected_by_id.name">-</td>
+                                    <td><strong>Reason</strong></td>
+                                    <td t-out="doc.rejection_reason or ''"/>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <t t-call="gc_erm_lead_to_billing.gc_report_footer"/>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

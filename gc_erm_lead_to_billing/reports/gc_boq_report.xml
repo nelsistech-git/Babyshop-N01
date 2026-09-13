@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Customer facing BOQ: quantities and selling prices only. -->
+    <template id="report_gc_boq_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-set="gc_title" t-value="'BILL OF QUANTITIES'"/>
+                <t t-set="gc_date" t-value="doc.prepared_date"/>
+                <t t-set="gc_partner" t-value="doc.partner_id"/>
+                <t t-set="gc_site" t-value="doc.survey_id.service_location"/>
+                <t t-call="web.internal_layout">
+                    <div class="page">
+                        <t t-call="gc_erm_lead_to_billing.gc_report_header"/>
+                        <t t-call="gc_erm_lead_to_billing.gc_report_customer_block"/>
+
+                        <table class="table table-sm">
+                            <tr>
+                                <td style="width:25%"><strong>Version</strong></td>
+                                <td t-out="doc.version">1</td>
+                                <td style="width:25%"><strong>Prepared By</strong></td>
+                                <td t-out="doc.prepared_by_id.name">Engineer</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Survey</strong></td>
+                                <td t-out="doc.survey_id.name">GC-SUR-00001</td>
+                                <td><strong>Status</strong></td>
+                                <td t-out="dict(doc._fields['state'].selection).get(doc.state)">Draft</td>
+                            </tr>
+                        </table>
+
+                        <table class="table table-sm table-bordered mt-3">
+                            <thead style="background:#f2f4f8;">
+                                <tr>
+                                    <th style="width:4%">#</th>
+                                    <th>Description</th>
+                                    <th class="text-end" style="width:10%">Qty</th>
+                                    <th style="width:10%">UoM</th>
+                                    <th class="text-end" style="width:14%">Unit Price</th>
+                                    <th class="text-end" style="width:9%">Disc.%</th>
+                                    <th class="text-end" style="width:16%">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="doc.line_ids" t-as="line">
+                                    <td t-out="line_index + 1">1</td>
+                                    <td>
+                                        <span t-out="line.name or line.product_id.display_name">Item</span>
+                                    </td>
+                                    <td class="text-end" t-out="line.quantity">1</td>
+                                    <td t-out="line.uom_id.name or ''"/>
+                                    <td class="text-end"
+                                        t-out="line.sales_price"
+                                        t-options='{"widget": "float", "precision": 2}'>0.00</td>
+                                    <td class="text-end" t-out="line.discount">0</td>
+                                    <td class="text-end" t-out="line.price_subtotal"
+                                        t-options='{"widget": "monetary", "display_currency": doc.currency_id}'>0.00</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="row justify-content-end">
+                            <div class="col-5">
+                                <table class="table table-sm">
+                                    <tr>
+                                        <td><strong>Untaxed Amount</strong></td>
+                                        <td class="text-end" t-out="doc.amount_untaxed"
+                                            t-options='{"widget": "monetary", "display_currency": doc.currency_id}'>0.00</td>
+                                    </tr>
+                                    <tr t-if="doc.total_discount">
+                                        <td><strong>Discount</strong></td>
+                                        <td class="text-end" t-out="doc.total_discount"
+                                            t-options='{"widget": "monetary", "display_currency": doc.currency_id}'>0.00</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Taxes</strong></td>
+                                        <td class="text-end" t-out="doc.amount_tax"
+                                            t-options='{"widget": "monetary", "display_currency": doc.currency_id}'>0.00</td>
+                                    </tr>
+                                    <tr style="border-top:2px solid #17479e;">
+                                        <td><strong>Total</strong></td>
+                                        <td class="text-end">
+                                            <strong t-out="doc.amount_total"
+                                                    t-options='{"widget": "monetary", "display_currency": doc.currency_id}'>0.00</strong>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div t-if="doc.note" class="mt-3">
+                            <h5 style="color:#17479e;">Notes</h5>
+                            <div t-field="doc.note"/>
+                        </div>
+
+                        <t t-call="gc_erm_lead_to_billing.gc_report_footer"/>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!-- Internal costing sheet: shows the cost breakdown and the margin. -->
+    <template id="report_gc_costing_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-set="gc_title" t-value="'TECHNICAL COSTING'"/>
+                <t t-set="gc_date" t-value="doc.prepared_date"/>
+                <t t-set="gc_partner" t-value="doc.partner_id"/>
+                <t t-call="web.internal_layout">
+                    <div class="page">
+                        <t t-call="gc_erm_lead_to_billing.gc_report_header"/>
+                        <div class="alert alert-warning py-1 px-2"
+                             style="font-size:11px;">
+                            <strong>Internal document.</strong> Contains cost and margin
+                            information. Do not share with the customer.
+                        </div>
+
+                        <table class="table table-sm">
+                            <tr>
+                                <td style="width:25%"><strong>Customer</strong></td>
+                                <td t-out="doc.partner_id.name">Customer</td>
+                                <td style="width:25%"><strong>Version</strong></td>
+                                <td t-out="doc.version">1</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Margin Method</strong></td>
+                                <td t-out="dict(doc._fields['margin_method'].selection).get(doc.margin_method)">
+                                    Percentage on Cost</td>
+                                <td><strong>Margin Value</strong></td>
+                                <td t-out="doc.margin_value">20</td>
+                            </tr>
+                        </table>
+
+                        <table class="table table-sm table-bordered mt-3"
+                               style="font-size:10px;">
+                            <thead style="background:#f2f4f8;">
+                                <tr>
+                                    <th>Product</th>
+                                    <th class="text-end">Qty</th>
+                                    <th class="text-end">Unit Cost</th>
+                                    <th class="text-end">Material</th>
+                                    <th class="text-end">Install.</th>
+                                    <th class="text-end">Transport</th>
+                                    <th class="text-end">Other</th>
+                                    <th class="text-end">Line Cost</th>
+                                    <th class="text-end">Margin</th>
+                                    <th class="text-end">Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="doc.line_ids" t-as="line">
+                                    <td t-out="line.name or line.product_id.display_name">Item</td>
+                                    <td class="text-end" t-out="line.quantity">1</td>
+                                    <td class="text-end" t-out="line.unit_cost">0</td>
+                                    <td class="text-end" t-out="line.material_cost">0</td>
+                                    <td class="text-end" t-out="line.installation_cost">0</td>
+                                    <td class="text-end" t-out="line.transport_cost">0</td>
+                                    <td class="text-end" t-out="line.other_cost">0</td>
+                                    <td class="text-end" t-out="line.line_cost">0</td>
+                                    <td class="text-end" t-out="line.margin_amount">0</td>
+                                    <td class="text-end" t-out="line.price_subtotal">0</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="row justify-content-end">
+                            <div class="col-6">
+                                <table class="table table-sm">
+                                    <tr>
+                                        <td><strong>Material Cost</strong></td>
+                                        <td class="text-end" t-out="doc.total_material_cost"
+                                            t-options='{"widget": "monetary", "display_currency": doc.currency_id}'>0.00</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Installation Cost</strong></td>
+                                        <td class="text-end" t-out="doc.total_installation_cost"
+                                            t-options='{"widget": "monetary", "display_currency": doc.currency_id}'>0.00</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Transport Cost</strong></td>
+                                        <td class="text-end" t-out="doc.total_transport_cost"
+                                            t-options='{"widget": "monetary", "display_currency": doc.currency_id}'>0.00</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Other Cost</strong></td>
+                                        <td class="text-end" t-out="doc.total_other_cost"
+                                            t-options='{"widget": "monetary", "display_currency": doc.currency_id}'>0.00</td>
+                                    </tr>
+                                    <tr style="border-top:1px solid #999;">
+                                        <td><strong>Total Internal Cost</strong></td>
+                                        <td class="text-end">
+                                            <strong t-out="doc.total_cost"
+                                                    t-options='{"widget": "monetary", "display_currency": doc.currency_id}'>0.00</strong>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Total Margin</strong></td>
+                                        <td class="text-end" t-out="doc.total_margin"
+                                            t-options='{"widget": "monetary", "display_currency": doc.currency_id}'>0.00</td>
+                                    </tr>
+                                    <tr style="border-top:2px solid #17479e;">
+                                        <td><strong>Selling Price (untaxed)</strong></td>
+                                        <td class="text-end">
+                                            <strong t-out="doc.amount_untaxed"
+                                                    t-options='{"widget": "monetary", "display_currency": doc.currency_id}'>0.00</strong>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Margin %</strong></td>
+                                        <td class="text-end">
+                                            <span t-out="'%.2f' % doc.margin_percentage">0.00</span>%
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <t t-call="gc_erm_lead_to_billing.gc_report_footer"/>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

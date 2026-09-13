@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="report_gc_procurement_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-set="gc_title" t-value="'PROCUREMENT REQUEST'"/>
+                <t t-set="gc_date" t-value="doc.request_date"/>
+                <t t-set="gc_partner" t-value="doc.partner_id"/>
+                <t t-call="web.internal_layout">
+                    <div class="page">
+                        <t t-call="gc_erm_lead_to_billing.gc_report_header"/>
+
+                        <table class="table table-sm">
+                            <tr>
+                                <td style="width:25%"><strong>Work Order</strong></td>
+                                <td t-out="doc.work_order_id.name">GC-WO-00001</td>
+                                <td style="width:25%"><strong>End Customer</strong></td>
+                                <td t-out="doc.partner_id.name or '-'">-</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Requested By</strong></td>
+                                <td t-out="doc.requested_by_id.name">User</td>
+                                <td><strong>Required Date</strong></td>
+                                <td t-out="doc.required_date or '-'">-</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Priority</strong></td>
+                                <td t-out="dict(doc._fields['priority'].selection).get(doc.priority)">Normal</td>
+                                <td><strong>Status</strong></td>
+                                <td t-out="dict(doc._fields['state'].selection).get(doc.state)">Draft</td>
+                            </tr>
+                        </table>
+
+                        <table class="table table-sm table-bordered mt-3">
+                            <thead style="background:#f2f4f8;">
+                                <tr>
+                                    <th>Product</th>
+                                    <th class="text-end" style="width:11%">Required</th>
+                                    <th class="text-end" style="width:11%">Available</th>
+                                    <th class="text-end" style="width:11%">Shortage</th>
+                                    <th class="text-end" style="width:11%">Received</th>
+                                    <th style="width:18%">Suggested Vendor</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="doc.line_ids" t-as="line">
+                                    <td t-out="line.product_id.display_name">Product</td>
+                                    <td class="text-end" t-out="line.required_qty">0</td>
+                                    <td class="text-end" t-out="line.available_qty">0</td>
+                                    <td class="text-end" t-out="line.shortage_qty">0</td>
+                                    <td class="text-end" t-out="line.received_qty">0</td>
+                                    <td t-out="line.vendor_id.name or '-'">-</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="row justify-content-end">
+                            <div class="col-5">
+                                <table class="table table-sm">
+                                    <tr>
+                                        <td><strong>Estimated Amount</strong></td>
+                                        <td class="text-end" t-out="doc.estimated_amount"
+                                            t-options='{"widget": "monetary", "display_currency": doc.currency_id}'>0.00</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div t-if="doc.purchase_order_ids" class="mt-3">
+                            <h5 style="color:#17479e;">Linked Purchase Documents</h5>
+                            <table class="table table-sm table-bordered">
+                                <thead style="background:#f2f4f8;">
+                                    <tr><th>Reference</th><th>Vendor</th><th>Status</th>
+                                        <th class="text-end">Amount</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="doc.purchase_order_ids" t-as="po">
+                                        <td t-out="po.name">P00001</td>
+                                        <td t-out="po.partner_id.name">Vendor</td>
+                                        <td t-out="po.state">draft</td>
+                                        <td class="text-end" t-out="po.amount_total"
+                                            t-options='{"widget": "monetary", "display_currency": po.currency_id}'>0.00</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div t-if="doc.remarks" class="mt-3">
+                            <h5 style="color:#17479e;">Remarks</h5>
+                            <p t-out="doc.remarks"/>
+                        </div>
+
+                        <t t-call="gc_erm_lead_to_billing.gc_report_footer"/>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

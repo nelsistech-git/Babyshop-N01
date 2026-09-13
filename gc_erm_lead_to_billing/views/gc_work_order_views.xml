@@ -1,0 +1,450 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_gc_work_order_form" model="ir.ui.view">
+        <field name="name">gc.erm.work.order.form</field>
+        <field name="model">gc.erm.work.order</field>
+        <field name="arch" type="xml">
+            <form string="Work Order">
+                <header>
+                    <button name="action_confirm" type="object" string="Confirm"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_load_materials_from_boq" type="object"
+                            string="Load Materials"
+                            invisible="state not in ('draft', 'ready', 'assigned', 'material_pending')"/>
+                    <button name="action_check_inventory" type="object"
+                            string="Check Inventory"
+                            invisible="state in ('draft', 'completed', 'cancelled')"/>
+                    <button name="action_assign_team" type="object" string="Assign Team"
+                            class="btn-primary"
+                            invisible="state not in ('ready', 'assigned', 'material_pending', 'ready_install')"/>
+                    <button name="action_create_procurement_request" type="object"
+                            string="Create Procurement Request" class="btn-primary"
+                            invisible="material_state != 'shortage' or state in ('draft', 'completed', 'cancelled')"/>
+                    <button name="action_create_delivery" type="object" string="Delivery"
+                            invisible="state in ('draft', 'completed', 'cancelled') or material_state == 'none'"/>
+                    <button name="action_reserve_stock" type="object" string="Reserve Stock"
+                            invisible="picking_count == 0 or state in ('draft', 'completed', 'cancelled')"/>
+                    <button name="action_set_ready_for_installation" type="object"
+                            string="Ready for Installation"
+                            invisible="state not in ('ready', 'assigned', 'material_pending')"/>
+                    <button name="action_create_installation" type="object"
+                            string="New Installation" class="btn-primary"
+                            invisible="state not in ('assigned', 'ready_install', 'installing')"/>
+                    <button name="action_start_qc" type="object" string="Start QC"
+                            invisible="state != 'install_done'"/>
+                    <button name="action_open_invoice_wizard" type="object"
+                            string="Create Invoice" class="btn-primary"
+                            invisible="not billing_ready or state == 'cancelled'"
+                            groups="gc_erm_lead_to_billing.group_gc_accounts_user"/>
+                    <button name="action_complete" type="object" string="Complete"
+                            invisible="state not in ('install_done', 'qc')"/>
+                    <button name="action_reset_draft" type="object" string="Reset to Draft"
+                            invisible="state not in ('ready', 'cancelled')"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                            invisible="state in ('cancelled', 'completed')"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,ready,assigned,material_pending,ready_install,installing,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_sale_order" type="object"
+                                class="oe_stat_button" icon="fa-shopping-cart">
+                            <div class="o_stat_info"><span class="o_stat_text">Sales Order</span></div>
+                        </button>
+                        <button name="action_view_pickings" type="object"
+                                class="oe_stat_button" icon="fa-truck"
+                                invisible="picking_count == 0">
+                            <field name="picking_count" widget="statinfo" string="Deliveries"/>
+                        </button>
+                        <button name="action_view_procurements" type="object"
+                                class="oe_stat_button" icon="fa-exchange"
+                                invisible="procurement_count == 0">
+                            <field name="procurement_count" widget="statinfo" string="Procurement"/>
+                        </button>
+                        <button name="action_view_purchase_orders" type="object"
+                                class="oe_stat_button" icon="fa-credit-card"
+                                invisible="purchase_order_count == 0">
+                            <field name="purchase_order_count" widget="statinfo" string="Purchases"/>
+                        </button>
+                        <button name="action_view_installations" type="object"
+                                class="oe_stat_button" icon="fa-plug"
+                                invisible="installation_count == 0">
+                            <field name="installation_count" widget="statinfo" string="Installations"/>
+                        </button>
+                        <button name="action_view_invoices" type="object"
+                                class="oe_stat_button" icon="fa-money"
+                                invisible="invoice_count == 0">
+                            <field name="invoice_count" widget="statinfo" string="Invoices"/>
+                        </button>
+                        <button name="action_view_task" type="object"
+                                class="oe_stat_button" icon="fa-tasks" invisible="not task_id">
+                            <div class="o_stat_info"><span class="o_stat_text">Task</span></div>
+                        </button>
+                    </div>
+
+                    <widget name="web_ribbon" title="Completed" bg_color="text-bg-success"
+                            invisible="state != 'completed'"/>
+                    <widget name="web_ribbon" title="Cancelled" bg_color="text-bg-danger"
+                            invisible="state != 'cancelled'"/>
+                    <widget name="web_ribbon" title="Delayed" bg_color="text-bg-warning"
+                            invisible="not is_delayed"/>
+
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+
+                    <div class="alert alert-warning" role="alert"
+                         invisible="material_state != 'shortage'">
+                        <strong>Material shortage.</strong> Required materials are not
+                        available. Create a procurement request to trigger the purchase flow.
+                    </div>
+                    <div class="alert alert-info" role="alert"
+                         invisible="billing_ready or state in ('draft', 'cancelled')">
+                        <strong>Billing blocked:</strong> <field name="billing_blocked_reason" readonly="1" nolabel="1"/>
+                    </div>
+
+                    <group>
+                        <group string="Customer &amp; Order">
+                            <field name="sale_order_id" options="{'no_create': True}"
+                                   readonly="state != 'draft'"/>
+                            <field name="partner_id" readonly="state != 'draft'"/>
+                            <field name="contact_id"/>
+                            <field name="service_ids" widget="many2many_tags"
+                                   options="{'no_create': True}"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="is_delayed" invisible="1"/>
+                            <field name="material_state" invisible="1"/>
+                            <field name="billing_ready" invisible="1"/>
+                        </group>
+                        <group string="Planning">
+                            <field name="manager_id" widget="many2one_avatar_user"/>
+                            <field name="team_id"/>
+                            <field name="team_leader_id" widget="many2one_avatar_user"/>
+                            <field name="engineer_id" widget="many2one_avatar_user"/>
+                            <field name="priority" widget="priority"/>
+                            <field name="start_date"/>
+                            <field name="schedule_date"/>
+                            <field name="expected_completion"/>
+                            <field name="actual_completion" invisible="not actual_completion"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Source Documents" class="text-muted">
+                            <field name="proposal_id" readonly="1"/>
+                            <field name="lead_id" readonly="1"/>
+                            <field name="survey_id" readonly="1"/>
+                            <field name="technical_report_id" readonly="1"/>
+                            <field name="boq_id" readonly="1"/>
+                        </group>
+                        <group string="Status Summary">
+                            <field name="material_state" widget="badge"
+                                   decoration-success="material_state in ('available', 'reserved', 'delivered')"
+                                   decoration-danger="material_state == 'shortage'"/>
+                            <field name="delivery_state"/>
+                            <field name="billing_ready" widget="boolean_toggle" readonly="1"/>
+                            <field name="sla_state" widget="badge"
+                                   decoration-success="sla_state == 'on_time'"
+                                   decoration-warning="sla_state == 'at_risk'"
+                                   decoration-danger="sla_state == 'overdue'"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Required Materials" name="materials">
+                            <field name="warehouse_id" readonly="state not in ('draft', 'ready')"/>
+                            <field name="line_ids"
+                                   readonly="state in ('completed', 'cancelled')">
+                                <tree editable="bottom" decoration-danger="availability == 'shortage'"
+                                      decoration-success="availability == 'available'">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="company_id" column_invisible="True"/>
+                                    <field name="product_id" options="{'no_create': True}"/>
+                                    <field name="name"/>
+                                    <field name="required_qty"/>
+                                    <field name="uom_id" groups="uom.group_uom" optional="show"/>
+                                    <field name="available_qty" readonly="1"/>
+                                    <field name="reserved_qty" readonly="1" optional="show"/>
+                                    <field name="shortage_qty" readonly="1" sum="Shortage"/>
+                                    <field name="availability" widget="badge" readonly="1"
+                                           decoration-success="availability == 'available'"
+                                           decoration-danger="availability == 'shortage'"/>
+                                    <field name="boq_line_id" column_invisible="True"/>
+                                    <field name="remarks" optional="hide"/>
+                                </tree>
+                            </field>
+                            <group class="mt-2">
+                                <group>
+                                    <field name="total_required_qty"/>
+                                    <field name="total_available_qty"/>
+                                    <field name="total_shortage_qty"/>
+                                </group>
+                                <group>
+                                    <field name="last_stock_check"/>
+                                    <field name="receipt_count" string="Linked Receipts"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Site &amp; Scope" name="site">
+                            <group>
+                                <group string="Location">
+                                    <field name="street"/>
+                                    <field name="city"/>
+                                    <field name="district"/>
+                                    <field name="area"/>
+                                    <field name="service_location"/>
+                                    <field name="gps_latitude"/>
+                                    <field name="gps_longitude"/>
+                                    <field name="map_url" widget="url" readonly="1"
+                                           text="Open in map" invisible="not map_url"/>
+                                </group>
+                                <group string="Team">
+                                    <field name="technician_ids" widget="many2many_avatar_user"/>
+                                    <field name="project_id"/>
+                                    <field name="task_id" readonly="1"/>
+                                    <button name="action_create_project_task" type="object"
+                                            string="Create Task" class="btn-link"
+                                            invisible="task_id or not project_id"/>
+                                </group>
+                            </group>
+                            <separator string="Installation Requirements"/>
+                            <field name="installation_requirements"/>
+                            <separator string="Special Requirements"/>
+                            <field name="special_requirements" nolabel="1"/>
+                            <separator string="Technical Documents"/>
+                            <field name="attachment_ids" widget="many2many_binary"/>
+                        </page>
+
+                        <page string="Billing" name="billing">
+                            <group>
+                                <group string="Policy (SRS 41 / 43)">
+                                    <field name="billing_policy"
+                                           readonly="state in ('completed', 'cancelled')"/>
+                                    <field name="advance_percent"
+                                           invisible="billing_policy not in ('milestone', 'advance_final')"/>
+                                    <field name="installation_percent"
+                                           invisible="billing_policy != 'milestone'"/>
+                                    <field name="completion_percent"
+                                           invisible="billing_policy != 'milestone'"/>
+                                </group>
+                                <group string="Amounts">
+                                    <field name="amount_total"/>
+                                    <field name="amount_invoiced"/>
+                                    <field name="amount_residual"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Remarks" name="remarks">
+                            <field name="remarks" nolabel="1"/>
+                        </page>
+
+                        <page string="Audit" name="audit">
+                            <field name="status_history_ids" readonly="1">
+                                <tree>
+                                    <field name="change_date"/>
+                                    <field name="old_state_label" string="From"/>
+                                    <field name="new_state_label" string="To"/>
+                                    <field name="user_id"/>
+                                    <field name="comment"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_gc_work_order_tree" model="ir.ui.view">
+        <field name="name">gc.erm.work.order.tree</field>
+        <field name="model">gc.erm.work.order</field>
+        <field name="arch" type="xml">
+            <tree string="Work Orders" sample="1"
+                  decoration-muted="state == 'cancelled'"
+                  decoration-danger="is_delayed or material_state == 'shortage'"
+                  decoration-success="state == 'completed'">
+                <field name="priority" widget="priority" nolabel="1"/>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="sale_order_id" optional="show"/>
+                <field name="service_summary" optional="hide"/>
+                <field name="district" optional="hide"/>
+                <field name="engineer_id" widget="many2one_avatar_user" optional="show"/>
+                <field name="team_id" optional="hide"/>
+                <field name="start_date" optional="show"/>
+                <field name="expected_completion" optional="show"/>
+                <field name="material_state" widget="badge" optional="show"
+                       decoration-success="material_state in ('available', 'reserved', 'delivered')"
+                       decoration-danger="material_state == 'shortage'"/>
+                <field name="delivery_state" optional="hide"/>
+                <field name="billing_ready" widget="boolean_toggle" optional="show" readonly="1"/>
+                <field name="amount_total" sum="Order Total" optional="hide"/>
+                <field name="is_delayed" column_invisible="True"/>
+                <field name="currency_id" column_invisible="True"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                <field name="state" widget="badge"
+                       decoration-info="state in ('draft', 'ready', 'assigned', 'installing')"
+                       decoration-warning="state == 'material_pending'"
+                       decoration-success="state in ('completed', 'install_done', 'ready_install')"
+                       decoration-danger="state == 'cancelled'"/>
+                <field name="activity_ids" widget="list_activity" optional="show"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_gc_work_order_kanban" model="ir.ui.view">
+        <field name="name">gc.erm.work.order.kanban</field>
+        <field name="model">gc.erm.work.order</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" class="o_kanban_small_column" sample="1"
+                    quick_create="false">
+                <field name="state"/>
+                <field name="material_state"/>
+                <field name="is_delayed"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click o_gc_kanban_card">
+                            <div class="o_kanban_record_top mb-0">
+                                <div class="o_kanban_record_headings">
+                                    <strong class="o_gc_kanban_title"><field name="partner_id"/></strong>
+                                    <small class="text-muted d-block"><field name="name"/></small>
+                                </div>
+                                <field name="priority" widget="priority"/>
+                            </div>
+                            <div class="o_kanban_record_body o_gc_kanban_meta">
+                                <div t-if="record.service_location.raw_value">
+                                    <i class="fa fa-map-marker me-1" title="Location"/>
+                                    <field name="service_location"/>
+                                </div>
+                                <div t-if="record.expected_completion.raw_value">
+                                    <i class="fa fa-calendar-check-o me-1" title="Expected completion"/>
+                                    <field name="expected_completion"/>
+                                </div>
+                            </div>
+                            <div class="o_kanban_record_bottom">
+                                <div class="oe_kanban_bottom_left">
+                                    <field name="activity_ids" widget="kanban_activity"/>
+                                    <span class="badge rounded-pill text-bg-danger ms-1"
+                                          t-if="record.material_state.raw_value == 'shortage'">Shortage</span>
+                                    <span class="badge rounded-pill text-bg-warning ms-1"
+                                          t-if="record.is_delayed.raw_value">Delayed</span>
+                                </div>
+                                <div class="oe_kanban_bottom_right">
+                                    <field name="engineer_id" widget="many2one_avatar_user"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_gc_work_order_search" model="ir.ui.view">
+        <field name="name">gc.erm.work.order.search</field>
+        <field name="model">gc.erm.work.order</field>
+        <field name="arch" type="xml">
+            <search string="Work Orders">
+                <field name="name"
+                       filter_domain="['|', '|', ('name', 'ilike', self), ('partner_id', 'ilike', self), ('sale_order_id', 'ilike', self)]"/>
+                <field name="partner_id"/>
+                <field name="engineer_id"/>
+                <field name="team_id"/>
+                <field name="manager_id"/>
+                <filter name="filter_mine" string="My Work Orders"
+                        domain="['|', '|', ('engineer_id', '=', uid), ('manager_id', '=', uid), ('technician_ids', 'in', [uid])]"/>
+                <separator/>
+                <filter name="filter_open" string="Open"
+                        domain="[('state', 'not in', ('completed', 'cancelled'))]"/>
+                <filter name="filter_assigned" string="Assigned"
+                        domain="[('state', '=', 'assigned')]"/>
+                <filter name="filter_material" string="Material Pending"
+                        domain="[('state', '=', 'material_pending')]"/>
+                <filter name="filter_ready" string="Ready for Installation"
+                        domain="[('state', '=', 'ready_install')]"/>
+                <filter name="filter_installing" string="Installation Ongoing"
+                        domain="[('state', '=', 'installing')]"/>
+                <filter name="filter_completed" string="Completed"
+                        domain="[('state', '=', 'completed')]"/>
+                <separator/>
+                <filter name="filter_delayed" string="Delayed" domain="[('is_delayed', '=', True)]"/>
+                <filter name="filter_shortage" string="Material Shortage"
+                        domain="[('material_state', '=', 'shortage')]"/>
+                <filter name="filter_billing" string="Billing Ready"
+                        domain="[('billing_ready', '=', True)]"/>
+                <separator/>
+                <filter name="filter_start" string="Start Date" date="start_date"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_material" string="Material Status"
+                            context="{'group_by': 'material_state'}"/>
+                    <filter name="group_team" string="Team" context="{'group_by': 'team_id'}"/>
+                    <filter name="group_engineer" string="Engineer"
+                            context="{'group_by': 'engineer_id'}"/>
+                    <filter name="group_partner" string="Customer" context="{'group_by': 'partner_id'}"/>
+                    <filter name="group_billing" string="Billing Policy"
+                            context="{'group_by': 'billing_policy'}"/>
+                    <filter name="group_month" string="Start Month"
+                            context="{'group_by': 'start_date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_gc_work_order_calendar" model="ir.ui.view">
+        <field name="name">gc.erm.work.order.calendar</field>
+        <field name="model">gc.erm.work.order</field>
+        <field name="arch" type="xml">
+            <calendar string="Implementation Planning" date_start="schedule_date"
+                      color="team_id" mode="month">
+                <field name="partner_id"/>
+                <field name="engineer_id"/>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="view_gc_work_order_pivot" model="ir.ui.view">
+        <field name="name">gc.erm.work.order.pivot</field>
+        <field name="model">gc.erm.work.order</field>
+        <field name="arch" type="xml">
+            <pivot string="Implementation Analysis" sample="1">
+                <field name="team_id" type="row"/>
+                <field name="state" type="col"/>
+                <field name="amount_total" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_gc_work_order" model="ir.actions.act_window">
+        <field name="name">Work Orders</field>
+        <field name="res_model">gc.erm.work.order</field>
+        <field name="view_mode">kanban,tree,form,calendar,pivot</field>
+        <field name="search_view_id" ref="view_gc_work_order_search"/>
+        <field name="context">{'search_default_filter_open': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No work order yet</p>
+            <p>Work orders are generated from a confirmed sales order and drive the
+               material check, delivery, installation and billing.</p>
+        </field>
+    </record>
+
+    <record id="action_gc_work_order_my" model="ir.actions.act_window">
+        <field name="name">My Work Orders</field>
+        <field name="res_model">gc.erm.work.order</field>
+        <field name="view_mode">kanban,tree,form,calendar</field>
+        <field name="search_view_id" ref="view_gc_work_order_search"/>
+        <field name="domain">['|', '|', ('engineer_id', '=', uid), ('manager_id', '=', uid), ('technician_ids', 'in', [uid])]</field>
+        <field name="context">{'search_default_filter_open': 1}</field>
+    </record>
+
+</odoo>

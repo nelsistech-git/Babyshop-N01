@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <!-- ==============================================================
+             Application category (SRS 7)
+             ============================================================== -->
+        <record id="module_category_gc_erm" model="ir.module.category">
+            <field name="name">Grameen Cybernet ERM</field>
+            <field name="description">Role based access for the Lead to Billing process.</field>
+            <field name="sequence">15</field>
+        </record>
+
+        <!-- ==============================================================
+             Base group - every ERM user inherits it
+             ============================================================== -->
+        <record id="group_gc_erm_user" model="res.groups">
+            <field name="name">ERM User</field>
+            <field name="category_id" ref="module_category_gc_erm"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+            <field name="comment">Baseline access to the ERM configuration data and to the audit trail.</field>
+        </record>
+
+        <!-- ==============================================================
+             7.1 Sales User
+             ============================================================== -->
+        <record id="group_gc_sales_user" model="res.groups">
+            <field name="name">Sales User</field>
+            <field name="category_id" ref="module_category_gc_erm"/>
+            <field name="implied_ids" eval="[(4, ref('group_gc_erm_user')), (4, ref('sales_team.group_sale_salesman'))]"/>
+            <field name="comment">Creates and submits leads, generates surveys, prepares proposals. Cannot approve its own documents.</field>
+        </record>
+
+        <!-- ==============================================================
+             7.2 Sales HOD
+             ============================================================== -->
+        <record id="group_gc_sales_hod" model="res.groups">
+            <field name="name">Sales HOD</field>
+            <field name="category_id" ref="module_category_gc_erm"/>
+            <field name="implied_ids" eval="[(4, ref('group_gc_sales_user')), (4, ref('sales_team.group_sale_salesman_all_leads'))]"/>
+            <field name="comment">Reviews, approves and rejects leads and proposals for the whole sales department.</field>
+        </record>
+
+        <!-- ==============================================================
+             7.3 Technical User
+             ============================================================== -->
+        <record id="group_gc_technical_user" model="res.groups">
+            <field name="name">Technical User</field>
+            <field name="category_id" ref="module_category_gc_erm"/>
+            <field name="implied_ids" eval="[(4, ref('group_gc_erm_user'))]"/>
+            <field name="comment">Performs technical surveys, prepares BOQ and costing, submits technical reports.</field>
+        </record>
+
+        <!-- ==============================================================
+             7.4 Technical Manager
+             ============================================================== -->
+        <record id="group_gc_technical_manager" model="res.groups">
+            <field name="name">Technical Manager</field>
+            <field name="category_id" ref="module_category_gc_erm"/>
+            <field name="implied_ids" eval="[(4, ref('group_gc_technical_user'))]"/>
+            <field name="comment">Reviews technical surveys and costing, approves technical reports when the review is enabled.</field>
+        </record>
+
+        <!-- ==============================================================
+             7.5 Implementation User
+             ============================================================== -->
+        <record id="group_gc_implementation_user" model="res.groups">
+            <field name="name">Implementation User</field>
+            <field name="category_id" ref="module_category_gc_erm"/>
+            <field name="implied_ids" eval="[(4, ref('group_gc_erm_user'))]"/>
+            <field name="comment">Executes work orders, records installations and submits installation reports.</field>
+        </record>
+
+        <!-- ==============================================================
+             7.6 Inventory User
+             ============================================================== -->
+        <record id="group_gc_inventory_user" model="res.groups">
+            <field name="name">ERM Inventory User</field>
+            <field name="category_id" ref="module_category_gc_erm"/>
+            <field name="implied_ids" eval="[(4, ref('group_gc_erm_user')), (4, ref('stock.group_stock_user'))]"/>
+            <field name="comment">Checks stock, reserves material and processes deliveries for work orders.</field>
+        </record>
+
+        <!-- ==============================================================
+             7.7 Purchase User
+             ============================================================== -->
+        <record id="group_gc_purchase_user" model="res.groups">
+            <field name="name">ERM Purchase User</field>
+            <field name="category_id" ref="module_category_gc_erm"/>
+            <field name="implied_ids" eval="[(4, ref('group_gc_erm_user')), (4, ref('purchase.group_purchase_user'))]"/>
+            <field name="comment">Processes procurement requests, creates RFQs and purchase orders.</field>
+        </record>
+
+        <!-- ==============================================================
+             7.8 Accounts User
+             ============================================================== -->
+        <record id="group_gc_accounts_user" model="res.groups">
+            <field name="name">ERM Accounts User</field>
+            <field name="category_id" ref="module_category_gc_erm"/>
+            <field name="implied_ids" eval="[(4, ref('group_gc_erm_user')), (4, ref('account.group_account_invoice'))]"/>
+            <field name="comment">Creates, posts and follows up customer invoices generated from the ERM.</field>
+        </record>
+
+        <!-- ==============================================================
+             7.9 Management - company wide read access
+             ============================================================== -->
+        <record id="group_gc_management" model="res.groups">
+            <field name="name">ERM Management</field>
+            <field name="category_id" ref="module_category_gc_erm"/>
+            <field name="implied_ids" eval="[(4, ref('group_gc_erm_user'))]"/>
+            <field name="comment">Read-only access to every operational record plus dashboards and reports.</field>
+        </record>
+
+        <!-- ==============================================================
+             7.10 Administrator
+             ============================================================== -->
+        <record id="group_gc_erm_admin" model="res.groups">
+            <field name="name">ERM Administrator</field>
+            <field name="category_id" ref="module_category_gc_erm"/>
+            <field name="implied_ids" eval="[(4, ref('group_gc_management')),
+                                             (4, ref('group_gc_sales_hod')),
+                                             (4, ref('group_gc_technical_manager')),
+                                             (4, ref('group_gc_implementation_user')),
+                                             (4, ref('group_gc_inventory_user')),
+                                             (4, ref('group_gc_purchase_user')),
+                                             (4, ref('group_gc_accounts_user'))]"/>
+            <field name="users" eval="[(4, ref('base.user_admin'))]"/>
+            <field name="comment">Full access, including the ability to unlock approved documents and to purge audit entries.</field>
+        </record>
+
+    </data>
+</odoo>

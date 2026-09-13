@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- ==============================================================
+             SRS 18 / 60 / 67 / 81 - default configuration parameters
+             ============================================================== -->
+        <record id="gc_param_segregation" model="ir.config_parameter">
+            <field name="key">gc_erm.segregation_of_duties</field>
+            <field name="value">True</field>
+        </record>
+        <record id="gc_param_technical_review" model="ir.config_parameter">
+            <field name="key">gc_erm.technical_review_required</field>
+            <field name="value">False</field>
+        </record>
+        <record id="gc_param_auto_wo" model="ir.config_parameter">
+            <field name="key">gc_erm.auto_create_work_order</field>
+            <field name="value">False</field>
+        </record>
+        <record id="gc_param_margin_method" model="ir.config_parameter">
+            <field name="key">gc_erm.default_margin_method</field>
+            <field name="value">cost_pct</field>
+        </record>
+        <record id="gc_param_margin_value" model="ir.config_parameter">
+            <field name="key">gc_erm.default_margin_value</field>
+            <field name="value">20</field>
+        </record>
+        <record id="gc_param_validity" model="ir.config_parameter">
+            <field name="key">gc_erm.proposal_validity_days</field>
+            <field name="value">30</field>
+        </record>
+        <record id="gc_param_sla_lead" model="ir.config_parameter">
+            <field name="key">gc_erm.sla_lead_days</field>
+            <field name="value">1</field>
+        </record>
+        <record id="gc_param_sla_survey" model="ir.config_parameter">
+            <field name="key">gc_erm.sla_survey_days</field>
+            <field name="value">2</field>
+        </record>
+        <record id="gc_param_sla_tr" model="ir.config_parameter">
+            <field name="key">gc_erm.sla_technical_report_days</field>
+            <field name="value">2</field>
+        </record>
+        <record id="gc_param_sla_proposal" model="ir.config_parameter">
+            <field name="key">gc_erm.sla_proposal_days</field>
+            <field name="value">1</field>
+        </record>
+        <record id="gc_param_sla_impl" model="ir.config_parameter">
+            <field name="key">gc_erm.sla_implementation_days</field>
+            <field name="value">5</field>
+        </record>
+        <record id="gc_param_sla_procurement" model="ir.config_parameter">
+            <field name="key">gc_erm.sla_procurement_days</field>
+            <field name="value">3</field>
+        </record>
+        <record id="gc_param_sla_installation" model="ir.config_parameter">
+            <field name="key">gc_erm.sla_installation_days</field>
+            <field name="value">3</field>
+        </record>
+        <record id="gc_param_sla_billing" model="ir.config_parameter">
+            <field name="key">gc_erm.sla_billing_days</field>
+            <field name="value">1</field>
+        </record>
+
+        <!-- ==============================================================
+             Milestone billing product used by the invoice wizard
+             ============================================================== -->
+        <record id="product_gc_milestone_billing" model="product.product">
+            <field name="name">ERM Milestone Billing</field>
+            <field name="default_code">GC-MILESTONE</field>
+            <field name="type">service</field>
+            <field name="invoice_policy">order</field>
+            <field name="sale_ok" eval="False"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">0.0</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- ==============================================================
+             SRS 8.3 - Service categories
+             ============================================================== -->
+        <record id="gc_service_category_connectivity" model="gc.erm.service.category">
+            <field name="name">Connectivity</field>
+            <field name="code">CONN</field>
+            <field name="sequence">10</field>
+        </record>
+        <record id="gc_service_category_hosting" model="gc.erm.service.category">
+            <field name="name">Hosting &amp; Cloud</field>
+            <field name="code">HOST</field>
+            <field name="sequence">20</field>
+        </record>
+        <record id="gc_service_category_messaging" model="gc.erm.service.category">
+            <field name="name">Messaging</field>
+            <field name="code">MAIL</field>
+            <field name="sequence">30</field>
+        </record>
+        <record id="gc_service_category_managed" model="gc.erm.service.category">
+            <field name="name">Managed Services</field>
+            <field name="code">MGD</field>
+            <field name="sequence">40</field>
+        </record>
+
+        <!-- ==============================================================
+             SRS 8.3 - Starter service catalog
+             ============================================================== -->
+        <record id="gc_service_internet" model="gc.erm.service.catalog">
+            <field name="name">Dedicated Internet Bandwidth</field>
+            <field name="code">INT</field>
+            <field name="sequence">10</field>
+            <field name="category_id" ref="gc_service_category_connectivity"/>
+            <field name="default_duration">12</field>
+            <field name="pricing_rule">cost_pct</field>
+            <field name="default_margin">25.0</field>
+            <field name="survey_required" eval="True"/>
+            <field name="installation_required" eval="True"/>
+            <field name="billing_policy">full</field>
+            <field name="description">Dedicated symmetric internet bandwidth delivered over fibre.</field>
+        </record>
+
+        <record id="gc_service_data" model="gc.erm.service.catalog">
+            <field name="name">Data Connectivity / P2P Link</field>
+            <field name="code">DATA</field>
+            <field name="sequence">20</field>
+            <field name="category_id" ref="gc_service_category_connectivity"/>
+            <field name="default_duration">12</field>
+            <field name="pricing_rule">cost_pct</field>
+            <field name="default_margin">25.0</field>
+            <field name="survey_required" eval="True"/>
+            <field name="installation_required" eval="True"/>
+            <field name="billing_policy">milestone</field>
+            <field name="advance_percent">30.0</field>
+            <field name="installation_percent">40.0</field>
+            <field name="completion_percent">30.0</field>
+        </record>
+
+        <record id="gc_service_mail" model="gc.erm.service.catalog">
+            <field name="name">Corporate Mail Solution</field>
+            <field name="code">MAIL</field>
+            <field name="sequence">30</field>
+            <field name="category_id" ref="gc_service_category_messaging"/>
+            <field name="default_duration">12</field>
+            <field name="pricing_rule">price_pct</field>
+            <field name="default_margin">30.0</field>
+            <field name="survey_required" eval="False"/>
+            <field name="installation_required" eval="False"/>
+            <field name="billing_policy">advance</field>
+        </record>
+
+        <record id="gc_service_hosting" model="gc.erm.service.catalog">
+            <field name="name">Hosting / Co-location</field>
+            <field name="code">HOST</field>
+            <field name="sequence">40</field>
+            <field name="category_id" ref="gc_service_category_hosting"/>
+            <field name="default_duration">12</field>
+            <field name="pricing_rule">cost_pct</field>
+            <field name="default_margin">35.0</field>
+            <field name="survey_required" eval="False"/>
+            <field name="installation_required" eval="True"/>
+            <field name="billing_policy">advance_final</field>
+            <field name="advance_percent">50.0</field>
+        </record>
+
+        <record id="gc_service_managed" model="gc.erm.service.catalog">
+            <field name="name">Managed Network Service</field>
+            <field name="code">MGD</field>
+            <field name="sequence">50</field>
+            <field name="category_id" ref="gc_service_category_managed"/>
+            <field name="default_duration">24</field>
+            <field name="pricing_rule">fixed</field>
+            <field name="default_margin">15000.0</field>
+            <field name="survey_required" eval="True"/>
+            <field name="installation_required" eval="True"/>
+            <field name="billing_policy">delivery</field>
+        </record>
+
+        <!-- ==============================================================
+             SRS 37 - Default installation checklist
+             ============================================================== -->
+        <record id="gc_checklist_default" model="gc.erm.checklist.template">
+            <field name="name">Standard Installation Checklist</field>
+            <field name="sequence">10</field>
+            <field name="is_default" eval="True"/>
+        </record>
+
+        <record id="gc_checklist_item_01" model="gc.erm.checklist.template.item">
+            <field name="template_id" ref="gc_checklist_default"/>
+            <field name="sequence">10</field>
+            <field name="name">Site Access Confirmed</field>
+            <field name="category">site</field>
+            <field name="mandatory" eval="True"/>
+        </record>
+        <record id="gc_checklist_item_02" model="gc.erm.checklist.template.item">
+            <field name="template_id" ref="gc_checklist_default"/>
+            <field name="sequence">20</field>
+            <field name="name">Equipment Received</field>
+            <field name="category">material</field>
+            <field name="mandatory" eval="True"/>
+        </record>
+        <record id="gc_checklist_item_03" model="gc.erm.checklist.template.item">
+            <field name="template_id" ref="gc_checklist_default"/>
+            <field name="sequence">30</field>
+            <field name="name">Power Available</field>
+            <field name="category">site</field>
+            <field name="mandatory" eval="True"/>
+        </record>
+        <record id="gc_checklist_item_04" model="gc.erm.checklist.template.item">
+            <field name="template_id" ref="gc_checklist_default"/>
+            <field name="sequence">40</field>
+            <field name="name">Rack Available</field>
+            <field name="category">site</field>
+            <field name="mandatory" eval="False"/>
+        </record>
+        <record id="gc_checklist_item_05" model="gc.erm.checklist.template.item">
+            <field name="template_id" ref="gc_checklist_default"/>
+            <field name="sequence">50</field>
+            <field name="name">Cable Installed</field>
+            <field name="category">install</field>
+            <field name="mandatory" eval="True"/>
+        </record>
+        <record id="gc_checklist_item_06" model="gc.erm.checklist.template.item">
+            <field name="template_id" ref="gc_checklist_default"/>
+            <field name="sequence">60</field>
+            <field name="name">Router Installed</field>
+            <field name="category">install</field>
+            <field name="mandatory" eval="True"/>
+        </record>
+        <record id="gc_checklist_item_07" model="gc.erm.checklist.template.item">
+            <field name="template_id" ref="gc_checklist_default"/>
+            <field name="sequence">70</field>
+            <field name="name">Switch Installed</field>
+            <field name="category">install</field>
+            <field name="mandatory" eval="False"/>
+        </record>
+        <record id="gc_checklist_item_08" model="gc.erm.checklist.template.item">
+            <field name="template_id" ref="gc_checklist_default"/>
+            <field name="sequence">80</field>
+            <field name="name">SFP Installed</field>
+            <field name="category">install</field>
+            <field name="mandatory" eval="False"/>
+        </record>
+        <record id="gc_checklist_item_09" model="gc.erm.checklist.template.item">
+            <field name="template_id" ref="gc_checklist_default"/>
+            <field name="sequence">90</field>
+            <field name="name">Configuration Completed</field>
+            <field name="category">install</field>
+            <field name="mandatory" eval="True"/>
+        </record>
+        <record id="gc_checklist_item_10" model="gc.erm.checklist.template.item">
+            <field name="template_id" ref="gc_checklist_default"/>
+            <field name="sequence">100</field>
+            <field name="name">Connectivity Tested</field>
+            <field name="category">test</field>
+            <field name="mandatory" eval="True"/>
+        </record>
+        <record id="gc_checklist_item_11" model="gc.erm.checklist.template.item">
+            <field name="template_id" ref="gc_checklist_default"/>
+            <field name="sequence">110</field>
+            <field name="name">Bandwidth Tested</field>
+            <field name="category">test</field>
+            <field name="mandatory" eval="True"/>
+        </record>
+        <record id="gc_checklist_item_12" model="gc.erm.checklist.template.item">
+            <field name="template_id" ref="gc_checklist_default"/>
+            <field name="sequence">120</field>
+            <field name="name">Customer Demonstration Completed</field>
+            <field name="category">customer</field>
+            <field name="mandatory" eval="True"/>
+        </record>
+        <record id="gc_checklist_item_13" model="gc.erm.checklist.template.item">
+            <field name="template_id" ref="gc_checklist_default"/>
+            <field name="sequence">130</field>
+            <field name="name">Customer Acceptance Obtained</field>
+            <field name="category">customer</field>
+            <field name="mandatory" eval="True"/>
+        </record>
+
+        <!-- ==============================================================
+             SRS 60 - Amount based approval matrix (BDT thresholds)
+             ============================================================== -->
+        <record id="gc_approval_lead_band_1" model="gc.erm.approval.matrix">
+            <field name="document_type">lead</field>
+            <field name="amount_from">0</field>
+            <field name="amount_to">1000000</field>
+            <field name="approver_group_id" ref="group_gc_sales_hod"/>
+        </record>
+        <record id="gc_approval_lead_band_2" model="gc.erm.approval.matrix">
+            <field name="document_type">lead</field>
+            <field name="amount_from">1000000.01</field>
+            <field name="amount_to">0</field>
+            <field name="approver_group_id" ref="group_gc_management"/>
+        </record>
+
+        <record id="gc_approval_proposal_band_1" model="gc.erm.approval.matrix">
+            <field name="document_type">proposal</field>
+            <field name="amount_from">0</field>
+            <field name="amount_to">100000</field>
+            <field name="approver_group_id" ref="group_gc_sales_hod"/>
+        </record>
+        <record id="gc_approval_proposal_band_2" model="gc.erm.approval.matrix">
+            <field name="document_type">proposal</field>
+            <field name="amount_from">100000.01</field>
+            <field name="amount_to">500000</field>
+            <field name="approver_group_id" ref="group_gc_sales_hod"/>
+        </record>
+        <record id="gc_approval_proposal_band_3" model="gc.erm.approval.matrix">
+            <field name="document_type">proposal</field>
+            <field name="amount_from">500000.01</field>
+            <field name="amount_to">1000000</field>
+            <field name="approver_group_id" ref="group_gc_management"/>
+        </record>
+        <record id="gc_approval_proposal_band_4" model="gc.erm.approval.matrix">
+            <field name="document_type">proposal</field>
+            <field name="amount_from">1000000.01</field>
+            <field name="amount_to">0</field>
+            <field name="approver_group_id" ref="group_gc_erm_admin"/>
+        </record>
+
+    </data>
+</odoo>

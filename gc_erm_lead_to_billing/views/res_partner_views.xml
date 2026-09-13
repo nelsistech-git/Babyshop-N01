@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_partner_form_gc_erm" model="ir.ui.view">
+        <field name="name">res.partner.form.gc.erm</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <button name="action_gc_view_leads" type="object" class="oe_stat_button"
+                        icon="fa-bullseye" invisible="gc_lead_count == 0"
+                        groups="gc_erm_lead_to_billing.group_gc_erm_user">
+                    <field name="gc_lead_count" widget="statinfo" string="ERM Leads"/>
+                </button>
+                <button name="action_gc_view_work_orders" type="object" class="oe_stat_button"
+                        icon="fa-wrench" invisible="gc_work_order_count == 0"
+                        groups="gc_erm_lead_to_billing.group_gc_erm_user">
+                    <field name="gc_work_order_count" widget="statinfo" string="Work Orders"/>
+                </button>
+                <button name="action_gc_view_installations" type="object" class="oe_stat_button"
+                        icon="fa-plug" invisible="gc_installation_count == 0"
+                        groups="gc_erm_lead_to_billing.group_gc_erm_user">
+                    <field name="gc_installation_count" widget="statinfo" string="Installations"/>
+                </button>
+            </div>
+
+            <xpath expr="//field[@name='category_id']" position="after">
+                <field name="gc_customer_type"
+                       groups="gc_erm_lead_to_billing.group_gc_erm_user"/>
+            </xpath>
+
+            <notebook position="inside">
+                <page string="ERM Location" name="gc_erm_location"
+                      groups="gc_erm_lead_to_billing.group_gc_erm_user">
+                    <group>
+                        <group string="Service Area">
+                            <field name="gc_district"/>
+                            <field name="gc_area"/>
+                        </group>
+                        <group string="GPS Coordinates">
+                            <field name="gc_latitude"/>
+                            <field name="gc_longitude"/>
+                            <field name="gc_map_url" widget="url" readonly="1"
+                                   text="Open in map" invisible="not gc_map_url"/>
+                        </group>
+                    </group>
+                </page>
+            </notebook>
+        </field>
+    </record>
+
+    <record id="view_res_partner_filter_gc_erm" model="ir.ui.view">
+        <field name="name">res.partner.search.gc.erm</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_res_partner_filter"/>
+        <field name="arch" type="xml">
+            <field name="category_id" position="after">
+                <field name="gc_district" string="District"
+                       groups="gc_erm_lead_to_billing.group_gc_erm_user"/>
+                <field name="gc_customer_type" string="Customer Type"
+                       groups="gc_erm_lead_to_billing.group_gc_erm_user"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>

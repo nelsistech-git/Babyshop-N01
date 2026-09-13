@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_gc_installation_form" model="ir.ui.view">
+        <field name="name">gc.erm.installation.form</field>
+        <field name="model">gc.erm.installation</field>
+        <field name="arch" type="xml">
+            <form string="Installation">
+                <header>
+                    <button name="action_start" type="object" string="Start Installation"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_submit_report" type="object"
+                            string="Submit Report" class="btn-primary"
+                            invisible="state != 'in_progress'"/>
+                    <button name="action_open_revisit_wizard" type="object"
+                            string="Request Revisit"
+                            invisible="state not in ('in_progress', 'submitted')"/>
+                    <button name="action_complete" type="object"
+                            string="Complete Installation" class="btn-primary"
+                            invisible="state != 'submitted'"/>
+                    <button name="action_reset_draft" type="object" string="Reopen"
+                            invisible="state not in ('submitted', 'cancelled')"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                            invisible="state in ('done', 'cancelled')"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,in_progress,submitted,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_work_order" type="object"
+                                class="oe_stat_button" icon="fa-wrench">
+                            <div class="o_stat_info"><span class="o_stat_text">Work Order</span></div>
+                        </button>
+                        <button name="action_view_deliveries" type="object"
+                                class="oe_stat_button" icon="fa-truck">
+                            <div class="o_stat_info"><span class="o_stat_text">Delivery</span></div>
+                        </button>
+                        <button name="action_view_invoices" type="object"
+                                class="oe_stat_button" icon="fa-money"
+                                invisible="invoice_count == 0">
+                            <field name="invoice_count" widget="statinfo" string="Invoices"/>
+                        </button>
+                        <button name="action_view_revisits" type="object"
+                                class="oe_stat_button" icon="fa-refresh"
+                                invisible="revisit_count == 0">
+                            <field name="revisit_count" widget="statinfo" string="Revisits"/>
+                        </button>
+                    </div>
+
+                    <widget name="web_ribbon" title="Completed" bg_color="text-bg-success"
+                            invisible="state != 'done'"/>
+                    <widget name="web_ribbon" title="Revisit Required" bg_color="text-bg-warning"
+                            invisible="state != 'revisit'"/>
+                    <widget name="web_ribbon" title="Cancelled" bg_color="text-bg-danger"
+                            invisible="state != 'cancelled'"/>
+
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                            <span class="ms-2 text-muted" invisible="visit_number &lt;= 1">
+                                (visit <field name="visit_number" readonly="1" class="oe_inline"/>)
+                            </span>
+                        </h1>
+                    </div>
+
+                    <div class="alert alert-warning" role="alert"
+                         invisible="not revisit_of_id">
+                        This is a revisit of <field name="revisit_of_id" readonly="1" nolabel="1"/>.
+                        The previous report is preserved.
+                    </div>
+
+                    <group>
+                        <group string="Reference">
+                            <field name="work_order_id" options="{'no_create': True}"
+                                   readonly="state != 'draft'"/>
+                            <field name="partner_id" readonly="1"/>
+                            <field name="sale_order_id" readonly="1"/>
+                            <field name="lead_id" readonly="1" invisible="not lead_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                        <group string="Execution">
+                            <field name="team_id"/>
+                            <field name="engineer_id" widget="many2one_avatar_user"/>
+                            <field name="technician_ids" widget="many2many_avatar_user"/>
+                            <field name="installation_date"/>
+                            <field name="start_time"/>
+                            <field name="end_time"/>
+                            <field name="duration_hours" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <group string="Site">
+                        <group>
+                            <field name="service_location"/>
+                        </group>
+                        <group>
+                            <field name="gps_latitude"/>
+                            <field name="gps_longitude"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Checklist" name="checklist">
+                            <field name="checklist_template_id" options="{'no_create': True}"
+                                   readonly="state not in ('draft', 'in_progress')"/>
+                            <field name="checklist_line_ids" class="o_gc_checklist"
+                                   readonly="state in ('done', 'cancelled')">
+                                <tree editable="bottom"
+                                      decoration-success="answer == 'yes'"
+                                      decoration-danger="answer == 'no'"
+                                      decoration-muted="answer == 'na'">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="company_id" column_invisible="True"/>
+                                    <field name="category"/>
+                                    <field name="name" readonly="1"/>
+                                    <field name="mandatory" widget="boolean_toggle" readonly="1"/>
+                                    <field name="answer" widget="radio" options="{'horizontal': True}"/>
+                                    <field name="remarks"/>
+                                    <field name="help_text" optional="hide" readonly="1"/>
+                                </tree>
+                            </field>
+                            <group class="mt-2">
+                                <group>
+                                    <field name="checklist_progress" widget="progressbar"/>
+                                    <field name="checklist_complete" widget="boolean_toggle"
+                                           readonly="1"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Installed Equipment" name="equipment">
+                            <field name="line_ids" readonly="state in ('done', 'cancelled')">
+                                <tree editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="company_id" column_invisible="True"/>
+                                    <field name="product_id" options="{'no_create': True}"/>
+                                    <field name="name"/>
+                                    <field name="quantity"/>
+                                    <field name="uom_id" groups="uom.group_uom" optional="hide"/>
+                                    <field name="serial_number"/>
+                                    <field name="lot_id" optional="hide"
+                                           options="{'no_create': True}"/>
+                                    <field name="mac_address" optional="show"/>
+                                    <field name="ip_address" optional="show"/>
+                                    <field name="installed" widget="boolean_toggle"/>
+                                    <field name="remarks" optional="hide"/>
+                                </tree>
+                            </field>
+                            <separator string="IP Information"/>
+                            <field name="ip_information" nolabel="1"
+                                   placeholder="WAN IP, LAN subnet, gateway, DNS..."/>
+                            <separator string="Configuration Details"/>
+                            <field name="configuration_details"/>
+                        </page>
+
+                        <page string="Testing &amp; Result" name="result">
+                            <group>
+                                <group string="Result (SRS 38)">
+                                    <field name="result"
+                                           required="state in ('submitted', 'done')"/>
+                                    <field name="bandwidth_tested"/>
+                                </group>
+                                <group string="Follow-up"
+                                       invisible="result not in ('failed', 'revisit')">
+                                    <field name="failure_reason"
+                                           required="result in ('failed', 'revisit')"/>
+                                    <field name="required_action"
+                                           required="result in ('failed', 'revisit')"/>
+                                    <field name="next_visit_date"
+                                           required="result in ('failed', 'revisit')"/>
+                                    <field name="next_engineer_id"
+                                           required="result in ('failed', 'revisit')"/>
+                                </group>
+                            </group>
+                            <separator string="Testing Results"/>
+                            <field name="testing_results"/>
+                            <separator string="Engineer Remarks"/>
+                            <field name="remarks" nolabel="1"/>
+                        </page>
+
+                        <page string="Customer Confirmation" name="customer">
+                            <group>
+                                <group>
+                                    <field name="customer_representative"/>
+                                    <field name="customer_designation"/>
+                                    <field name="customer_signed_on"/>
+                                    <field name="customer_accepted"/>
+                                </group>
+                                <group>
+                                    <field name="customer_signature" widget="signature"
+                                           options="{'full_name': 'customer_representative'}"/>
+                                </group>
+                            </group>
+                            <separator string="Installation Photos"/>
+                            <field name="photo_ids" widget="many2many_binary"/>
+                        </page>
+
+                        <page string="Audit" name="audit">
+                            <group>
+                                <group>
+                                    <field name="report_submitted_date"/>
+                                    <field name="submitted_by_id"/>
+                                </group>
+                                <group>
+                                    <field name="approved_by_id"/>
+                                    <field name="approved_date"/>
+                                    <field name="visit_number"/>
+                                </group>
+                            </group>
+                            <field name="status_history_ids" readonly="1">
+                                <tree>
+                                    <field name="change_date"/>
+                                    <field name="old_state_label" string="From"/>
+                                    <field name="new_state_label" string="To"/>
+                                    <field name="user_id"/>
+                                    <field name="comment"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_gc_installation_tree" model="ir.ui.view">
+        <field name="name">gc.erm.installation.tree</field>
+        <field name="model">gc.erm.installation</field>
+        <field name="arch" type="xml">
+            <tree string="Installations" sample="1"
+                  decoration-muted="state == 'cancelled'"
+                  decoration-danger="result == 'failed' or state == 'revisit'"
+                  decoration-success="state == 'done'">
+                <field name="name"/>
+                <field name="installation_date"/>
+                <field name="partner_id"/>
+                <field name="work_order_id" optional="show"/>
+                <field name="engineer_id" widget="many2one_avatar_user" optional="show"/>
+                <field name="team_id" optional="hide"/>
+                <field name="visit_number" optional="hide"/>
+                <field name="checklist_progress" widget="progressbar" optional="show"/>
+                <field name="result" widget="badge" optional="show"
+                       decoration-success="result == 'success'"
+                       decoration-warning="result in ('partial', 'revisit')"
+                       decoration-danger="result == 'failed'"/>
+                <field name="duration_hours" optional="hide"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                <field name="state" widget="badge"
+                       decoration-info="state in ('draft', 'in_progress', 'submitted')"
+                       decoration-success="state == 'done'"
+                       decoration-warning="state == 'revisit'"
+                       decoration-danger="state == 'cancelled'"/>
+                <field name="activity_ids" widget="list_activity" optional="show"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_gc_installation_kanban" model="ir.ui.view">
+        <field name="name">gc.erm.installation.kanban</field>
+        <field name="model">gc.erm.installation</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" class="o_kanban_small_column" sample="1"
+                    quick_create="false">
+                <field name="state"/>
+                <field name="result"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click o_gc_kanban_card">
+                            <div class="o_kanban_record_top mb-0">
+                                <div class="o_kanban_record_headings">
+                                    <strong class="o_gc_kanban_title"><field name="partner_id"/></strong>
+                                    <small class="text-muted d-block"><field name="name"/></small>
+                                </div>
+                            </div>
+                            <div class="o_kanban_record_body o_gc_kanban_meta">
+                                <div t-if="record.service_location.raw_value">
+                                    <i class="fa fa-map-marker me-1" title="Location"/>
+                                    <field name="service_location"/>
+                                </div>
+                                <div>
+                                    <i class="fa fa-calendar me-1" title="Installation date"/>
+                                    <field name="installation_date"/>
+                                </div>
+                                <div class="mt-1">
+                                    <field name="checklist_progress" widget="progressbar"/>
+                                </div>
+                            </div>
+                            <div class="o_kanban_record_bottom">
+                                <div class="oe_kanban_bottom_left">
+                                    <field name="activity_ids" widget="kanban_activity"/>
+                                    <span class="badge rounded-pill text-bg-danger ms-1"
+                                          t-if="record.result.raw_value == 'failed'">Failed</span>
+                                </div>
+                                <div class="oe_kanban_bottom_right">
+                                    <field name="engineer_id" widget="many2one_avatar_user"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_gc_installation_search" model="ir.ui.view">
+        <field name="name">gc.erm.installation.search</field>
+        <field name="model">gc.erm.installation</field>
+        <field name="arch" type="xml">
+            <search string="Installations">
+                <field name="name"
+                       filter_domain="['|', '|', ('name', 'ilike', self), ('partner_id', 'ilike', self), ('work_order_id', 'ilike', self)]"/>
+                <field name="partner_id"/>
+                <field name="engineer_id"/>
+                <field name="team_id"/>
+                <filter name="filter_mine" string="My Installations"
+                        domain="['|', ('engineer_id', '=', uid), ('technician_ids', 'in', [uid])]"/>
+                <separator/>
+                <filter name="filter_open" string="Open"
+                        domain="[('state', 'in', ('draft', 'in_progress', 'submitted'))]"/>
+                <filter name="filter_done" string="Completed" domain="[('state', '=', 'done')]"/>
+                <filter name="filter_revisit" string="Revisit Required"
+                        domain="['|', ('state', '=', 'revisit'), ('result', '=', 'revisit')]"/>
+                <filter name="filter_failed" string="Failed" domain="[('result', '=', 'failed')]"/>
+                <separator/>
+                <filter name="filter_date" string="Installation Date" date="installation_date"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_result" string="Result" context="{'group_by': 'result'}"/>
+                    <filter name="group_engineer" string="Engineer"
+                            context="{'group_by': 'engineer_id'}"/>
+                    <filter name="group_team" string="Team" context="{'group_by': 'team_id'}"/>
+                    <filter name="group_partner" string="Customer"
+                            context="{'group_by': 'partner_id'}"/>
+                    <filter name="group_month" string="Installation Month"
+                            context="{'group_by': 'installation_date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_gc_installation_calendar" model="ir.ui.view">
+        <field name="name">gc.erm.installation.calendar</field>
+        <field name="model">gc.erm.installation</field>
+        <field name="arch" type="xml">
+            <calendar string="Installation Planning" date_start="installation_date"
+                      color="engineer_id" mode="month">
+                <field name="partner_id"/>
+                <field name="engineer_id"/>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="view_gc_installation_pivot" model="ir.ui.view">
+        <field name="name">gc.erm.installation.pivot</field>
+        <field name="model">gc.erm.installation</field>
+        <field name="arch" type="xml">
+            <pivot string="Installation Analysis" sample="1">
+                <field name="engineer_id" type="row"/>
+                <field name="result" type="col"/>
+                <field name="duration_hours" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_gc_installation" model="ir.actions.act_window">
+        <field name="name">Installations</field>
+        <field name="res_model">gc.erm.installation</field>
+        <field name="view_mode">kanban,tree,form,calendar,pivot</field>
+        <field name="search_view_id" ref="view_gc_installation_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No installation yet</p>
+            <p>Installations are created from a work order that is ready for
+               installation, and carry the checklist, serial numbers and the
+               customer confirmation.</p>
+        </field>
+    </record>
+
+    <record id="action_gc_installation_my" model="ir.actions.act_window">
+        <field name="name">My Installations</field>
+        <field name="res_model">gc.erm.installation</field>
+        <field name="view_mode">kanban,tree,form,calendar</field>
+        <field name="search_view_id" ref="view_gc_installation_search"/>
+        <field name="domain">['|', ('engineer_id', '=', uid), ('technician_ids', 'in', [uid])]</field>
+        <field name="context">{'search_default_filter_open': 1}</field>
+    </record>
+
+</odoo>

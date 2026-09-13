@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- SRS 13 - Customer survey form -->
+    <template id="report_gc_survey_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-set="gc_title" t-value="'SURVEY FORM'"/>
+                <t t-set="gc_date" t-value="doc.survey_date or doc.create_date"/>
+                <t t-set="gc_partner" t-value="doc.partner_id"/>
+                <t t-set="gc_site" t-value="doc.service_location or doc.street"/>
+                <t t-call="web.internal_layout">
+                    <div class="page">
+                        <t t-call="gc_erm_lead_to_billing.gc_report_header"/>
+
+                        <h5 style="color:#17479e;">A. Client Information</h5>
+                        <table class="table table-sm">
+                            <tr>
+                                <td style="width:25%"><strong>Client Name</strong></td>
+                                <td t-out="doc.partner_id.name">Client</td>
+                                <td style="width:25%"><strong>Lead</strong></td>
+                                <td t-out="doc.lead_id.name">GC-LEAD-00001</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Address</strong></td>
+                                <td t-out="doc.street or '-'">-</td>
+                                <td><strong>District / Area</strong></td>
+                                <td><span t-out="doc.district or '-'"/> / <span t-out="doc.area or '-'"/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Service Location</strong></td>
+                                <td t-out="doc.service_location or '-'">-</td>
+                                <td><strong>GPS</strong></td>
+                                <td><span t-out="doc.gps_latitude"/>, <span t-out="doc.gps_longitude"/></td>
+                            </tr>
+                        </table>
+
+                        <h5 class="mt-3" style="color:#17479e;">B. Contact Details</h5>
+                        <table class="table table-sm">
+                            <tr>
+                                <td style="width:25%"><strong>Contact Person</strong></td>
+                                <td t-out="doc.contact_person or '-'">-</td>
+                                <td style="width:25%"><strong>Designation</strong></td>
+                                <td t-out="doc.contact_designation or '-'">-</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Phone</strong></td>
+                                <td t-out="doc.contact_phone or '-'">-</td>
+                                <td><strong>Alternative Phone</strong></td>
+                                <td t-out="doc.contact_phone_alt or '-'">-</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Mail ID</strong></td>
+                                <td colspan="3" t-out="doc.contact_email or '-'">-</td>
+                            </tr>
+                        </table>
+
+                        <h5 class="mt-3" style="color:#17479e;">C / D. Required Service &amp; Details</h5>
+                        <table class="table table-sm table-bordered">
+                            <thead style="background:#f2f4f8;">
+                                <tr>
+                                    <th>Service</th>
+                                    <th class="text-end">Quantity / Links</th>
+                                    <th>Required Bandwidth</th>
+                                    <th>Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="doc.service_line_ids" t-as="line">
+                                    <td t-out="line.service_id.display_name">Service</td>
+                                    <td class="text-end" t-out="line.quantity">1</td>
+                                    <td t-out="line.bandwidth or '-'">-</td>
+                                    <td t-out="line.remarks or ''"/>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table class="table table-sm">
+                            <tr>
+                                <td style="width:25%"><strong>Expected Go-Live</strong></td>
+                                <td t-out="doc.expected_golive_date or '-'">-</td>
+                                <td style="width:25%"><strong>Contract Duration</strong></td>
+                                <td><span t-out="doc.contract_duration"/> months</td>
+                            </tr>
+                        </table>
+
+                        <h5 class="mt-3" style="color:#17479e;">E. Additional Information</h5>
+                        <table class="table table-sm">
+                            <tr>
+                                <td style="width:25%"><strong>Existing ISP</strong></td>
+                                <td colspan="3" t-out="doc.existing_isp or '-'">-</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Special Requirements</strong></td>
+                                <td colspan="3" t-out="doc.special_requirements or '-'">-</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Remarks</strong></td>
+                                <td colspan="3" t-out="doc.remarks or '-'">-</td>
+                            </tr>
+                        </table>
+
+                        <div class="row mt-5">
+                            <div class="col-6">
+                                <div style="border-top:1px solid #333; padding-top:4px;">
+                                    Customer Signature
+                                </div>
+                            </div>
+                            <div class="col-6 text-end">
+                                <div style="border-top:1px solid #333; padding-top:4px;">
+                                    Surveyed by:
+                                    <span t-out="doc.engineer_id.name or '________'">Engineer</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <t t-call="gc_erm_lead_to_billing.gc_report_footer"/>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!-- SRS 15 / 16 - Technical survey report -->
+    <template id="report_gc_technical_survey_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-set="gc_title" t-value="'TECHNICAL SURVEY REPORT'"/>
+                <t t-set="gc_date" t-value="doc.survey_date or doc.create_date"/>
+                <t t-set="gc_partner" t-value="doc.partner_id"/>
+                <t t-set="gc_site" t-value="doc.service_location or doc.street"/>
+                <t t-call="web.internal_layout">
+                    <div class="page">
+                        <t t-call="gc_erm_lead_to_billing.gc_report_header"/>
+                        <t t-call="gc_erm_lead_to_billing.gc_report_customer_block"/>
+
+                        <table class="table table-sm">
+                            <tr>
+                                <td style="width:25%"><strong>Engineer</strong></td>
+                                <td t-out="doc.engineer_id.name or '-'">-</td>
+                                <td style="width:25%"><strong>Team</strong></td>
+                                <td t-out="doc.team_id.display_name or '-'">-</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Survey Date</strong></td>
+                                <td t-out="doc.survey_date or '-'">-</td>
+                                <td><strong>Completed On</strong></td>
+                                <td t-out="doc.completed_date or '-'">-</td>
+                            </tr>
+                        </table>
+
+                        <h5 class="mt-3" style="color:#17479e;">Site Availability</h5>
+                        <table class="table table-sm table-bordered">
+                            <thead style="background:#f2f4f8;">
+                                <tr><th>Item</th><th>Status</th><th>Item</th><th>Status</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Network</strong></td>
+                                    <td t-out="dict(doc._fields['network_availability'].selection).get(doc.network_availability, '-')">-</td>
+                                    <td><strong>Bandwidth</strong></td>
+                                    <td t-out="dict(doc._fields['bandwidth_availability'].selection).get(doc.bandwidth_availability, '-')">-</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Fiber</strong></td>
+                                    <td t-out="dict(doc._fields['fiber_availability'].selection).get(doc.fiber_availability, '-')">-</td>
+                                    <td><strong>Power</strong></td>
+                                    <td t-out="dict(doc._fields['power_availability'].selection).get(doc.power_availability, '-')">-</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Rack</strong></td>
+                                    <td t-out="dict(doc._fields['rack_availability'].selection).get(doc.rack_availability, '-')">-</td>
+                                    <td><strong>Complexity</strong></td>
+                                    <td t-out="dict(doc._fields['installation_complexity'].selection).get(doc.installation_complexity, '-')">-</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Nearest POP</strong></td>
+                                    <td t-out="doc.nearest_pop or '-'">-</td>
+                                    <td><strong>Distance (m)</strong></td>
+                                    <td t-out="doc.distance_from_pop">0</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h5 class="mt-3" style="color:#17479e;">Feasibility</h5>
+                        <table class="table table-sm">
+                            <tr>
+                                <td style="width:25%"><strong>Assessment</strong></td>
+                                <td>
+                                    <strong t-out="dict(doc._fields['feasibility'].selection).get(doc.feasibility, 'Not assessed')">
+                                        Feasible
+                                    </strong>
+                                </td>
+                            </tr>
+                            <tr t-if="doc.feasibility_reason">
+                                <td><strong>Reason</strong></td>
+                                <td t-out="doc.feasibility_reason"/>
+                            </tr>
+                            <tr t-if="doc.feasibility_conditions">
+                                <td><strong>Conditions</strong></td>
+                                <td t-out="doc.feasibility_conditions"/>
+                            </tr>
+                            <tr t-if="doc.investigation_note">
+                                <td><strong>Further Investigation</strong></td>
+                                <td t-out="doc.investigation_note"/>
+                            </tr>
+                        </table>
+
+                        <div t-if="doc.existing_network" class="mt-3">
+                            <h5 style="color:#17479e;">Existing Network</h5>
+                            <p t-out="doc.existing_network"/>
+                        </div>
+                        <div t-if="doc.equipment_requirement" class="mt-3">
+                            <h5 style="color:#17479e;">Equipment Requirement</h5>
+                            <p t-out="doc.equipment_requirement"/>
+                        </div>
+                        <div t-if="doc.technical_remarks" class="mt-3">
+                            <h5 style="color:#17479e;">Technical Remarks</h5>
+                            <p t-out="doc.technical_remarks"/>
+                        </div>
+
+                        <t t-call="gc_erm_lead_to_billing.gc_report_footer"/>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

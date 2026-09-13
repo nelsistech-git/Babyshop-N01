@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_gc_procurement_po_wizard_form" model="ir.ui.view">
+        <field name="name">gc.erm.procurement.po.wizard.form</field>
+        <field name="model">gc.erm.procurement.po.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Create Request for Quotation">
+                <group>
+                    <group>
+                        <field name="request_id" readonly="1"/>
+                        <field name="vendor_id" options="{'no_quick_create': True}"/>
+                    </group>
+                    <group>
+                        <field name="date_planned"/>
+                        <field name="confirm_order"/>
+                    </group>
+                </group>
+                <group string="Lines to Order">
+                    <field name="line_ids" nolabel="1"
+                           widget="many2many"
+                           options="{'no_create': True, 'no_open': True}">
+                        <tree create="false" delete="false">
+                            <field name="product_id"/>
+                            <field name="description"/>
+                            <field name="shortage_qty"/>
+                            <field name="ordered_qty"/>
+                            <field name="vendor_id"/>
+                            <field name="estimated_price"/>
+                            <field name="currency_id" column_invisible="True"/>
+                        </tree>
+                    </field>
+                </group>
+                <group string="Note to Vendor">
+                    <field name="note" nolabel="1"/>
+                </group>
+                <footer>
+                    <button name="action_create_rfq" type="object" string="Create RFQ"
+                            class="btn-primary" data-hotkey="q"/>
+                    <button string="Discard" class="btn-secondary" special="cancel"
+                            data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

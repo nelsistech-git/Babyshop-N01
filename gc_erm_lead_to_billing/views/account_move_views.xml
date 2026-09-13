@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_move_form_gc_erm" model="ir.ui.view">
+        <field name="name">account.move.form.gc.erm</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='invoice_origin']" position="after">
+                <field name="gc_work_order_id" readonly="1"
+                       invisible="not gc_work_order_id"
+                       groups="gc_erm_lead_to_billing.group_gc_erm_user"/>
+                <field name="gc_milestone" readonly="1"
+                       invisible="not gc_milestone"
+                       groups="gc_erm_lead_to_billing.group_gc_erm_user"/>
+                <field name="gc_installation_id" readonly="1"
+                       invisible="not gc_installation_id"
+                       groups="gc_erm_lead_to_billing.group_gc_erm_user"/>
+                <field name="gc_lead_id" readonly="1" invisible="1"/>
+                <field name="gc_proposal_id" readonly="1" invisible="1"/>
+                <field name="gc_is_erm_invoice" invisible="1"/>
+                <field name="gc_is_overdue" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_invoice_tree_gc_erm" model="ir.ui.view">
+        <field name="name">account.move.tree.gc.erm</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_invoice_tree"/>
+        <field name="arch" type="xml">
+            <field name="invoice_origin" position="after">
+                <field name="gc_work_order_id" optional="hide"
+                       groups="gc_erm_lead_to_billing.group_gc_erm_user"/>
+                <field name="gc_milestone" optional="hide"
+                       groups="gc_erm_lead_to_billing.group_gc_erm_user"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_account_invoice_filter_gc_erm" model="ir.ui.view">
+        <field name="name">account.move.search.gc.erm</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_account_invoice_filter"/>
+        <field name="arch" type="xml">
+            <filter name="late" position="after">
+                <separator/>
+                <filter name="filter_gc_erm" string="From ERM"
+                        domain="[('gc_is_erm_invoice', '=', True)]"
+                        groups="gc_erm_lead_to_billing.group_gc_erm_user"/>
+                <filter name="filter_gc_overdue" string="ERM Overdue"
+                        domain="[('gc_is_overdue', '=', True)]"
+                        groups="gc_erm_lead_to_billing.group_gc_erm_user"/>
+            </filter>
+        </field>
+    </record>
+
+    <record id="action_gc_erm_invoice" model="ir.actions.act_window">
+        <field name="name">ERM Invoices</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">tree,kanban,form</field>
+        <field name="domain">[('move_type', 'in', ('out_invoice', 'out_refund')), ('gc_is_erm_invoice', '=', True)]</field>
+        <field name="context">{'default_move_type': 'out_invoice'}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No ERM invoice yet</p>
+            <p>Invoices generated from ERM work orders appear here with their
+               milestone and payment status.</p>
+        </field>
+    </record>
+
+</odoo>

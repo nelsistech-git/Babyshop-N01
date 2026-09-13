@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- SRS 56 - Email templates. Editable from Settings > Technical >
+         Email Templates; noupdate keeps customer wording across upgrades. -->
+    <data noupdate="1">
+
+        <!-- ============================ LEAD ============================ -->
+        <record id="mail_template_gc_lead_approval_request" model="mail.template">
+            <field name="name">GC ERM: Lead Approval Request</field>
+            <field name="model_id" ref="model_gc_erm_lead"/>
+            <field name="subject">Approval required: Lead {{ object.name }}</field>
+            <field name="email_from">{{ (object.company_id.email or user.email_formatted) }}</field>
+            <field name="partner_to">{{ object._gc_hod_user().partner_id.id or '' }}</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html" type="html">
+                <div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#454748;">
+                    <p>Dear Sir/Madam,</p>
+                    <p>A new sales lead requires your approval.</p>
+                    <table style="border-collapse:collapse;width:100%;max-width:560px;">
+                        <tr><td style="padding:4px 8px;"><strong>Lead</strong></td><td style="padding:4px 8px;" t-out="object.name or ''">GC-LEAD-00001</td></tr>
+                        <tr><td style="padding:4px 8px;"><strong>Customer</strong></td><td style="padding:4px 8px;" t-out="object.partner_id.display_name or ''">Customer</td></tr>
+                        <tr><td style="padding:4px 8px;"><strong>Salesperson</strong></td><td style="padding:4px 8px;" t-out="object.salesperson_id.name or ''">Salesperson</td></tr>
+                        <tr><td style="padding:4px 8px;"><strong>Expected Revenue</strong></td><td style="padding:4px 8px;" t-out="format_amount(object.expected_revenue, object.currency_id) or ''">0.00</td></tr>
+                        <tr><td style="padding:4px 8px;"><strong>Expected Closing</strong></td><td style="padding:4px 8px;" t-out="object.date_deadline or ''"></td></tr>
+                    </table>
+                    <p>Please review and approve or reject the lead in the ERM.</p>
+                    <p style="color:#8f8f8f;font-size:12px;">Grameen Cybernet ERM</p>
+                </div>
+            </field>
+        </record>
+
+        <record id="mail_template_gc_lead_approved" model="mail.template">
+            <field name="name">GC ERM: Lead Approved</field>
+            <field name="model_id" ref="model_gc_erm_lead"/>
+            <field name="subject">Lead {{ object.name }} approved</field>
+            <field name="email_from">{{ (object.company_id.email or user.email_formatted) }}</field>
+            <field name="partner_to">{{ object.salesperson_id.partner_id.id or '' }}</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html" type="html">
+                <div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#454748;">
+                    <p>Lead <strong t-out="object.name or ''">GC-LEAD-00001</strong> for
+                        <strong t-out="object.partner_id.display_name or ''">Customer</strong>
+                        has been approved by <t t-out="object.approved_by_id.name or ''">HOD</t>.</p>
+                    <p>You can now generate the customer survey.</p>
+                </div>
+            </field>
+        </record>
+
+        <record id="mail_template_gc_lead_rejected" model="mail.template">
+            <field name="name">GC ERM: Lead Rejected</field>
+            <field name="model_id" ref="model_gc_erm_lead"/>
+            <field name="subject">Lead {{ object.name }} rejected</field>
+            <field name="email_from">{{ (object.company_id.email or user.email_formatted) }}</field>
+            <field name="partner_to">{{ object.salesperson_id.partner_id.id or '' }}</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html" type="html">
+                <div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#454748;">
+                    <p>Lead <strong t-out="object.name or ''">GC-LEAD-00001</strong> has been rejected.</p>
+                    <p><strong>Reason:</strong> <t t-out="object.rejection_reason or ''">Reason</t></p>
+                </div>
+            </field>
+        </record>
+
+        <!-- =========================== SURVEY =========================== -->
+        <record id="mail_template_gc_survey_assignment" model="mail.template">
+            <field name="name">GC ERM: Survey Assignment</field>
+            <field name="model_id" ref="model_gc_erm_survey"/>
+            <field name="subject">Survey assigned: {{ object.name }}</field>
+            <field name="email_from">{{ (object.company_id.email or user.email_formatted) }}</field>
+            <field name="partner_to">{{ object.engineer_id.partner_id.id or '' }}</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html" type="html">
+                <div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#454748;">
+                    <p>A technical survey has been assigned to you.</p>
+                    <table style="border-collapse:collapse;width:100%;max-width:560px;">
+                        <tr><td style="padding:4px 8px;"><strong>Survey</strong></td><td style="padding:4px 8px;" t-out="object.name or ''">GC-SUR-00001</td></tr>
+                        <tr><td style="padding:4px 8px;"><strong>Client</strong></td><td style="padding:4px 8px;" t-out="object.partner_id.display_name or ''">Client</td></tr>
+                        <tr><td style="padding:4px 8px;"><strong>Location</strong></td><td style="padding:4px 8px;" t-out="object.service_location or object.street or ''">Location</td></tr>
+                        <tr><td style="padding:4px 8px;"><strong>Survey Date</strong></td><td style="padding:4px 8px;" t-out="object.survey_date or ''"></td></tr>
+                        <tr><td style="padding:4px 8px;"><strong>Deadline</strong></td><td style="padding:4px 8px;" t-out="object.deadline or ''"></td></tr>
+                    </table>
+                </div>
+            </field>
+        </record>
+
+        <record id="mail_template_gc_survey_completed" model="mail.template">
+            <field name="name">GC ERM: Survey Completed</field>
+            <field name="model_id" ref="model_gc_erm_survey"/>
+            <field name="subject">Survey {{ object.name }} completed</field>
+            <field name="email_from">{{ (object.company_id.email or user.email_formatted) }}</field>
+            <field name="partner_to">{{ object.salesperson_id.partner_id.id or '' }}</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html" type="html">
+                <div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#454748;">
+                    <p>The technical survey <strong t-out="object.name or ''">GC-SUR-00001</strong>
+                        for <strong t-out="object.partner_id.display_name or ''">Client</strong> is complete.</p>
+                    <p><strong>Feasibility:</strong>
+                        <t t-out="dict(object._fields['feasibility'].selection).get(object.feasibility, '') or ''">Feasible</t></p>
+                </div>
+            </field>
+        </record>
+
+        <!-- ====================== TECHNICAL REPORT ====================== -->
+        <record id="mail_template_gc_technical_report_submitted" model="mail.template">
+            <field name="name">GC ERM: Technical Report Submitted</field>
+            <field name="model_id" ref="model_gc_erm_technical_report"/>
+            <field name="subject">Technical report {{ object.name }} submitted</field>
+            <field name="email_from">{{ (object.company_id.email or user.email_formatted) }}</field>
+            <field name="partner_to">{{ object.salesperson_id.partner_id.id or '' }}</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html" type="html">
+                <div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#454748;">
+                    <p>Technical report <strong t-out="object.name or ''">GC-TR-00001</strong> has been submitted to Sales.</p>
+                    <table style="border-collapse:collapse;width:100%;max-width:560px;">
+                        <tr><td style="padding:4px 8px;"><strong>Customer</strong></td><td style="padding:4px 8px;" t-out="object.partner_id.display_name or ''">Customer</td></tr>
+                        <tr><td style="padding:4px 8px;"><strong>Total Cost</strong></td><td style="padding:4px 8px;" t-out="format_amount(object.total_cost, object.currency_id) or ''">0.00</td></tr>
+                        <tr><td style="padding:4px 8px;"><strong>Selling Price</strong></td><td style="padding:4px 8px;" t-out="format_amount(object.amount_total, object.currency_id) or ''">0.00</td></tr>
+                    </table>
+                    <p>You can now prepare the commercial proposal.</p>
+                </div>
+            </field>
+        </record>
+
+        <!-- ========================== PROPOSAL ========================== -->
+        <record id="mail_template_gc_proposal_approval_request" model="mail.template">
+            <field name="name">GC ERM: Proposal Approval Request</field>
+            <field name="model_id" ref="model_gc_erm_proposal"/>
+            <field name="subject">Approval required: Proposal {{ object.name }}</field>
+            <field name="email_from">{{ (object.company_id.email or user.email_formatted) }}</field>
+            <field name="partner_to">{{ object._gc_approver().partner_id.id or '' }}</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html" type="html">
+                <div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#454748;">
+                    <p>A commercial proposal requires your approval.</p>
+                    <table style="border-collapse:collapse;width:100%;max-width:560px;">
+                        <tr><td style="padding:4px 8px;"><strong>Proposal</strong></td><td style="padding:4px 8px;" t-out="object.name or ''">GC-PROP-00001</td></tr>
+                        <tr><td style="padding:4px 8px;"><strong>Customer</strong></td><td style="padding:4px 8px;" t-out="object.partner_id.display_name or ''">Customer</td></tr>
+                        <tr><td style="padding:4px 8px;"><strong>Total</strong></td><td style="padding:4px 8px;" t-out="format_amount(object.amount_total, object.currency_id) or ''">0.00</td></tr>
+                        <tr><td style="padding:4px 8px;"><strong>Margin</strong></td><td style="padding:4px 8px;"><t t-out="'%.2f' % (object.margin_percentage or 0.0)">0.00</t>%</td></tr>
+                        <tr><td style="padding:4px 8px;"><strong>Valid Until</strong></td><td style="padding:4px 8px;" t-out="object.validity_date or ''"></td></tr>
+                    </table>
+                </div>
+            </field>
+        </record>
+
+        <record id="mail_template_gc_proposal_approved" model="mail.template">
+            <field name="name">GC ERM: Proposal Approved</field>
+            <field name="model_id" ref="model_gc_erm_proposal"/>
+            <field name="subject">Proposal {{ object.name }} approved</field>
+            <field name="email_from">{{ (object.company_id.email or user.email_formatted) }}</field>
+            <field name="partner_to">{{ object.salesperson_id.partner_id.id or '' }}</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html" type="html">
+                <div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#454748;">
+                    <p>Proposal <strong t-out="object.name or ''">GC-PROP-00001</strong> has been approved.
+                        You can now send the offer to <t t-out="object.partner_id.display_name or ''">the customer</t>.</p>
+                </div>
+            </field>
+        </record>
+
+        <record id="mail_template_gc_proposal_rejected" model="mail.template">
+            <field name="name">GC ERM: Proposal Rejected</field>
+            <field name="model_id" ref="model_gc_erm_proposal"/>
+            <field name="subject">Proposal {{ object.name }} rejected</field>
+            <field name="email_from">{{ (object.company_id.email or user.email_formatted) }}</field>
+            <field name="partner_to">{{ object.salesperson_id.partner_id.id or '' }}</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html" type="html">
+                <div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#454748;">
+                    <p>Proposal <strong t-out="object.name or ''">GC-PROP-00001</strong> has been rejected.</p>
+                    <p><strong>Reason:</strong> <t t-out="object.rejection_reason or ''">Reason</t></p>
+                </div>
+            </field>
+        </record>
+
+        <record id="mail_template_gc_quotation_sent" model="mail.template">
+            <field name="name">GC ERM: Quotation Sent to Customer</field>
+            <field name="model_id" ref="model_gc_erm_proposal"/>
+            <field name="subject">Your offer from {{ object.company_id.name }} - {{ object.name }}</field>
+            <field name="email_from">{{ (object.salesperson_id.email_formatted or object.company_id.email) }}</field>
+            <field name="partner_to">{{ (object.contact_id or object.partner_id).id }}</field>
+            <field name="auto_delete" eval="False"/>
+            <field name="body_html" type="html">
+                <div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#454748;">
+                    <p>Dear <t t-out="(object.contact_id or object.partner_id).name or ''">Customer</t>,</p>
+                    <p>Please find our offer <strong t-out="object.name or ''">GC-PROP-00001</strong>
+                        for a total of <strong t-out="format_amount(object.amount_total, object.currency_id) or ''">0.00</strong>,
+                        valid until <t t-out="object.validity_date or ''"></t>.</p>
+                    <p>Kind regards,<br/>
+                        <t t-out="object.salesperson_id.name or ''">Salesperson</t><br/>
+                        <t t-out="object.company_id.name or ''">Company</t></p>
+                </div>
+            </field>
+        </record>
+
+        <!-- ========================= WORK ORDER ========================= -->
+        <record id="mail_template_gc_work_order_assigned" model="mail.template">
+            <field name="name">GC ERM: Work Order Assigned</field>
+            <field name="model_id" ref="model_gc_erm_work_order"/>
+            <field name="subject">Work order assigned: {{ object.name }}</field>
+            <field name="email_from">{{ (object.company_id.email or user.email_formatted) }}</field>
+            <field name="partner_to">{{ object.engineer_id.partner_id.id or '' }}</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html" type="html">
+                <div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#454748;">
+                    <p>A work order has been assigned to your team.</p>
+                    <table style="border-collapse:collapse;width:100%;max-width:560px;">
+                        <tr><td style="padding:4px 8px;"><strong>Work Order</strong></td><td style="padding:4px 8px;" t-out="object.name or ''">GC-WO-00001</td></tr>
+                        <tr><td style="padding:4px 8px;"><strong>Customer</strong></td><td style="padding:4px 8px;" t-out="object.partner_id.display_name or ''">Customer</td></tr>
+                        <tr><td style="padding:4px 8px;"><strong>Location</strong></td><td style="padding:4px 8px;" t-out="object.service_location or object.street or ''">Location</td></tr>
+                        <tr><td style="padding:4px 8px;"><strong>Schedule</strong></td><td style="padding:4px 8px;" t-out="object.schedule_date or object.start_date or ''"></td></tr>
+                    </table>
+                </div>
+            </field>
+        </record>
+
+        <record id="mail_template_gc_material_shortage" model="mail.template">
+            <field name="name">GC ERM: Material Shortage</field>
+            <field name="model_id" ref="model_gc_erm_work_order"/>
+            <field name="subject">Material shortage on {{ object.name }}</field>
+            <field name="email_from">{{ (object.company_id.email or user.email_formatted) }}</field>
+            <field name="partner_to">{{ object._gc_group_partner_ids('gc_erm_lead_to_billing.group_gc_purchase_user') }}</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html" type="html">
+                <div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#454748;">
+                    <p>A material shortage has been detected on work order
+                        <strong t-out="object.name or ''">GC-WO-00001</strong>
+                        for <t t-out="object.partner_id.display_name or ''">Customer</t>.</p>
+                    <p>Total shortage quantity: <strong t-out="'%.2f' % (object.total_shortage_qty or 0.0)">0.00</strong></p>
+                    <table style="border-collapse:collapse;width:100%;max-width:640px;">
+                        <tr style="background:#f0f0f0;">
+                            <th style="padding:6px 8px;text-align:left;">Product</th>
+                            <th style="padding:6px 8px;text-align:right;">Required</th>
+                            <th style="padding:6px 8px;text-align:right;">Available</th>
+                            <th style="padding:6px 8px;text-align:right;">Shortage</th>
+                        </tr>
+                        <tr t-foreach="object.line_ids.filtered(lambda l: l.shortage_qty &gt; 0)" t-as="line">
+                            <td style="padding:6px 8px;" t-out="line.product_id.display_name or ''">Product</td>
+                            <td style="padding:6px 8px;text-align:right;" t-out="'%.2f' % line.required_qty">0.00</td>
+                            <td style="padding:6px 8px;text-align:right;" t-out="'%.2f' % line.available_qty">0.00</td>
+                            <td style="padding:6px 8px;text-align:right;" t-out="'%.2f' % line.shortage_qty">0.00</td>
+                        </tr>
+                    </table>
+                </div>
+            </field>
+        </record>
+
+        <record id="mail_template_gc_billing_ready" model="mail.template">
+            <field name="name">GC ERM: Billing Ready</field>
+            <field name="model_id" ref="model_gc_erm_work_order"/>
+            <field name="subject">Billing ready: {{ object.name }}</field>
+            <field name="email_from">{{ (object.company_id.email or user.email_formatted) }}</field>
+            <field name="partner_to">{{ object._gc_group_partner_ids('gc_erm_lead_to_billing.group_gc_accounts_user') }}</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html" type="html">
+                <div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#454748;">
+                    <p>Work order <strong t-out="object.name or ''">GC-WO-00001</strong>
+                        for <t t-out="object.partner_id.display_name or ''">Customer</t>
+                        satisfies the billing conditions and can now be invoiced.</p>
+                    <p>Order total: <strong t-out="format_amount(object.amount_total, object.currency_id) or ''">0.00</strong></p>
+                </div>
+            </field>
+        </record>
+
+        <record id="mail_template_gc_invoice_created" model="mail.template">
+            <field name="name">GC ERM: Invoice Created</field>
+            <field name="model_id" ref="model_gc_erm_work_order"/>
+            <field name="subject">Invoice created for {{ object.name }}</field>
+            <field name="email_from">{{ (object.company_id.email or user.email_formatted) }}</field>
+            <field name="partner_to">{{ object._gc_group_partner_ids('gc_erm_lead_to_billing.group_gc_accounts_user') }}</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html" type="html">
+                <div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#454748;">
+                    <p>A customer invoice has been generated for work order
+                        <strong t-out="object.name or ''">GC-WO-00001</strong>.</p>
+                    <p>Please review and post it in Accounting.</p>
+                </div>
+            </field>
+        </record>
+
+        <!-- ========================= PROCUREMENT ======================== -->
+        <record id="mail_template_gc_procurement_created" model="mail.template">
+            <field name="name">GC ERM: Procurement Request Created</field>
+            <field name="model_id" ref="model_gc_erm_procurement_request"/>
+            <field name="subject">Procurement request {{ object.name }}</field>
+            <field name="email_from">{{ (object.company_id.email or user.email_formatted) }}</field>
+            <field name="partner_to">{{ object._gc_group_partner_ids('gc_erm_lead_to_billing.group_gc_purchase_user') }}</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html" type="html">
+                <div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#454748;">
+                    <p>Procurement request <strong t-out="object.name or ''">GC-PR-00001</strong>
+                        has been submitted for work order
+                        <t t-out="object.work_order_id.name or ''">GC-WO-00001</t>.</p>
+                    <p>Required by: <strong t-out="object.required_date or ''"></strong></p>
+                </div>
+            </field>
+        </record>
+
+        <record id="mail_template_gc_material_received" model="mail.template">
+            <field name="name">GC ERM: Material Received</field>
+            <field name="model_id" ref="model_gc_erm_procurement_request"/>
+            <field name="subject">Material received for {{ object.name }}</field>
+            <field name="email_from">{{ (object.company_id.email or user.email_formatted) }}</field>
+            <field name="partner_to">{{ object.requested_by_id.partner_id.id or '' }}</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html" type="html">
+                <div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#454748;">
+                    <p>All materials of procurement request
+                        <strong t-out="object.name or ''">GC-PR-00001</strong> have been received.</p>
+                    <p>Work order <t t-out="object.work_order_id.name or ''">GC-WO-00001</t>
+                        can proceed with the delivery and installation.</p>
+                </div>
+            </field>
+        </record>
+
+        <!-- ======================== INSTALLATION ======================== -->
+        <record id="mail_template_gc_installation_scheduled" model="mail.template">
+            <field name="name">GC ERM: Installation Scheduled</field>
+            <field name="model_id" ref="model_gc_erm_installation"/>
+            <field name="subject">Installation scheduled: {{ object.name }}</field>
+            <field name="email_from">{{ (object.company_id.email or user.email_formatted) }}</field>
+            <field name="partner_to">{{ object.engineer_id.partner_id.id or '' }}</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html" type="html">
+                <div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#454748;">
+                    <p>Installation <strong t-out="object.name or ''">GC-INS-00001</strong>
+                        is scheduled on <strong t-out="object.installation_date or ''"></strong>
+                        for <t t-out="object.partner_id.display_name or ''">Customer</t>.</p>
+                </div>
+            </field>
+        </record>
+
+        <record id="mail_template_gc_installation_completed" model="mail.template">
+            <field name="name">GC ERM: Installation Completed</field>
+            <field name="model_id" ref="model_gc_erm_installation"/>
+            <field name="subject">Installation report {{ object.name }} submitted</field>
+            <field name="email_from">{{ (object.company_id.email or user.email_formatted) }}</field>
+            <field name="partner_to">{{ object.work_order_id.manager_id.partner_id.id or '' }}</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html" type="html">
+                <div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#454748;">
+                    <p>The installation report of <strong t-out="object.name or ''">GC-INS-00001</strong> has been submitted.</p>
+                    <table style="border-collapse:collapse;width:100%;max-width:560px;">
+                        <tr><td style="padding:4px 8px;"><strong>Customer</strong></td><td style="padding:4px 8px;" t-out="object.partner_id.display_name or ''">Customer</td></tr>
+                        <tr><td style="padding:4px 8px;"><strong>Engineer</strong></td><td style="padding:4px 8px;" t-out="object.engineer_id.name or ''">Engineer</td></tr>
+                        <tr><td style="padding:4px 8px;"><strong>Result</strong></td><td style="padding:4px 8px;" t-out="dict(object._fields['result'].selection).get(object.result, '') or ''">Successful</td></tr>
+                    </table>
+                </div>
+            </field>
+        </record>
+
+        <!-- =========================== FINANCE ========================== -->
+        <record id="mail_template_gc_payment_reminder" model="mail.template">
+            <field name="name">GC ERM: Payment Reminder</field>
+            <field name="model_id" ref="account.model_account_move"/>
+            <field name="subject">Payment reminder - invoice {{ object.name }}</field>
+            <field name="email_from">{{ (object.company_id.email or user.email_formatted) }}</field>
+            <field name="partner_to">{{ object.partner_id.id }}</field>
+            <field name="auto_delete" eval="False"/>
+            <field name="body_html" type="html">
+                <div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#454748;">
+                    <p>Dear <t t-out="object.partner_id.name or ''">Customer</t>,</p>
+                    <p>Our records show that invoice <strong t-out="object.name or ''">INV/0001</strong>
+                        of <strong t-out="format_amount(object.amount_total, object.currency_id) or ''">0.00</strong>
+                        was due on <strong t-out="object.invoice_date_due or ''"></strong>
+                        and is still outstanding
+                        (<t t-out="format_amount(object.amount_residual, object.currency_id) or ''">0.00</t>).</p>
+                    <p>Please arrange the payment at your earliest convenience. If the payment
+                        has already been made, kindly ignore this reminder.</p>
+                    <p>Kind regards,<br/><t t-out="object.company_id.name or ''">Company</t></p>
+                </div>
+            </field>
+        </record>
+
+    </data>
+</odoo>

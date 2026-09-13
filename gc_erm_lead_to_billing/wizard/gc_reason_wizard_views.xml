@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_gc_reason_wizard_form" model="ir.ui.view">
+        <field name="name">gc.erm.reason.wizard.form</field>
+        <field name="model">gc.erm.reason.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Reason">
+                <field name="mode" invisible="1"/>
+                <field name="res_model" invisible="1"/>
+                <field name="res_id" invisible="1"/>
+                <div class="alert alert-warning" role="alert" invisible="mode != 'reject'">
+                    You are about to <strong>reject</strong>
+                    <field name="document_name" readonly="1" nolabel="1" class="oe_inline"/>.
+                    A written reason is mandatory and is stored in the audit trail.
+                </div>
+                <div class="alert alert-info" role="alert" invisible="mode != 'revision'">
+                    You are about to send
+                    <field name="document_name" readonly="1" nolabel="1" class="oe_inline"/>
+                    back for <strong>revision</strong>. Explain what must be changed.
+                </div>
+                <group>
+                    <field name="reason" nolabel="1" colspan="2"
+                           placeholder="Explain the decision..."/>
+                    <field name="notify_owner"/>
+                </group>
+                <footer>
+                    <button name="action_confirm" type="object" string="Confirm"
+                            class="btn-primary" data-hotkey="q"/>
+                    <button string="Discard" class="btn-secondary" special="cancel"
+                            data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

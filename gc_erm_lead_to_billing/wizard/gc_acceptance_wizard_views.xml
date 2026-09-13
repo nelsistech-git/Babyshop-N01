@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_gc_acceptance_wizard_form" model="ir.ui.view">
+        <field name="name">gc.erm.acceptance.wizard.form</field>
+        <field name="model">gc.erm.acceptance.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Customer Acceptance">
+                <group>
+                    <group>
+                        <field name="proposal_id" readonly="1"/>
+                        <field name="partner_id" readonly="1"/>
+                        <field name="currency_id" invisible="1"/>
+                        <field name="amount_total" readonly="1"/>
+                    </group>
+                    <group>
+                        <field name="method"/>
+                        <field name="acceptance_date"/>
+                        <field name="accepted_by"
+                               placeholder="Name of the person who accepted"/>
+                    </group>
+                </group>
+                <group string="Acceptance Document"
+                       invisible="method not in ('signed', 'portal')">
+                    <field name="attachment_ids" widget="many2many_binary" nolabel="1"
+                           required="method == 'signed'"/>
+                </group>
+                <group string="Remarks">
+                    <field name="remarks" nolabel="1"/>
+                </group>
+                <group string="Next Steps">
+                    <field name="confirm_sale_order"/>
+                    <field name="create_work_order"/>
+                </group>
+                <footer>
+                    <button name="action_confirm" type="object" string="Record Acceptance"
+                            class="btn-primary" data-hotkey="q"/>
+                    <button string="Discard" class="btn-secondary" special="cancel"
+                            data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>
