@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fw_channel_partner_tree" model="ir.ui.view">
+        <field name="name">fw.channel.partner.tree</field>
+        <field name="model">fw.channel.partner</field>
+        <field name="arch" type="xml">
+            <tree string="Channel Partners">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="channel_type"/>
+                <field name="territory"/>
+                <field name="assigned_salesperson_id"/>
+                <field name="credit_limit" widget="monetary"/>
+                <field name="currency_id" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_fw_channel_partner_form" model="ir.ui.view">
+        <field name="name">fw.channel.partner.form</field>
+        <field name="model">fw.channel.partner</field>
+        <field name="arch" type="xml">
+            <form string="Channel Partner">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_orders" type="object"
+                                class="oe_stat_button" icon="fa-file-text-o"
+                                invisible="order_count == 0">
+                            <field name="order_count" widget="statinfo" string="Orders"/>
+                        </button>
+                        <button name="action_view_warranty_claims" type="object"
+                                class="oe_stat_button" icon="fa-shield"
+                                invisible="warranty_claim_count == 0">
+                            <field name="warranty_claim_count" widget="statinfo" string="Warranty Claims"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Partner Name"/></h1>
+                        <h3><field name="code" placeholder="Partner Code"/></h3>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="channel_type"/>
+                            <field name="partner_id"/>
+                            <field name="territory"/>
+                            <field name="assigned_salesperson_id"/>
+                        </group>
+                        <group>
+                            <field name="email"/>
+                            <field name="phone"/>
+                            <field name="currency_id" groups="base.group_multi_currency"/>
+                            <field name="credit_limit"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_fw_channel_partner_search" model="ir.ui.view">
+        <field name="name">fw.channel.partner.search</field>
+        <field name="model">fw.channel.partner</field>
+        <field name="arch" type="xml">
+            <search string="Search Channel Partners">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="territory"/>
+                <group expand="0" string="Group By">
+                    <filter string="Channel Type" name="group_type" context="{'group_by': 'channel_type'}"/>
+                    <filter string="Territory" name="group_territory" context="{'group_by': 'territory'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_fw_channel_partner" model="ir.actions.act_window">
+        <field name="name">Dealers / Distributors / Retail</field>
+        <field name="res_model">fw.channel.partner</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_fw_channel_partner_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first channel partner</p>
+        </field>
+    </record>
+</odoo>

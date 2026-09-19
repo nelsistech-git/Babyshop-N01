@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fw_incentive_scheme_tree" model="ir.ui.view">
+        <field name="name">fw.incentive.scheme.tree</field>
+        <field name="model">fw.incentive.scheme</field>
+        <field name="arch" type="xml">
+            <tree string="Incentive Schemes">
+                <field name="name"/>
+                <field name="scheme_type"/>
+                <field name="operation_id"/>
+                <field name="rate_per_piece"/>
+                <field name="efficiency_threshold_percent"/>
+                <field name="bonus_rate_per_percent"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_fw_incentive_scheme_form" model="ir.ui.view">
+        <field name="name">fw.incentive.scheme.form</field>
+        <field name="model">fw.incentive.scheme</field>
+        <field name="arch" type="xml">
+            <form string="Incentive Scheme">
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Scheme Name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="scheme_type"/>
+                            <field name="operation_id" invisible="scheme_type != 'piece_rate'"/>
+                            <field name="currency_id" groups="base.group_multi_currency"/>
+                        </group>
+                        <group>
+                            <field name="rate_per_piece" invisible="scheme_type != 'piece_rate'"/>
+                            <field name="efficiency_threshold_percent"
+                                   invisible="scheme_type != 'efficiency_bonus'"/>
+                            <field name="bonus_rate_per_percent"
+                                   invisible="scheme_type != 'efficiency_bonus'"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_fw_incentive_scheme" model="ir.actions.act_window">
+        <field name="name">Incentive Schemes</field>
+        <field name="res_model">fw.incentive.scheme</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first incentive scheme</p>
+        </field>
+    </record>
+</odoo>

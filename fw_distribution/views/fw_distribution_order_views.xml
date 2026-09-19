@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fw_distribution_order_tree" model="ir.ui.view">
+        <field name="name">fw.distribution.order.tree</field>
+        <field name="model">fw.distribution.order</field>
+        <field name="arch" type="xml">
+            <tree string="Distribution Orders" decoration-danger="state=='cancelled'"
+                  decoration-success="state in ('delivered','invoiced')">
+                <field name="name"/>
+                <field name="channel_partner_id"/>
+                <field name="channel_type"/>
+                <field name="order_date"/>
+                <field name="delivery_date"/>
+                <field name="total_qty" sum="Total"/>
+                <field name="total_amount" widget="monetary" sum="Total"/>
+                <field name="currency_id" invisible="1"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_fw_distribution_order_form" model="ir.ui.view">
+        <field name="name">fw.distribution.order.form</field>
+        <field name="model">fw.distribution.order</field>
+        <field name="arch" type="xml">
+            <form string="Distribution Order">
+                <header>
+                    <button name="action_confirm" type="object" string="Confirm"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_deliver" type="object" string="Mark Delivered"
+                            invisible="state != 'confirmed'"/>
+                    <button name="action_invoice" type="object" string="Mark Invoiced"
+                            invisible="state != 'delivered'"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                            invisible="state in ('invoiced','cancelled')"/>
+                    <button name="action_reset_draft" type="object" string="Reset to Draft"
+                            invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,confirmed,delivered,invoiced"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="channel_partner_id"/>
+                            <field name="channel_type" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="order_date"/>
+                            <field name="delivery_date"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="total_qty"/>
+                            <field name="total_amount" widget="monetary"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Order Lines">
+                            <field name="line_ids">
+                                <tree editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="style_id"/>
+                                    <field name="color_id"/>
+                                    <field name="size_curve_id"/>
+                                    <field name="qty"/>
+                                    <field name="unit_price"/>
+                                    <field name="currency_id" invisible="1"/>
+                                    <field name="amount" widget="monetary"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_fw_distribution_order_search" model="ir.ui.view">
+        <field name="name">fw.distribution.order.search</field>
+        <field name="model">fw.distribution.order</field>
+        <field name="arch" type="xml">
+            <search string="Search Distribution Orders">
+                <field name="name"/>
+                <field name="channel_partner_id"/>
+                <group expand="0" string="Group By">
+                    <filter string="Channel Partner" name="group_partner" context="{'group_by': 'channel_partner_id'}"/>
+                    <filter string="Channel Type" name="group_type" context="{'group_by': 'channel_type'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_fw_distribution_order" model="ir.actions.act_window">
+        <field name="name">Distribution Orders</field>
+        <field name="res_model">fw.distribution.order</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_fw_distribution_order_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first distribution order</p>
+        </field>
+    </record>
+</odoo>

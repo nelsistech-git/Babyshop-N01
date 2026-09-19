@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fw_factory_costing_tree" model="ir.ui.view">
+        <field name="name">fw.factory.costing.tree</field>
+        <field name="model">fw.factory.costing</field>
+        <field name="arch" type="xml">
+            <tree string="Factory Costing">
+                <field name="name"/>
+                <field name="factory_id"/>
+                <field name="period_start"/>
+                <field name="period_end"/>
+                <field name="total_production_qty"/>
+                <field name="total_cost" widget="monetary"/>
+                <field name="cost_per_pair" widget="monetary"/>
+                <field name="currency_id" invisible="1"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_fw_factory_costing_form" model="ir.ui.view">
+        <field name="name">fw.factory.costing.form</field>
+        <field name="model">fw.factory.costing</field>
+        <field name="arch" type="xml">
+            <form string="Factory Costing">
+                <header>
+                    <button name="action_confirm" type="object" string="Confirm"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_reset_draft" type="object" string="Reset to Draft"
+                            invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="factory_id"/>
+                            <field name="period_start"/>
+                            <field name="period_end"/>
+                        </group>
+                        <group>
+                            <field name="currency_id" groups="base.group_multi_currency"/>
+                            <field name="total_production_qty"/>
+                            <button name="action_pull_production_qty" type="object"
+                                    string="Pull Production Qty" class="btn-secondary"/>
+                        </group>
+                    </group>
+                    <group string="Direct Costs">
+                        <group>
+                            <field name="total_material_cost"/>
+                            <field name="total_labor_cost"/>
+                            <field name="total_overhead_cost"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Other Expenses">
+                            <field name="expense_line_ids">
+                                <tree editable="bottom">
+                                    <field name="expense_type"/>
+                                    <field name="description"/>
+                                    <field name="amount"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                    <group string="Summary">
+                        <group>
+                            <field name="total_other_expense" readonly="1"/>
+                            <field name="total_cost" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="cost_per_pair" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_fw_factory_costing" model="ir.actions.act_window">
+        <field name="name">Factory Costing</field>
+        <field name="res_model">fw.factory.costing</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first factory costing period</p>
+        </field>
+    </record>
+</odoo>

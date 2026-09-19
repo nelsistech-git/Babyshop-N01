@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fw_warranty_claim_tree" model="ir.ui.view">
+        <field name="name">fw.warranty.claim.tree</field>
+        <field name="model">fw.warranty.claim</field>
+        <field name="arch" type="xml">
+            <tree string="Warranty Claims" decoration-danger="state=='rejected'"
+                  decoration-success="state=='resolved'">
+                <field name="name"/>
+                <field name="channel_partner_id"/>
+                <field name="style_id"/>
+                <field name="customer_name"/>
+                <field name="claim_date"/>
+                <field name="resolution"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_fw_warranty_claim_form" model="ir.ui.view">
+        <field name="name">fw.warranty.claim.form</field>
+        <field name="model">fw.warranty.claim</field>
+        <field name="arch" type="xml">
+            <form string="Warranty Claim">
+                <header>
+                    <button name="action_start_review" type="object" string="Start Review"
+                            class="btn-primary" invisible="state != 'submitted'"/>
+                    <button name="action_resolve" type="object" string="Resolve"
+                            class="btn-primary" invisible="state != 'under_review'"/>
+                    <button name="action_reject" type="object" string="Reject"
+                            invisible="state != 'under_review'"/>
+                    <button name="action_reset_submitted" type="object" string="Reset"
+                            invisible="state == 'submitted'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="submitted,under_review,resolved"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="channel_partner_id"/>
+                            <field name="style_id"/>
+                            <field name="handled_by"/>
+                        </group>
+                        <group>
+                            <field name="customer_name"/>
+                            <field name="customer_phone"/>
+                            <field name="purchase_date"/>
+                            <field name="claim_date"/>
+                        </group>
+                    </group>
+                    <field name="defect_description" placeholder="Describe the defect..."/>
+                    <group string="Resolution">
+                        <group>
+                            <field name="resolution"/>
+                        </group>
+                    </group>
+                    <field name="resolution_notes" placeholder="Resolution notes..."/>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_fw_warranty_claim_search" model="ir.ui.view">
+        <field name="name">fw.warranty.claim.search</field>
+        <field name="model">fw.warranty.claim</field>
+        <field name="arch" type="xml">
+            <search string="Search Warranty Claims">
+                <field name="name"/>
+                <field name="channel_partner_id"/>
+                <field name="customer_name"/>
+                <filter string="Under Review" name="under_review" domain="[('state','=','under_review')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Channel Partner" name="group_partner" context="{'group_by': 'channel_partner_id'}"/>
+                    <filter string="Resolution" name="group_resolution" context="{'group_by': 'resolution'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_fw_warranty_claim" model="ir.actions.act_window">
+        <field name="name">Warranty Claims</field>
+        <field name="res_model">fw.warranty.claim</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_fw_warranty_claim_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Record your first warranty claim</p>
+        </field>
+    </record>
+</odoo>

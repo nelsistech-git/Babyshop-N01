@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fw_production_daily_output_tree" model="ir.ui.view">
+        <field name="name">fw.production.daily.output.tree</field>
+        <field name="model">fw.production.daily.output</field>
+        <field name="arch" type="xml">
+            <tree string="Daily Production Output" editable="bottom">
+                <field name="date"/>
+                <field name="production_order_id"/>
+                <field name="stage_line_id" domain="[('production_order_id','=',production_order_id)]"/>
+                <field name="stage" readonly="1"/>
+                <field name="production_line_id" readonly="1"/>
+                <field name="shift"/>
+                <field name="qty_produced" sum="Total Produced"/>
+                <field name="defect_qty" sum="Total Defect"/>
+                <field name="entered_by"/>
+                <field name="remarks"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_fw_production_daily_output_search" model="ir.ui.view">
+        <field name="name">fw.production.daily.output.search</field>
+        <field name="model">fw.production.daily.output</field>
+        <field name="arch" type="xml">
+            <search string="Search Daily Output">
+                <field name="production_order_id"/>
+                <field name="production_line_id"/>
+                <field name="date"/>
+                <group expand="0" string="Group By">
+                    <filter string="Production Order" name="group_order"
+                            context="{'group_by': 'production_order_id'}"/>
+                    <filter string="Stage" name="group_stage" context="{'group_by': 'stage'}"/>
+                    <filter string="Line" name="group_line" context="{'group_by': 'production_line_id'}"/>
+                    <filter string="Date" name="group_date" context="{'group_by': 'date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_fw_production_daily_output" model="ir.actions.act_window">
+        <field name="name">Daily Production Output</field>
+        <field name="res_model">fw.production.daily.output</field>
+        <field name="view_mode">tree</field>
+        <field name="search_view_id" ref="view_fw_production_daily_output_search"/>
+        <field name="context">{'search_default_group_order': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Record your first daily output entry</p>
+        </field>
+    </record>
+</odoo>

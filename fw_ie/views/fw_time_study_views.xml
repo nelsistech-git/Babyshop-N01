@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fw_time_study_tree" model="ir.ui.view">
+        <field name="name">fw.time.study.tree</field>
+        <field name="model">fw.time.study</field>
+        <field name="arch" type="xml">
+            <tree string="Time Studies" decoration-success="state=='approved'">
+                <field name="name"/>
+                <field name="style_id"/>
+                <field name="operation_id"/>
+                <field name="date"/>
+                <field name="avg_observed_time"/>
+                <field name="standard_smv"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_fw_time_study_form" model="ir.ui.view">
+        <field name="name">fw.time.study.form</field>
+        <field name="model">fw.time.study</field>
+        <field name="arch" type="xml">
+            <form string="Time Study">
+                <header>
+                    <button name="action_approve" type="object" string="Approve &amp; Push SMV"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_reset_draft" type="object" string="Reset to Draft"
+                            invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,approved"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="style_id"/>
+                            <field name="operation_id"/>
+                            <field name="date"/>
+                            <field name="studied_by"/>
+                        </group>
+                        <group>
+                            <field name="performance_rating"/>
+                            <field name="allowance_percent"/>
+                            <field name="avg_observed_time" readonly="1"/>
+                            <field name="basic_time" readonly="1"/>
+                            <field name="standard_time_seconds" readonly="1"/>
+                            <field name="standard_smv" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Cycle Readings (Stopwatch)">
+                            <field name="reading_ids">
+                                <tree editable="bottom">
+                                    <field name="cycle_no"/>
+                                    <field name="observed_time"/>
+                                    <field name="remarks"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_fw_time_study_search" model="ir.ui.view">
+        <field name="name">fw.time.study.search</field>
+        <field name="model">fw.time.study</field>
+        <field name="arch" type="xml">
+            <search string="Search Time Studies">
+                <field name="name"/>
+                <field name="style_id"/>
+                <field name="operation_id"/>
+                <filter string="Approved" name="approved" domain="[('state','=','approved')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Operation" name="group_operation" context="{'group_by': 'operation_id'}"/>
+                    <filter string="Style" name="group_style" context="{'group_by': 'style_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_fw_time_study" model="ir.actions.act_window">
+        <field name="name">Time Studies</field>
+        <field name="res_model">fw.time.study</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_fw_time_study_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Record your first time study</p>
+        </field>
+    </record>
+</odoo>

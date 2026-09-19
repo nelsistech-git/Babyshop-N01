@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fw_worker_output_tree" model="ir.ui.view">
+        <field name="name">fw.worker.output.tree</field>
+        <field name="model">fw.worker.output</field>
+        <field name="arch" type="xml">
+            <tree string="Worker Output" editable="bottom">
+                <field name="date"/>
+                <field name="employee_id"/>
+                <field name="operation_id"/>
+                <field name="production_line_id"/>
+                <field name="qty_produced" sum="Total Produced"/>
+                <field name="defect_qty" sum="Total Defect"/>
+                <field name="remarks"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_fw_worker_output_search" model="ir.ui.view">
+        <field name="name">fw.worker.output.search</field>
+        <field name="model">fw.worker.output</field>
+        <field name="arch" type="xml">
+            <search string="Search Worker Output">
+                <field name="employee_id"/>
+                <field name="operation_id"/>
+                <field name="date"/>
+                <group expand="0" string="Group By">
+                    <filter string="Employee" name="group_employee" context="{'group_by': 'employee_id'}"/>
+                    <filter string="Operation" name="group_operation" context="{'group_by': 'operation_id'}"/>
+                    <filter string="Date" name="group_date" context="{'group_by': 'date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_fw_worker_output" model="ir.actions.act_window">
+        <field name="name">Worker Output</field>
+        <field name="res_model">fw.worker.output</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_fw_worker_output_search"/>
+        <field name="context">{'search_default_group_employee': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Record your first worker output entry</p>
+        </field>
+    </record>
+</odoo>

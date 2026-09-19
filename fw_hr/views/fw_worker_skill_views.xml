@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fw_worker_skill_tree" model="ir.ui.view">
+        <field name="name">fw.worker.skill.tree</field>
+        <field name="model">fw.worker.skill</field>
+        <field name="arch" type="xml">
+            <tree string="Worker Skill Matrix" editable="bottom"
+                  decoration-success="skill_level=='expert'"
+                  decoration-info="skill_level=='skilled'">
+                <field name="employee_id"/>
+                <field name="operation_id"/>
+                <field name="skill_level"/>
+                <field name="certified_date"/>
+                <field name="certified_by"/>
+                <field name="remarks"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_fw_worker_skill_search" model="ir.ui.view">
+        <field name="name">fw.worker.skill.search</field>
+        <field name="model">fw.worker.skill</field>
+        <field name="arch" type="xml">
+            <search string="Search Worker Skills">
+                <field name="employee_id"/>
+                <field name="operation_id"/>
+                <group expand="0" string="Group By">
+                    <filter string="Employee" name="group_employee" context="{'group_by': 'employee_id'}"/>
+                    <filter string="Operation" name="group_operation" context="{'group_by': 'operation_id'}"/>
+                    <filter string="Skill Level" name="group_level" context="{'group_by': 'skill_level'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_fw_worker_skill" model="ir.actions.act_window">
+        <field name="name">Worker Skill Matrix</field>
+        <field name="res_model">fw.worker.skill</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_fw_worker_skill_search"/>
+        <field name="context">{'search_default_group_employee': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Add your first worker skill entry</p>
+        </field>
+    </record>
+</odoo>

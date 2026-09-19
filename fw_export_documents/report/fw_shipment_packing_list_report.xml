@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_fw_shipment_packing_list_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Packing List</h2>
+                        <div class="row mt-4 mb-4">
+                            <div class="col-6">
+                                <strong>Buyer:</strong>
+                                <div t-field="doc.buyer_id.name"/>
+                                <strong>Buyer Order:</strong>
+                                <div t-field="doc.order_id.name"/>
+                            </div>
+                            <div class="col-6 text-end">
+                                <div>
+                                    <strong>Shipment Reference:</strong>
+                                    <span t-field="doc.name"/>
+                                </div>
+                                <div>
+                                    <strong>Shipment Date:</strong>
+                                    <span t-field="doc.shipment_date"/>
+                                </div>
+                                <div t-if="doc.container_no">
+                                    <strong>Container No.:</strong>
+                                    <span t-field="doc.container_no"/>
+                                </div>
+                                <div t-if="doc.vessel_flight_no">
+                                    <strong>Vessel/Flight No.:</strong>
+                                    <span t-field="doc.vessel_flight_no"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <table class="table table-sm table-bordered">
+                            <thead>
+                                <tr class="table-active">
+                                    <th>Carton No.</th>
+                                    <th>Barcode</th>
+                                    <th>Style / Color</th>
+                                    <th>Size Content</th>
+                                    <th class="text-end">Total Qty</th>
+                                    <th class="text-end">Gross Wt. (kg)</th>
+                                    <th class="text-end">Net Wt. (kg)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-set="cartons" t-value="doc.env['fw.carton'].sudo().search(
+                                    [('shipment_id', '=', doc.id)], order='carton_no')"/>
+                                <tr t-foreach="cartons" t-as="carton">
+                                    <td t-field="carton.carton_no"/>
+                                    <td t-field="carton.barcode"/>
+                                    <td>
+                                        <span t-field="carton.style_id.name"/>
+                                        /
+                                        <span t-field="carton.color_id.name"/>
+                                    </td>
+                                    <td>
+                                        <span t-foreach="carton.size_line_ids" t-as="sline">
+                                            <span t-field="sline.size_id.name"/>:
+                                            <span t-field="sline.qty"/>
+                                            <span t-if="not sline_last">, </span>
+                                        </span>
+                                    </td>
+                                    <td class="text-end" t-field="carton.total_qty"/>
+                                    <td class="text-end" t-field="carton.gross_weight"/>
+                                    <td class="text-end" t-field="carton.net_weight"/>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr class="fw-bold">
+                                    <td colspan="4">Total (<span t-esc="len(cartons)"/> Cartons)</td>
+                                    <td class="text-end" t-esc="sum(cartons.mapped('total_qty'))"/>
+                                    <td class="text-end"
+                                        t-esc="'%.2f' % sum(cartons.mapped('gross_weight'))"/>
+                                    <td class="text-end"
+                                        t-esc="'%.2f' % sum(cartons.mapped('net_weight'))"/>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_report_fw_shipment_packing_list" model="ir.actions.report">
+        <field name="name">Packing List</field>
+        <field name="model">fw.shipment</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">fw_export_documents.report_fw_shipment_packing_list_document</field>
+        <field name="report_file">fw_export_documents.report_fw_shipment_packing_list_document</field>
+        <field name="print_report_name">'Packing List - %s' % (object.name)</field>
+        <field name="binding_model_id" ref="fw_merchandising.model_fw_shipment"/>
+        <field name="binding_type">report</field>
+    </record>
+</odoo>

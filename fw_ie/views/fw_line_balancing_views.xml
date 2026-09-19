@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fw_line_balancing_tree" model="ir.ui.view">
+        <field name="name">fw.line.balancing.tree</field>
+        <field name="model">fw.line.balancing</field>
+        <field name="arch" type="xml">
+            <tree string="Line Balancing Sheets" decoration-success="state=='confirmed'">
+                <field name="name"/>
+                <field name="style_id"/>
+                <field name="production_line_id"/>
+                <field name="target_output_per_day"/>
+                <field name="total_smv"/>
+                <field name="total_manpower"/>
+                <field name="line_efficiency_percent" widget="percentage"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_fw_line_balancing_form" model="ir.ui.view">
+        <field name="name">fw.line.balancing.form</field>
+        <field name="model">fw.line.balancing</field>
+        <field name="arch" type="xml">
+            <form string="Line Balancing Sheet">
+                <header>
+                    <button name="action_confirm" type="object" string="Confirm"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_reset_draft" type="object" string="Reset to Draft"
+                            invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="style_id"/>
+                            <field name="production_line_id"/>
+                            <field name="factory_id" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="target_output_per_day"/>
+                            <field name="working_minutes_per_day"/>
+                            <field name="cycle_time" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Summary">
+                        <group>
+                            <field name="total_smv" readonly="1"/>
+                            <field name="total_manpower" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="line_efficiency_percent" widget="percentage" readonly="1"/>
+                            <field name="achievable_output" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Operation Breakdown">
+                            <field name="line_ids">
+                                <tree editable="bottom" decoration-danger="is_bottleneck==True">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="operation_id"/>
+                                    <field name="smv"/>
+                                    <field name="workstation_no"/>
+                                    <field name="assigned_operator_id"/>
+                                    <field name="manpower_required" readonly="1"/>
+                                    <field name="is_bottleneck" readonly="1"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_fw_line_balancing_search" model="ir.ui.view">
+        <field name="name">fw.line.balancing.search</field>
+        <field name="model">fw.line.balancing</field>
+        <field name="arch" type="xml">
+            <search string="Search Line Balancing">
+                <field name="name"/>
+                <field name="style_id"/>
+                <field name="production_line_id"/>
+                <group expand="0" string="Group By">
+                    <filter string="Production Line" name="group_line" context="{'group_by': 'production_line_id'}"/>
+                    <filter string="Style" name="group_style" context="{'group_by': 'style_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_fw_line_balancing" model="ir.actions.act_window">
+        <field name="name">Line Balancing</field>
+        <field name="res_model">fw.line.balancing</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_fw_line_balancing_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first line balancing sheet</p>
+        </field>
+    </record>
+</odoo>

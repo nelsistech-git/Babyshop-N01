@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_fw_buyer_order_invoice_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Commercial / Proforma Invoice</h2>
+                        <div class="row mt-4 mb-4">
+                            <div class="col-6">
+                                <strong>Buyer:</strong>
+                                <div t-field="doc.buyer_id.name"/>
+                                <div t-if="doc.buyer_id.partner_id.email"
+                                     t-field="doc.buyer_id.partner_id.email"/>
+                            </div>
+                            <div class="col-6 text-end">
+                                <div>
+                                    <strong>Order Reference:</strong>
+                                    <span t-field="doc.name"/>
+                                </div>
+                                <div t-if="doc.buyer_po_no">
+                                    <strong>Buyer PO No.:</strong>
+                                    <span t-field="doc.buyer_po_no"/>
+                                </div>
+                                <div>
+                                    <strong>Order Date:</strong>
+                                    <span t-field="doc.order_date"/>
+                                </div>
+                                <div t-if="doc.ship_date">
+                                    <strong>Ship Date:</strong>
+                                    <span t-field="doc.ship_date"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <table class="table table-sm table-bordered">
+                            <thead>
+                                <tr class="table-active">
+                                    <th>Style</th>
+                                    <th>Color</th>
+                                    <th>Size Curve</th>
+                                    <th class="text-end">Qty (Pairs)</th>
+                                    <th class="text-end">Unit Price</th>
+                                    <th class="text-end">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="doc.line_ids" t-as="line">
+                                    <td>
+                                        <span t-field="line.style_id.style_no"/>
+                                        -
+                                        <span t-field="line.style_id.name"/>
+                                    </td>
+                                    <td t-field="line.color_id.name"/>
+                                    <td t-field="line.size_curve_id.name"/>
+                                    <td class="text-end" t-field="line.total_qty"/>
+                                    <td class="text-end"
+                                        t-field="line.unit_price"
+                                        t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/>
+                                    <td class="text-end"
+                                        t-field="line.amount"
+                                        t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr class="fw-bold">
+                                    <td colspan="3">Total</td>
+                                    <td class="text-end" t-field="doc.total_qty"/>
+                                    <td/>
+                                    <td class="text-end"
+                                        t-field="doc.total_amount"
+                                        t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/>
+                                </tr>
+                            </tfoot>
+                        </table>
+
+                        <div class="mt-5 row">
+                            <div class="col-6"/>
+                            <div class="col-6 text-center">
+                                <div style="margin-top: 60px;">_______________________</div>
+                                <div>Authorized Signature</div>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_report_fw_buyer_order_invoice" model="ir.actions.report">
+        <field name="name">Commercial / Proforma Invoice</field>
+        <field name="model">fw.buyer.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">fw_export_documents.report_fw_buyer_order_invoice_document</field>
+        <field name="report_file">fw_export_documents.report_fw_buyer_order_invoice_document</field>
+        <field name="print_report_name">'Invoice - %s' % (object.name)</field>
+        <field name="binding_model_id" ref="fw_merchandising.model_fw_buyer_order"/>
+        <field name="binding_type">report</field>
+    </record>
+</odoo>

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fw_efficiency_report_tree" model="ir.ui.view">
+        <field name="name">fw.efficiency.report.tree</field>
+        <field name="model">fw.efficiency.report</field>
+        <field name="arch" type="xml">
+            <tree string="Daily Efficiency Reports" editable="bottom"
+                  decoration-danger="efficiency_percent &lt; 50"
+                  decoration-warning="efficiency_percent &gt;= 50 and efficiency_percent &lt; 75"
+                  decoration-success="efficiency_percent &gt;= 75">
+                <field name="date"/>
+                <field name="factory_id"/>
+                <field name="production_line_id"/>
+                <field name="style_id"/>
+                <field name="balancing_id"/>
+                <field name="smv"/>
+                <field name="working_minutes"/>
+                <field name="manpower_present"/>
+                <field name="produced_qty"/>
+                <field name="earned_minutes" readonly="1"/>
+                <field name="available_minutes" readonly="1"/>
+                <field name="efficiency_percent" widget="percentage" readonly="1"/>
+                <field name="remarks"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_fw_efficiency_report_form" model="ir.ui.view">
+        <field name="name">fw.efficiency.report.form</field>
+        <field name="model">fw.efficiency.report</field>
+        <field name="arch" type="xml">
+            <form string="Daily Efficiency Report">
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="date"/>
+                            <field name="factory_id"/>
+                            <field name="production_line_id"/>
+                            <field name="style_id"/>
+                            <field name="balancing_id"/>
+                        </group>
+                        <group>
+                            <field name="smv"/>
+                            <field name="working_minutes"/>
+                            <field name="manpower_present"/>
+                            <field name="produced_qty"/>
+                        </group>
+                    </group>
+                    <group string="Result">
+                        <group>
+                            <field name="earned_minutes" readonly="1"/>
+                            <field name="available_minutes" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="efficiency_percent" widget="percentage" readonly="1"/>
+                        </group>
+                    </group>
+                    <field name="remarks" placeholder="Remarks..."/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_fw_efficiency_report_search" model="ir.ui.view">
+        <field name="name">fw.efficiency.report.search</field>
+        <field name="model">fw.efficiency.report</field>
+        <field name="arch" type="xml">
+            <search string="Search Efficiency Reports">
+                <field name="production_line_id"/>
+                <field name="style_id"/>
+                <field name="date"/>
+                <group expand="0" string="Group By">
+                    <filter string="Factory" name="group_factory" context="{'group_by': 'factory_id'}"/>
+                    <filter string="Line" name="group_line" context="{'group_by': 'production_line_id'}"/>
+                    <filter string="Date" name="group_date" context="{'group_by': 'date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_fw_efficiency_report" model="ir.actions.act_window">
+        <field name="name">Daily Efficiency Reports</field>
+        <field name="res_model">fw.efficiency.report</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_fw_efficiency_report_search"/>
+        <field name="context">{'search_default_group_line': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Record your first daily efficiency report</p>
+        </field>
+    </record>
+</odoo>

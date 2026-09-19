@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fw_style_costing_tree" model="ir.ui.view">
+        <field name="name">fw.style.costing.tree</field>
+        <field name="model">fw.style.costing</field>
+        <field name="arch" type="xml">
+            <tree string="Style Cost Sheets" decoration-danger="profit_margin_percent &lt; 10"
+                  decoration-success="profit_margin_percent &gt;= 25">
+                <field name="name"/>
+                <field name="style_id"/>
+                <field name="total_cost" widget="monetary"/>
+                <field name="selling_price" widget="monetary"/>
+                <field name="profit_margin_percent"/>
+                <field name="currency_id" invisible="1"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_fw_style_costing_form" model="ir.ui.view">
+        <field name="name">fw.style.costing.form</field>
+        <field name="model">fw.style.costing</field>
+        <field name="arch" type="xml">
+            <form string="Style Cost Sheet">
+                <header>
+                    <button name="action_confirm" type="object" string="Confirm"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_reset_draft" type="object" string="Reset to Draft"
+                            invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="style_id"/>
+                            <field name="bom_id"/>
+                            <field name="line_balancing_id"/>
+                        </group>
+                        <group>
+                            <field name="currency_id" groups="base.group_multi_currency"/>
+                        </group>
+                    </group>
+                    <group string="Material Cost">
+                        <group>
+                            <field name="material_cost"/>
+                        </group>
+                        <group>
+                            <button name="action_pull_material_cost" type="object"
+                                    string="Pull from BOM" class="btn-secondary"/>
+                        </group>
+                    </group>
+                    <group string="Labor Cost">
+                        <group>
+                            <field name="labor_rate_per_minute"/>
+                            <field name="labor_cost"/>
+                        </group>
+                        <group>
+                            <button name="action_pull_labor_cost" type="object"
+                                    string="Pull from Line Balancing" class="btn-secondary"/>
+                        </group>
+                    </group>
+                    <group string="Overhead &amp; Other">
+                        <group>
+                            <field name="overhead_percent"/>
+                            <field name="overhead_cost" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="other_cost"/>
+                        </group>
+                    </group>
+                    <group string="Summary">
+                        <group>
+                            <field name="total_cost" readonly="1"/>
+                            <field name="selling_price"/>
+                            <button name="action_pull_selling_price" type="object"
+                                    string="Pull from Style Last Price" class="btn-secondary"/>
+                        </group>
+                        <group>
+                            <field name="profit_amount" readonly="1"/>
+                            <field name="profit_margin_percent" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_fw_style_costing_search" model="ir.ui.view">
+        <field name="name">fw.style.costing.search</field>
+        <field name="model">fw.style.costing</field>
+        <field name="arch" type="xml">
+            <search string="Search Style Cost Sheets">
+                <field name="name"/>
+                <field name="style_id"/>
+                <group expand="0" string="Group By">
+                    <filter string="Style" name="group_style" context="{'group_by': 'style_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_fw_style_costing" model="ir.actions.act_window">
+        <field name="name">Style Cost Sheets</field>
+        <field name="res_model">fw.style.costing</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_fw_style_costing_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first style cost sheet</p>
+        </field>
+    </record>
+</odoo>

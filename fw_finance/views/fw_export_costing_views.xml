@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fw_export_costing_tree" model="ir.ui.view">
+        <field name="name">fw.export.costing.tree</field>
+        <field name="model">fw.export.costing</field>
+        <field name="arch" type="xml">
+            <tree string="Export Costing" decoration-danger="net_margin_percent &lt; 5"
+                  decoration-success="net_margin_percent &gt;= 15">
+                <field name="name"/>
+                <field name="buyer_order_id"/>
+                <field name="order_qty"/>
+                <field name="fob_value" widget="monetary"/>
+                <field name="total_export_cost" widget="monetary"/>
+                <field name="net_margin" widget="monetary"/>
+                <field name="net_margin_percent"/>
+                <field name="currency_id" invisible="1"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_fw_export_costing_form" model="ir.ui.view">
+        <field name="name">fw.export.costing.form</field>
+        <field name="model">fw.export.costing</field>
+        <field name="arch" type="xml">
+            <form string="Export Costing">
+                <header>
+                    <button name="action_confirm" type="object" string="Confirm"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_reset_draft" type="object" string="Reset to Draft"
+                            invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="buyer_order_id"/>
+                            <field name="order_qty" readonly="1"/>
+                            <field name="currency_id" groups="base.group_multi_currency"/>
+                        </group>
+                        <group>
+                            <field name="fob_value"/>
+                            <button name="action_pull_fob_from_order" type="object"
+                                    string="Pull FOB from Order" class="btn-secondary"/>
+                        </group>
+                    </group>
+                    <group string="Cut &amp; Make Cost">
+                        <group>
+                            <field name="style_costing_id"/>
+                            <field name="cm_cost_per_pair"/>
+                            <button name="action_pull_cm_from_costing" type="object"
+                                    string="Pull from Style Cost Sheet" class="btn-secondary"/>
+                        </group>
+                        <group>
+                            <field name="total_cm_cost" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Export Costs">
+                        <group>
+                            <field name="freight_cost"/>
+                            <field name="insurance_cost"/>
+                            <field name="other_export_cost"/>
+                        </group>
+                    </group>
+                    <group string="Summary">
+                        <group>
+                            <field name="total_export_cost" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="net_margin" readonly="1"/>
+                            <field name="net_margin_percent" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_fw_export_costing" model="ir.actions.act_window">
+        <field name="name">Export Costing</field>
+        <field name="res_model">fw.export.costing</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first export costing sheet</p>
+        </field>
+    </record>
+</odoo>
