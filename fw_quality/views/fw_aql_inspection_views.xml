@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fw_aql_inspection_tree" model="ir.ui.view">
+        <field name="name">fw.aql.inspection.tree</field>
+        <field name="model">fw.aql.inspection</field>
+        <field name="arch" type="xml">
+            <tree string="AQL Inspections" decoration-danger="result=='fail'"
+                  decoration-success="result=='pass'">
+                <field name="name"/>
+                <field name="inspection_type"/>
+                <field name="style_id"/>
+                <field name="production_order_id"/>
+                <field name="shipment_id"/>
+                <field name="date"/>
+                <field name="lot_size"/>
+                <field name="sample_size"/>
+                <field name="result" widget="badge"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_fw_aql_inspection_form" model="ir.ui.view">
+        <field name="name">fw.aql.inspection.form</field>
+        <field name="model">fw.aql.inspection</field>
+        <field name="arch" type="xml">
+            <form string="AQL Inspection">
+                <header>
+                    <button name="action_start" type="object" string="Start Inspection"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_complete" type="object" string="Complete"
+                            class="btn-primary" invisible="state != 'in_progress'"/>
+                    <button name="action_reset_draft" type="object" string="Reset to Draft"
+                            invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,in_progress,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                        <h3>
+                            <field name="result" widget="badge"
+                                   decoration-success="result=='pass'"
+                                   decoration-danger="result=='fail'"/>
+                        </h3>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="inspection_type"/>
+                            <field name="style_id"/>
+                            <field name="production_order_id"/>
+                            <field name="shipment_id"/>
+                        </group>
+                        <group>
+                            <field name="date"/>
+                            <field name="inspector_id"/>
+                            <field name="lot_size"/>
+                            <field name="inspection_level"/>
+                        </group>
+                    </group>
+                    <div class="oe_button_box">
+                        <button name="action_determine_sample" type="object"
+                                string="Determine Sample Size (AQL Lookup)"
+                                class="btn-secondary"/>
+                    </div>
+                    <group string="Sample Plan (from AQL Table)">
+                        <group>
+                            <field name="aql_table_id" readonly="1"/>
+                            <field name="sample_size"/>
+                        </group>
+                        <group>
+                            <field name="ac_major"/>
+                            <field name="re_major"/>
+                            <field name="ac_minor"/>
+                            <field name="re_minor"/>
+                            <field name="ac_critical"/>
+                            <field name="re_critical"/>
+                        </group>
+                    </group>
+                    <group string="Found Defects (Enter Counts)">
+                        <group>
+                            <field name="found_critical_qty"/>
+                            <field name="found_major_qty"/>
+                            <field name="found_minor_qty"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Defect Detail">
+                            <field name="defect_line_ids">
+                                <tree editable="bottom" decoration-danger="severity=='critical'"
+                                      decoration-warning="severity=='major'">
+                                    <field name="defect_code_id"/>
+                                    <field name="severity" readonly="1"/>
+                                    <field name="qty"/>
+                                    <field name="remarks"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Remarks">
+                            <field name="remarks"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_fw_aql_inspection_search" model="ir.ui.view">
+        <field name="name">fw.aql.inspection.search</field>
+        <field name="model">fw.aql.inspection</field>
+        <field name="arch" type="xml">
+            <search string="Search AQL Inspections">
+                <field name="name"/>
+                <field name="style_id"/>
+                <field name="production_order_id"/>
+                <field name="shipment_id"/>
+                <filter string="Passed" name="passed" domain="[('result','=','pass')]"/>
+                <filter string="Failed" name="failed" domain="[('result','=','fail')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Inspection Type" name="group_type" context="{'group_by': 'inspection_type'}"/>
+                    <filter string="Result" name="group_result" context="{'group_by': 'result'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_fw_aql_inspection" model="ir.actions.act_window">
+        <field name="name">AQL Inspections</field>
+        <field name="res_model">fw.aql.inspection</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_fw_aql_inspection_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first AQL inspection</p>
+        </field>
+    </record>
+</odoo>

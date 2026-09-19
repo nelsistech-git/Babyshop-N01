@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fw_material_lot_tree" model="ir.ui.view">
+        <field name="name">fw.material.lot.tree</field>
+        <field name="model">fw.material.lot</field>
+        <field name="arch" type="xml">
+            <tree string="Material Lots" decoration-warning="state=='quarantine'"
+                  decoration-muted="state=='exhausted'">
+                <field name="lot_no"/>
+                <field name="component_id"/>
+                <field name="shade_code"/>
+                <field name="supplier_id"/>
+                <field name="received_qty"/>
+                <field name="consumed_qty"/>
+                <field name="remaining_qty"/>
+                <field name="received_date"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_fw_material_lot_form" model="ir.ui.view">
+        <field name="name">fw.material.lot.form</field>
+        <field name="model">fw.material.lot</field>
+        <field name="arch" type="xml">
+            <form string="Material Lot">
+                <header>
+                    <button name="action_set_quarantine" type="object" string="Set Quarantine"
+                            invisible="state != 'active'"/>
+                    <button name="action_reactivate" type="object" string="Reactivate"
+                            class="btn-primary" invisible="state != 'quarantine'"/>
+                    <button name="action_mark_exhausted" type="object" string="Mark Exhausted"
+                            invisible="state == 'exhausted'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="active,exhausted"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="lot_no" placeholder="Supplier's Lot / Batch No."/></h1>
+                        <h3><field name="name" readonly="1"/></h3>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="component_id"/>
+                            <field name="shade_code"/>
+                            <field name="supplier_id"/>
+                            <field name="grn_id"/>
+                        </group>
+                        <group>
+                            <field name="uom_id"/>
+                            <field name="received_qty"/>
+                            <field name="consumed_qty" readonly="1"/>
+                            <field name="remaining_qty" readonly="1"/>
+                            <field name="received_date"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Consumption Records">
+                            <field name="consumption_ids">
+                                <tree editable="bottom">
+                                    <field name="production_order_id"/>
+                                    <field name="bundle_id"/>
+                                    <field name="qty_used"/>
+                                    <field name="consumption_date"/>
+                                    <field name="remarks"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Remarks">
+                            <field name="remarks"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_fw_material_lot_search" model="ir.ui.view">
+        <field name="name">fw.material.lot.search</field>
+        <field name="model">fw.material.lot</field>
+        <field name="arch" type="xml">
+            <search string="Search Material Lots">
+                <field name="lot_no"/>
+                <field name="component_id"/>
+                <field name="shade_code"/>
+                <field name="supplier_id"/>
+                <filter string="Quarantine" name="quarantine" domain="[('state','=','quarantine')]"/>
+                <filter string="Active with Stock" name="active_stock"
+                        domain="[('state','=','active'),('remaining_qty','&gt;',0)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Component" name="group_component" context="{'group_by': 'component_id'}"/>
+                    <filter string="Shade Code" name="group_shade" context="{'group_by': 'shade_code'}"/>
+                    <filter string="Supplier" name="group_supplier" context="{'group_by': 'supplier_id'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_fw_material_lot" model="ir.actions.act_window">
+        <field name="name">Material Lots</field>
+        <field name="res_model">fw.material.lot</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_fw_material_lot_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Register your first material lot</p>
+        </field>
+    </record>
+</odoo>

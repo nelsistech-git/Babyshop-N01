@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fw_fabric_swatch_tree" model="ir.ui.view">
+        <field name="name">fw.fabric.swatch.tree</field>
+        <field name="model">fw.fabric.swatch</field>
+        <field name="arch" type="xml">
+            <tree string="Fabric / Trim Swatches">
+                <field name="name"/>
+                <field name="material_type"/>
+                <field name="material_description"/>
+                <field name="color_id"/>
+                <field name="supplier_id"/>
+                <field name="location_id"/>
+                <field name="received_date"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_fw_fabric_swatch_form" model="ir.ui.view">
+        <field name="name">fw.fabric.swatch.form</field>
+        <field name="model">fw.fabric.swatch</field>
+        <field name="arch" type="xml">
+            <form string="Fabric / Trim Swatch">
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="material_type"/>
+                            <field name="material_description"/>
+                            <field name="color_id"/>
+                        </group>
+                        <group>
+                            <field name="supplier_id"/>
+                            <field name="location_id"/>
+                            <field name="received_date"/>
+                        </group>
+                    </group>
+                    <group string="Used in Styles">
+                        <field name="style_ids" widget="many2many_tags" nolabel="1"/>
+                    </group>
+                    <field name="remarks" placeholder="Remarks..."/>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_fw_fabric_swatch_search" model="ir.ui.view">
+        <field name="name">fw.fabric.swatch.search</field>
+        <field name="model">fw.fabric.swatch</field>
+        <field name="arch" type="xml">
+            <search string="Search Swatches">
+                <field name="name"/>
+                <field name="material_description"/>
+                <field name="supplier_id"/>
+                <field name="style_ids"/>
+                <group expand="0" string="Group By">
+                    <filter string="Material Type" name="group_type" context="{'group_by': 'material_type'}"/>
+                    <filter string="Location" name="group_location" context="{'group_by': 'location_id'}"/>
+                    <filter string="Supplier" name="group_supplier" context="{'group_by': 'supplier_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_fw_fabric_swatch" model="ir.actions.act_window">
+        <field name="name">Fabric / Trim Swatches</field>
+        <field name="res_model">fw.fabric.swatch</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_fw_fabric_swatch_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Add your first fabric/trim swatch</p>
+        </field>
+    </record>
+</odoo>

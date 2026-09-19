@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fw_rework_order_tree" model="ir.ui.view">
+        <field name="name">fw.rework.order.tree</field>
+        <field name="model">fw.rework.order</field>
+        <field name="arch" type="xml">
+            <tree string="Rework Orders" decoration-danger="reinspection_result=='fail'"
+                  decoration-success="reinspection_result=='pass'">
+                <field name="name"/>
+                <field name="production_order_id"/>
+                <field name="style_id"/>
+                <field name="source"/>
+                <field name="total_rework_qty"/>
+                <field name="scrapped_qty"/>
+                <field name="reworked_qty"/>
+                <field name="assigned_to"/>
+                <field name="reinspection_result"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_fw_rework_order_form" model="ir.ui.view">
+        <field name="name">fw.rework.order.form</field>
+        <field name="model">fw.rework.order</field>
+        <field name="arch" type="xml">
+            <form string="Rework Order">
+                <header>
+                    <button name="action_start" type="object" string="Start Rework"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_send_reinspection" type="object"
+                            string="Send for Re-Inspection" class="btn-primary"
+                            invisible="state != 'in_progress'"/>
+                    <button name="action_reinspection_pass" type="object" string="Pass"
+                            class="btn-primary" invisible="state != 'reinspection'"/>
+                    <button name="action_reinspection_fail" type="object" string="Fail"
+                            invisible="state != 'reinspection'"/>
+                    <button name="action_create_followup_rework" type="object"
+                            string="Create Follow-Up Rework"
+                            invisible="reinspection_result != 'fail' or followup_rework_id"/>
+                    <button name="action_reset_draft" type="object" string="Reset to Draft"
+                            invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,in_progress,reinspection,closed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="source"/>
+                            <field name="inline_qc_id" invisible="source != 'inline_qc'"/>
+                            <field name="aql_inspection_id" invisible="source != 'aql_inspection'"/>
+                            <field name="production_order_id"/>
+                            <field name="style_id" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="assigned_to"/>
+                            <field name="rework_start_date"/>
+                            <field name="rework_end_date"/>
+                        </group>
+                    </group>
+                    <group string="Quantities">
+                        <group>
+                            <field name="total_rework_qty" readonly="1"/>
+                            <field name="scrapped_qty"/>
+                        </group>
+                        <group>
+                            <field name="reworked_qty" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Re-Inspection">
+                        <group>
+                            <field name="reinspection_result" readonly="1"/>
+                            <field name="followup_rework_id" readonly="1"
+                                   invisible="not followup_rework_id"/>
+                        </group>
+                    </group>
+                    <field name="reinspection_notes" placeholder="Re-inspection notes..."/>
+                    <notebook>
+                        <page string="Defects to Rework">
+                            <field name="defect_line_ids">
+                                <tree editable="bottom">
+                                    <field name="defect_code_id"/>
+                                    <field name="qty"/>
+                                    <field name="remarks"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_fw_rework_order_search" model="ir.ui.view">
+        <field name="name">fw.rework.order.search</field>
+        <field name="model">fw.rework.order</field>
+        <field name="arch" type="xml">
+            <search string="Search Rework Orders">
+                <field name="name"/>
+                <field name="production_order_id"/>
+                <field name="style_id"/>
+                <filter string="Awaiting Re-Inspection" name="reinspection" domain="[('state','=','reinspection')]"/>
+                <filter string="Failed Re-Inspection" name="failed" domain="[('reinspection_result','=','fail')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Production Order" name="group_order" context="{'group_by': 'production_order_id'}"/>
+                    <filter string="Style" name="group_style" context="{'group_by': 'style_id'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_fw_rework_order" model="ir.actions.act_window">
+        <field name="name">Rework Orders</field>
+        <field name="res_model">fw.rework.order</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_fw_rework_order_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first rework order</p>
+        </field>
+    </record>
+</odoo>
