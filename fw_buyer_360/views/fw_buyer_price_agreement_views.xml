@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fw_buyer_price_agreement_tree" model="ir.ui.view">
+        <field name="name">fw.buyer.price.agreement.tree</field>
+        <field name="model">fw.buyer.price.agreement</field>
+        <field name="arch" type="xml">
+            <tree string="Price Agreements" decoration-muted="state=='expired'"
+                  decoration-success="state=='active'">
+                <field name="name"/>
+                <field name="buyer_id"/>
+                <field name="style_id"/>
+                <field name="category"/>
+                <field name="season_id"/>
+                <field name="price_from" widget="monetary"/>
+                <field name="price_to" widget="monetary"/>
+                <field name="currency_id" invisible="1"/>
+                <field name="valid_from"/>
+                <field name="valid_to"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_fw_buyer_price_agreement_form" model="ir.ui.view">
+        <field name="name">fw.buyer.price.agreement.form</field>
+        <field name="model">fw.buyer.price.agreement</field>
+        <field name="arch" type="xml">
+            <form string="Price Agreement">
+                <header>
+                    <button name="action_activate" type="object" string="Activate"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_expire" type="object" string="Mark Expired"
+                            invisible="state != 'active'"/>
+                    <button name="action_reset_draft" type="object" string="Reset to Draft"
+                            invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,active,expired"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="buyer_id"/>
+                            <field name="style_id"/>
+                            <field name="category" invisible="style_id"/>
+                            <field name="season_id"/>
+                        </group>
+                        <group>
+                            <field name="currency_id" groups="base.group_multi_currency"/>
+                            <field name="price_from"/>
+                            <field name="price_to"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="valid_from"/>
+                            <field name="valid_to"/>
+                        </group>
+                    </group>
+                    <field name="notes" placeholder="Notes..."/>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_fw_buyer_price_agreement_search" model="ir.ui.view">
+        <field name="name">fw.buyer.price.agreement.search</field>
+        <field name="model">fw.buyer.price.agreement</field>
+        <field name="arch" type="xml">
+            <search string="Search Price Agreements">
+                <field name="name"/>
+                <field name="buyer_id"/>
+                <field name="style_id"/>
+                <filter string="Active" name="active_filter" domain="[('state','=','active')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Buyer" name="group_buyer" context="{'group_by': 'buyer_id'}"/>
+                    <filter string="Season" name="group_season" context="{'group_by': 'season_id'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_fw_buyer_price_agreement" model="ir.actions.act_window">
+        <field name="name">Price Agreements</field>
+        <field name="res_model">fw.buyer.price.agreement</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_fw_buyer_price_agreement_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first price agreement</p>
+        </field>
+    </record>
+</odoo>

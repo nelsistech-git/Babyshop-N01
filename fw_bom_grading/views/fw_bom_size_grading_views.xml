@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fw_bom_size_grading_tree" model="ir.ui.view">
+        <field name="name">fw.bom.size.grading.tree</field>
+        <field name="model">fw.bom.size.grading</field>
+        <field name="arch" type="xml">
+            <tree string="All Size Grading Rows" editable="bottom">
+                <field name="bom_line_id"/>
+                <field name="size_id"/>
+                <field name="qty_per_pair"/>
+                <field name="remarks"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_fw_bom_size_grading_search" model="ir.ui.view">
+        <field name="name">fw.bom.size.grading.search</field>
+        <field name="model">fw.bom.size.grading</field>
+        <field name="arch" type="xml">
+            <search string="Search Size Grading Rows">
+                <field name="bom_line_id"/>
+                <field name="size_id"/>
+                <group expand="0" string="Group By">
+                    <filter string="BOM Component" name="group_line" context="{'group_by': 'bom_line_id'}"/>
+                    <filter string="Size" name="group_size" context="{'group_by': 'size_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_fw_bom_size_grading" model="ir.actions.act_window">
+        <field name="name">All Size Grading Rows</field>
+        <field name="res_model">fw.bom.size.grading</field>
+        <field name="view_mode">tree</field>
+        <field name="search_view_id" ref="view_fw_bom_size_grading_search"/>
+        <field name="context">{'search_default_group_line': 1}</field>
+    </record>
+
+    <menuitem id="menu_fw_bom_size_grading_all" name="All Size Grading Rows"
+              parent="fw_plm.menu_fw_plm_root" action="action_fw_bom_size_grading"
+              sequence="16"/>
+</odoo>

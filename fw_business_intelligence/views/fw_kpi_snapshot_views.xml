@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fw_kpi_snapshot_tree" model="ir.ui.view">
+        <field name="name">fw.kpi.snapshot.tree</field>
+        <field name="model">fw.kpi.snapshot</field>
+        <field name="arch" type="xml">
+            <tree string="KPI Snapshots" decoration-danger="avg_line_efficiency_percent &lt; 50 and state == 'generated'"
+                  decoration-success="avg_line_efficiency_percent &gt;= 75">
+                <field name="name"/>
+                <field name="factory_id"/>
+                <field name="period_start"/>
+                <field name="period_end"/>
+                <field name="total_production_qty"/>
+                <field name="avg_dhu_percent"/>
+                <field name="avg_line_efficiency_percent"/>
+                <field name="total_sales_value" widget="monetary"/>
+                <field name="currency_id" invisible="1"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_fw_kpi_snapshot_form" model="ir.ui.view">
+        <field name="name">fw.kpi.snapshot.form</field>
+        <field name="model">fw.kpi.snapshot</field>
+        <field name="arch" type="xml">
+            <form string="KPI Snapshot">
+                <header>
+                    <button name="action_generate_snapshot" type="object"
+                            string="Generate / Refresh Snapshot" class="btn-primary"/>
+                    <button name="action_reset_draft" type="object" string="Reset to Draft"
+                            invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,generated"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="factory_id"/>
+                            <field name="period_start"/>
+                            <field name="period_end"/>
+                        </group>
+                        <group>
+                            <field name="snapshot_date" readonly="1"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <group string="Production">
+                        <group>
+                            <field name="total_production_qty" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="total_orders_count" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Quality">
+                        <group>
+                            <field name="avg_dhu_percent" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="aql_pass_rate_percent" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Industrial Engineering">
+                        <field name="avg_line_efficiency_percent" readonly="1"/>
+                    </group>
+                    <group string="Maintenance">
+                        <group>
+                            <field name="breakdown_count" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="total_downtime_hours" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Finance">
+                        <group>
+                            <field name="total_sales_value" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="cost_per_pair" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_fw_kpi_snapshot_graph" model="ir.ui.view">
+        <field name="name">fw.kpi.snapshot.graph</field>
+        <field name="model">fw.kpi.snapshot</field>
+        <field name="arch" type="xml">
+            <graph string="KPI Trends" type="bar">
+                <field name="period_end" type="row"/>
+                <field name="avg_line_efficiency_percent" type="measure"/>
+                <field name="avg_dhu_percent" type="measure"/>
+                <field name="total_production_qty" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_fw_kpi_snapshot_pivot" model="ir.ui.view">
+        <field name="name">fw.kpi.snapshot.pivot</field>
+        <field name="model">fw.kpi.snapshot</field>
+        <field name="arch" type="xml">
+            <pivot string="KPI Analysis">
+                <field name="factory_id" type="row"/>
+                <field name="period_end" type="col"/>
+                <field name="total_production_qty" type="measure"/>
+                <field name="avg_line_efficiency_percent" type="measure"/>
+                <field name="avg_dhu_percent" type="measure"/>
+                <field name="total_sales_value" type="measure"/>
+                <field name="cost_per_pair" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_fw_kpi_snapshot_search" model="ir.ui.view">
+        <field name="name">fw.kpi.snapshot.search</field>
+        <field name="model">fw.kpi.snapshot</field>
+        <field name="arch" type="xml">
+            <search string="Search KPI Snapshots">
+                <field name="name"/>
+                <field name="factory_id"/>
+                <group expand="0" string="Group By">
+                    <filter string="Factory" name="group_factory" context="{'group_by': 'factory_id'}"/>
+                    <filter string="Period End" name="group_period" context="{'group_by': 'period_end'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_fw_kpi_snapshot" model="ir.actions.act_window">
+        <field name="name">KPI Snapshots</field>
+        <field name="res_model">fw.kpi.snapshot</field>
+        <field name="view_mode">tree,form,graph,pivot</field>
+        <field name="search_view_id" ref="view_fw_kpi_snapshot_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Generate your first KPI snapshot</p>
+        </field>
+    </record>
+</odoo>

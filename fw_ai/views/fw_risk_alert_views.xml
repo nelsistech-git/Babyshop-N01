@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fw_risk_alert_tree" model="ir.ui.view">
+        <field name="name">fw.risk.alert.tree</field>
+        <field name="model">fw.risk.alert</field>
+        <field name="arch" type="xml">
+            <tree string="Risk Alerts" decoration-danger="severity=='high' and state=='open'"
+                  decoration-warning="severity=='medium' and state=='open'"
+                  decoration-muted="state=='resolved'">
+                <field name="name"/>
+                <field name="risk_type"/>
+                <field name="severity"/>
+                <field name="buyer_order_id"/>
+                <field name="machine_id"/>
+                <field name="supplier_id"/>
+                <field name="spare_part_id"/>
+                <field name="detected_date"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_fw_risk_alert_form" model="ir.ui.view">
+        <field name="name">fw.risk.alert.form</field>
+        <field name="model">fw.risk.alert</field>
+        <field name="arch" type="xml">
+            <form string="Risk Alert">
+                <header>
+                    <button name="action_acknowledge" type="object" string="Acknowledge"
+                            class="btn-primary" invisible="state != 'open'"/>
+                    <button name="action_resolve" type="object" string="Resolve"
+                            class="btn-primary" invisible="state == 'resolved'"/>
+                    <button name="action_reopen" type="object" string="Reopen"
+                            invisible="state != 'resolved'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="open,acknowledged,resolved"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                        <h3>
+                            <field name="severity" widget="badge"
+                                   decoration-danger="severity=='high'"
+                                   decoration-warning="severity=='medium'"
+                                   decoration-info="severity=='low'"/>
+                        </h3>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="risk_type"/>
+                            <field name="scan_id" readonly="1"/>
+                            <field name="detected_date"/>
+                        </group>
+                        <group>
+                            <field name="buyer_order_id" invisible="not buyer_order_id"/>
+                            <field name="machine_id" invisible="not machine_id"/>
+                            <field name="supplier_id" invisible="not supplier_id"/>
+                            <field name="spare_part_id" invisible="not spare_part_id"/>
+                        </group>
+                    </group>
+                    <field name="description" readonly="1"/>
+                    <group string="Resolution" invisible="not resolved_by">
+                        <field name="resolved_by" readonly="1"/>
+                        <field name="resolved_date" readonly="1"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_fw_risk_alert_search" model="ir.ui.view">
+        <field name="name">fw.risk.alert.search</field>
+        <field name="model">fw.risk.alert</field>
+        <field name="arch" type="xml">
+            <search string="Search Risk Alerts">
+                <field name="name"/>
+                <field name="buyer_order_id"/>
+                <field name="machine_id"/>
+                <field name="supplier_id"/>
+                <filter string="Open" name="open" domain="[('state','=','open')]"/>
+                <filter string="High Severity" name="high" domain="[('severity','=','high')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Risk Type" name="group_type" context="{'group_by': 'risk_type'}"/>
+                    <filter string="Severity" name="group_severity" context="{'group_by': 'severity'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_fw_risk_alert" model="ir.actions.act_window">
+        <field name="name">Risk Alerts</field>
+        <field name="res_model">fw.risk.alert</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_fw_risk_alert_search"/>
+        <field name="context">{'search_default_open': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No risk alerts yet - run a scan first</p>
+        </field>
+    </record>
+</odoo>

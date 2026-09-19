@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Sales Analysis: Buyer Orders -->
+    <record id="view_fw_buyer_order_graph_bi" model="ir.ui.view">
+        <field name="name">fw.buyer.order.graph.bi</field>
+        <field name="model">fw.buyer.order</field>
+        <field name="arch" type="xml">
+            <graph string="Sales Analysis" type="bar">
+                <field name="order_date" type="row" interval="month"/>
+                <field name="total_amount" type="measure"/>
+                <field name="total_qty" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_fw_buyer_order_pivot_bi" model="ir.ui.view">
+        <field name="name">fw.buyer.order.pivot.bi</field>
+        <field name="model">fw.buyer.order</field>
+        <field name="arch" type="xml">
+            <pivot string="Sales Analysis">
+                <field name="buyer_id" type="row"/>
+                <field name="order_date" type="col" interval="month"/>
+                <field name="total_qty" type="measure"/>
+                <field name="total_amount" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_fw_bi_sales_analysis" model="ir.actions.act_window">
+        <field name="name">Sales Analysis</field>
+        <field name="res_model">fw.buyer.order</field>
+        <field name="view_mode">graph,pivot,tree</field>
+    </record>
+
+    <!-- Efficiency Analysis -->
+    <record id="view_fw_efficiency_report_graph_bi" model="ir.ui.view">
+        <field name="name">fw.efficiency.report.graph.bi</field>
+        <field name="model">fw.efficiency.report</field>
+        <field name="arch" type="xml">
+            <graph string="Efficiency Analysis" type="line">
+                <field name="date" type="row" interval="week"/>
+                <field name="efficiency_percent" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_fw_efficiency_report_pivot_bi" model="ir.ui.view">
+        <field name="name">fw.efficiency.report.pivot.bi</field>
+        <field name="model">fw.efficiency.report</field>
+        <field name="arch" type="xml">
+            <pivot string="Efficiency Analysis">
+                <field name="production_line_id" type="row"/>
+                <field name="date" type="col" interval="month"/>
+                <field name="produced_qty" type="measure"/>
+                <field name="efficiency_percent" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_fw_bi_efficiency_analysis" model="ir.actions.act_window">
+        <field name="name">Efficiency Analysis</field>
+        <field name="res_model">fw.efficiency.report</field>
+        <field name="view_mode">graph,pivot,tree</field>
+    </record>
+
+    <!-- Costing Analysis -->
+    <record id="view_fw_factory_costing_graph_bi" model="ir.ui.view">
+        <field name="name">fw.factory.costing.graph.bi</field>
+        <field name="model">fw.factory.costing</field>
+        <field name="arch" type="xml">
+            <graph string="Cost per Pair Trend" type="line">
+                <field name="period_end" type="row"/>
+                <field name="cost_per_pair" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_fw_factory_costing_pivot_bi" model="ir.ui.view">
+        <field name="name">fw.factory.costing.pivot.bi</field>
+        <field name="model">fw.factory.costing</field>
+        <field name="arch" type="xml">
+            <pivot string="Costing Analysis">
+                <field name="factory_id" type="row"/>
+                <field name="period_end" type="col"/>
+                <field name="total_cost" type="measure"/>
+                <field name="cost_per_pair" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_fw_bi_costing_analysis" model="ir.actions.act_window">
+        <field name="name">Costing Analysis</field>
+        <field name="res_model">fw.factory.costing</field>
+        <field name="view_mode">graph,pivot,tree</field>
+    </record>
+</odoo>

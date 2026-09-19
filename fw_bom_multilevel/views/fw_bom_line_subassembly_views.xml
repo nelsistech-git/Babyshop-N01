@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fw_bom_line_subassembly_form" model="ir.ui.view">
+        <field name="name">fw.bom.line.subassembly.form</field>
+        <field name="model">fw.bom.line</field>
+        <field name="arch" type="xml">
+            <form string="BOM Component - Sub-Assembly">
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="part_name" readonly="1"/></h1>
+                        <h3><field name="component_id" readonly="1"/></h3>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="bom_id" readonly="1"/>
+                            <field name="qty_per_pair"/>
+                        </group>
+                        <group>
+                            <field name="unit_cost"/>
+                            <field name="line_cost" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Sub-Assembly">
+                        <field name="sub_bom_id"/>
+                        <button name="action_sync_cost_from_subbom" type="object"
+                                string="Sync Cost from Sub-Assembly" class="btn-secondary"
+                                invisible="not sub_bom_id"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_fw_bom_line_subassembly_tree" model="ir.ui.view">
+        <field name="name">fw.bom.line.subassembly.tree</field>
+        <field name="model">fw.bom.line</field>
+        <field name="arch" type="xml">
+            <tree string="BOM Components (Sub-Assembly)" decoration-info="is_sub_assembly==True">
+                <field name="bom_id"/>
+                <field name="part_name"/>
+                <field name="component_id"/>
+                <field name="unit_cost"/>
+                <field name="line_cost"/>
+                <field name="sub_bom_id"/>
+                <field name="is_sub_assembly" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_fw_bom_line_subassembly_search" model="ir.ui.view">
+        <field name="name">fw.bom.line.subassembly.search</field>
+        <field name="model">fw.bom.line</field>
+        <field name="arch" type="xml">
+            <search string="Search BOM Components">
+                <field name="bom_id"/>
+                <field name="part_name"/>
+                <field name="sub_bom_id"/>
+                <filter string="Is Sub-Assembly" name="is_sub" domain="[('is_sub_assembly','=',True)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="BOM Version" name="group_bom" context="{'group_by': 'bom_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_fw_bom_line_subassembly" model="ir.actions.act_window">
+        <field name="name">BOM Sub-Assemblies</field>
+        <field name="res_model">fw.bom.line</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_fw_bom_line_subassembly_search"/>
+        <field name="context">{'search_default_is_sub': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Select a BOM component to link it to a sub-assembly BOM
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_fw_bom_line_subassembly" name="BOM Sub-Assemblies"
+              parent="fw_plm.menu_fw_plm_root" action="action_fw_bom_line_subassembly"
+              sequence="17"/>
+</odoo>
