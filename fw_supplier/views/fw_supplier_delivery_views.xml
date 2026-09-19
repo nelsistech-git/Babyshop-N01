@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fw_supplier_delivery_tree" model="ir.ui.view">
+        <field name="name">fw.supplier.delivery.tree</field>
+        <field name="model">fw.supplier.delivery</field>
+        <field name="arch" type="xml">
+            <tree string="Supplier Deliveries" editable="bottom"
+                  decoration-danger="delay_days &gt; 0" decoration-success="on_time==True">
+                <field name="name"/>
+                <field name="supplier_id"/>
+                <field name="po_reference"/>
+                <field name="material_description"/>
+                <field name="promised_date"/>
+                <field name="actual_delivery_date"/>
+                <field name="delay_days" readonly="1"/>
+                <field name="on_time" readonly="1"/>
+                <field name="remarks"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_fw_supplier_delivery_search" model="ir.ui.view">
+        <field name="name">fw.supplier.delivery.search</field>
+        <field name="model">fw.supplier.delivery</field>
+        <field name="arch" type="xml">
+            <search string="Search Deliveries">
+                <field name="supplier_id"/>
+                <field name="po_reference"/>
+                <filter string="Late" name="late" domain="[('delay_days','&gt;',0)]"/>
+                <filter string="On Time" name="on_time_filter" domain="[('on_time','=',True)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Supplier" name="group_supplier" context="{'group_by': 'supplier_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_fw_supplier_delivery" model="ir.actions.act_window">
+        <field name="name">Supplier Deliveries</field>
+        <field name="res_model">fw.supplier.delivery</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_fw_supplier_delivery_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Record your first supplier delivery</p>
+        </field>
+    </record>
+</odoo>

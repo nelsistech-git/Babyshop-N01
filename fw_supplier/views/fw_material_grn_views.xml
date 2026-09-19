@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fw_material_grn_tree" model="ir.ui.view">
+        <field name="name">fw.material.grn.tree</field>
+        <field name="model">fw.material.grn</field>
+        <field name="arch" type="xml">
+            <tree string="Material GRN" decoration-danger="acceptance_rate &lt; 90"
+                  decoration-success="acceptance_rate &gt;= 98">
+                <field name="name"/>
+                <field name="supplier_id"/>
+                <field name="material_description"/>
+                <field name="received_date"/>
+                <field name="received_qty"/>
+                <field name="accepted_qty"/>
+                <field name="rejected_qty"/>
+                <field name="acceptance_rate"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_fw_material_grn_form" model="ir.ui.view">
+        <field name="name">fw.material.grn.form</field>
+        <field name="model">fw.material.grn</field>
+        <field name="arch" type="xml">
+            <form string="Material GRN">
+                <header>
+                    <button name="action_confirm_inspection" type="object"
+                            string="Confirm Inspection" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_reset_draft" type="object" string="Reset to Draft"
+                            invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,inspected"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="supplier_id"/>
+                            <field name="po_reference"/>
+                            <field name="material_description"/>
+                            <field name="uom_id"/>
+                        </group>
+                        <group>
+                            <field name="received_date"/>
+                            <field name="inspected_by"/>
+                        </group>
+                    </group>
+                    <group string="Quantities">
+                        <group>
+                            <field name="received_qty"/>
+                            <field name="accepted_qty"/>
+                        </group>
+                        <group>
+                            <field name="rejected_qty" readonly="1"/>
+                            <field name="acceptance_rate" readonly="1"/>
+                        </group>
+                    </group>
+                    <field name="quality_remarks" placeholder="Quality inspection remarks..."/>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_fw_material_grn_search" model="ir.ui.view">
+        <field name="name">fw.material.grn.search</field>
+        <field name="model">fw.material.grn</field>
+        <field name="arch" type="xml">
+            <search string="Search Material GRN">
+                <field name="name"/>
+                <field name="supplier_id"/>
+                <field name="material_description"/>
+                <group expand="0" string="Group By">
+                    <filter string="Supplier" name="group_supplier" context="{'group_by': 'supplier_id'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_fw_material_grn" model="ir.actions.act_window">
+        <field name="name">Material GRN</field>
+        <field name="res_model">fw.material.grn</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_fw_material_grn_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Record your first material GRN inspection</p>
+        </field>
+    </record>
+</odoo>

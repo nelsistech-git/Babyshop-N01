@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fw_bundle_tree" model="ir.ui.view">
+        <field name="name">fw.bundle.tree</field>
+        <field name="model">fw.bundle</field>
+        <field name="arch" type="xml">
+            <tree string="WIP Bundles" decoration-success="state=='completed'">
+                <field name="name"/>
+                <field name="barcode"/>
+                <field name="production_order_id"/>
+                <field name="style_id"/>
+                <field name="color_id"/>
+                <field name="size_id"/>
+                <field name="bundle_qty"/>
+                <field name="current_stage"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_fw_bundle_form" model="ir.ui.view">
+        <field name="name">fw.bundle.form</field>
+        <field name="model">fw.bundle</field>
+        <field name="arch" type="xml">
+            <form string="WIP Bundle">
+                <header>
+                    <button name="action_move_next_stage" type="object" string="Move to Next Stage"
+                            class="btn-primary" invisible="state == 'completed'"/>
+                    <button name="action_reset_created" type="object" string="Reset"
+                            invisible="state == 'created'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="created,in_process,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                        <h3><field name="barcode" widget="barcode"/></h3>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="production_order_id"/>
+                            <field name="style_id" readonly="1"/>
+                            <field name="color_id" readonly="1"/>
+                            <field name="size_id"/>
+                        </group>
+                        <group>
+                            <field name="bundle_qty"/>
+                            <field name="current_stage"/>
+                            <field name="current_location_id"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_fw_bundle_search" model="ir.ui.view">
+        <field name="name">fw.bundle.search</field>
+        <field name="model">fw.bundle</field>
+        <field name="arch" type="xml">
+            <search string="Search WIP Bundles">
+                <field name="name"/>
+                <field name="barcode"/>
+                <field name="production_order_id"/>
+                <group expand="0" string="Group By">
+                    <filter string="Production Order" name="group_order"
+                            context="{'group_by': 'production_order_id'}"/>
+                    <filter string="Stage" name="group_stage" context="{'group_by': 'current_stage'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_fw_bundle" model="ir.actions.act_window">
+        <field name="name">WIP Bundles</field>
+        <field name="res_model">fw.bundle</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_fw_bundle_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first WIP bundle</p>
+        </field>
+    </record>
+</odoo>

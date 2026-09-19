@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fw_factory_form_warehouse_inherit" model="ir.ui.view">
+        <field name="name">fw.factory.form.warehouse.inherit</field>
+        <field name="model">fw.factory</field>
+        <field name="inherit_id" ref="fw_core_master.view_fw_factory_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='production_lines']" position="after">
+                <page string="Warehouse Zones" name="warehouse_zones">
+                    <group>
+                        <field name="zones_configured" invisible="1"/>
+                        <button name="action_setup_warehouse_zones" type="object"
+                                string="Setup Warehouse Zones" class="btn-primary"
+                                invisible="zones_configured"/>
+                        <button name="action_view_zone_stock" type="object"
+                                string="View Stock by Zone" class="btn-secondary"
+                                invisible="not zones_configured"/>
+                    </group>
+                    <group>
+                        <field name="raw_material_location_id"/>
+                        <field name="wip_location_id"/>
+                        <field name="finished_goods_location_id"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>
