@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fw_season_list" model="ir.ui.view">
+        <field name="name">fw.season.list</field>
+        <field name="model">fw.season</field>
+        <field name="arch" type="xml">
+            <tree string="Seasons">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="date_start"/>
+                <field name="date_end"/>
+                <field name="state" widget="badge"
+                       decoration-info="state=='planning'"
+                       decoration-warning="state=='development'"
+                       decoration-success="state=='production'"
+                       decoration-muted="state=='closed'"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_fw_season_form" model="ir.ui.view">
+        <field name="name">fw.season.form</field>
+        <field name="model">fw.season</field>
+        <field name="arch" type="xml">
+            <form string="Season">
+                <header>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="planning,development,production,closed"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                        </group>
+                        <group>
+                            <field name="date_start"/>
+                            <field name="date_end"/>
+                        </group>
+                    </group>
+                    <field name="notes" placeholder="Notes..."/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_fw_season" model="ir.actions.act_window">
+        <field name="name">Seasons</field>
+        <field name="res_model">fw.season</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

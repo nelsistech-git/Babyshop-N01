@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fw_style_list" model="ir.ui.view">
+        <field name="name">fw.style.list</field>
+        <field name="model">fw.style</field>
+        <field name="arch" type="xml">
+            <tree string="Styles" decoration-muted="state=='discontinued'">
+                <field name="style_no"/>
+                <field name="name"/>
+                <field name="category"/>
+                <field name="gender"/>
+                <field name="season_id"/>
+                <field name="buyer_id"/>
+                <field name="factory_id"/>
+                <field name="state" widget="badge"
+                       decoration-info="state=='concept'"
+                       decoration-warning="state=='sampling'"
+                       decoration-success="state in ('approved','production')"
+                       decoration-danger="state=='discontinued'"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_fw_style_form" model="ir.ui.view">
+        <field name="name">fw.style.form</field>
+        <field name="model">fw.style</field>
+        <field name="arch" type="xml">
+            <form string="Style">
+                <header>
+                    <button name="action_set_sampling" type="object" string="Send to Sampling"
+                            class="btn-primary" invisible="state != 'concept'"/>
+                    <button name="action_set_approved" type="object" string="Approve"
+                            class="btn-primary" invisible="state != 'sampling'"/>
+                    <button name="action_set_production" type="object" string="Start Production"
+                            class="btn-primary" invisible="state != 'approved'"/>
+                    <button name="action_set_discontinued" type="object" string="Discontinue"
+                            invisible="state == 'discontinued'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="concept,sampling,approved,production"/>
+                </header>
+                <sheet>
+                    <field name="image_1920" widget="image" class="oe_avatar"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Style Name"/></h1>
+                        <label for="style_no"/>
+                        <h3><field name="style_no" placeholder="Style Number"/></h3>
+                    </div>
+                    <group>
+                        <group string="Classification">
+                            <field name="category"/>
+                            <field name="gender"/>
+                            <field name="season_id"/>
+                            <field name="color_ids" widget="many2many_tags"/>
+                            <field name="size_curve_id"/>
+                        </group>
+                        <group string="Business">
+                            <field name="buyer_id"/>
+                            <field name="factory_id"/>
+                            <field name="product_tmpl_id"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="last_price" widget="monetary"
+                                   options="{'currency_field': 'currency_id'}"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Design Notes">
+                            <field name="description"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_fw_style_search" model="ir.ui.view">
+        <field name="name">fw.style.search</field>
+        <field name="model">fw.style</field>
+        <field name="arch" type="xml">
+            <search string="Search Styles">
+                <field name="style_no"/>
+                <field name="name"/>
+                <field name="buyer_id"/>
+                <field name="season_id"/>
+                <field name="factory_id"/>
+                <filter string="In Production" name="in_production" domain="[('state','=','production')]"/>
+                <filter string="Approved" name="approved" domain="[('state','=','approved')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Buyer" name="group_buyer" context="{'group_by': 'buyer_id'}"/>
+                    <filter string="Season" name="group_season" context="{'group_by': 'season_id'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_fw_style" model="ir.actions.act_window">
+        <field name="name">Styles</field>
+        <field name="res_model">fw.style</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_fw_style_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first footwear style</p>
+        </field>
+    </record>
+</odoo>

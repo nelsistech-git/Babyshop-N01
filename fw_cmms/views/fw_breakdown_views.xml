@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fw_breakdown_tree" model="ir.ui.view">
+        <field name="name">fw.breakdown.tree</field>
+        <field name="model">fw.breakdown</field>
+        <field name="arch" type="xml">
+            <tree string="Breakdowns" decoration-danger="priority=='critical'"
+                  decoration-warning="priority=='high'"
+                  decoration-success="state in ('resolved','closed')">
+                <field name="name"/>
+                <field name="machine_id"/>
+                <field name="factory_id"/>
+                <field name="breakdown_reason"/>
+                <field name="priority"/>
+                <field name="reported_date"/>
+                <field name="downtime_hours"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_fw_breakdown_form" model="ir.ui.view">
+        <field name="name">fw.breakdown.form</field>
+        <field name="model">fw.breakdown</field>
+        <field name="arch" type="xml">
+            <form string="Breakdown">
+                <header>
+                    <button name="action_assign" type="object" string="Assign Technician"
+                            class="btn-primary" invisible="state != 'reported'"/>
+                    <button name="action_start_repair" type="object" string="Start Repair"
+                            class="btn-primary" invisible="state != 'assigned'"/>
+                    <button name="action_resolve" type="object" string="Mark Resolved"
+                            class="btn-primary" invisible="state != 'in_progress'"/>
+                    <button name="action_close" type="object" string="Close"
+                            invisible="state != 'resolved'"/>
+                    <button name="action_reset_reported" type="object" string="Reset"
+                            invisible="state == 'reported'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="reported,assigned,in_progress,resolved,closed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="machine_id"/>
+                            <field name="factory_id" readonly="1"/>
+                            <field name="breakdown_reason"/>
+                            <field name="priority"/>
+                        </group>
+                        <group>
+                            <field name="reported_by"/>
+                            <field name="reported_date"/>
+                            <field name="assigned_technician_id"/>
+                        </group>
+                    </group>
+                    <group string="Repair Timing" invisible="not start_repair_datetime">
+                        <group>
+                            <field name="start_repair_datetime" readonly="1"/>
+                            <field name="end_repair_datetime" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="downtime_hours" readonly="1"/>
+                        </group>
+                    </group>
+                    <field name="description" placeholder="Describe the problem..."/>
+                    <notebook>
+                        <page string="Spare Parts Used">
+                            <field name="spare_used_ids">
+                                <tree editable="bottom">
+                                    <field name="spare_id"/>
+                                    <field name="available_stock" readonly="1"/>
+                                    <field name="qty_used"/>
+                                    <field name="remarks"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Resolution Notes">
+                            <field name="resolution_notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_fw_breakdown_search" model="ir.ui.view">
+        <field name="name">fw.breakdown.search</field>
+        <field name="model">fw.breakdown</field>
+        <field name="arch" type="xml">
+            <search string="Search Breakdowns">
+                <field name="name"/>
+                <field name="machine_id"/>
+                <field name="factory_id"/>
+                <filter string="Open" name="open" domain="[('state','not in',('resolved','closed'))]"/>
+                <filter string="Critical" name="critical" domain="[('priority','=','critical')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Factory" name="group_factory" context="{'group_by': 'factory_id'}"/>
+                    <filter string="Machine" name="group_machine" context="{'group_by': 'machine_id'}"/>
+                    <filter string="Reason" name="group_reason" context="{'group_by': 'breakdown_reason'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_fw_breakdown" model="ir.actions.act_window">
+        <field name="name">Breakdowns</field>
+        <field name="res_model">fw.breakdown</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_fw_breakdown_search"/>
+        <field name="context">{'search_default_open': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Report your first machine breakdown</p>
+        </field>
+    </record>
+</odoo>

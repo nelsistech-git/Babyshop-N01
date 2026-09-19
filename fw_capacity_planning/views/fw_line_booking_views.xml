@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fw_line_booking_calendar" model="ir.ui.view">
+        <field name="name">fw.line.booking.calendar</field>
+        <field name="model">fw.line.booking</field>
+        <field name="arch" type="xml">
+            <calendar string="Line Capacity Bookings" date_start="date_start"
+                      date_stop="date_end" color="production_line_id" mode="month">
+                <field name="production_line_id"/>
+                <field name="buyer_order_id"/>
+                <field name="booked_qty"/>
+                <field name="state"/>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="view_fw_line_booking_tree" model="ir.ui.view">
+        <field name="name">fw.line.booking.tree</field>
+        <field name="model">fw.line.booking</field>
+        <field name="arch" type="xml">
+            <tree string="Line Bookings" decoration-danger="is_overbooked==True"
+                  decoration-muted="state=='cancelled'">
+                <field name="name"/>
+                <field name="production_line_id"/>
+                <field name="factory_id"/>
+                <field name="buyer_order_id"/>
+                <field name="style_id"/>
+                <field name="date_start"/>
+                <field name="date_end"/>
+                <field name="booked_qty"/>
+                <field name="required_days"/>
+                <field name="is_overbooked"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_fw_line_booking_form" model="ir.ui.view">
+        <field name="name">fw.line.booking.form</field>
+        <field name="model">fw.line.booking</field>
+        <field name="arch" type="xml">
+            <form string="Line Booking">
+                <header>
+                    <button name="action_confirm" type="object" string="Confirm"
+                            class="btn-primary" invisible="state != 'planned'"/>
+                    <button name="action_complete" type="object" string="Mark Completed"
+                            invisible="state != 'confirmed'"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                            invisible="state in ('completed','cancelled')"/>
+                    <button name="action_reset_planned" type="object" string="Reset to Planned"
+                            invisible="state == 'planned'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="planned,confirmed,completed"/>
+                </header>
+                <sheet>
+                    <div class="alert alert-warning" role="alert" invisible="not is_overbooked">
+                        This booking's date range is shorter than the time required to
+                        produce the booked quantity at the line's rated capacity.
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="production_line_id"/>
+                            <field name="factory_id" readonly="1"/>
+                            <field name="rated_capacity" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="buyer_order_id"/>
+                            <field name="style_id"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="date_start"/>
+                            <field name="date_end"/>
+                            <field name="booked_days" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="booked_qty"/>
+                            <field name="required_days" readonly="1"/>
+                            <field name="is_overbooked" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_fw_line_booking_search" model="ir.ui.view">
+        <field name="name">fw.line.booking.search</field>
+        <field name="model">fw.line.booking</field>
+        <field name="arch" type="xml">
+            <search string="Search Line Bookings">
+                <field name="production_line_id"/>
+                <field name="buyer_order_id"/>
+                <field name="factory_id"/>
+                <filter string="Overbooked" name="overbooked" domain="[('is_overbooked','=',True)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Production Line" name="group_line" context="{'group_by': 'production_line_id'}"/>
+                    <filter string="Factory" name="group_factory" context="{'group_by': 'factory_id'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_fw_line_booking" model="ir.actions.act_window">
+        <field name="name">Line Capacity Bookings</field>
+        <field name="res_model">fw.line.booking</field>
+        <field name="view_mode">calendar,tree,form</field>
+        <field name="search_view_id" ref="view_fw_line_booking_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Book your first production line slot</p>
+        </field>
+    </record>
+</odoo>

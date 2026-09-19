@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fw_factory_tree" model="ir.ui.view">
+        <field name="name">fw.factory.tree</field>
+        <field name="model">fw.factory</field>
+        <field name="arch" type="xml">
+            <tree string="Factories">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="factory_type"/>
+                <field name="line_count"/>
+                <field name="capacity_pairs_per_day"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_fw_factory_form" model="ir.ui.view">
+        <field name="name">fw.factory.form</field>
+        <field name="model">fw.factory</field>
+        <field name="arch" type="xml">
+            <form string="Factory">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="%(action_fw_production_line)d" type="action"
+                                class="oe_stat_button" icon="fa-cogs"
+                                context="{'default_factory_id': id}">
+                            <field name="line_count" widget="statinfo" string="Lines"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name" placeholder="Factory Name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="factory_type"/>
+                            <field name="warehouse_id"/>
+                        </group>
+                        <group>
+                            <field name="capacity_pairs_per_day"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <field name="address" placeholder="Address..."/>
+                    <notebook>
+                        <page string="Production Lines" name="production_lines">
+                            <field name="line_ids">
+                                <tree editable="bottom">
+                                    <field name="code"/>
+                                    <field name="name"/>
+                                    <field name="line_type"/>
+                                    <field name="workstation_count"/>
+                                    <field name="rated_capacity_pairs_per_day"/>
+                                    <field name="supervisor_id"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_fw_factory" model="ir.actions.act_window">
+        <field name="name">Factories</field>
+        <field name="res_model">fw.factory</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

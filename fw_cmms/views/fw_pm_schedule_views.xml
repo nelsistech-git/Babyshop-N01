@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fw_pm_schedule_tree" model="ir.ui.view">
+        <field name="name">fw.pm.schedule.tree</field>
+        <field name="model">fw.pm.schedule</field>
+        <field name="arch" type="xml">
+            <tree string="PM Schedules">
+                <field name="name"/>
+                <field name="machine_id"/>
+                <field name="frequency_type"/>
+                <field name="frequency_interval"/>
+                <field name="last_maintenance_date"/>
+                <field name="next_due_date"/>
+                <field name="responsible_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_fw_pm_schedule_form" model="ir.ui.view">
+        <field name="name">fw.pm.schedule.form</field>
+        <field name="model">fw.pm.schedule</field>
+        <field name="arch" type="xml">
+            <form string="PM Schedule">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_tasks" type="object"
+                                class="oe_stat_button" icon="fa-tasks"
+                                invisible="task_count == 0">
+                            <field name="task_count" widget="statinfo" string="PM Tasks"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Schedule Name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="machine_id"/>
+                            <field name="responsible_id"/>
+                        </group>
+                        <group>
+                            <field name="frequency_type"/>
+                            <field name="frequency_interval"/>
+                            <field name="last_maintenance_date"/>
+                            <field name="next_due_date"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Checklist Template">
+                            <field name="checklist_ids">
+                                <tree editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="task_description"/>
+                                </tree>
+                            </field>
+                            <button name="action_generate_task" type="object"
+                                    string="Generate Next PM Task" class="btn-primary mt-2"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_fw_pm_schedule" model="ir.actions.act_window">
+        <field name="name">PM Schedules</field>
+        <field name="res_model">fw.pm.schedule</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first preventive maintenance schedule</p>
+        </field>
+    </record>
+
+    <record id="view_fw_pm_task_tree" model="ir.ui.view">
+        <field name="name">fw.pm.task.tree</field>
+        <field name="model">fw.pm.task</field>
+        <field name="arch" type="xml">
+            <tree string="PM Tasks" decoration-success="state=='done'"
+                  decoration-danger="state=='planned' and planned_date &lt; context_today()">
+                <field name="name"/>
+                <field name="machine_id"/>
+                <field name="planned_date"/>
+                <field name="actual_date"/>
+                <field name="technician_id"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_fw_pm_task_form" model="ir.ui.view">
+        <field name="name">fw.pm.task.form</field>
+        <field name="model">fw.pm.task</field>
+        <field name="arch" type="xml">
+            <form string="PM Task">
+                <header>
+                    <button name="action_start" type="object" string="Start"
+                            class="btn-primary" invisible="state != 'planned'"/>
+                    <button name="action_complete" type="object" string="Complete"
+                            class="btn-primary" invisible="state != 'in_progress'"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                            invisible="state in ('done','cancelled')"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="planned,in_progress,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="machine_id"/>
+                            <field name="schedule_id"/>
+                            <field name="technician_id"/>
+                        </group>
+                        <group>
+                            <field name="planned_date"/>
+                            <field name="actual_date" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Checklist">
+                            <field name="checklist_result_ids">
+                                <tree editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="description"/>
+                                    <field name="is_done"/>
+                                    <field name="remarks"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Remarks">
+                            <field name="remarks"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_fw_pm_task" model="ir.actions.act_window">
+        <field name="name">PM Tasks</field>
+        <field name="res_model">fw.pm.task</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No PM tasks yet</p>
+        </field>
+    </record>
+</odoo>

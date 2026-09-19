@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fw_machine_tree" model="ir.ui.view">
+        <field name="name">fw.machine.tree</field>
+        <field name="model">fw.machine</field>
+        <field name="arch" type="xml">
+            <tree string="Machines" decoration-danger="status=='breakdown'"
+                  decoration-warning="status=='under_maintenance'"
+                  decoration-muted="status=='scrapped'">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="machine_type"/>
+                <field name="factory_id"/>
+                <field name="production_line_id"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_fw_machine_form" model="ir.ui.view">
+        <field name="name">fw.machine.form</field>
+        <field name="model">fw.machine</field>
+        <field name="arch" type="xml">
+            <form string="Machine">
+                <header>
+                    <field name="status" widget="statusbar"
+                           statusbar_visible="running,idle,under_maintenance,breakdown"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_breakdowns" type="object"
+                                class="oe_stat_button" icon="fa-wrench"
+                                invisible="breakdown_count == 0">
+                            <field name="breakdown_count" widget="statinfo" string="Breakdowns"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Machine Name"/></h1>
+                        <h3><field name="code" placeholder="Machine Code"/></h3>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="machine_type"/>
+                            <field name="factory_id"/>
+                            <field name="production_line_id"/>
+                            <field name="operation_id"/>
+                        </group>
+                        <group>
+                            <field name="brand"/>
+                            <field name="model_no"/>
+                            <field name="serial_no"/>
+                            <field name="responsible_technician_id"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="purchase_date"/>
+                            <field name="warranty_end_date"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Preventive Maintenance Schedules">
+                            <field name="pm_schedule_ids">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="frequency_type"/>
+                                    <field name="frequency_interval"/>
+                                    <field name="next_due_date"/>
+                                    <field name="responsible_id"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_fw_machine_search" model="ir.ui.view">
+        <field name="name">fw.machine.search</field>
+        <field name="model">fw.machine</field>
+        <field name="arch" type="xml">
+            <search string="Search Machines">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="factory_id"/>
+                <filter string="Breakdown" name="breakdown" domain="[('status','=','breakdown')]"/>
+                <filter string="Under Maintenance" name="under_maintenance"
+                        domain="[('status','=','under_maintenance')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Factory" name="group_factory" context="{'group_by': 'factory_id'}"/>
+                    <filter string="Type" name="group_type" context="{'group_by': 'machine_type'}"/>
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_fw_machine" model="ir.actions.act_window">
+        <field name="name">Machines</field>
+        <field name="res_model">fw.machine</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_fw_machine_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Register your first machine</p>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fw_social_compliance_audit_tree" model="ir.ui.view">
+        <field name="name">fw.social.compliance.audit.tree</field>
+        <field name="model">fw.social.compliance.audit</field>
+        <field name="arch" type="xml">
+            <tree string="Internal Compliance Audits" decoration-danger="result=='fail'"
+                  decoration-warning="result=='pass_with_cap'" decoration-success="result=='pass'">
+                <field name="name"/>
+                <field name="factory_id"/>
+                <field name="audit_type"/>
+                <field name="audit_date"/>
+                <field name="score"/>
+                <field name="result"/>
+                <field name="open_cap_count"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_fw_social_compliance_audit_form" model="ir.ui.view">
+        <field name="name">fw.social.compliance.audit.form</field>
+        <field name="model">fw.social.compliance.audit</field>
+        <field name="arch" type="xml">
+            <form string="Internal Social Compliance Audit">
+                <header>
+                    <button name="action_complete" type="object" string="Mark Completed"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_reset_draft" type="object" string="Reset to Draft"
+                            invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="factory_id"/>
+                            <field name="audit_type"/>
+                        </group>
+                        <group>
+                            <field name="audit_date"/>
+                            <field name="auditor_name"/>
+                            <field name="score"/>
+                            <field name="result"/>
+                        </group>
+                    </group>
+                    <field name="findings" placeholder="Audit findings..."/>
+                    <notebook>
+                        <page string="Corrective Action Plan (CAP)">
+                            <group>
+                                <field name="open_cap_count" readonly="1"/>
+                                <field name="closed_cap_count" readonly="1"/>
+                            </group>
+                            <field name="cap_line_ids">
+                                <tree editable="bottom" decoration-success="status=='closed'"
+                                      decoration-warning="status=='open'">
+                                    <field name="finding"/>
+                                    <field name="corrective_action"/>
+                                    <field name="responsible_id"/>
+                                    <field name="target_date"/>
+                                    <field name="status"/>
+                                    <field name="closed_date"/>
+                                    <field name="remarks"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_fw_social_compliance_audit_search" model="ir.ui.view">
+        <field name="name">fw.social.compliance.audit.search</field>
+        <field name="model">fw.social.compliance.audit</field>
+        <field name="arch" type="xml">
+            <search string="Search Internal Audits">
+                <field name="name"/>
+                <field name="factory_id"/>
+                <filter string="With Open CAP" name="open_cap" domain="[('open_cap_count','&gt;',0)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Factory" name="group_factory" context="{'group_by': 'factory_id'}"/>
+                    <filter string="Audit Type" name="group_type" context="{'group_by': 'audit_type'}"/>
+                    <filter string="Result" name="group_result" context="{'group_by': 'result'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_fw_social_compliance_audit" model="ir.actions.act_window">
+        <field name="name">Internal Compliance Audits</field>
+        <field name="res_model">fw.social.compliance.audit</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_fw_social_compliance_audit_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Record your first internal compliance audit</p>
+        </field>
+    </record>
+</odoo>

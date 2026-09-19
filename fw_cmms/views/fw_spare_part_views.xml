@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fw_spare_part_tree" model="ir.ui.view">
+        <field name="name">fw.spare.part.tree</field>
+        <field name="model">fw.spare.part</field>
+        <field name="arch" type="xml">
+            <tree string="Spare Parts" decoration-danger="below_reorder==True">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="category"/>
+                <field name="current_stock"/>
+                <field name="min_stock_level"/>
+                <field name="uom_id"/>
+                <field name="unit_cost"/>
+                <field name="vendor_id"/>
+                <field name="below_reorder" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_fw_spare_part_form" model="ir.ui.view">
+        <field name="name">fw.spare.part.form</field>
+        <field name="model">fw.spare.part</field>
+        <field name="arch" type="xml">
+            <form string="Spare Part">
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Spare Part Name"/></h1>
+                        <h3><field name="code" placeholder="Part Code"/></h3>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="category"/>
+                            <field name="uom_id"/>
+                            <field name="vendor_id"/>
+                        </group>
+                        <group>
+                            <field name="current_stock"/>
+                            <field name="min_stock_level"/>
+                            <field name="below_reorder" readonly="1"/>
+                            <field name="unit_cost"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_fw_spare_part_search" model="ir.ui.view">
+        <field name="name">fw.spare.part.search</field>
+        <field name="model">fw.spare.part</field>
+        <field name="arch" type="xml">
+            <search string="Search Spare Parts">
+                <field name="name"/>
+                <field name="code"/>
+                <filter string="Below Reorder Level" name="low_stock" domain="[('below_reorder','=',True)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Category" name="group_category" context="{'group_by': 'category'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_fw_spare_part" model="ir.actions.act_window">
+        <field name="name">Spare Parts</field>
+        <field name="res_model">fw.spare.part</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_fw_spare_part_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Add your first spare part</p>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fw_factory_certification_tree" model="ir.ui.view">
+        <field name="name">fw.factory.certification.tree</field>
+        <field name="model">fw.factory.certification</field>
+        <field name="arch" type="xml">
+            <tree string="Factory Certifications" decoration-danger="status=='expired'"
+                  decoration-warning="status=='expiring_soon'" decoration-success="status=='valid'">
+                <field name="factory_id"/>
+                <field name="certification_type"/>
+                <field name="certificate_no"/>
+                <field name="issuing_body"/>
+                <field name="issue_date"/>
+                <field name="expiry_date"/>
+                <field name="status" widget="badge"/>
+                <field name="responsible_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_fw_factory_certification_form" model="ir.ui.view">
+        <field name="name">fw.factory.certification.form</field>
+        <field name="model">fw.factory.certification</field>
+        <field name="arch" type="xml">
+            <form string="Factory Certification">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="status" widget="badge"
+                                   decoration-success="status=='valid'"
+                                   decoration-warning="status=='expiring_soon'"
+                                   decoration-danger="status=='expired'"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="factory_id"/>
+                            <field name="certification_type"/>
+                            <field name="certificate_no"/>
+                            <field name="issuing_body"/>
+                        </group>
+                        <group>
+                            <field name="issue_date"/>
+                            <field name="expiry_date"/>
+                            <field name="responsible_id"/>
+                        </group>
+                    </group>
+                    <field name="remarks" placeholder="Remarks..."/>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_fw_factory_certification_search" model="ir.ui.view">
+        <field name="name">fw.factory.certification.search</field>
+        <field name="model">fw.factory.certification</field>
+        <field name="arch" type="xml">
+            <search string="Search Factory Certifications">
+                <field name="factory_id"/>
+                <field name="certificate_no"/>
+                <filter string="Expiring Soon" name="expiring" domain="[('status','=','expiring_soon')]"/>
+                <filter string="Expired" name="expired" domain="[('status','=','expired')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Factory" name="group_factory" context="{'group_by': 'factory_id'}"/>
+                    <filter string="Certification Type" name="group_type" context="{'group_by': 'certification_type'}"/>
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_fw_factory_certification" model="ir.actions.act_window">
+        <field name="name">Factory Certifications</field>
+        <field name="res_model">fw.factory.certification</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_fw_factory_certification_search"/>
+        <field name="context">{'search_default_expiring': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Add your first factory certification</p>
+        </field>
+    </record>
+</odoo>
