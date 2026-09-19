@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fw_order_allocation_tree" model="ir.ui.view">
+        <field name="name">fw.order.allocation.tree</field>
+        <field name="model">fw.order.allocation</field>
+        <field name="arch" type="xml">
+            <tree string="Order Allocations" decoration-danger="state=='cancelled'"
+                  decoration-warning="not fully_allocated and state != 'draft'"
+                  decoration-success="fully_allocated==True">
+                <field name="name"/>
+                <field name="buyer_order_id"/>
+                <field name="buyer_id"/>
+                <field name="style_id"/>
+                <field name="color_id"/>
+                <field name="order_qty"/>
+                <field name="total_allocated_qty"/>
+                <field name="fully_allocated" invisible="1"/>
+                <field name="commission_amount" widget="monetary"/>
+                <field name="currency_id" invisible="1"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_fw_order_allocation_form" model="ir.ui.view">
+        <field name="name">fw.order.allocation.form</field>
+        <field name="model">fw.order.allocation</field>
+        <field name="arch" type="xml">
+            <form string="Order Allocation">
+                <header>
+                    <button name="action_confirm" type="object" string="Confirm"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_complete" type="object" string="Mark Completed"
+                            invisible="state != 'confirmed'"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                            invisible="state in ('completed','cancelled')"/>
+                    <button name="action_reset_draft" type="object" string="Reset to Draft"
+                            invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,confirmed,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="buyer_order_line_id"/>
+                            <field name="buyer_order_id" readonly="1"/>
+                            <field name="buyer_id" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="style_id" readonly="1"/>
+                            <field name="color_id" readonly="1"/>
+                            <field name="order_qty" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Allocation Status">
+                        <group>
+                            <field name="total_allocated_qty" readonly="1"/>
+                            <field name="unallocated_qty" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="fully_allocated" readonly="1"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Factory Allocation">
+                            <field name="allocation_line_ids">
+                                <tree editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="factory_id"/>
+                                    <field name="relationship_type" readonly="1"/>
+                                    <field name="qty_allocated"/>
+                                    <field name="unit_cost"/>
+                                    <field name="currency_id" invisible="1"/>
+                                    <field name="line_amount" widget="monetary" readonly="1"/>
+                                    <field name="production_order_id"
+                                           invisible="relationship_type != 'owned'"/>
+                                    <field name="subcontract_order_id" readonly="1"
+                                           invisible="relationship_type != 'subcontractor'"/>
+                                    <button name="action_create_subcontract_order" type="object"
+                                            string="Create Subcontract Order" icon="fa-industry"
+                                            invisible="relationship_type != 'subcontractor' or subcontract_order_id"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Commission">
+                            <group>
+                                <group>
+                                    <field name="commission_type"/>
+                                    <field name="commission_rate"/>
+                                </group>
+                                <group>
+                                    <field name="commission_amount" readonly="1"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Notes">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_fw_order_allocation_search" model="ir.ui.view">
+        <field name="name">fw.order.allocation.search</field>
+        <field name="model">fw.order.allocation</field>
+        <field name="arch" type="xml">
+            <search string="Search Order Allocations">
+                <field name="name"/>
+                <field name="buyer_order_id"/>
+                <field name="buyer_id"/>
+                <field name="style_id"/>
+                <filter string="Not Fully Allocated" name="not_full" domain="[('fully_allocated','=',False)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Buyer" name="group_buyer" context="{'group_by': 'buyer_id'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_fw_order_allocation" model="ir.actions.act_window">
+        <field name="name">Order Allocations</field>
+        <field name="res_model">fw.order.allocation</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_fw_order_allocation_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first order allocation</p>
+        </field>
+    </record>
+</odoo>

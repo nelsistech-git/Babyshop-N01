@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fw_techpack_tree" model="ir.ui.view">
+        <field name="name">fw.techpack.tree</field>
+        <field name="model">fw.techpack</field>
+        <field name="arch" type="xml">
+            <tree string="Tech Packs" decoration-muted="state=='obsolete'">
+                <field name="name"/>
+                <field name="style_id"/>
+                <field name="construction_type"/>
+                <field name="state" widget="badge"
+                       decoration-info="state=='draft'"
+                       decoration-warning="state=='review'"
+                       decoration-success="state=='approved'"
+                       decoration-muted="state=='obsolete'"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_fw_techpack_form" model="ir.ui.view">
+        <field name="name">fw.techpack.form</field>
+        <field name="model">fw.techpack</field>
+        <field name="arch" type="xml">
+            <form string="Tech Pack">
+                <header>
+                    <button name="action_send_review" type="object" string="Send for Review"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_approve" type="object" string="Approve"
+                            class="btn-primary" invisible="state != 'review'"/>
+                    <button name="action_set_obsolete" type="object" string="Mark Obsolete"
+                            invisible="state == 'obsolete'"/>
+                    <button name="action_reset_draft" type="object" string="Reset to Draft"
+                            invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,review,approved"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="style_id"/>
+                            <field name="revision"/>
+                            <field name="construction_type"/>
+                        </group>
+                        <group>
+                            <field name="upper_material"/>
+                            <field name="sole_material"/>
+                            <field name="lining_material"/>
+                        </group>
+                    </group>
+                    <group string="Approval" invisible="not approved_by">
+                        <field name="approved_by" readonly="1"/>
+                        <field name="approved_date" readonly="1"/>
+                    </group>
+                    <notebook>
+                        <page string="Construction Spec">
+                            <field name="line_ids">
+                                <tree editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="part_name"/>
+                                    <field name="material_description"/>
+                                    <field name="color_id"/>
+                                    <field name="remarks"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_fw_techpack_search" model="ir.ui.view">
+        <field name="name">fw.techpack.search</field>
+        <field name="model">fw.techpack</field>
+        <field name="arch" type="xml">
+            <search string="Search Tech Packs">
+                <field name="name"/>
+                <field name="style_id"/>
+                <filter string="Approved" name="approved" domain="[('state','=','approved')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Style" name="group_style" context="{'group_by': 'style_id'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_fw_techpack" model="ir.actions.act_window">
+        <field name="name">Tech Packs</field>
+        <field name="res_model">fw.techpack</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_fw_techpack_search"/>
+        <field name="context">{'search_default_group_style': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first tech pack</p>
+        </field>
+    </record>
+</odoo>

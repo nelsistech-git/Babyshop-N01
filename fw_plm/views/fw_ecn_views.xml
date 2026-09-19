@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fw_ecn_tree" model="ir.ui.view">
+        <field name="name">fw.ecn.tree</field>
+        <field name="model">fw.ecn</field>
+        <field name="arch" type="xml">
+            <tree string="Engineering Change Notices" decoration-danger="state=='rejected'"
+                  decoration-success="state=='implemented'">
+                <field name="name"/>
+                <field name="style_id"/>
+                <field name="change_reason"/>
+                <field name="date_requested"/>
+                <field name="requested_by"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_fw_ecn_form" model="ir.ui.view">
+        <field name="name">fw.ecn.form</field>
+        <field name="model">fw.ecn</field>
+        <field name="arch" type="xml">
+            <form string="Engineering Change Notice">
+                <header>
+                    <button name="action_submit" type="object" string="Submit"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_approve" type="object" string="Approve"
+                            class="btn-primary" invisible="state != 'submitted'"/>
+                    <button name="action_reject" type="object" string="Reject"
+                            invisible="state != 'submitted'"/>
+                    <button name="action_implement" type="object" string="Implement"
+                            class="btn-primary" invisible="state != 'approved'"/>
+                    <button name="action_reset_draft" type="object" string="Reset to Draft"
+                            invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,submitted,approved,implemented"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="style_id"/>
+                            <field name="bom_id"/>
+                            <field name="techpack_id"/>
+                            <field name="change_reason"/>
+                        </group>
+                        <group>
+                            <field name="requested_by"/>
+                            <field name="date_requested"/>
+                            <field name="approved_by" readonly="1" invisible="not approved_by"/>
+                            <field name="date_approved" readonly="1" invisible="not date_approved"/>
+                        </group>
+                    </group>
+                    <field name="description" placeholder="Describe the change and its impact..."/>
+                    <notebook>
+                        <page string="Component Changes">
+                            <field name="line_ids">
+                                <tree editable="bottom">
+                                    <field name="part_name"/>
+                                    <field name="old_component_id"/>
+                                    <field name="new_component_id"/>
+                                    <field name="old_qty"/>
+                                    <field name="new_qty"/>
+                                    <field name="remarks"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_fw_ecn_search" model="ir.ui.view">
+        <field name="name">fw.ecn.search</field>
+        <field name="model">fw.ecn</field>
+        <field name="arch" type="xml">
+            <search string="Search ECNs">
+                <field name="name"/>
+                <field name="style_id"/>
+                <filter string="Pending Approval" name="pending" domain="[('state','=','submitted')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Style" name="group_style" context="{'group_by': 'style_id'}"/>
+                    <filter string="Reason" name="group_reason" context="{'group_by': 'change_reason'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_fw_ecn" model="ir.actions.act_window">
+        <field name="name">Engineering Change Notices</field>
+        <field name="res_model">fw.ecn</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_fw_ecn_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first ECN</p>
+        </field>
+    </record>
+</odoo>

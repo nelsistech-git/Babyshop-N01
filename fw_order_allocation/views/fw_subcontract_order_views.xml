@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fw_subcontract_order_tree" model="ir.ui.view">
+        <field name="name">fw.subcontract.order.tree</field>
+        <field name="model">fw.subcontract.order</field>
+        <field name="arch" type="xml">
+            <tree string="Subcontract Orders" decoration-success="state=='completed'"
+                  decoration-danger="state=='cancelled'">
+                <field name="name"/>
+                <field name="subcontractor_id"/>
+                <field name="style_id"/>
+                <field name="color_id"/>
+                <field name="qty"/>
+                <field name="total_qty_received"/>
+                <field name="balance_qty"/>
+                <field name="total_conversion_cost" widget="monetary"/>
+                <field name="currency_id" invisible="1"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_fw_subcontract_order_form" model="ir.ui.view">
+        <field name="name">fw.subcontract.order.form</field>
+        <field name="model">fw.subcontract.order</field>
+        <field name="arch" type="xml">
+            <form string="Subcontract Order">
+                <header>
+                    <button name="action_start_process" type="object" string="Start Process"
+                            class="btn-primary" invisible="state != 'material_sent'"/>
+                    <button name="action_mark_goods_received" type="object"
+                            string="Mark Goods Received" class="btn-primary"
+                            invisible="state != 'in_process'"/>
+                    <button name="action_complete" type="object" string="Complete"
+                            invisible="state != 'goods_received'"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                            invisible="state in ('completed','cancelled')"/>
+                    <button name="action_reset" type="object" string="Reset"
+                            invisible="state == 'material_sent'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="material_sent,in_process,goods_received,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="allocation_line_id" readonly="1"/>
+                            <field name="subcontractor_id" readonly="1"/>
+                            <field name="buyer_order_id" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="style_id" readonly="1"/>
+                            <field name="color_id" readonly="1"/>
+                            <field name="qty" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Conversion Cost">
+                        <group>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="conversion_cost_per_pair"/>
+                        </group>
+                        <group>
+                            <field name="total_conversion_cost" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Receiving Status">
+                        <group>
+                            <field name="total_qty_received" readonly="1"/>
+                            <field name="balance_qty" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="aql_inspection_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Material Sent Out">
+                            <field name="material_out_line_ids">
+                                <tree editable="bottom">
+                                    <field name="sent_date"/>
+                                    <field name="component_id"/>
+                                    <field name="qty_sent"/>
+                                    <field name="uom_id"/>
+                                    <field name="challan_no"/>
+                                    <field name="remarks"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Finished Goods Received">
+                            <field name="finished_goods_in_line_ids">
+                                <tree editable="bottom">
+                                    <field name="received_date"/>
+                                    <field name="qty_received"/>
+                                    <field name="defect_qty"/>
+                                    <field name="challan_no"/>
+                                    <field name="remarks"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_fw_subcontract_order_search" model="ir.ui.view">
+        <field name="name">fw.subcontract.order.search</field>
+        <field name="model">fw.subcontract.order</field>
+        <field name="arch" type="xml">
+            <search string="Search Subcontract Orders">
+                <field name="name"/>
+                <field name="subcontractor_id"/>
+                <field name="style_id"/>
+                <group expand="0" string="Group By">
+                    <filter string="Subcontractor" name="group_sub" context="{'group_by': 'subcontractor_id'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_fw_subcontract_order" model="ir.actions.act_window">
+        <field name="name">Subcontract Orders</field>
+        <field name="res_model">fw.subcontract.order</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_fw_subcontract_order_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Subcontract orders are created from an Order Allocation line</p>
+        </field>
+    </record>
+</odoo>

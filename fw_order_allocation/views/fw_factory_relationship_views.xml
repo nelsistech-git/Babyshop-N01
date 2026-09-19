@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fw_factory_form_relationship_inherit" model="ir.ui.view">
+        <field name="name">fw.factory.form.relationship.inherit</field>
+        <field name="model">fw.factory</field>
+        <field name="inherit_id" ref="fw_core_master.view_fw_factory_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='production_lines']" position="after">
+                <page string="Relationship &amp; Subcontracting">
+                    <group>
+                        <group>
+                            <field name="relationship_type"/>
+                            <field name="subcontractor_contact_id"
+                                   invisible="relationship_type == 'owned'"/>
+                        </group>
+                        <group>
+                            <field name="currency_id" groups="base.group_multi_currency"/>
+                            <field name="default_conversion_rate"
+                                   invisible="relationship_type != 'subcontractor'"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_fw_factory_tree_relationship_inherit" model="ir.ui.view">
+        <field name="name">fw.factory.tree.relationship.inherit</field>
+        <field name="model">fw.factory</field>
+        <field name="inherit_id" ref="fw_core_master.view_fw_factory_list"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='factory_type']" position="after">
+                <field name="relationship_type" widget="badge"
+                       decoration-info="relationship_type=='owned'"
+                       decoration-warning="relationship_type=='subcontractor'"
+                       decoration-muted="relationship_type=='external_vendor'"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

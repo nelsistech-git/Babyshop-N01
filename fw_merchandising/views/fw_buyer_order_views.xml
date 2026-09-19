@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fw_buyer_order_tree" model="ir.ui.view">
+        <field name="name">fw.buyer.order.tree</field>
+        <field name="model">fw.buyer.order</field>
+        <field name="arch" type="xml">
+            <tree string="Buyer Orders" decoration-danger="state=='cancelled'"
+                  decoration-success="state=='closed'"
+                  decoration-warning="delayed_tna_count &gt; 0">
+                <field name="name"/>
+                <field name="buyer_po_no"/>
+                <field name="buyer_id"/>
+                <field name="season_id"/>
+                <field name="order_date"/>
+                <field name="ship_date"/>
+                <field name="total_qty" sum="Total"/>
+                <field name="total_amount" widget="monetary" sum="Total"/>
+                <field name="currency_id" invisible="1"/>
+                <field name="delayed_tna_count"/>
+                <field name="state" widget="badge"
+                       decoration-info="state=='draft'"
+                       decoration-success="state in ('confirmed','in_production','shipped','closed')"
+                       decoration-danger="state=='cancelled'"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_fw_buyer_order_form" model="ir.ui.view">
+        <field name="name">fw.buyer.order.form</field>
+        <field name="model">fw.buyer.order</field>
+        <field name="arch" type="xml">
+            <form string="Buyer Order">
+                <header>
+                    <button name="action_confirm" type="object" string="Confirm"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_start_production" type="object" string="Start Production"
+                            class="btn-primary" invisible="state != 'confirmed'"/>
+                    <button name="action_mark_shipped" type="object" string="Mark Shipped"
+                            invisible="state != 'in_production'"/>
+                    <button name="action_close" type="object" string="Close Order"
+                            invisible="state != 'shipped'"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                            invisible="state in ('closed','cancelled')"/>
+                    <button name="action_reset_draft" type="object" string="Reset to Draft"
+                            invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,confirmed,in_production,shipped,closed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_shipments" type="object"
+                                class="oe_stat_button" icon="fa-truck"
+                                invisible="shipment_count == 0">
+                            <field name="shipment_count" widget="statinfo" string="Shipments"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="buyer_id"/>
+                            <field name="buyer_po_no"/>
+                            <field name="season_id"/>
+                            <field name="factory_id"/>
+                        </group>
+                        <group>
+                            <field name="order_date"/>
+                            <field name="ship_date"/>
+                            <field name="currency_id" groups="base.group_multi_currency"/>
+                            <field name="total_qty"/>
+                            <field name="total_amount" widget="monetary"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Order Lines">
+                            <field name="line_ids">
+                                <tree editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="style_id" domain="[('buyer_id','=',parent.buyer_id)]"/>
+                                    <field name="color_id"/>
+                                    <field name="size_curve_id"/>
+                                    <field name="total_qty"/>
+                                    <field name="unit_price"/>
+                                    <field name="currency_id" invisible="1"/>
+                                    <field name="amount" widget="monetary"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Time &amp; Action (TNA)">
+                            <field name="tna_line_ids">
+                                <tree editable="bottom" decoration-danger="status=='delayed'"
+                                      decoration-success="status=='done'">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="milestone"/>
+                                    <field name="planned_date"/>
+                                    <field name="actual_date"/>
+                                    <field name="responsible_id"/>
+                                    <field name="status"/>
+                                    <field name="remarks"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_fw_buyer_order_search" model="ir.ui.view">
+        <field name="name">fw.buyer.order.search</field>
+        <field name="model">fw.buyer.order</field>
+        <field name="arch" type="xml">
+            <search string="Search Buyer Orders">
+                <field name="name"/>
+                <field name="buyer_po_no"/>
+                <field name="buyer_id"/>
+                <field name="season_id"/>
+                <filter string="Confirmed" name="confirmed" domain="[('state','=','confirmed')]"/>
+                <filter string="In Production" name="in_production" domain="[('state','=','in_production')]"/>
+                <filter string="Delayed Milestones" name="delayed" domain="[('delayed_tna_count','&gt;',0)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Buyer" name="group_buyer" context="{'group_by': 'buyer_id'}"/>
+                    <filter string="Season" name="group_season" context="{'group_by': 'season_id'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_fw_buyer_order" model="ir.actions.act_window">
+        <field name="name">Buyer Orders</field>
+        <field name="res_model">fw.buyer.order</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_fw_buyer_order_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first buyer order</p>
+        </field>
+    </record>
+</odoo>

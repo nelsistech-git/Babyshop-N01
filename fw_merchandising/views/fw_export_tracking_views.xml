@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fw_export_tracking_tree" model="ir.ui.view">
+        <field name="name">fw.export.tracking.tree</field>
+        <field name="model">fw.export.tracking</field>
+        <field name="arch" type="xml">
+            <tree string="Export Tracking" decoration-success="state=='completed'">
+                <field name="name"/>
+                <field name="shipment_id"/>
+                <field name="buyer_id"/>
+                <field name="lc_no"/>
+                <field name="bl_awb_no"/>
+                <field name="document_status"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_fw_export_tracking_form" model="ir.ui.view">
+        <field name="name">fw.export.tracking.form</field>
+        <field name="model">fw.export.tracking</field>
+        <field name="arch" type="xml">
+            <form string="Export Tracking">
+                <header>
+                    <button name="action_set_documents_ready" type="object"
+                            string="Documents Ready" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_set_customs_cleared" type="object"
+                            string="Customs Cleared" class="btn-primary"
+                            invisible="state != 'documents_ready'"/>
+                    <button name="action_complete" type="object" string="Complete"
+                            invisible="state != 'customs_cleared'"/>
+                    <button name="action_reset_draft" type="object" string="Reset to Draft"
+                            invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,documents_ready,customs_cleared,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="shipment_id"/>
+                            <field name="order_id" readonly="1"/>
+                            <field name="buyer_id" readonly="1"/>
+                            <field name="document_status"/>
+                        </group>
+                        <group>
+                            <field name="lc_no"/>
+                            <field name="lc_date"/>
+                            <field name="invoice_no"/>
+                            <field name="invoice_date"/>
+                            <field name="bl_awb_no"/>
+                            <field name="customs_bill_no"/>
+                        </group>
+                    </group>
+                    <field name="remarks" placeholder="Remarks..."/>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_fw_export_tracking_search" model="ir.ui.view">
+        <field name="name">fw.export.tracking.search</field>
+        <field name="model">fw.export.tracking</field>
+        <field name="arch" type="xml">
+            <search string="Search Export Tracking">
+                <field name="name"/>
+                <field name="shipment_id"/>
+                <field name="buyer_id"/>
+                <field name="lc_no"/>
+                <field name="bl_awb_no"/>
+                <group expand="0" string="Group By">
+                    <filter string="Buyer" name="group_buyer" context="{'group_by': 'buyer_id'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_fw_export_tracking" model="ir.actions.act_window">
+        <field name="name">Export Tracking</field>
+        <field name="res_model">fw.export.tracking</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_fw_export_tracking_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first export tracking record</p>
+        </field>
+    </record>
+</odoo>

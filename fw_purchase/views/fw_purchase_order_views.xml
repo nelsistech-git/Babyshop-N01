@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fw_purchase_order_tree" model="ir.ui.view">
+        <field name="name">fw.purchase.order.tree</field>
+        <field name="model">fw.purchase.order</field>
+        <field name="arch" type="xml">
+            <tree string="Purchase Orders" decoration-danger="state=='cancelled'"
+                  decoration-success="state=='received'"
+                  decoration-warning="state=='partially_received'">
+                <field name="name"/>
+                <field name="vendor_id"/>
+                <field name="order_date"/>
+                <field name="expected_date"/>
+                <field name="total_amount" widget="monetary"/>
+                <field name="currency_id" invisible="1"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_fw_purchase_order_form" model="ir.ui.view">
+        <field name="name">fw.purchase.order.form</field>
+        <field name="model">fw.purchase.order</field>
+        <field name="arch" type="xml">
+            <form string="Purchase Order">
+                <header>
+                    <button name="action_send" type="object" string="Send to Vendor"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_confirm" type="object" string="Confirm"
+                            class="btn-primary" invisible="state != 'sent'"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                            invisible="state in ('received','cancelled')"/>
+                    <button name="action_reset_draft" type="object" string="Reset to Draft"
+                            invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,sent,confirmed,partially_received,received"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_grns" type="object"
+                                class="oe_stat_button" icon="fa-truck"
+                                invisible="grn_count == 0">
+                            <field name="grn_count" widget="statinfo" string="GRNs"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="vendor_id"/>
+                            <field name="rfq_id" readonly="1" invisible="not rfq_id"/>
+                        </group>
+                        <group>
+                            <field name="order_date"/>
+                            <field name="expected_date"/>
+                            <field name="currency_id" groups="base.group_multi_currency"/>
+                            <field name="total_amount"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Order Lines">
+                            <field name="line_ids">
+                                <tree editable="bottom">
+                                    <field name="material_description"/>
+                                    <field name="product_id"/>
+                                    <field name="qty"/>
+                                    <field name="uom_id"/>
+                                    <field name="unit_price"/>
+                                    <field name="currency_id" invisible="1"/>
+                                    <field name="amount" widget="monetary"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_fw_purchase_order_search" model="ir.ui.view">
+        <field name="name">fw.purchase.order.search</field>
+        <field name="model">fw.purchase.order</field>
+        <field name="arch" type="xml">
+            <search string="Search Purchase Orders">
+                <field name="name"/>
+                <field name="vendor_id"/>
+                <group expand="0" string="Group By">
+                    <filter string="Vendor" name="group_vendor" context="{'group_by': 'vendor_id'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_fw_purchase_order" model="ir.actions.act_window">
+        <field name="name">Purchase Orders</field>
+        <field name="res_model">fw.purchase.order</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_fw_purchase_order_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first purchase order</p>
+        </field>
+    </record>
+</odoo>
