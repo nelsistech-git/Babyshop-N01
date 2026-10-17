@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright (c) Nelsis Tech. Developer / Product Owner: Nur Uddin Ahammed. -->
+<templates xml:space="preserve">
+    <t t-name="nelsis_bond_dashboard.Dashboard">
+        <div class="o_nbd h-100 overflow-auto">
+            <div class="o_nbd_inner">
+                <div class="o_nbd_header">
+                    <div>
+                        <h2 class="o_nbd_title"><i class="fa fa-shield me-2"/>Bonded Warehouse</h2>
+                        <div class="o_nbd_sub" t-if="state.data">Live from Odoo records. Updated <t t-esc="state.data.generated"/></div>
+                    </div>
+                    <div class="o_nbd_actions">
+                        <button type="button" class="btn btn-light rounded-pill nl-btn nl-warning" t-on-click="openAllAlerts">
+                            <i class="fa fa-bell me-1"/>Alerts
+                            <span t-if="state.data and state.data.alert_total" class="badge rounded-pill text-bg-danger ms-1" t-esc="state.data.alert_total"/>
+                        </button>
+                        <button type="button" class="btn btn-primary rounded-pill nl-btn nl-primary" t-on-click="load" t-att-disabled="state.loading">
+                            <i t-att-class="'fa me-1 ' + (state.loading ? 'fa-circle-o-notch fa-spin' : 'fa-refresh')"/>Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <div t-if="state.failed" class="alert alert-danger" role="alert">
+                    The dashboard could not be loaded. Check that you hold a Bond Dashboard role, then select Refresh.
+                </div>
+
+                <div t-elif="state.loading and !state.data" class="o_nbd_loading">
+                    <i class="fa fa-circle-o-notch fa-spin fa-2x"/>
+                </div>
+
+                <t t-elif="state.data">
+                    <div t-if="state.data.alerts.length" class="o_nbd_alerts">
+                        <div class="o_nbd_section_title"><i class="fa fa-bell-o me-2"/>Needs attention</div>
+                        <button type="button" t-foreach="state.data.alerts" t-as="alert" t-key="alert.id"
+                                class="o_nbd_alert_row" t-on-click="() => this.openAlert(alert)">
+                            <span t-att-class="'badge ' + severityClass(alert.severity)" t-esc="alert.severity"/>
+                            <span class="o_nbd_alert_name" t-esc="alert.name"/>
+                            <span class="o_nbd_alert_meta" t-if="alert.deadline">Due <t t-esc="alert.deadline"/></span>
+                            <i class="fa fa-angle-right ms-auto"/>
+                        </button>
+                    </div>
+
+                    <div t-if="!state.data.sections.length" class="o_nbd_empty">
+                        <i class="fa fa-inbox fa-2x mb-2"/>
+                        <div>No cards are available for your role yet. Ask a dashboard administrator to review the card settings.</div>
+                    </div>
+
+                    <section t-foreach="state.data.sections" t-as="section" t-key="section.key" class="o_nbd_section">
+                        <div class="o_nbd_section_title"><i t-att-class="'fa me-2 ' + section.icon"/><t t-esc="section.label"/></div>
+                        <div class="o_nbd_grid">
+                            <div t-foreach="section.cards" t-as="card" t-key="card.id"
+                                 t-att-class="cardClass(card)" role="button" tabindex="0"
+                                 t-att-title="card.message or card.name"
+                                 t-on-click="() => this.openCard(card)"
+                                 t-on-keydown="(ev) => this.onCardKey(ev, card)">
+                                <div class="o_nbd_card_head">
+                                    <span class="o_nbd_icon"><i t-att-class="'fa fa-fw ' + card.icon"/></span>
+                                    <span class="o_nbd_label" t-esc="card.name"/>
+                                </div>
+                                <div class="o_nbd_value" t-esc="card.display"/>
+                                <div t-if="card.status !== 'ok'" class="o_nbd_msg">
+                                    <i class="fa fa-wrench me-1"/><t t-esc="card.message"/>
+                                </div>
+                                <div t-if="card.rows.length" class="o_nbd_rows">
+                                    <div t-foreach="card.rows" t-as="row" t-key="row_index" class="o_nbd_row">
+                                        <div class="o_nbd_row_text"><span t-esc="row.label"/><strong t-esc="row.display"/></div>
+                                        <div class="o_nbd_bar"><div class="o_nbd_bar_fill" t-att-style="'width:' + row.pct + '%'"/></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </t>
+            </div>
+        </div>
+    </t>
+</templates>

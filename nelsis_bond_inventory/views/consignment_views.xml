@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_bond_consignment_tree" model="ir.ui.view">
+        <field name="name">bond.inventory.consignment.tree</field>
+        <field name="model">bond.inventory.consignment</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="lc_label"/>
+                <field name="boe_number"/>
+                <field name="boe_date"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_bond_consignment_form" model="ir.ui.view">
+        <field name="name">bond.inventory.consignment.form</field>
+        <field name="model">bond.inventory.consignment</field>
+        <field name="arch" type="xml">
+            <form class="nl-ui">
+                <header>
+                    <button name="action_open" type="object" string="Open" class="btn-primary nl-btn nl-primary" invisible="state != 'draft'" icon="fa-folder-open-o"/>
+                    <button name="action_close" type="object" string="Close" invisible="state != 'open'" class="nl-btn nl-neutral" icon="fa-lock"/>
+                    <button name="action_reopen" type="object" string="Reopen" invisible="state != 'closed'" class="nl-btn nl-neutral" icon="fa-unlock-alt"/>
+                    <button name="action_cancel" type="object" string="Cancel" invisible="state not in ('draft', 'open')" class="nl-btn nl-danger" icon="fa-ban"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,open,closed" class="nl-statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_receipts" type="object" class="oe_stat_button nl-stat" icon="fa-download"
+                                invisible="receipt_count == 0">
+                            <field name="receipt_count" widget="statinfo" string="Receipts"/>
+                        </button>
+                    </div>
+                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="partner_id" readonly="state != 'draft'"/>
+                            <field name="lc_ref" readonly="state != 'draft'"/>
+                            <field name="lc_number" readonly="state != 'draft'"/>
+                        </group>
+                        <group>
+                            <field name="boe_number" readonly="state != 'draft'"/>
+                            <field name="boe_date" readonly="state != 'draft'"/>
+                            <field name="customs_ref" readonly="state != 'draft'"/>
+                            <field name="company_id" invisible="1"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Declared Goods" name="lines">
+                            <field name="line_ids" readonly="state != 'draft'">
+                                <tree editable="bottom">
+                                    <field name="product_id"/>
+                                    <field name="hs_code"/>
+                                    <field name="product_uom_id"/>
+                                    <field name="declared_qty"/>
+                                    <field name="received_qty"/>
+                                    <field name="accepted_qty"/>
+                                    <field name="remaining_qty"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Notes" name="notes"><field name="note"/></page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_bond_consignment_search" model="ir.ui.view">
+        <field name="name">bond.inventory.consignment.search</field>
+        <field name="model">bond.inventory.consignment</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="lc_number"/>
+                <field name="boe_number"/>
+                <filter name="open" string="Open" domain="[('state', '=', 'open')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_partner" string="Supplier" context="{'group_by': 'partner_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_bond_consignment" model="ir.actions.act_window">
+        <field name="name">Consignments</field>
+        <field name="res_model">bond.inventory.consignment</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_bond_consignment_search"/>
+    </record>
+</odoo>

@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_bond_report_wizard_form" model="ir.ui.view">
+        <field name="name">bond.warehouse.report.wizard.form</field>
+        <field name="model">bond.warehouse.report.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Bond Reports" class="nl-ui">
+                <div class="alert alert-warning" role="alert">
+                    <field name="statutory_notice" readonly="1" nolabel="1"/>
+                </div>
+                <field name="xlsx_available" invisible="1"/>
+                <group>
+                    <group string="Report">
+                        <field name="report_type"/>
+                        <field name="company_id" invisible="1"/>
+                        <field name="company_id" groups="base.group_multi_company"/>
+                        <field name="date_from" invisible="report_type in ('register_export',)"/>
+                        <field name="date_to" invisible="report_type in ('register_export',)"/>
+                        <field name="bond_classification"/>
+                    </group>
+                    <group string="Filters">
+                        <field name="warehouse_id"/>
+                        <field name="location_ids" widget="many2many_tags"/>
+                        <field name="product_ids" widget="many2many_tags"/>
+                        <field name="lc_ref"/>
+                        <field name="boe_ref"/>
+                        <field name="reconciliation_id" invisible="report_type != 'discrepancy'"/>
+                    </group>
+                </group>
+                <group string="Required Items (configurable, no legal requirement is assumed)"
+                       invisible="report_type != 'missing_docs'">
+                    <field name="require_lc"/>
+                    <field name="require_boe"/>
+                    <field name="require_license"/>
+                    <field name="require_attachment"/>
+                </group>
+                <footer>
+                    <button name="action_print_pdf" type="object" string="PDF" icon="fa-file-pdf-o"
+                            class="btn-primary nl-btn nl-danger"/>
+                    <button name="action_export_csv" type="object" string="CSV" icon="fa-file-text-o"
+                            class="btn-secondary nl-btn nl-info"/>
+                    <button name="action_export_xlsx" type="object" string="XLSX" icon="fa-file-excel-o"
+                            class="btn-secondary nl-btn nl-success" invisible="not xlsx_available"/>
+                    <button name="action_open_analysis" type="object" string="On Screen" icon="fa-bar-chart"
+                            class="btn-secondary nl-btn nl-primary"/>
+                    <button string="Close" class="btn-link nl-btn nl-ghost" special="cancel" icon="fa-times"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_bond_report_wizard" model="ir.actions.act_window">
+        <field name="name">Bond Reports</field>
+        <field name="res_model">bond.warehouse.report.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- one menu action per report type -->
+    <record id="action_bond_rep_lc_wise" model="ir.actions.act_window">
+        <field name="name">LC-wise Stock</field>
+        <field name="res_model">bond.warehouse.report.wizard</field>
+        <field name="view_mode">form</field><field name="target">new</field>
+        <field name="context">{'default_report_type': 'lc_wise'}</field>
+    </record>
+    <record id="action_bond_rep_boe_wise" model="ir.actions.act_window">
+        <field name="name">Bill of Entry-wise Stock</field>
+        <field name="res_model">bond.warehouse.report.wizard</field>
+        <field name="view_mode">form</field><field name="target">new</field>
+        <field name="context">{'default_report_type': 'boe_wise'}</field>
+    </record>
+    <record id="action_bond_rep_classification" model="ir.actions.act_window">
+        <field name="name">Bonded / Non-Bonded Stock</field>
+        <field name="res_model">bond.warehouse.report.wizard</field>
+        <field name="view_mode">form</field><field name="target">new</field>
+        <field name="context">{'default_report_type': 'classification', 'default_bond_classification': 'all'}</field>
+    </record>
+    <record id="action_bond_rep_product_hs" model="ir.actions.act_window">
+        <field name="name">Product / HS Code Stock</field>
+        <field name="res_model">bond.warehouse.report.wizard</field>
+        <field name="view_mode">form</field><field name="target">new</field>
+        <field name="context">{'default_report_type': 'product_hs'}</field>
+    </record>
+    <record id="action_bond_rep_location_ledger" model="ir.actions.act_window">
+        <field name="name">Warehouse / Location Ledger</field>
+        <field name="res_model">bond.warehouse.report.wizard</field>
+        <field name="view_mode">form</field><field name="target">new</field>
+        <field name="context">{'default_report_type': 'location_ledger'}</field>
+    </record>
+    <record id="action_bond_rep_rir" model="ir.actions.act_window">
+        <field name="name">Receipt, Issue and Return</field>
+        <field name="res_model">bond.warehouse.report.wizard</field>
+        <field name="view_mode">form</field><field name="target">new</field>
+        <field name="context">{'default_report_type': 'rir'}</field>
+    </record>
+    <record id="action_bond_rep_entitlement" model="ir.actions.act_window">
+        <field name="name">Entitlement Utilization</field>
+        <field name="res_model">bond.warehouse.report.wizard</field>
+        <field name="view_mode">form</field><field name="target">new</field>
+        <field name="context">{'default_report_type': 'entitlement'}</field>
+    </record>
+    <record id="action_bond_rep_discrepancy" model="ir.actions.act_window">
+        <field name="name">Physical Stock Discrepancy</field>
+        <field name="res_model">bond.warehouse.report.wizard</field>
+        <field name="view_mode">form</field><field name="target">new</field>
+        <field name="context">{'default_report_type': 'discrepancy'}</field>
+    </record>
+    <record id="action_bond_rep_missing_docs" model="ir.actions.act_window">
+        <field name="name">Missing Documents</field>
+        <field name="res_model">bond.warehouse.report.wizard</field>
+        <field name="view_mode">form</field><field name="target">new</field>
+        <field name="context">{'default_report_type': 'missing_docs'}</field>
+    </record>
+    <record id="action_bond_rep_exceptions" model="ir.actions.act_window">
+        <field name="name">Authorization Exceptions</field>
+        <field name="res_model">bond.warehouse.report.wizard</field>
+        <field name="view_mode">form</field><field name="target">new</field>
+        <field name="context">{'default_report_type': 'exceptions'}</field>
+    </record>
+    <record id="action_bond_rep_audit_index" model="ir.actions.act_window">
+        <field name="name">Audit Document Index</field>
+        <field name="res_model">bond.warehouse.report.wizard</field>
+        <field name="view_mode">form</field><field name="target">new</field>
+        <field name="context">{'default_report_type': 'audit_index'}</field>
+    </record>
+    <record id="action_bond_rep_register_export" model="ir.actions.act_window">
+        <field name="name">Bond Register Export</field>
+        <field name="res_model">bond.warehouse.report.wizard</field>
+        <field name="view_mode">form</field><field name="target">new</field>
+        <field name="context">{'default_report_type': 'register_export'}</field>
+    </record>
+</odoo>

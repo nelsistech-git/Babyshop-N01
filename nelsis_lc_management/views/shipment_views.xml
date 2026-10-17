@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright © Nelsis Tech. Developer: Nur Uddin Ahammed. All rights reserved. -->
+<odoo>
+    <record id="view_nelsis_lc_shipment_form" model="ir.ui.view">
+        <field name="name">nelsis.lc.shipment.form</field>
+        <field name="model">nelsis.lc.shipment</field>
+        <field name="arch" type="xml">
+            <form string="LC Shipment" class="nl-ui">
+                <header>
+                    <button name="action_ship" string="Mark Shipped" type="object" class="btn-primary nl-btn nl-info"
+                            icon="fa-ship" invisible="state != 'planned'"
+                            groups="nelsis_lc_management.group_lc_officer"/>
+                    <button name="action_docs_received" string="Documents Received" type="object"
+                            class="btn-primary nl-btn nl-success" icon="fa-file-text-o" invisible="state != 'shipped'"
+                            groups="nelsis_lc_management.group_lc_officer"/>
+                    <button name="action_clear" string="Customs Cleared" type="object" class="btn-primary nl-btn nl-success"
+                            icon="fa-shield" invisible="state != 'docs_received'"
+                            groups="nelsis_lc_management.group_lc_officer"/>
+                    <button name="action_receive" string="Received in Warehouse" type="object"
+                            class="btn-success nl-btn nl-success" icon="fa-archive" invisible="state != 'customs_cleared'"
+                            groups="nelsis_lc_management.group_lc_officer"/>
+                    <button name="action_load_required_documents" string="Load Checklist" type="object"
+                            icon="fa-tasks" invisible="state in ('received', 'cancelled')"
+                            groups="nelsis_lc_management.group_lc_officer" class="nl-btn nl-info"/>
+                    <button name="action_cancel" string="Cancel" type="object" icon="fa-ban"
+                            invisible="state in ('received', 'cancelled')"
+                            groups="nelsis_lc_management.group_lc_officer" class="nl-btn nl-danger"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="planned,shipped,docs_received,customs_cleared,received" class="nl-statusbar"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Cancelled" bg_color="text-bg-danger"
+                            invisible="state != 'cancelled'"/>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_boes" type="object" class="oe_stat_button nl-stat" icon="fa-file-text-o">
+                            <field name="boe_count" widget="statinfo" string="Bills of Entry"/>
+                        </button>
+                        <button name="action_view_receipts" type="object" class="oe_stat_button nl-stat" icon="fa-truck"
+                                groups="stock.group_stock_user">
+                            <field name="picking_count" widget="statinfo" string="Receipts"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group string="Shipment">
+                            <field name="lc_id" readonly="id" options="{'no_create': True}"/>
+                            <field name="partner_id"/>
+                            <field name="bl_awb_no"/>
+                            <field name="vessel"/>
+                            <field name="shipment_date"/>
+                            <field name="eta_date"/>
+                        </group>
+                        <group string="Commercial Invoice">
+                            <field name="invoice_no"/>
+                            <field name="invoice_date"/>
+                            <field name="currency_id"/>
+                            <field name="invoice_value" widget="monetary"/>
+                        </group>
+                    </group>
+                    <group string="Progress">
+                        <group>
+                            <field name="doc_received_date"/>
+                            <field name="customs_cleared_date" readonly="1"/>
+                            <field name="received_date" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="cancel_reason" invisible="state != 'cancelled'"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Documents" name="documents">
+                            <field name="document_ids" context="{'default_lc_id': lc_id, 'default_shipment_id': id}">
+                                <tree editable="bottom" decoration-success="state == 'received'"
+                                      decoration-muted="state == 'waived'">
+                                    <field name="type_id"/>
+                                    <field name="name"/>
+                                    <field name="is_required"/>
+                                    <field name="due_date"/>
+                                    <field name="state" widget="badge"/>
+                                    <button name="action_mark_received" type="object" icon="fa-check"
+                                            title="Mark received" invisible="state != 'pending'"
+                                            groups="nelsis_lc_management.group_lc_officer"/>
+                                    <button name="action_waive" type="object" icon="fa-ban" title="Waive"
+                                            invisible="state != 'pending'"
+                                            groups="nelsis_lc_management.group_lc_officer"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Notes" name="notes">
+                            <field name="note"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_nelsis_lc_shipment_tree" model="ir.ui.view">
+        <field name="name">nelsis.lc.shipment.tree</field>
+        <field name="model">nelsis.lc.shipment</field>
+        <field name="arch" type="xml">
+            <tree string="Shipments" decoration-muted="state == 'cancelled'">
+                <field name="name"/>
+                <field name="lc_id"/>
+                <field name="partner_id"/>
+                <field name="bl_awb_no"/>
+                <field name="invoice_no"/>
+                <field name="invoice_value"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="shipment_date"/>
+                <field name="eta_date" optional="show"/>
+                <field name="state" widget="badge"
+                       decoration-info="state in ('planned', 'shipped')"
+                       decoration-warning="state in ('docs_received', 'customs_cleared')"
+                       decoration-success="state == 'received'"
+                       decoration-danger="state == 'cancelled'"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_nelsis_lc_shipment_graph" model="ir.ui.view">
+        <field name="name">nelsis.lc.shipment.graph</field>
+        <field name="model">nelsis.lc.shipment</field>
+        <field name="arch" type="xml">
+            <graph string="Shipments by Supplier" type="bar">
+                <field name="partner_id"/>
+                <field name="invoice_value" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_nelsis_lc_shipment_pivot" model="ir.ui.view">
+        <field name="name">nelsis.lc.shipment.pivot</field>
+        <field name="model">nelsis.lc.shipment</field>
+        <field name="arch" type="xml">
+            <pivot string="Shipment-wise / Supplier-wise">
+                <field name="currency_id" type="col"/>
+                <field name="partner_id" type="row"/>
+                <field name="lc_id" type="row"/>
+                <field name="invoice_value" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_nelsis_lc_shipment_search" model="ir.ui.view">
+        <field name="name">nelsis.lc.shipment.search</field>
+        <field name="model">nelsis.lc.shipment</field>
+        <field name="arch" type="xml">
+            <search string="Search Shipments">
+                <field name="name"/>
+                <field name="lc_id"/>
+                <field name="partner_id"/>
+                <field name="bl_awb_no"/>
+                <field name="invoice_no"/>
+                <filter name="f_open" string="In Transit / Clearing"
+                        domain="[('state', 'in', ['planned', 'shipped', 'docs_received', 'customs_cleared'])]"/>
+                <filter name="f_received" string="Received" domain="[('state', '=', 'received')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="g_lc" string="LC" context="{'group_by': 'lc_id'}"/>
+                    <filter name="g_partner" string="Supplier" context="{'group_by': 'partner_id'}"/>
+                    <filter name="g_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="g_month" string="Shipment Month" context="{'group_by': 'shipment_date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_nelsis_lc_shipment" model="ir.actions.act_window">
+        <field name="name">Shipments</field>
+        <field name="res_model">nelsis.lc.shipment</field>
+        <field name="view_mode">tree,form,graph,pivot</field>
+        <field name="search_view_id" ref="view_nelsis_lc_shipment_search"/>
+    </record>
+</odoo>

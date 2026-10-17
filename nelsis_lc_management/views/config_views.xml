@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright © Nelsis Tech. Developer: Nur Uddin Ahammed. All rights reserved. -->
+<odoo>
+    <!-- Settings -->
+    <record id="view_nelsis_lc_setting_form" model="ir.ui.view">
+        <field name="name">nelsis.lc.setting.form</field>
+        <field name="model">nelsis.lc.setting</field>
+        <field name="arch" type="xml">
+            <form string="LC Settings" class="nl-ui">
+                <sheet>
+                    <div class="oe_title"><h1><field name="company_id" readonly="id"/></h1></div>
+                    <group>
+                        <group string="Reminders (days)">
+                            <field name="expiry_reminder_days"/>
+                            <field name="shipment_reminder_days"/>
+                            <field name="document_reminder_days"/>
+                        </group>
+                        <group string="Approval">
+                            <field name="enforce_maker_checker"/>
+                        </group>
+                    </group>
+                    <group string="Closure and Clearance Controls (company policy - verify with your customs professional)">
+                        <field name="block_close_pending_documents"/>
+                        <field name="block_close_open_shipments"/>
+                        <field name="block_close_pending_boe"/>
+                        <field name="require_boe_for_clearance"/>
+                        <field name="require_receipt_for_received"/>
+                    </group>
+                    <field name="note" placeholder="Policy note..."/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_nelsis_lc_setting_tree" model="ir.ui.view">
+        <field name="name">nelsis.lc.setting.tree</field>
+        <field name="model">nelsis.lc.setting</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="company_id"/>
+                <field name="expiry_reminder_days"/>
+                <field name="shipment_reminder_days"/>
+                <field name="document_reminder_days"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_nelsis_lc_setting" model="ir.actions.act_window">
+        <field name="name">LC Settings</field>
+        <field name="res_model">nelsis.lc.setting</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Document types -->
+    <record id="view_nelsis_lc_document_type_form" model="ir.ui.view">
+        <field name="name">nelsis.lc.document.type.form</field>
+        <field name="model">nelsis.lc.document.type</field>
+        <field name="arch" type="xml">
+            <form string="Document Type" class="nl-ui">
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                            <field name="scope"/>
+                            <field name="lc_type"/>
+                        </group>
+                        <group>
+                            <field name="required_default"/>
+                            <field name="compliance_ref_id"/>
+                            <field name="sequence"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                    </group>
+                    <field name="description" placeholder="Description / when this document applies..."/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_nelsis_lc_document_type_tree" model="ir.ui.view">
+        <field name="name">nelsis.lc.document.type.tree</field>
+        <field name="model">nelsis.lc.document.type</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="scope"/>
+                <field name="lc_type"/>
+                <field name="required_default"/>
+                <field name="compliance_ref_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_nelsis_lc_document_type" model="ir.actions.act_window">
+        <field name="name">Document Types</field>
+        <field name="res_model">nelsis.lc.document.type</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Compliance mapping -->
+    <record id="view_nelsis_lc_compliance_ref_form" model="ir.ui.view">
+        <field name="name">nelsis.lc.compliance.ref.form</field>
+        <field name="model">nelsis.lc.compliance.ref</field>
+        <field name="arch" type="xml">
+            <form string="Compliance Reference" class="nl-ui">
+                <header>
+                    <field name="verification_status" widget="statusbar" options="{'clickable': '1'}"
+                           statusbar_visible="unverified,in_review,verified" class="nl-statusbar"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="source_url" widget="url"/>
+                            <field name="publication_date"/>
+                            <field name="effective_date"/>
+                            <field name="amendment_status"/>
+                        </group>
+                        <group>
+                            <field name="reviewer"/>
+                            <field name="reviewed_date"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="process_affected"/>
+                        <field name="required_documents"/>
+                        <field name="user_controls"/>
+                        <field name="note"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_nelsis_lc_compliance_ref_tree" model="ir.ui.view">
+        <field name="name">nelsis.lc.compliance.ref.tree</field>
+        <field name="model">nelsis.lc.compliance.ref</field>
+        <field name="arch" type="xml">
+            <tree decoration-success="verification_status == 'verified'"
+                  decoration-warning="verification_status == 'unverified'">
+                <field name="name"/>
+                <field name="effective_date"/>
+                <field name="amendment_status"/>
+                <field name="reviewer"/>
+                <field name="verification_status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_nelsis_lc_compliance_ref" model="ir.actions.act_window">
+        <field name="name">Compliance Mapping</field>
+        <field name="res_model">nelsis.lc.compliance.ref</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Record legal references here</p>
+            <p>Enter rule / SRO references found on the official Bangladesh Customs and NBR sites,
+               then have them verified by your customs professional. This module ships no legal rules.</p>
+        </field>
+    </record>
+</odoo>

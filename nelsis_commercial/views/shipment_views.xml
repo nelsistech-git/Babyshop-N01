@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright © Nelsis Tech. Developer: Nur Uddin Ahammed. All rights reserved. -->
+<odoo>
+    <!-- Shipment -->
+    <record id="view_commercial_shipment_form" model="ir.ui.view">
+        <field name="name">nelsis.commercial.shipment.form</field>
+        <field name="model">nelsis.commercial.shipment</field>
+        <field name="arch" type="xml">
+            <form string="Shipment" class="nl-ui">
+                <header>
+                    <button name="action_in_transit" string="In Transit" type="object" class="btn-primary nl-btn nl-info" invisible="state != 'planned'" icon="fa-ship"/>
+                    <button name="action_arrived" string="Arrived" type="object" class="btn-success nl-btn nl-success"
+                            invisible="state not in ('planned', 'in_transit')" icon="fa-inbox"/>
+                    <button name="action_cancel" string="Cancel" type="object" invisible="state in ('arrived', 'cancel')"
+                            confirm="Cancel this shipment?" class="nl-btn nl-danger" icon="fa-ban"/>
+                    <field name="state" widget="statusbar" statusbar_visible="planned,in_transit,arrived" class="nl-statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="file_id"/>
+                            <field name="lc_display"/>
+                            <field name="partner_id"/>
+                            <field name="transport_mode"/>
+                            <field name="origin_country_id"/>
+                            <field name="port_loading"/>
+                            <field name="destination"/>
+                        </group>
+                        <group>
+                            <field name="vessel"/>
+                            <field name="container_no"/>
+                            <field name="transport_doc_no"/>
+                            <field name="shipment_date"/>
+                            <field name="eta_date"/>
+                            <field name="arrival_date"/>
+                            <field name="is_partial"/>
+                            <field name="partial_no" invisible="not is_partial"/>
+                            <field name="receipt_state"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Documents">
+                            <field name="document_ids" readonly="1">
+                                <tree>
+                                    <field name="document_type_id"/>
+                                    <field name="number"/>
+                                    <field name="version"/>
+                                    <field name="state" widget="badge"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Bills of Entry">
+                            <field name="boe_ids" readonly="1">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="date"/>
+                                    <field name="state" widget="badge"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Warehouse Receipts">
+                            <field name="picking_ids" domain="[('picking_type_code', '=', 'incoming')]"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+    <record id="view_commercial_shipment_tree" model="ir.ui.view">
+        <field name="name">nelsis.commercial.shipment.tree</field>
+        <field name="model">nelsis.commercial.shipment</field>
+        <field name="arch" type="xml">
+            <tree string="Shipments">
+                <field name="name"/>
+                <field name="file_id"/>
+                <field name="lc_display"/>
+                <field name="partner_id"/>
+                <field name="transport_doc_no"/>
+                <field name="eta_date"/>
+                <field name="arrival_date"/>
+                <field name="is_partial"/>
+                <field name="receipt_state" widget="badge"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+    <record id="view_commercial_shipment_search" model="ir.ui.view">
+        <field name="name">nelsis.commercial.shipment.search</field>
+        <field name="model">nelsis.commercial.shipment</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="file_id"/>
+                <field name="transport_doc_no"/>
+                <field name="container_no"/>
+                <filter name="in_transit" string="In Transit" domain="[('state', '=', 'in_transit')]"/>
+                <filter name="arrived" string="Arrived" domain="[('state', '=', 'arrived')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="g_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="g_partner" string="Supplier" context="{'group_by': 'partner_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    <record id="action_commercial_shipment" model="ir.actions.act_window">
+        <field name="name">Shipments</field>
+        <field name="res_model">nelsis.commercial.shipment</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Bill of Entry -->
+    <record id="view_commercial_boe_form" model="ir.ui.view">
+        <field name="name">nelsis.commercial.boe.form</field>
+        <field name="model">nelsis.commercial.boe</field>
+        <field name="arch" type="xml">
+            <form string="Bill of Entry" class="nl-ui">
+                <header>
+                    <button name="action_submit" string="Submit" type="object" class="btn-primary nl-btn nl-primary" invisible="state != 'draft'" icon="fa-paper-plane"/>
+                    <button name="action_verify" string="Verify" type="object" class="btn-success nl-btn nl-success" invisible="state != 'submitted'" icon="fa-check-circle"/>
+                    <button name="action_clear" string="Record Clearance" type="object" class="btn-success nl-btn nl-success" invisible="state != 'verified'" icon="fa-flag-checkered"/>
+                    <button name="action_reset_draft" string="Reset to Draft" type="object"
+                            invisible="state not in ('submitted', 'verified', 'cancel')" class="nl-btn nl-neutral" icon="fa-undo"/>
+                    <button name="action_cancel" string="Cancel" type="object" invisible="state in ('cleared', 'cancel')"
+                            confirm="Cancel this Bill of Entry?" class="nl-btn nl-danger" icon="fa-ban"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,verified,cleared" class="nl-statusbar"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="date"/>
+                            <field name="customs_station"/>
+                            <field name="file_id"/>
+                            <field name="lc_display"/>
+                            <field name="shipment_id"/>
+                            <field name="invoice_ref"/>
+                        </group>
+                        <group>
+                            <field name="officer_id" widget="many2one_avatar_user"/>
+                            <field name="clearance_date" readonly="state == 'cleared'"/>
+                            <field name="verified_by"/>
+                            <field name="verified_date"/>
+                        </group>
+                    </group>
+                    <group string="Supporting Attachments">
+                        <field name="attachment_ids" widget="many2many_binary" nolabel="1"/>
+                    </group>
+                    <notebook>
+                        <page string="Related Receipts">
+                            <field name="picking_ids" domain="[('picking_type_code', '=', 'incoming')]"/>
+                        </page>
+                        <page string="Verified Quantities">
+                            <field name="line_ids" readonly="1">
+                                <tree>
+                                    <field name="product_id"/>
+                                    <field name="qty"/>
+                                    <field name="uom_id"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Notes"><field name="notes"/></page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+    <record id="view_commercial_boe_tree" model="ir.ui.view">
+        <field name="name">nelsis.commercial.boe.tree</field>
+        <field name="model">nelsis.commercial.boe</field>
+        <field name="arch" type="xml">
+            <tree string="Bills of Entry">
+                <field name="name"/>
+                <field name="date"/>
+                <field name="customs_station"/>
+                <field name="file_id"/>
+                <field name="lc_display"/>
+                <field name="clearance_date"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+    <record id="view_commercial_boe_search" model="ir.ui.view">
+        <field name="name">nelsis.commercial.boe.search</field>
+        <field name="model">nelsis.commercial.boe</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="file_id"/>
+                <filter name="pending" string="Pending Verification" domain="[('state', '=', 'submitted')]"/>
+                <filter name="verified" string="Awaiting Clearance" domain="[('state', '=', 'verified')]"/>
+                <filter name="cleared" string="Cleared" domain="[('state', '=', 'cleared')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="g_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="g_date" string="B/E Date" context="{'group_by': 'date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    <record id="action_commercial_boe" model="ir.actions.act_window">
+        <field name="name">Bills of Entry</field>
+        <field name="res_model">nelsis.commercial.boe</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Discrepancies -->
+    <record id="view_commercial_discrepancy_form" model="ir.ui.view">
+        <field name="name">nelsis.commercial.discrepancy.form</field>
+        <field name="model">nelsis.commercial.discrepancy</field>
+        <field name="arch" type="xml">
+            <form string="Quantity Comparison" create="0" class="nl-ui">
+                <header>
+                    <button name="action_approve" string="Approve with Explanation" type="object" class="btn-success nl-btn nl-success"
+                            invisible="state not in ('mismatch', 'uom_review')" icon="fa-thumbs-up"/>
+                    <field name="state" widget="statusbar" statusbar_visible="pending,ok,mismatch,approved" class="nl-statusbar"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="file_id"/>
+                            <field name="shipment_id"/>
+                            <field name="product_id"/>
+                            <field name="source_kind"/>
+                        </group>
+                        <group>
+                            <field name="documented_qty"/>
+                            <field name="uom_id"/>
+                            <field name="received_qty"/>
+                            <field name="received_uom_id"/>
+                            <field name="difference"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="basis"/>
+                        <field name="explanation" readonly="state == 'approved'"/>
+                        <field name="approved_by"/>
+                        <field name="approved_date"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+    <record id="view_commercial_discrepancy_tree" model="ir.ui.view">
+        <field name="name">nelsis.commercial.discrepancy.tree</field>
+        <field name="model">nelsis.commercial.discrepancy</field>
+        <field name="arch" type="xml">
+            <tree string="Quantity Comparison" create="0" decoration-danger="state == 'mismatch'"
+                  decoration-warning="state == 'uom_review'" decoration-success="state in ('ok', 'approved')">
+                <field name="file_id"/>
+                <field name="shipment_id"/>
+                <field name="product_id"/>
+                <field name="source_kind"/>
+                <field name="documented_qty"/>
+                <field name="uom_id"/>
+                <field name="received_qty"/>
+                <field name="received_uom_id"/>
+                <field name="difference"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+    <record id="view_commercial_discrepancy_search" model="ir.ui.view">
+        <field name="name">nelsis.commercial.discrepancy.search</field>
+        <field name="model">nelsis.commercial.discrepancy</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="file_id"/>
+                <field name="product_id"/>
+                <filter name="open" string="Outstanding" domain="[('state', 'in', ('mismatch', 'uom_review'))]"/>
+                <filter name="approved" string="Approved" domain="[('state', '=', 'approved')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="g_file" string="Commercial File" context="{'group_by': 'file_id'}"/>
+                    <filter name="g_state" string="Status" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    <record id="action_commercial_discrepancy" model="ir.actions.act_window">
+        <field name="name">Quantity Discrepancies</field>
+        <field name="res_model">nelsis.commercial.discrepancy</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_open': 1}</field>
+    </record>
+</odoo>

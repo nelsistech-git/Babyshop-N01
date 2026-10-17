@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) Nelsis Tech. Developer / Product Owner: Nur Uddin Ahammed. -->
+<odoo>
+    <record id="rule_alert_recipient_only" model="ir.rule">
+        <field name="name">Bond alert: operational roles see alerts addressed to them</field>
+        <field name="model_id" ref="model_bond_dashboard_alert"/>
+        <field name="domain_force">[('recipient_user_ids', 'in', [user.id])]</field>
+        <field name="groups" eval="[(4, ref('group_bond_dash_storekeeper')), (4, ref('group_bond_dash_commercial'))]"/>
+    </record>
+    <record id="rule_alert_full_access" model="ir.rule">
+        <field name="name">Bond alert: managers, auditors and administrators see all</field>
+        <field name="model_id" ref="model_bond_dashboard_alert"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_bond_dash_bond_manager')), (4, ref('group_bond_dash_auditor'))]"/>
+    </record>
+</odoo>

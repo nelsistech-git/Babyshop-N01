@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) Nelsis Tech. Developer / Product Owner: Nur Uddin Ahammed. -->
+<odoo>
+    <record id="view_bond_alert_list" model="ir.ui.view">
+        <field name="name">bond.dashboard.alert.list</field>
+        <field name="model">bond.dashboard.alert</field>
+        <field name="arch" type="xml">
+            <tree create="0" delete="0"
+                  decoration-danger="severity == 'critical' and state != 'resolved'"
+                  decoration-warning="severity == 'warning' and state != 'resolved'"
+                  decoration-muted="state == 'resolved'">
+                <field name="create_date" string="Raised"/>
+                <field name="name"/>
+                <field name="alert_type"/>
+                <field name="severity" widget="badge" decoration-danger="severity == 'critical'" decoration-warning="severity == 'warning'" decoration-info="severity == 'info'"/>
+                <field name="deadline"/>
+                <field name="state" widget="badge" decoration-success="state == 'resolved'" decoration-warning="state == 'acknowledged'" decoration-danger="state == 'open'"/>
+                <field name="activity_ids" widget="list_activity" optional="show"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_bond_alert_form" model="ir.ui.view">
+        <field name="name">bond.dashboard.alert.form</field>
+        <field name="model">bond.dashboard.alert</field>
+        <field name="arch" type="xml">
+            <form create="0" delete="0" class="nl-ui">
+                <header>
+                    <button name="action_acknowledge" type="object" string="Acknowledge" class="btn-primary nl-btn nl-success" icon="fa-check" invisible="state != 'open'"/>
+                    <button name="action_resolve" type="object" string="Resolve" class="btn-success nl-btn nl-success" icon="fa-check-circle" invisible="state == 'resolved'"/>
+                    <button name="action_open_source" type="object" string="Open Source Record" icon="fa-external-link" invisible="not res_id" class="nl-btn nl-primary"/>
+                    <field name="state" widget="statusbar" statusbar_visible="open,acknowledged,resolved" class="nl-statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group string="What happened">
+                            <field name="alert_type"/>
+                            <field name="severity" widget="badge" decoration-danger="severity == 'critical'" decoration-warning="severity == 'warning'" decoration-info="severity == 'info'"/>
+                            <field name="message"/>
+                            <field name="deadline"/>
+                        </group>
+                        <group string="Source and rule">
+                            <field name="res_name"/>
+                            <field name="res_model"/>
+                            <field name="res_id"/>
+                            <field name="rule_id"/>
+                            <field name="recipient_user_ids" widget="many2many_tags"/>
+                        </group>
+                    </group>
+                    <group string="Handling">
+                        <group>
+                            <field name="acknowledged_by_id"/>
+                            <field name="acknowledged_date"/>
+                        </group>
+                        <group>
+                            <field name="resolved_date"/>
+                            <field name="auto_resolved"/>
+                        </group>
+                        <field name="resolution_note" colspan="2" placeholder="Describe how this was resolved (required to resolve)"
+                               readonly="state == 'resolved'"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_bond_alert_search" model="ir.ui.view">
+        <field name="name">bond.dashboard.alert.search</field>
+        <field name="model">bond.dashboard.alert</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="res_name"/>
+                <filter name="open" string="Unresolved" domain="[('state', '!=', 'resolved')]"/>
+                <filter name="mine" string="Addressed to me" domain="[('recipient_user_ids', 'in', [uid])]"/>
+                <filter name="critical" string="Critical" domain="[('severity', '=', 'critical')]"/>
+                <filter name="resolved" string="Resolved" domain="[('state', '=', 'resolved')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_type" string="Type" context="{'group_by': 'alert_type'}"/>
+                    <filter name="group_severity" string="Severity" context="{'group_by': 'severity'}"/>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_bond_dashboard_alert" model="ir.actions.act_window">
+        <field name="name">Compliance Alerts</field>
+        <field name="res_model">bond.dashboard.alert</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_open': 1}</field>
+    </record>
+</odoo>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Suite roles: one assignment gives the matching role in every module. Each module's own
+     groups still work on their own; these only imply them. -->
+<odoo>
+    <record id="module_category_bond_suite" model="ir.module.category">
+        <field name="name">Bond Warehouse Suite</field>
+        <field name="sequence">44</field>
+    </record>
+
+    <record id="group_bond_suite_operator" model="res.groups">
+        <field name="name">Operator</field>
+        <field name="category_id" ref="module_category_bond_suite"/>
+        <field name="implied_ids" eval="[
+            (4, ref('nelsis_bond_license.group_bond_license_user')),
+            (4, ref('nelsis_bond_compliance.group_bond_compliance_user')),
+            (4, ref('nelsis_lc_management.group_lc_user')),
+            (4, ref('nelsis_commercial.group_commercial_user')),
+            (4, ref('nelsis_bond_inventory.group_bond_inventory_user')),
+            (4, ref('nelsis_bond_movement.group_bond_movement_user')),
+            (4, ref('nelsis_bond_reconciliation.group_bond_recon_user')),
+        ]"/>
+    </record>
+
+    <record id="group_bond_suite_manager" model="res.groups">
+        <field name="name">Manager</field>
+        <field name="category_id" ref="module_category_bond_suite"/>
+        <field name="implied_ids" eval="[
+            (4, ref('group_bond_suite_operator')),
+            (4, ref('nelsis_bond_license.group_bond_license_manager')),
+            (4, ref('nelsis_bond_compliance.group_bond_compliance_manager')),
+            (4, ref('nelsis_lc_management.group_lc_manager')),
+            (4, ref('nelsis_commercial.group_commercial_manager')),
+            (4, ref('nelsis_bond_inventory.group_bond_inventory_manager')),
+            (4, ref('nelsis_bond_movement.group_bond_movement_manager')),
+            (4, ref('nelsis_bond_reconciliation.group_bond_recon_manager')),
+        ]"/>
+    </record>
+
+    <record id="group_bond_suite_auditor" model="res.groups">
+        <field name="name">Auditor (read-only)</field>
+        <field name="category_id" ref="module_category_bond_suite"/>
+        <field name="implied_ids" eval="[(4, ref('nelsis_lc_management.group_lc_auditor'))]"/>
+    </record>
+
+    <record id="base.user_admin" model="res.users">
+        <field name="groups_id" eval="[(4, ref('group_bond_suite_manager'))]"/>
+    </record>
+</odoo>

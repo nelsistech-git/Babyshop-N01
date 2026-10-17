@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) Nelsis Tech. Developer / Product Owner: Nur Uddin Ahammed -->
+<odoo>
+    <record id="view_bond_movement_tree" model="ir.ui.view">
+        <field name="name">bond.warehouse.movement.tree</field>
+        <field name="model">bond.warehouse.movement</field>
+        <field name="arch" type="xml">
+            <tree string="Bond Movements" decoration-muted="state in ('cancel', 'reversed')"
+                  decoration-success="state == 'done'" decoration-info="state in ('submitted', 'approved')">
+                <field name="name"/>
+                <field name="date"/>
+                <field name="movement_type"/>
+                <field name="product_id"/>
+                <field name="lot_id"/>
+                <field name="quantity" sum="Total"/>
+                <field name="uom_id" groups="uom.group_uom"/>
+                <field name="location_id"/>
+                <field name="location_dest_id"/>
+                <field name="bond_classification" widget="badge"/>
+                <field name="prepared_by_id" optional="hide"/>
+                <field name="approved_by_id" optional="hide"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'done'" decoration-info="state in ('submitted', 'approved')"
+                       decoration-danger="state == 'reversed'" decoration-muted="state in ('draft', 'cancel')"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_bond_movement_form" model="ir.ui.view">
+        <field name="name">bond.warehouse.movement.form</field>
+        <field name="model">bond.warehouse.movement</field>
+        <field name="arch" type="xml">
+            <form string="Bond Movement" class="nl-ui">
+                <header>
+                    <button name="action_submit" string="Submit" type="object" class="btn-primary nl-btn nl-primary"
+                            invisible="state != 'draft'" icon="fa-paper-plane"/>
+                    <button name="action_approve" string="Approve" type="object" class="btn-primary nl-btn nl-success"
+                            invisible="state != 'submitted'"
+                            groups="nelsis_bond_movement.group_bond_movement_manager" icon="fa-thumbs-up"/>
+                    <button name="action_validate" string="Validate &amp; Post Stock" type="object"
+                            class="btn-primary nl-btn nl-success" invisible="state != 'approved'"
+                            confirm="This posts the stock move and cannot be undone except by a reversal. Continue?"
+                            groups="nelsis_bond_movement.group_bond_movement_manager" icon="fa-check-circle"/>
+                    <button name="action_grant_exception" string="Grant Return Exception" type="object"
+                            invisible="movement_type != 'return' or state not in ('draft', 'submitted') or exception_approved"
+                            groups="nelsis_bond_movement.group_bond_movement_controller" class="nl-btn nl-warning" icon="fa-key"/>
+                    <button name="%(action_bond_movement_reverse)d" string="Reverse" type="action"
+                            class="btn-secondary nl-btn nl-danger" invisible="state != 'done'"
+                            groups="nelsis_bond_movement.group_bond_movement_manager" icon="fa-exchange"/>
+                    <button name="action_reset_draft" string="Reset to Draft" type="object"
+                            invisible="state not in ('submitted', 'approved', 'cancel')"
+                            groups="nelsis_bond_movement.group_bond_movement_manager" class="nl-btn nl-neutral" icon="fa-undo"/>
+                    <button name="action_cancel" string="Cancel" type="object"
+                            invisible="state not in ('draft', 'submitted', 'approved')" class="nl-btn nl-danger" icon="fa-ban"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,submitted,approved,done" class="nl-statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_stock_moves" type="object" class="oe_stat_button nl-stat"
+                                icon="fa-exchange" invisible="not move_id">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_text">Stock Moves</span>
+                            </div>
+                        </button>
+                        <button name="action_view_returns" type="object" class="oe_stat_button nl-stat"
+                                icon="fa-undo" invisible="movement_type != 'issue' or return_count == 0">
+                            <field name="return_count" widget="statinfo" string="Returns"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Reversed" bg_color="text-bg-danger"
+                            invisible="state != 'reversed'"/>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group name="left">
+                            <field name="movement_type" readonly="state != 'draft'"/>
+                            <field name="bond_classification" readonly="state != 'draft'"/>
+                            <field name="product_id" readonly="state != 'draft'" options="{'no_create': True}"/>
+                            <field name="product_tracking" invisible="1"/>
+                            <field name="lot_id" readonly="state != 'draft'"
+                                   required="product_tracking in ('lot', 'serial')"
+                                   options="{'no_create': True}"/>
+                            <label for="quantity" invisible="movement_type == 'adjustment'"/>
+                            <div class="o_row" invisible="movement_type == 'adjustment'">
+                                <field name="quantity" readonly="state != 'draft'"/>
+                                <field name="uom_id" groups="uom.group_uom"/>
+                            </div>
+                        </group>
+                        <group name="right">
+                            <field name="date" readonly="state != 'draft'"/>
+                            <field name="location_id" readonly="state != 'draft'"/>
+                            <field name="location_dest_id" readonly="state != 'draft'"
+                                   invisible="movement_type == 'adjustment'"/>
+                            <field name="company_id" invisible="1"/>
+                            <field name="company_id" groups="base.group_multi_company" readonly="state != 'draft'"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="reason" readonly="state != 'draft'" placeholder="Business reason for this movement"/>
+                    </group>
+                    <notebook>
+                        <page string="Customs References" name="refs">
+                            <group>
+                                <field name="license_ref" readonly="state != 'draft'"/>
+                                <field name="lc_ref" readonly="state != 'draft'"/>
+                                <field name="boe_ref" readonly="state != 'draft'"/>
+                            </group>
+                        </page>
+                        <page string="Transfer" name="transfer" invisible="movement_type != 'transfer'">
+                            <group>
+                                <field name="reclass_reason" readonly="state != 'draft'"/>
+                            </group>
+                        </page>
+                        <page string="Issue" name="issue" invisible="movement_type != 'issue'">
+                            <group>
+                                <field name="operational_ref" readonly="state != 'draft'"/>
+                                <field name="recipient_ref" readonly="state != 'draft'"/>
+                                <field name="support_approval_ref" readonly="state != 'draft'"/>
+                                <field name="returned_qty"/>
+                                <field name="outstanding_qty"/>
+                            </group>
+                        </page>
+                        <page string="Return" name="return" invisible="movement_type != 'return'">
+                            <group>
+                                <group>
+                                    <field name="origin_issue_id" readonly="state != 'draft'"
+                                           options="{'no_create': True}"/>
+                                    <field name="return_condition" readonly="state != 'draft'"/>
+                                    <field name="inspection_result" readonly="state != 'draft'"/>
+                                </group>
+                                <group string="Over-return Exception">
+                                    <field name="exception_note" readonly="state != 'draft'"/>
+                                    <field name="exception_approved"/>
+                                    <field name="exception_approved_by_id"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Adjustment" name="adjustment" invisible="movement_type != 'adjustment'">
+                            <group>
+                                <group>
+                                    <field name="count_ref" readonly="state != 'draft'"/>
+                                    <field name="system_qty"/>
+                                    <field name="counted_qty" readonly="state != 'draft'"/>
+                                    <field name="variance"/>
+                                </group>
+                                <group>
+                                    <field name="evidence_ids" widget="many2many_binary"
+                                           readonly="state != 'draft'"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Approval &amp; Audit" name="audit">
+                            <group>
+                                <group>
+                                    <field name="prepared_by_id"/>
+                                    <field name="approved_by_id"/>
+                                    <field name="approval_date"/>
+                                    <field name="validation_date"/>
+                                    <field name="move_id"/>
+                                </group>
+                                <group string="Reversal" invisible="state != 'reversed'">
+                                    <field name="reversal_reason"/>
+                                    <field name="reversed_by_id"/>
+                                    <field name="reversal_date"/>
+                                    <field name="reversal_move_id"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_bond_movement_search" model="ir.ui.view">
+        <field name="name">bond.warehouse.movement.search</field>
+        <field name="model">bond.warehouse.movement</field>
+        <field name="arch" type="xml">
+            <search string="Bond Movements">
+                <field name="name"/>
+                <field name="product_id"/>
+                <field name="lot_id"/>
+                <field name="lc_ref"/>
+                <field name="boe_ref"/>
+                <field name="license_ref"/>
+                <filter name="f_draft" string="Draft" domain="[('state', '=', 'draft')]"/>
+                <filter name="f_pending" string="Awaiting Approval" domain="[('state', '=', 'submitted')]"/>
+                <filter name="f_approved" string="Approved" domain="[('state', '=', 'approved')]"/>
+                <filter name="f_done" string="Validated" domain="[('state', '=', 'done')]"/>
+                <separator/>
+                <filter name="f_bonded" string="Bonded" domain="[('bond_classification', '=', 'bonded')]"/>
+                <filter name="f_non_bonded" string="Non-Bonded" domain="[('bond_classification', '=', 'non_bonded')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="g_type" string="Type" context="{'group_by': 'movement_type'}"/>
+                    <filter name="g_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="g_product" string="Product" context="{'group_by': 'product_id'}"/>
+                    <filter name="g_class" string="Classification" context="{'group_by': 'bond_classification'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_bond_movement_all" model="ir.actions.act_window">
+        <field name="name">All Bond Movements</field>
+        <field name="res_model">bond.warehouse.movement</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_bond_movement_search"/>
+    </record>
+    <record id="action_bond_movement_transfer" model="ir.actions.act_window">
+        <field name="name">Internal Transfers</field>
+        <field name="res_model">bond.warehouse.movement</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('movement_type', '=', 'transfer')]</field>
+        <field name="context">{'default_movement_type': 'transfer'}</field>
+        <field name="search_view_id" ref="view_bond_movement_search"/>
+    </record>
+    <record id="action_bond_movement_issue" model="ir.actions.act_window">
+        <field name="name">Material Issues</field>
+        <field name="res_model">bond.warehouse.movement</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('movement_type', '=', 'issue')]</field>
+        <field name="context">{'default_movement_type': 'issue'}</field>
+        <field name="search_view_id" ref="view_bond_movement_search"/>
+    </record>
+    <record id="action_bond_movement_return" model="ir.actions.act_window">
+        <field name="name">Material Returns</field>
+        <field name="res_model">bond.warehouse.movement</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('movement_type', '=', 'return')]</field>
+        <field name="context">{'default_movement_type': 'return'}</field>
+        <field name="search_view_id" ref="view_bond_movement_search"/>
+    </record>
+    <record id="action_bond_movement_adjustment" model="ir.actions.act_window">
+        <field name="name">Stock Adjustments</field>
+        <field name="res_model">bond.warehouse.movement</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('movement_type', '=', 'adjustment')]</field>
+        <field name="context">{'default_movement_type': 'adjustment'}</field>
+        <field name="search_view_id" ref="view_bond_movement_search"/>
+    </record>
+</odoo>

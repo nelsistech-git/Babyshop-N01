@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright © Nelsis Tech. Developer: Nur Uddin Ahammed. All rights reserved. -->
+<odoo>
+    <record id="view_nelsis_lc_boe_form" model="ir.ui.view">
+        <field name="name">nelsis.lc.boe.form</field>
+        <field name="model">nelsis.lc.boe</field>
+        <field name="arch" type="xml">
+            <form string="Bill of Entry" class="nl-ui">
+                <header>
+                    <button name="action_submit" string="Submit" type="object" class="btn-primary nl-btn nl-primary"
+                            icon="fa-paper-plane" invisible="state != 'draft'"
+                            groups="nelsis_lc_management.group_lc_officer"/>
+                    <button name="action_clear" string="Mark Cleared" type="object" class="btn-success nl-btn nl-success"
+                            icon="fa-check-circle" invisible="state != 'submitted'"
+                            groups="nelsis_lc_management.group_lc_officer"/>
+                    <button name="action_cancel" string="Cancel" type="object" icon="fa-ban"
+                            invisible="state == 'cancelled'"
+                            groups="nelsis_lc_management.group_lc_officer" class="nl-btn nl-danger"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,cleared" class="nl-statusbar"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Cancelled" bg_color="text-bg-danger"
+                            invisible="state != 'cancelled'"/>
+                    <div class="oe_title">
+                        <label for="name" string="Bill of Entry No."/>
+                        <h1><field name="name" placeholder="BoE number"
+                                   readonly="state in ('cleared', 'cancelled')"/></h1>
+                    </div>
+                    <group>
+                        <group string="Reference">
+                            <field name="lc_id" readonly="id" options="{'no_create': True}"
+                                   domain="[('state', 'in', ['opened', 'in_progress', 'partial', 'cleared'])]"/>
+                            <field name="shipment_id" options="{'no_create': True}"
+                                   readonly="state in ('cleared', 'cancelled')"/>
+                            <field name="partner_id"/>
+                            <field name="boe_date" readonly="state in ('cleared', 'cancelled')"/>
+                            <field name="customs_house" readonly="state in ('cleared', 'cancelled')"/>
+                        </group>
+                        <group string="Customs Values (as per customs documents)">
+                            <field name="company_currency_id" invisible="1"/>
+                            <field name="assessed_value" widget="monetary" readonly="state in ('cleared', 'cancelled')"/>
+                            <field name="duty_paid_amount" widget="monetary" readonly="state in ('cleared', 'cancelled')"/>
+                            <field name="clearance_date" readonly="state in ('cleared', 'cancelled')"/>
+                        </group>
+                    </group>
+                    <field name="note" placeholder="Notes..." readonly="state in ('cleared', 'cancelled')"/>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_nelsis_lc_boe_tree" model="ir.ui.view">
+        <field name="name">nelsis.lc.boe.tree</field>
+        <field name="model">nelsis.lc.boe</field>
+        <field name="arch" type="xml">
+            <tree string="Bills of Entry" decoration-muted="state == 'cancelled'">
+                <field name="name"/>
+                <field name="lc_id"/>
+                <field name="shipment_id"/>
+                <field name="partner_id"/>
+                <field name="boe_date"/>
+                <field name="customs_house" optional="show"/>
+                <field name="assessed_value" optional="show"/>
+                <field name="company_currency_id" column_invisible="1"/>
+                <field name="clearance_date"/>
+                <field name="state" widget="badge" decoration-info="state == 'submitted'"
+                       decoration-success="state == 'cleared'" decoration-danger="state == 'cancelled'"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_nelsis_lc_boe_search" model="ir.ui.view">
+        <field name="name">nelsis.lc.boe.search</field>
+        <field name="model">nelsis.lc.boe</field>
+        <field name="arch" type="xml">
+            <search string="Search Bills of Entry">
+                <field name="name"/>
+                <field name="lc_id"/>
+                <field name="shipment_id"/>
+                <field name="partner_id"/>
+                <filter name="f_pending" string="Not Yet Cleared" domain="[('state', 'in', ['draft', 'submitted'])]"/>
+                <filter name="f_cleared" string="Cleared" domain="[('state', '=', 'cleared')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="g_lc" string="LC" context="{'group_by': 'lc_id'}"/>
+                    <filter name="g_state" string="Status" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_nelsis_lc_boe" model="ir.actions.act_window">
+        <field name="name">Bills of Entry</field>
+        <field name="res_model">nelsis.lc.boe</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_nelsis_lc_boe_search"/>
+    </record>
+</odoo>

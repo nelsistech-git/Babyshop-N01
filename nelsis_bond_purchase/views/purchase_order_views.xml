@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) Nelsis Tech. Developer / Product Owner: Nur Uddin Ahammed. -->
+<odoo>
+    <record id="purchase_order_form_bond" model="ir.ui.view">
+        <field name="name">purchase.order.form.bond</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <field name="bond_has_uncovered_qty" invisible="1"/>
+                <button name="action_bond_create_lc" type="object" string="Create LC"
+                        invisible="lc_id or state in ('cancel', 'done') or bond_purchase_type == 'local'"
+                        groups="nelsis_bond_purchase.group_bond_purchase_officer,nelsis_bond_warehouse.group_bond_suite_operator" class="nl-btn nl-violet" icon="fa-plus-circle"/>
+                <button name="action_bond_create_commercial_file" type="object" string="Create Commercial File"
+                        invisible="commercial_file_id or state in ('cancel', 'done') or bond_purchase_type == 'local'"
+                        groups="nelsis_bond_purchase.group_bond_purchase_officer,nelsis_bond_warehouse.group_bond_suite_operator" class="nl-btn nl-violet" icon="fa-plus-circle"/>
+                <button name="action_bond_create_consignment" type="object" string="Create Consignment"
+                        class="btn-primary nl-btn nl-violet" invisible="not bond_has_uncovered_qty"
+                        groups="nelsis_bond_purchase.group_bond_purchase_officer,nelsis_bond_warehouse.group_bond_suite_operator" icon="fa-plus-circle"/>
+                <button name="action_bond_sync" type="object" string="Sync Bond Data"
+                        invisible="bond_purchase_type != 'import_bonded' or state not in ('purchase', 'done')" class="nl-btn nl-info" icon="fa-refresh"/>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_lc" type="object" class="oe_stat_button nl-stat" icon="fa-bank"
+                        invisible="not lc_id" groups="nelsis_bond_purchase.group_bond_purchase_officer,nelsis_bond_warehouse.group_bond_suite_operator">
+                    <div class="o_stat_info"><span class="o_stat_text">LC</span></div>
+                </button>
+                <button name="action_view_commercial_file" type="object" class="oe_stat_button nl-stat" icon="fa-file-text-o"
+                        invisible="not commercial_file_id" groups="nelsis_bond_purchase.group_bond_purchase_officer,nelsis_bond_warehouse.group_bond_suite_operator">
+                    <div class="o_stat_info"><span class="o_stat_text">Commercial File</span></div>
+                </button>
+                <button name="action_view_bond_consignments" type="object" class="oe_stat_button nl-stat" icon="fa-ship"
+                        invisible="bond_consignment_count == 0" groups="nelsis_bond_purchase.group_bond_purchase_officer,nelsis_bond_warehouse.group_bond_suite_operator">
+                    <field name="bond_consignment_count" widget="statinfo" string="Consignments"/>
+                </button>
+                <button name="action_view_bond_receipts" type="object" class="oe_stat_button nl-stat" icon="fa-truck"
+                        invisible="bond_receipt_count == 0" groups="nelsis_bond_purchase.group_bond_purchase_officer,nelsis_bond_warehouse.group_bond_suite_operator">
+                    <field name="bond_receipt_count" widget="statinfo" string="Bond Receipts"/>
+                </button>
+            </xpath>
+            <xpath expr="//field[@name='partner_ref']" position="after">
+                <field name="bond_purchase_type" readonly="state in ('purchase', 'done', 'cancel')"/>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Bond &amp; Import" name="bond_import" invisible="bond_purchase_type == 'local'" groups="nelsis_bond_purchase.group_bond_purchase_officer,nelsis_bond_warehouse.group_bond_suite_operator">
+                    <group>
+                        <group string="Documents">
+                            <field name="lc_id" readonly="state in ('done', 'cancel')" options="{'no_create': True}"/>
+                            <field name="lc_available_amount" invisible="not lc_id"/>
+                            <field name="commercial_file_id" readonly="state in ('done', 'cancel')"
+                                   options="{'no_create': True}"/>
+                            <field name="bond_entitlement_id" readonly="state in ('done', 'cancel')"
+                                   invisible="bond_purchase_type != 'import_bonded'" options="{'no_create': True}"/>
+                        </group>
+                        <group string="Receiving">
+                            <field name="bond_received_percent" widget="progressbar"
+                                   invisible="state not in ('purchase', 'done')"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree//field[@name='qty_received']" position="after">
+                <field name="bond_declared_qty" optional="hide" column_invisible="parent.bond_purchase_type != 'import_bonded'"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="purchase_order_tree_bond" model="ir.ui.view">
+        <field name="name">purchase.order.tree.bond</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_kpis_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='state']" position="before">
+                <field name="bond_purchase_type" optional="show"/>
+                <field name="lc_id" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="purchase_order_search_bond" model="ir.ui.view">
+        <field name="name">purchase.order.search.bond</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.view_purchase_order_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='draft']" position="before">
+                <filter name="bond_bonded" string="Bonded Import" domain="[('bond_purchase_type', '=', 'import_bonded')]"/>
+                <filter name="bond_no_lc" string="Bonded Without LC"
+                        domain="[('bond_purchase_type', '=', 'import_bonded'), ('state', 'in', ('purchase', 'done')), ('lc_id', '=', False)]"/>
+                <separator/>
+            </xpath>
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="lc_id"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

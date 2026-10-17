@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="paperformat_bond_landscape" model="report.paperformat">
+        <field name="name">Bond Report A4 Landscape</field>
+        <field name="format">A4</field>
+        <field name="orientation">Landscape</field>
+        <field name="margin_top">20</field>
+        <field name="margin_bottom">15</field>
+        <field name="margin_left">7</field>
+        <field name="margin_right">7</field>
+        <field name="header_spacing">15</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <record id="action_report_bond_generic" model="ir.actions.report">
+        <field name="name">Bond Management Report</field>
+        <field name="model">bond.warehouse.report.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">nelsis_bond_reconciliation.report_bond_generic</field>
+        <field name="report_file">nelsis_bond_reconciliation.report_bond_generic</field>
+        <field name="paperformat_id" ref="paperformat_bond_landscape"/>
+    </record>
+
+    <template id="report_bond_generic">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-set="rep" t-value="reports[doc.id]"/>
+                <t t-call="web.internal_layout">
+                    <div class="page" style="font-size: 9px;">
+                        <h3 t-esc="rep['title']"/>
+                        <div class="p-2 mb-2" style="border: 2px solid #b02a37; color: #b02a37; font-weight: bold;">
+                            <span t-esc="rep['notice']"/>
+                        </div>
+                        <div class="mb-2">
+                            <t t-foreach="rep['filters']" t-as="line">
+                                <span t-esc="line"/><span t-if="not line_last"> | </span>
+                            </t>
+                        </div>
+                        <table class="table table-sm table-bordered" style="font-size: 8px;">
+                            <thead>
+                                <tr style="background-color: #1F4E79; color: #fff;">
+                                    <t t-foreach="rep['headers']" t-as="head">
+                                        <th><span t-esc="head"/></th>
+                                    </t>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="rep['rows']" t-as="row">
+                                    <tr>
+                                        <t t-foreach="row" t-as="cell">
+                                            <td t-att-class="'text-end' if is_num(cell) else ''">
+                                                <span t-esc="fmt(cell)"/>
+                                            </td>
+                                        </t>
+                                    </tr>
+                                </t>
+                                <tr t-if="not rep['rows']">
+                                    <td t-att-colspan="len(rep['headers'])" class="text-center text-muted">
+                                        No data for the selected filters.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div t-foreach="rep['notes']" t-as="note" class="text-muted">
+                            <span t-esc="note"/>
+                        </div>
+                        <div class="text-muted mt-2">Generated: <span t-esc="rep['generated']"/></div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

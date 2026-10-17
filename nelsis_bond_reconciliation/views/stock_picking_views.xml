@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_picking_form_bond" model="ir.ui.view">
+        <field name="name">stock.picking.form.bond</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_bond_submit" type="object" string="Submit for Bond Verification"
+                        icon="fa-paper-plane" class="btn-secondary nl-btn nl-success"
+                        invisible="state != 'done' or bond_verification_state not in ('draft', 'rejected')"
+                        groups="nelsis_bond_reconciliation.group_bond_recon_user"/>
+                <button name="action_bond_verify" type="object" string="Verify (Bond)"
+                        icon="fa-check-circle" class="btn-success nl-btn nl-success"
+                        invisible="state != 'done' or bond_verification_state not in ('pending', 'rejected')"
+                        groups="nelsis_bond_reconciliation.group_bond_recon_manager"/>
+                <button name="action_bond_reject" type="object" string="Reject (Bond)"
+                        icon="fa-times-circle" class="btn-danger nl-btn nl-danger"
+                        invisible="state != 'done' or bond_verification_state != 'pending'"
+                        groups="nelsis_bond_reconciliation.group_bond_recon_manager"/>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_bond_view_documents" type="object" class="oe_stat_button nl-stat"
+                        icon="fa-paperclip" groups="nelsis_bond_reconciliation.group_bond_recon_user">
+                    <field name="bond_document_count" widget="statinfo" string="Bond Docs"/>
+                </button>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Bond" name="bond_page"
+                      groups="nelsis_bond_reconciliation.group_bond_recon_user">
+                    <group>
+                        <group string="Traceability">
+                            <field name="bond_license_ref" placeholder="Bond license no."/>
+                            <field name="bond_lc_ref" placeholder="LC no."/>
+                            <field name="bond_boe_ref" placeholder="Bill of Entry no."/>
+                            <field name="bond_entitlement_ref"/>
+                        </group>
+                        <group string="Verification">
+                            <field name="bond_verification_state" widget="badge"
+                                   decoration-success="bond_verification_state == 'verified'"
+                                   decoration-danger="bond_verification_state == 'rejected'"
+                                   decoration-warning="bond_verification_state == 'pending'"/>
+                            <field name="bond_verified_by"/>
+                            <field name="bond_verified_on"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

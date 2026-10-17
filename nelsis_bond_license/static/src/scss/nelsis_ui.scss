@@ -1,0 +1,144 @@
+// Copyright (c) Nelsis Tech. Developer: Nur Uddin Ahammed. Nelsis Bond Suite - modern UI layer.
+// Colourful 3D buttons, animated stat icons, status bars, menu icons. Opt-in classes only (nl-*).
+
+@keyframes nlPulse {
+    0%, 100% { box-shadow: 0 3px 0 var(--nl-edge), 0 6px 14px var(--nl-glow), 0 0 0 0 var(--nl-glow); }
+    50%      { box-shadow: 0 3px 0 var(--nl-edge), 0 6px 14px var(--nl-glow), 0 0 0 7px rgba(255, 255, 255, 0); }
+}
+@keyframes nlFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+@keyframes nlShine { 0% { left: -60%; } 100% { left: 140%; } }
+@keyframes nlPop { 0% { transform: scale(.6) rotate(-12deg); } 60% { transform: scale(1.18) rotate(6deg); } 100% { transform: scale(1) rotate(0); } }
+
+// ---------- 3D colourful buttons ----------
+.btn.nl-btn {
+    --nl-c1: #60a5fa; --nl-c2: #2563eb; --nl-edge: #1e40af; --nl-glow: rgba(37, 99, 235, .35);
+    position: relative; overflow: hidden; isolation: isolate;
+    color: #fff !important; font-weight: 600; letter-spacing: .15px;
+    border: 0 !important; border-radius: .6rem;
+    background: linear-gradient(180deg, var(--nl-c1) 0%, var(--nl-c2) 100%) !important;
+    box-shadow: 0 3px 0 var(--nl-edge), 0 6px 14px var(--nl-glow), inset 0 1px 0 rgba(255, 255, 255, .45);
+    text-shadow: 0 1px 1px rgba(0, 0, 0, .25);
+    transition: transform .16s ease, box-shadow .16s ease, filter .16s ease;
+
+    &::before { // glossy highlight
+        content: ""; position: absolute; inset: 0 0 52% 0; z-index: -1;
+        background: linear-gradient(180deg, rgba(255, 255, 255, .38), rgba(255, 255, 255, 0));
+        border-radius: .6rem .6rem 0 0; pointer-events: none;
+    }
+    &::after { // shine sweep
+        content: ""; position: absolute; top: 0; bottom: 0; left: -60%; width: 40%; z-index: -1;
+        background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .55), transparent);
+        transform: skewX(-20deg); pointer-events: none;
+    }
+    .fa, .oi { transition: transform .2s ease; text-shadow: 0 1px 1px rgba(0, 0, 0, .25); }
+
+    &:hover:not(:disabled):not(.disabled) {
+        transform: translateY(-2px); filter: saturate(1.15) brightness(1.04);
+        box-shadow: 0 5px 0 var(--nl-edge), 0 10px 20px var(--nl-glow), inset 0 1px 0 rgba(255, 255, 255, .5);
+        &::after { animation: nlShine .7s ease; }
+        .fa, .oi { transform: scale(1.22) rotate(-8deg); }
+    }
+    &:active:not(:disabled):not(.disabled) {
+        transform: translateY(2px); box-shadow: 0 1px 0 var(--nl-edge), 0 2px 6px var(--nl-glow), inset 0 2px 4px rgba(0, 0, 0, .18);
+    }
+    &:disabled, &.disabled { filter: grayscale(.7) opacity(.55); box-shadow: none; }
+    &:focus-visible { outline: 3px solid rgba(255, 255, 255, .8); outline-offset: -5px; }
+
+    &.nl-primary { --nl-c1: #60a5fa; --nl-c2: #2563eb; --nl-edge: #1e40af; --nl-glow: rgba(37, 99, 235, .35); }
+    &.nl-success { --nl-c1: #4ade80; --nl-c2: #16a34a; --nl-edge: #166534; --nl-glow: rgba(22, 163, 74, .35); }
+    &.nl-info    { --nl-c1: #22d3ee; --nl-c2: #0891b2; --nl-edge: #155e75; --nl-glow: rgba(8, 145, 178, .35); }
+    &.nl-warning { --nl-c1: #fbbf24; --nl-c2: #ea580c; --nl-edge: #9a3412; --nl-glow: rgba(234, 88, 12, .35); }
+    &.nl-danger  { --nl-c1: #fb7185; --nl-c2: #dc2626; --nl-edge: #991b1b; --nl-glow: rgba(220, 38, 38, .35); }
+    &.nl-violet  { --nl-c1: #c084fc; --nl-c2: #7c3aed; --nl-edge: #5b21b6; --nl-glow: rgba(124, 58, 237, .35); }
+    &.nl-neutral { --nl-c1: #94a3b8; --nl-c2: #475569; --nl-edge: #1e293b; --nl-glow: rgba(71, 85, 105, .3); }
+    &.nl-ghost {
+        --nl-edge: #cbd5e1; --nl-glow: rgba(100, 116, 139, .2);
+        color: #475569 !important; text-shadow: none; font-weight: 500;
+        background: linear-gradient(180deg, #fff, #eef2f7) !important;
+        .fa, .oi { text-shadow: none; }
+        &::before { opacity: .5; }
+    }
+}
+// the main next-step action gently pulses
+.o_form_view .o_statusbar_buttons .btn.nl-btn.nl-success:not(:disabled),
+.o_form_view .o_statusbar_buttons .btn.nl-btn.nl-primary:not(:disabled) { animation: nlPulse 2.8s ease-in-out infinite; }
+
+// ---------- Smart (stat) buttons ----------
+.o_form_view .oe_button_box .btn.oe_stat_button.nl-stat {
+    --nl-s1: #60a5fa; --nl-s2: #2563eb;
+    border-radius: .7rem; border: 1px solid rgba(148, 163, 184, .35); background: linear-gradient(180deg, #fff, #f4f7fb);
+    transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
+    .o_button_icon, .o_stat_button_icon {
+        color: #fff !important; width: 2.1rem; height: 2.1rem; display: inline-flex; align-items: center; justify-content: center;
+        border-radius: .65rem; font-size: 1.05rem; background: linear-gradient(145deg, var(--nl-s1), var(--nl-s2));
+        box-shadow: 0 3px 0 rgba(0, 0, 0, .18), inset 0 1px 0 rgba(255, 255, 255, .5); transition: transform .2s ease;
+    }
+    .o_stat_value { font-weight: 700; color: var(--nl-s2); }
+    &:hover { transform: translateY(-2px); border-color: var(--nl-s1); box-shadow: 0 8px 18px rgba(15, 23, 42, .12);
+        .o_button_icon, .o_stat_button_icon { animation: nlPop .45s ease; } }
+    &:nth-child(6n+1) { --nl-s1: #60a5fa; --nl-s2: #2563eb; }
+    &:nth-child(6n+2) { --nl-s1: #4ade80; --nl-s2: #16a34a; }
+    &:nth-child(6n+3) { --nl-s1: #fbbf24; --nl-s2: #ea580c; }
+    &:nth-child(6n+4) { --nl-s1: #f472b6; --nl-s2: #db2777; }
+    &:nth-child(6n+5) { --nl-s1: #a78bfa; --nl-s2: #7c3aed; }
+    &:nth-child(6n+6) { --nl-s1: #22d3ee; --nl-s2: #0891b2; }
+}
+
+// ---------- Form polish (only views tagged nl-ui) ----------
+.o_form_view.nl-ui, .o_form_view .nl-ui {
+    .o_form_sheet { border-top: 4px solid transparent; border-image: linear-gradient(90deg, var(--nl-accent, #7c3aed), #22d3ee, #f472b6) 1; border-radius: .4rem; }
+    .o_notebook .nav-tabs .nav-link { border: 0; border-bottom: 3px solid transparent; font-weight: 600; transition: color .15s ease, border-color .15s ease, transform .15s ease;
+        &:hover { color: var(--nl-accent, #7c3aed); transform: translateY(-1px); } }
+    .o_notebook .nav-tabs .nav-link.active { color: var(--nl-accent, #7c3aed); border-image: linear-gradient(90deg, var(--nl-accent, #7c3aed), #22d3ee) 1; }
+    .o_horizontal_separator { color: var(--nl-accent, #7c3aed); letter-spacing: .4px; }
+}
+.o_kanban_view.nl-ui .o_kanban_record { transition: transform .16s ease, box-shadow .16s ease;
+    &:hover { transform: translateY(-3px); box-shadow: 0 10px 22px rgba(15, 23, 42, .14); } }
+
+// ---------- Status bar ----------
+.o_statusbar_status.nl-statusbar, .nl-statusbar .o_statusbar_status {
+    .o_arrow_button { font-weight: 600; transition: filter .15s ease; &:hover { filter: brightness(1.05); } }
+    .o_arrow_button.o_arrow_button_current, .o_arrow_button.o_arrow_button_current:hover {
+        color: #fff !important; background: linear-gradient(180deg, var(--nl-accent2, #a78bfa), var(--nl-accent, #7c3aed)) !important;
+        text-shadow: 0 1px 1px rgba(0, 0, 0, .25);
+        &::after { border-left-color: var(--nl-accent, #7c3aed) !important; }
+    }
+}
+
+// ---------- Menu icons ----------
+.o_menu_sections, .o_menu_sections .dropdown-menu, .dropdown-menu {
+    [data-menu-xmlid^="nelsis_"]::before {
+        content: "\f111"; font: normal 12px/1 FontAwesome; color: #fff; text-shadow: 0 1px 1px rgba(0, 0, 0, .3);
+        display: inline-flex; align-items: center; justify-content: center; width: 1.45rem; height: 1.45rem; margin-right: .5rem;
+        border-radius: .45rem; vertical-align: middle; flex: 0 0 auto;
+        background: linear-gradient(145deg, var(--nl-ic1, #60a5fa), var(--nl-ic2, #2563eb));
+        box-shadow: 0 2px 0 rgba(0, 0, 0, .2), inset 0 1px 0 rgba(255, 255, 255, .45);
+        transition: transform .18s ease;
+    }
+    [data-menu-xmlid^="nelsis_"]:hover::before { transform: translateY(-2px) rotate(-8deg) scale(1.12); }
+}
+
+// ---------- Home-screen app icons (3D hover / float) ----------
+.o_home_menu .o_app[data-menu-xmlid^="nelsis_"] {
+    .o_app_icon, img.o_app_icon { transition: transform .25s ease, filter .25s ease; filter: drop-shadow(0 8px 10px rgba(15, 23, 42, .28)); }
+    &:hover .o_app_icon, &:focus .o_app_icon { transform: perspective(500px) translateY(-6px) rotateX(10deg) rotateY(-10deg) scale(1.08); filter: drop-shadow(0 16px 16px rgba(15, 23, 42, .35)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .btn.nl-btn, .btn.nl-btn::after, .o_statusbar_buttons .btn.nl-btn, .o_home_menu .o_app .o_app_icon { animation: none !important; transition: none !important; }
+}
+
+// ---------- nelsis_bond_license accent ----------
+.o_form_view.nl-ui, .o_statusbar_status { --nl-accent: #F59E0B; --nl-accent2: #FDE047; }
+// per-menu icons
+[data-menu-xmlid="nelsis_bond_license.menu_bond_license_root"]::before { content: "\f0a3"; --nl-ic1: #60A5FA; --nl-ic2: #2563EB; }
+[data-menu-xmlid="nelsis_bond_license.menu_bond_license"]::before { content: "\f0a3"; --nl-ic1: #34D399; --nl-ic2: #059669; }
+[data-menu-xmlid="nelsis_bond_license.menu_bond_renewal"]::before { content: "\f021"; --nl-ic1: #FBBF24; --nl-ic2: #D97706; }
+[data-menu-xmlid="nelsis_bond_license.menu_bond_security"]::before { content: "\f132"; --nl-ic1: #F472B6; --nl-ic2: #DB2777; }
+[data-menu-xmlid="nelsis_bond_license.menu_bond_entitlement_root"]::before { content: "\f0d6"; --nl-ic1: #A78BFA; --nl-ic2: #7C3AED; }
+[data-menu-xmlid="nelsis_bond_license.menu_bond_entitlement"]::before { content: "\f0d6"; --nl-ic1: #22D3EE; --nl-ic2: #0891B2; }
+[data-menu-xmlid="nelsis_bond_license.menu_bond_amendment"]::before { content: "\f040"; --nl-ic1: #FB923C; --nl-ic2: #EA580C; }
+[data-menu-xmlid="nelsis_bond_license.menu_bond_utilization"]::before { content: "\f080"; --nl-ic1: #F87171; --nl-ic2: #DC2626; }
+[data-menu-xmlid="nelsis_bond_license.menu_bond_config"]::before { content: "\f013"; --nl-ic1: #60A5FA; --nl-ic2: #2563EB; }
+[data-menu-xmlid="nelsis_bond_license.menu_bond_license_type"]::before { content: "\f2c2"; --nl-ic1: #34D399; --nl-ic2: #059669; }
+[data-menu-xmlid="nelsis_bond_license.menu_bond_factory_category"]::before { content: "\f02c"; --nl-ic1: #FBBF24; --nl-ic2: #D97706; }

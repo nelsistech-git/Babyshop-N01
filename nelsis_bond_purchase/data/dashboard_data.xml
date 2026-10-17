@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) Nelsis Tech. Developer / Product Owner: Nur Uddin Ahammed. -->
+<odoo noupdate="1">
+    <record id="kpi_bond_po_awaiting_receipt" model="bond.dashboard.kpi">
+        <field name="name">Bonded Purchase Orders Awaiting Receipt</field>
+        <field name="sequence">210</field>
+        <field name="section">documents</field>
+        <field name="model_name">purchase.order</field>
+        <field name="domain">[('bond_purchase_type', '=', 'import_bonded'), ('state', '=', 'purchase'), ('receipt_status', '!=', 'full')]</field>
+        <field name="icon">fa-shopping-cart</field>
+        <field name="color">info</field>
+        <field name="group_ids" eval="[(6, 0, [ref('nelsis_bond_dashboard.group_bond_dash_bond_manager'), ref('nelsis_bond_dashboard.group_bond_dash_commercial'), ref('nelsis_bond_dashboard.group_bond_dash_auditor')])]"/>
+    </record>
+    <record id="kpi_bond_po_without_lc" model="bond.dashboard.kpi">
+        <field name="name">Confirmed Bonded Purchase Orders Without LC</field>
+        <field name="sequence">220</field>
+        <field name="section">documents</field>
+        <field name="model_name">purchase.order</field>
+        <field name="domain">[('bond_purchase_type', '=', 'import_bonded'), ('state', 'in', ['purchase', 'done']), ('lc_id', '=', False)]</field>
+        <field name="icon">fa-exclamation-triangle</field>
+        <field name="color">danger</field>
+        <field name="danger_if_positive" eval="True"/>
+        <field name="group_ids" eval="[(6, 0, [ref('nelsis_bond_dashboard.group_bond_dash_bond_manager'), ref('nelsis_bond_dashboard.group_bond_dash_commercial'), ref('nelsis_bond_dashboard.group_bond_dash_auditor')])]"/>
+    </record>
+    <record id="rule_bond_po_without_lc" model="bond.dashboard.alert.rule">
+        <field name="name">Confirmed bonded purchase order without LC</field>
+        <field name="alert_type">missing_document</field>
+        <field name="severity">warning</field>
+        <field name="model_name">purchase.order</field>
+        <field name="domain">[('bond_purchase_type', '=', 'import_bonded'), ('state', 'in', ['purchase', 'done']), ('lc_id', '=', False)]</field>
+        <field name="group_ids" eval="[(6, 0, [ref('nelsis_bond_dashboard.group_bond_dash_bond_manager')])]"/>
+        <field name="active" eval="False"/>
+    </record>
+</odoo>

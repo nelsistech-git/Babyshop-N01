@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nelsis_bond_demo_log_tree" model="ir.ui.view">
+        <field name="name">nelsis.bond.demo.log.tree</field>
+        <field name="model">nelsis.bond.demo.log</field>
+        <field name="arch" type="xml">
+            <tree string="Demo Data Load Log" create="0" delete="0"
+                  decoration-danger="state == 'failed'" decoration-success="state == 'done'">
+                <header>
+                    <button name="action_rerun" type="object" string="Re-run pending steps"
+                            display="always" class="btn-primary nl-btn nl-info" icon="fa-play-circle"/>
+                </header>
+                <field name="sequence" widget="handle"/>
+                <field name="unit"/>
+                <field name="name"/>
+                <field name="state" widget="badge"/>
+                <field name="loaded_on"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_nelsis_bond_demo_log_form" model="ir.ui.view">
+        <field name="name">nelsis.bond.demo.log.form</field>
+        <field name="model">nelsis.bond.demo.log</field>
+        <field name="arch" type="xml">
+            <form string="Demo Data Step" create="0" delete="0" class="nl-ui">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="unit"/>
+                        <field name="state"/>
+                        <field name="loaded_on"/>
+                    </group>
+                    <group string="Details">
+                        <field name="message" nolabel="1" colspan="2"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_nelsis_bond_demo_log_search" model="ir.ui.view">
+        <field name="name">nelsis.bond.demo.log.search</field>
+        <field name="model">nelsis.bond.demo.log</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="unit"/>
+                <filter name="failed" string="Failed" domain="[('state', '=', 'failed')]"/>
+                <filter name="done" string="Loaded" domain="[('state', '=', 'done')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_unit" string="Unit" context="{'group_by': 'unit'}"/>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_nelsis_bond_demo_log" model="ir.actions.act_window">
+        <field name="name">Demo Data Load Log</field>
+        <field name="res_model">nelsis.bond.demo.log</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="action_nelsis_bond_demo_rerun" model="ir.actions.server">
+        <field name="name">Re-run pending demo data steps</field>
+        <field name="model_id" ref="model_nelsis_bond_demo_log"/>
+        <field name="state">code</field>
+        <field name="code">action = model.action_rerun()</field>
+    </record>
+
+    <menuitem id="menu_nelsis_bond_demo_root" name="Bond Demo Data" sequence="99"
+              groups="base.group_system" web_icon="nelsis_bond_demo,static/description/icon.svg"/>
+    <menuitem id="menu_nelsis_bond_demo_log" name="Load Log" parent="menu_nelsis_bond_demo_root"
+              action="action_nelsis_bond_demo_log" sequence="10"/>
+    <menuitem id="menu_nelsis_bond_demo_rerun" name="Re-run pending steps"
+              parent="menu_nelsis_bond_demo_root" action="action_nelsis_bond_demo_rerun" sequence="20"/>
+</odoo>

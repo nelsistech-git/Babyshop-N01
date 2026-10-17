@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright © Nelsis Tech. Developer: Nur Uddin Ahammed. All rights reserved. -->
+<odoo noupdate="0">
+
+    <!-- ===== model_nelsis_lc ===== -->
+    <record id="rule_lc_company" model="ir.rule">
+        <field name="name">LC lc: multi-company</field>
+        <field name="model_id" ref="model_nelsis_lc"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="rule_lc_own" model="ir.rule">
+        <field name="name">LC lc: LC users see their own LCs</field>
+        <field name="model_id" ref="model_nelsis_lc"/>
+        <field name="groups" eval="[(4, ref('group_lc_user'))]"/>
+        <field name="domain_force">['|', ('create_uid', '=', user.id), ('user_id', '=', user.id)]</field>
+    </record>
+    <record id="rule_lc_all" model="ir.rule">
+        <field name="name">LC lc: officers, managers and auditors see all</field>
+        <field name="model_id" ref="model_nelsis_lc"/>
+        <field name="groups" eval="[(4, ref('group_lc_officer')), (4, ref('group_lc_auditor'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+    <record id="rule_lc_bond" model="ir.rule">
+        <field name="name">LC lc: bond officers see LCs past review</field>
+        <field name="model_id" ref="model_nelsis_lc"/>
+        <field name="groups" eval="[(4, ref('group_lc_bond_officer'))]"/>
+        <field name="domain_force">[('state', 'not in', ['draft', 'review'])]</field>
+    </record>
+
+    <!-- ===== model_nelsis_lc_shipment ===== -->
+    <record id="rule_shipment_company" model="ir.rule">
+        <field name="name">LC shipment: multi-company</field>
+        <field name="model_id" ref="model_nelsis_lc_shipment"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="rule_shipment_own" model="ir.rule">
+        <field name="name">LC shipment: LC users see their own LCs</field>
+        <field name="model_id" ref="model_nelsis_lc_shipment"/>
+        <field name="groups" eval="[(4, ref('group_lc_user'))]"/>
+        <field name="domain_force">['|', ('lc_id.create_uid', '=', user.id), ('lc_id.user_id', '=', user.id)]</field>
+    </record>
+    <record id="rule_shipment_all" model="ir.rule">
+        <field name="name">LC shipment: officers, managers and auditors see all</field>
+        <field name="model_id" ref="model_nelsis_lc_shipment"/>
+        <field name="groups" eval="[(4, ref('group_lc_officer')), (4, ref('group_lc_auditor'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+    <record id="rule_shipment_bond" model="ir.rule">
+        <field name="name">LC shipment: bond officers see LCs past review</field>
+        <field name="model_id" ref="model_nelsis_lc_shipment"/>
+        <field name="groups" eval="[(4, ref('group_lc_bond_officer'))]"/>
+        <field name="domain_force">[('lc_id.state', 'not in', ['draft', 'review'])]</field>
+    </record>
+
+    <!-- ===== model_nelsis_lc_amendment ===== -->
+    <record id="rule_amendment_company" model="ir.rule">
+        <field name="name">LC amendment: multi-company</field>
+        <field name="model_id" ref="model_nelsis_lc_amendment"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="rule_amendment_own" model="ir.rule">
+        <field name="name">LC amendment: LC users see their own LCs</field>
+        <field name="model_id" ref="model_nelsis_lc_amendment"/>
+        <field name="groups" eval="[(4, ref('group_lc_user'))]"/>
+        <field name="domain_force">['|', ('lc_id.create_uid', '=', user.id), ('lc_id.user_id', '=', user.id)]</field>
+    </record>
+    <record id="rule_amendment_all" model="ir.rule">
+        <field name="name">LC amendment: officers, managers and auditors see all</field>
+        <field name="model_id" ref="model_nelsis_lc_amendment"/>
+        <field name="groups" eval="[(4, ref('group_lc_officer')), (4, ref('group_lc_auditor'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+    <record id="rule_amendment_bond" model="ir.rule">
+        <field name="name">LC amendment: bond officers see LCs past review</field>
+        <field name="model_id" ref="model_nelsis_lc_amendment"/>
+        <field name="groups" eval="[(4, ref('group_lc_bond_officer'))]"/>
+        <field name="domain_force">[('lc_id.state', 'not in', ['draft', 'review'])]</field>
+    </record>
+
+    <!-- ===== model_nelsis_lc_boe ===== -->
+    <record id="rule_boe_company" model="ir.rule">
+        <field name="name">LC boe: multi-company</field>
+        <field name="model_id" ref="model_nelsis_lc_boe"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="rule_boe_own" model="ir.rule">
+        <field name="name">LC boe: LC users see their own LCs</field>
+        <field name="model_id" ref="model_nelsis_lc_boe"/>
+        <field name="groups" eval="[(4, ref('group_lc_user'))]"/>
+        <field name="domain_force">['|', ('lc_id.create_uid', '=', user.id), ('lc_id.user_id', '=', user.id)]</field>
+    </record>
+    <record id="rule_boe_all" model="ir.rule">
+        <field name="name">LC boe: officers, managers and auditors see all</field>
+        <field name="model_id" ref="model_nelsis_lc_boe"/>
+        <field name="groups" eval="[(4, ref('group_lc_officer')), (4, ref('group_lc_auditor'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+    <record id="rule_boe_bond" model="ir.rule">
+        <field name="name">LC boe: bond officers see LCs past review</field>
+        <field name="model_id" ref="model_nelsis_lc_boe"/>
+        <field name="groups" eval="[(4, ref('group_lc_bond_officer'))]"/>
+        <field name="domain_force">[('lc_id.state', 'not in', ['draft', 'review'])]</field>
+    </record>
+
+    <!-- ===== model_nelsis_lc_document ===== -->
+    <record id="rule_document_company" model="ir.rule">
+        <field name="name">LC document: multi-company</field>
+        <field name="model_id" ref="model_nelsis_lc_document"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="rule_document_own" model="ir.rule">
+        <field name="name">LC document: LC users see their own LCs</field>
+        <field name="model_id" ref="model_nelsis_lc_document"/>
+        <field name="groups" eval="[(4, ref('group_lc_user'))]"/>
+        <field name="domain_force">['|', ('lc_id.create_uid', '=', user.id), ('lc_id.user_id', '=', user.id)]</field>
+    </record>
+    <record id="rule_document_all" model="ir.rule">
+        <field name="name">LC document: officers, managers and auditors see all</field>
+        <field name="model_id" ref="model_nelsis_lc_document"/>
+        <field name="groups" eval="[(4, ref('group_lc_officer')), (4, ref('group_lc_auditor'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+    <record id="rule_document_bond" model="ir.rule">
+        <field name="name">LC document: bond officers see LCs past review</field>
+        <field name="model_id" ref="model_nelsis_lc_document"/>
+        <field name="groups" eval="[(4, ref('group_lc_bond_officer'))]"/>
+        <field name="domain_force">[('lc_id.state', 'not in', ['draft', 'review'])]</field>
+    </record>
+
+    <!-- ===== model_nelsis_lc_log ===== -->
+    <record id="rule_log_company" model="ir.rule">
+        <field name="name">LC log: multi-company</field>
+        <field name="model_id" ref="model_nelsis_lc_log"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="rule_log_own" model="ir.rule">
+        <field name="name">LC log: LC users see their own LCs</field>
+        <field name="model_id" ref="model_nelsis_lc_log"/>
+        <field name="groups" eval="[(4, ref('group_lc_user'))]"/>
+        <field name="domain_force">['|', ('lc_id.create_uid', '=', user.id), ('lc_id.user_id', '=', user.id)]</field>
+    </record>
+    <record id="rule_log_all" model="ir.rule">
+        <field name="name">LC log: officers, managers and auditors see all</field>
+        <field name="model_id" ref="model_nelsis_lc_log"/>
+        <field name="groups" eval="[(4, ref('group_lc_officer')), (4, ref('group_lc_auditor'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+    <record id="rule_log_bond" model="ir.rule">
+        <field name="name">LC log: bond officers see LCs past review</field>
+        <field name="model_id" ref="model_nelsis_lc_log"/>
+        <field name="groups" eval="[(4, ref('group_lc_bond_officer'))]"/>
+        <field name="domain_force">[('lc_id.state', 'not in', ['draft', 'review'])]</field>
+    </record>
+
+    <record id="rule_setting_company" model="ir.rule">
+        <field name="name">LC setting: multi-company</field>
+        <field name="model_id" ref="model_nelsis_lc_setting"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+</odoo>

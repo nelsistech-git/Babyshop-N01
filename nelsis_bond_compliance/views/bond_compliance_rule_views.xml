@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) Nelsis Tech. Developer / Product Owner: Nur Uddin Ahammed -->
+<odoo>
+    <record id="view_bond_compliance_rule_tree" model="ir.ui.view">
+        <field name="name">bond.compliance.rule.tree</field>
+        <field name="model">bond.compliance.rule</field>
+        <field name="arch" type="xml">
+            <tree string="Compliance Rules"
+                  decoration-success="verification_status == 'active'"
+                  decoration-muted="verification_status == 'superseded'"
+                  decoration-danger="verification_status == 'rejected'">
+                <field name="code"/>
+                <field name="version"/>
+                <field name="name"/>
+                <field name="rule_category_id"/>
+                <field name="official_reference"/>
+                <field name="effective_from"/>
+                <field name="effective_to"/>
+                <field name="effective_state" widget="badge"/>
+                <field name="verification_status" widget="badge"/>
+                <field name="requires_professional_verification" optional="hide"/>
+                <field name="next_review_date" optional="hide"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_bond_compliance_rule_form" model="ir.ui.view">
+        <field name="name">bond.compliance.rule.form</field>
+        <field name="model">bond.compliance.rule</field>
+        <field name="arch" type="xml">
+            <form string="Compliance Rule" duplicate="0" class="nl-ui">
+                <header>
+                    <button name="action_submit_review" type="object" string="Submit for Review"
+                            class="btn-primary nl-btn nl-primary" invisible="verification_status != 'draft'"
+                            groups="nelsis_bond_compliance.group_bond_compliance_officer" icon="fa-paper-plane"/>
+                    <button name="action_mark_reviewed" type="object" string="Mark Reviewed"
+                            class="btn-primary nl-btn nl-success" invisible="verification_status != 'under_review'"
+                            groups="nelsis_bond_compliance.group_bond_compliance_reviewer" icon="fa-check-circle"/>
+                    <button name="action_approve" type="object" string="Approve"
+                            class="btn-primary nl-btn nl-success" invisible="verification_status != 'reviewed'"
+                            groups="nelsis_bond_compliance.group_bond_compliance_approver" icon="fa-thumbs-up"/>
+                    <button name="action_activate" type="object" string="Activate"
+                            class="btn-primary nl-btn nl-success" invisible="verification_status != 'approved'"
+                            groups="nelsis_bond_compliance.group_bond_compliance_approver" icon="fa-play-circle"/>
+                    <button name="action_open_reject_wizard" type="object" string="Reject"
+                            invisible="verification_status not in ('under_review', 'reviewed')"
+                            groups="nelsis_bond_compliance.group_bond_compliance_reviewer,nelsis_bond_compliance.group_bond_compliance_approver" class="nl-btn nl-danger" icon="fa-times-circle"/>
+                    <button name="action_return_to_draft" type="object" string="Return to Draft"
+                            invisible="verification_status not in ('under_review', 'reviewed', 'rejected')"
+                            groups="nelsis_bond_compliance.group_bond_compliance_officer,nelsis_bond_compliance.group_bond_compliance_reviewer,nelsis_bond_compliance.group_bond_compliance_approver" class="nl-btn nl-neutral" icon="fa-undo"/>
+                    <button name="action_new_version" type="object" string="Create New Version"
+                            invisible="verification_status not in ('active', 'superseded')"
+                            groups="nelsis_bond_compliance.group_bond_compliance_officer" class="nl-btn nl-violet" icon="fa-plus-circle"/>
+                    <field name="verification_status" widget="statusbar"
+                           statusbar_visible="draft,under_review,reviewed,approved,active" class="nl-statusbar"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_versions" type="object" class="oe_stat_button nl-stat" icon="fa-code-fork">
+                            <field name="version_count" widget="statinfo" string="Versions"/>
+                        </button>
+                        <button name="action_view_evaluations" type="object" class="oe_stat_button nl-stat" icon="fa-list-alt">
+                            <field name="evaluation_count" widget="statinfo" string="Evaluations"/>
+                        </button>
+                        <button name="action_view_exceptions" type="object" class="oe_stat_button nl-stat" icon="fa-exclamation-triangle">
+                            <field name="exception_count" widget="statinfo" string="Exceptions"/>
+                        </button>
+                    </div>
+                    <div class="alert alert-warning" role="alert"
+                         invisible="not requires_professional_verification or professional_verified_date">
+                        <strong>Professional verification pending.</strong>
+                        This rule contains a legal interpretation that must be confirmed by a qualified
+                        Bangladesh customs professional before it can be approved.
+                    </div>
+                    <div class="alert alert-danger" role="alert"
+                         invisible="verification_status != 'rejected'">
+                        <strong>Rejected:</strong> <field name="rejection_reason" nolabel="1"/>
+                    </div>
+                    <div class="alert alert-info" role="alert"
+                         invisible="not source_url or source_is_official_domain">
+                        The source URL is not on a gov.bd domain. Confirm that it is an official publication.
+                    </div>
+                    <field name="active" invisible="1"/>
+                    <field name="source_is_official_domain" invisible="1"/>
+                    <group>
+                        <group string="Identification">
+                            <field name="name" readonly="verification_status != 'draft'"/>
+                            <field name="code" readonly="verification_status != 'draft'" placeholder="e.g. STORAGE-PERIOD"/>
+                            <field name="version"/>
+                            <field name="rule_category_id" options="{'no_create': True}"
+                                   readonly="verification_status != 'draft'"/>
+                            <field name="effective_state" widget="badge"/>
+                        </group>
+                        <group string="Official Source">
+                            <field name="official_reference" readonly="verification_status != 'draft'"/>
+                            <field name="source_url" widget="url" readonly="verification_status != 'draft'"/>
+                            <field name="publication_date" readonly="verification_status != 'draft'"/>
+                            <field name="effective_from" readonly="verification_status != 'draft'"/>
+                            <field name="effective_to"
+                                   readonly="verification_status not in ('draft', 'approved', 'active')"/>
+                            <field name="next_review_date"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Definition" name="definition">
+                            <group>
+                                <field name="applicable_category_ids" widget="many2many_tags"
+                                       options="{'no_create': True}"
+                                       readonly="verification_status != 'draft'"/>
+                                <field name="applicability" readonly="verification_status != 'draft'"/>
+                                <field name="description" readonly="verification_status != 'draft'"/>
+                                <field name="required_document_type_ids" widget="many2many_tags"
+                                       options="{'no_create': True}"
+                                       readonly="verification_status != 'draft'"/>
+                            </group>
+                        </page>
+                        <page string="Parameters" name="parameters">
+                            <field name="parameter_ids" readonly="verification_status != 'draft'">
+                                <tree editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="key"/>
+                                    <field name="value_type"/>
+                                    <field name="operator"/>
+                                    <field name="value_integer" invisible="value_type != 'integer'"/>
+                                    <field name="value_float" invisible="value_type != 'float'"/>
+                                    <field name="value_char" invisible="value_type != 'char'"/>
+                                    <field name="value_boolean" invisible="value_type != 'boolean'"/>
+                                    <field name="value_date" invisible="value_type != 'date'"/>
+                                    <field name="value_is_set"/>
+                                    <field name="unit"/>
+                                    <field name="is_statutory"/>
+                                    <field name="is_required_input"/>
+                                    <field name="source_note"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Verification &amp; Approval" name="verification">
+                            <group>
+                                <group string="Workflow">
+                                    <field name="submitted_by"/>
+                                    <field name="submitted_date"/>
+                                    <field name="reviewed_by"/>
+                                    <field name="reviewed_date"/>
+                                    <field name="approved_by"/>
+                                    <field name="approved_date"/>
+                                </group>
+                                <group string="Professional Verification">
+                                    <field name="requires_professional_verification"
+                                           readonly="verification_status in ('approved', 'active', 'superseded')"/>
+                                    <field name="professional_verification_note"
+                                           invisible="not requires_professional_verification"
+                                           readonly="verification_status in ('approved', 'active', 'superseded')"/>
+                                    <field name="professional_verified_by"
+                                           invisible="not requires_professional_verification"
+                                           readonly="verification_status in ('approved', 'active', 'superseded')"/>
+                                    <field name="professional_verified_date"
+                                           invisible="not requires_professional_verification"
+                                           readonly="verification_status in ('approved', 'active', 'superseded')"/>
+                                </group>
+                            </group>
+                            <p class="text-muted">
+                                Software validation is not an official customs approval. Uncertain legal
+                                interpretations must be reviewed by a qualified Bangladesh customs professional.
+                            </p>
+                        </page>
+                        <page string="Version History" name="versions">
+                            <group>
+                                <field name="previous_version_id"/>
+                                <field name="next_version_ids" widget="many2many_tags" readonly="1"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_bond_compliance_rule_search" model="ir.ui.view">
+        <field name="name">bond.compliance.rule.search</field>
+        <field name="model">bond.compliance.rule</field>
+        <field name="arch" type="xml">
+            <search string="Compliance Rules">
+                <field name="name" string="Rule"
+                       filter_domain="['|', '|', ('name', 'ilike', self), ('code', 'ilike', self), ('official_reference', 'ilike', self)]"/>
+                <field name="rule_category_id"/>
+                <field name="applicable_category_ids"/>
+                <filter name="draft" string="Draft" domain="[('verification_status', '=', 'draft')]"/>
+                <filter name="in_workflow" string="In Review / Approval"
+                        domain="[('verification_status', 'in', ('under_review', 'reviewed', 'approved'))]"/>
+                <filter name="active_rules" string="Active" domain="[('verification_status', '=', 'active')]"/>
+                <filter name="superseded" string="Superseded" domain="[('verification_status', '=', 'superseded')]"/>
+                <filter name="rejected" string="Rejected" domain="[('verification_status', '=', 'rejected')]"/>
+                <separator/>
+                <filter name="in_force" string="In Force Today"
+                        domain="[('verification_status', 'in', ('active', 'superseded')), ('effective_from', '&lt;=', context_today().strftime('%Y-%m-%d')), '|', ('effective_to', '=', False), ('effective_to', '&gt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="expired" string="Expired"
+                        domain="[('verification_status', 'in', ('active', 'superseded')), ('effective_to', '&lt;', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="needs_verification" string="Needs Professional Verification"
+                        domain="[('requires_professional_verification', '=', True), ('professional_verified_date', '=', False)]"/>
+                <separator/>
+                <filter name="archived" string="Archived" domain="[('active', '=', False)]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_category" string="Rule Category" context="{'group_by': 'rule_category_id'}"/>
+                    <filter name="group_status" string="Status" context="{'group_by': 'verification_status'}"/>
+                    <filter name="group_code" string="Rule Code" context="{'group_by': 'code'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_bond_compliance_rule" model="ir.actions.act_window">
+        <field name="name">Regulatory Rule Register</field>
+        <field name="res_model">bond.compliance.rule</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Register the first regulatory rule</p>
+            <p>Copy each rule from the official NBR / Bangladesh Customs source. No statutory value is pre-filled.</p>
+        </field>
+    </record>
+</odoo>

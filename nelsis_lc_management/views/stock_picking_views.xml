@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright © Nelsis Tech. Developer: Nur Uddin Ahammed. All rights reserved. -->
+<odoo>
+    <record id="view_picking_form_nelsis_lc" model="ir.ui.view">
+        <field name="name">stock.picking.form.nelsis.lc</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='origin']" position="after">
+                <field name="lc_id"
+                       groups="nelsis_lc_management.group_lc_user,nelsis_lc_management.group_lc_bond_officer,nelsis_lc_management.group_lc_auditor"
+                       invisible="picking_type_code != 'incoming'"
+                       options="{'no_create': True}"
+                       domain="[('state', 'in', ['opened', 'in_progress', 'partial', 'cleared']), ('company_id', '=', company_id)]"/>
+                <field name="lc_shipment_id"
+                       groups="nelsis_lc_management.group_lc_user,nelsis_lc_management.group_lc_bond_officer,nelsis_lc_management.group_lc_auditor"
+                       invisible="picking_type_code != 'incoming' or not lc_id"
+                       options="{'no_create': True}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_picking_search_nelsis_lc" model="ir.ui.view">
+        <field name="name">stock.picking.search.nelsis.lc</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_internal_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='origin']" position="after">
+                <field name="lc_id"
+                       groups="nelsis_lc_management.group_lc_user,nelsis_lc_management.group_lc_bond_officer,nelsis_lc_management.group_lc_auditor"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_nelsis_lc_receipts" model="ir.actions.act_window">
+        <field name="name">LC Warehouse Receipts</field>
+        <field name="res_model">stock.picking</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('lc_id', '!=', False)]</field>
+        <field name="context">{'create': False}</field>
+    </record>
+
+    <record id="action_nelsis_lc_receipt_lines" model="ir.actions.act_window">
+        <field name="name">LC Receipt Traceability (received quantities)</field>
+        <field name="res_model">stock.move.line</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('picking_id.lc_id', '!=', False), ('picking_id.state', '=', 'done'), ('picking_id.picking_type_code', '=', 'incoming')]</field>
+        <field name="context">{'create': False, 'edit': False, 'delete': False}</field>
+    </record>
+</odoo>
