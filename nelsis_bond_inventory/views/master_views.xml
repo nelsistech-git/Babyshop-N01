@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Location: bonded status (read-only here; changed only through classification requests) -->
+    <record id="view_location_form_bond_inventory" model="ir.ui.view">
+        <field name="name">stock.location.form.bond.inventory</field>
+        <field name="model">stock.location</field>
+        <field name="inherit_id" ref="stock.view_location_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='additional_info']" position="inside">
+                <field name="bond_status" readonly="1"/>
+                <field name="bond_license_ref" readonly="1" invisible="bond_status != 'bonded'"/>
+                <field name="bond_authorized_from" readonly="1" invisible="bond_status != 'bonded'"/>
+                <field name="bond_authorized_to" readonly="1" invisible="bond_status != 'bonded'"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Product -->
+    <record id="view_product_template_form_bond_inventory" model="ir.ui.view">
+        <field name="name">product.template.form.bond.inventory</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="stock.view_template_property_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='traceability']" position="after">
+                <group string="Bonded Warehouse" name="bond_inventory" invisible="type != 'product'">
+                    <field name="bond_eligible" readonly="1"/>
+                    <field name="bond_hs_code"/>
+                    <field name="bond_requires_expiry"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Lot -->
+    <record id="view_production_lot_form_bond_inventory" model="ir.ui.view">
+        <field name="name">stock.lot.form.bond.inventory</field>
+        <field name="model">stock.lot</field>
+        <field name="inherit_id" ref="stock.view_production_lot_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='ref']" position="after">
+                <field name="bond_status" readonly="1"/>
+                <field name="bond_expiry_date"/>
+                <field name="bond_lc_label"/>
+                <field name="bond_boe_number"/>
+                <field name="bond_hs_code"/>
+                <field name="bond_consignment_id"/>
+                <field name="bond_receipt_id"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Document types -->
+    <record id="view_bond_document_type_tree" model="ir.ui.view">
+        <field name="name">bond.inventory.document.type.tree</field>
+        <field name="model">bond.inventory.document.type</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="required_for_bonded"/>
+                <field name="active" widget="boolean_toggle"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_bond_document_type" model="ir.actions.act_window">
+        <field name="name">Document Types</field>
+        <field name="res_model">bond.inventory.document.type</field>
+        <field name="view_mode">tree</field>
+    </record>
+
+    <!-- Company settings (opened through a server action on the current company) -->
+    <record id="view_company_form_bond_inventory" model="ir.ui.view">
+        <field name="name">res.company.form.bond.inventory</field>
+        <field name="model">res.company</field>
+        <field name="priority">99</field>
+        <field name="arch" type="xml">
+            <form string="Bond Inventory Settings" class="nl-ui">
+                <sheet>
+                    <group>
+                        <field name="name" readonly="1"/>
+                        <field name="bond_lc_model_name"/>
+                        <field name="bond_variance_tolerance_pct"/>
+                        <field name="bond_always_require_approval"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_bond_inventory_settings" model="ir.actions.server">
+        <field name="name">Bond Inventory Settings</field>
+        <field name="model_id" ref="base.model_res_company"/>
+        <field name="state">code</field>
+        <field name="code">
+action = {
+    'type': 'ir.actions.act_window',
+    'name': 'Bond Inventory Settings',
+    'res_model': 'res.company',
+    'view_mode': 'form',
+    'res_id': env.company.id,
+    'views': [(env.ref('nelsis_bond_inventory.view_company_form_bond_inventory').id, 'form')],
+    'target': 'current',
+}
+        </field>
+    </record>
+</odoo>

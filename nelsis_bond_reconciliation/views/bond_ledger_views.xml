@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_bond_ledger_tree" model="ir.ui.view">
+        <field name="name">bond.warehouse.ledger.tree</field>
+        <field name="model">bond.warehouse.ledger</field>
+        <field name="arch" type="xml">
+            <tree string="Bond Stock Ledger" create="0" edit="0" delete="0" sample="1"
+                  decoration-success="move_type in ('receipt', 'return_in')"
+                  decoration-danger="move_type in ('issue', 'return_out')"
+                  decoration-info="move_type == 'transfer'"
+                  decoration-warning="move_type == 'adjustment' and not adj_approved">
+                <field name="date"/>
+                <field name="reference"/>
+                <field name="product_id"/>
+                <field name="lot_id" optional="show"/>
+                <field name="location_id"/>
+                <field name="counterpart_location_id" optional="show"/>
+                <field name="move_type" widget="badge"/>
+                <field name="qty_in" sum="Total In"/>
+                <field name="qty_out" sum="Total Out"/>
+                <field name="running_balance"/>
+                <field name="product_uom_id" optional="show"/>
+                <field name="bond_classification" widget="badge" optional="show"/>
+                <field name="lc_ref" optional="show"/>
+                <field name="boe_ref" optional="show"/>
+                <field name="license_ref" optional="hide"/>
+                <field name="verification_state" widget="badge" optional="show"
+                       decoration-success="verification_state == 'verified'"
+                       decoration-danger="verification_state == 'rejected'"
+                       decoration-warning="verification_state == 'pending'"/>
+                <field name="processed_by_id" optional="show"/>
+                <field name="approval_user_id" optional="hide"/>
+                <field name="approval_date" optional="hide"/>
+                <field name="has_documents" optional="hide"/>
+                <field name="adj_approved" column_invisible="1"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                <field name="picking_id" column_invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_bond_ledger_search" model="ir.ui.view">
+        <field name="name">bond.warehouse.ledger.search</field>
+        <field name="model">bond.warehouse.ledger</field>
+        <field name="arch" type="xml">
+            <search string="Bond Stock Ledger">
+                <field name="reference"/>
+                <field name="product_id"/>
+                <field name="lot_id"/>
+                <field name="location_id"/>
+                <field name="lc_ref"/>
+                <field name="boe_ref"/>
+                <field name="license_ref"/>
+                <field name="hs_code"/>
+                <filter name="f_bonded" string="Bonded" domain="[('bond_classification', '=', 'bonded')]"/>
+                <filter name="f_non_bonded" string="Non-Bonded" domain="[('bond_classification', '=', 'non_bonded')]"/>
+                <separator/>
+                <filter name="f_receipt" string="Receipts" domain="[('move_type', '=', 'receipt')]"/>
+                <filter name="f_issue" string="Issues" domain="[('move_type', '=', 'issue')]"/>
+                <filter name="f_return" string="Returns" domain="[('move_type', 'in', ['return_in', 'return_out'])]"/>
+                <filter name="f_transfer" string="Transfers" domain="[('move_type', '=', 'transfer')]"/>
+                <filter name="f_adjust" string="Adjustments" domain="[('move_type', '=', 'adjustment')]"/>
+                <filter name="f_unapproved" string="Unapproved Adjustments"
+                        domain="[('move_type', '=', 'adjustment'), ('adj_approved', '=', False)]"/>
+                <separator/>
+                <filter name="f_no_lc" string="Missing LC" domain="[('lc_ref', '=', False), ('move_type', '!=', 'transfer')]"/>
+                <filter name="f_no_boe" string="Missing BoE" domain="[('boe_ref', '=', False), ('move_type', '!=', 'transfer')]"/>
+                <filter name="f_no_docs" string="No Documents" domain="[('picking_id', '!=', False), ('has_documents', '=', False)]"/>
+                <filter name="f_unverified" string="Not Verified" domain="[('verification_state', '!=', 'verified')]"/>
+                <separator/>
+                <filter name="f_date" string="Date" date="date"/>
+                <group expand="0" string="Group By">
+                    <filter name="g_product" string="Product" context="{'group_by': 'product_id'}"/>
+                    <filter name="g_lot" string="Lot/Batch" context="{'group_by': 'lot_id'}"/>
+                    <filter name="g_location" string="Location" context="{'group_by': 'location_id'}"/>
+                    <filter name="g_warehouse" string="Warehouse" context="{'group_by': 'warehouse_id'}"/>
+                    <filter name="g_class" string="Bond Classification" context="{'group_by': 'bond_classification'}"/>
+                    <filter name="g_type" string="Movement Type" context="{'group_by': 'move_type'}"/>
+                    <filter name="g_lc" string="LC" context="{'group_by': 'lc_ref'}"/>
+                    <filter name="g_boe" string="Bill of Entry" context="{'group_by': 'boe_ref'}"/>
+                    <filter name="g_month" string="Month" context="{'group_by': 'date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_bond_ledger_pivot" model="ir.ui.view">
+        <field name="name">bond.warehouse.ledger.pivot</field>
+        <field name="model">bond.warehouse.ledger</field>
+        <field name="arch" type="xml">
+            <pivot string="Bond Ledger Analysis" sample="1">
+                <field name="product_id" type="row"/>
+                <field name="move_type" type="col"/>
+                <field name="signed_qty" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_bond_ledger_graph" model="ir.ui.view">
+        <field name="name">bond.warehouse.ledger.graph</field>
+        <field name="model">bond.warehouse.ledger</field>
+        <field name="arch" type="xml">
+            <graph string="Bond Ledger" type="bar" sample="1">
+                <field name="product_id"/>
+                <field name="move_type"/>
+                <field name="signed_qty" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_bond_ledger" model="ir.actions.act_window">
+        <field name="name">Stock Ledger</field>
+        <field name="res_model">bond.warehouse.ledger</field>
+        <field name="view_mode">tree,pivot,graph</field>
+        <field name="context">{'search_default_f_bonded': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No validated bond stock movements yet</p>
+            <p>The ledger is built from validated Odoo stock transactions in locations
+               classified as bonded or non-bonded. Classify your locations first
+               (Inventory &gt; Configuration &gt; Locations).</p>
+        </field>
+    </record>
+
+    <record id="action_bond_ledger_approve" model="ir.actions.server">
+        <field name="name">Approve Bond Adjustment</field>
+        <field name="model_id" ref="model_bond_warehouse_ledger"/>
+        <field name="binding_model_id" ref="model_bond_warehouse_ledger"/>
+        <field name="binding_view_types">list</field>
+        <field name="groups_id" eval="[(4, ref('group_bond_recon_manager'))]"/>
+        <field name="state">code</field>
+        <field name="code">records.action_approve_adjustment()</field>
+    </record>
+</odoo>

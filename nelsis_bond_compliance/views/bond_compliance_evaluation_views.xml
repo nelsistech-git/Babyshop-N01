@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) Nelsis Tech. Developer / Product Owner: Nur Uddin Ahammed -->
+<odoo>
+    <record id="view_bond_compliance_evaluation_tree" model="ir.ui.view">
+        <field name="name">bond.compliance.evaluation.tree</field>
+        <field name="model">bond.compliance.evaluation</field>
+        <field name="arch" type="xml">
+            <tree string="Evaluation Log" create="0" edit="0" delete="0"
+                  decoration-success="status == 'passed'"
+                  decoration-danger="status in ('failed', 'ambiguous')"
+                  decoration-warning="status == 'no_rule'">
+                <field name="evaluated_at"/>
+                <field name="rule_code"/>
+                <field name="rule_version"/>
+                <field name="reference"/>
+                <field name="evaluated_on"/>
+                <field name="status" widget="badge"/>
+                <field name="covered_by_exception"/>
+                <field name="evaluated_by"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_bond_compliance_evaluation_form" model="ir.ui.view">
+        <field name="name">bond.compliance.evaluation.form</field>
+        <field name="model">bond.compliance.evaluation</field>
+        <field name="arch" type="xml">
+            <form string="Evaluation" create="0" edit="0" delete="0" class="nl-ui">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="rule_id"/>
+                            <field name="rule_code"/>
+                            <field name="rule_version"/>
+                            <field name="official_reference"/>
+                        </group>
+                        <group>
+                            <field name="reference"/>
+                            <field name="res_model"/>
+                            <field name="res_id"/>
+                            <field name="evaluated_on"/>
+                            <field name="evaluated_at"/>
+                            <field name="evaluated_by"/>
+                            <field name="status"/>
+                            <field name="covered_by_exception"/>
+                        </group>
+                    </group>
+                    <group string="Result Snapshot">
+                        <field name="result_json" nolabel="1" colspan="2"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_bond_compliance_evaluation_search" model="ir.ui.view">
+        <field name="name">bond.compliance.evaluation.search</field>
+        <field name="model">bond.compliance.evaluation</field>
+        <field name="arch" type="xml">
+            <search string="Evaluation Log">
+                <field name="rule_code"/>
+                <field name="reference"/>
+                <filter name="passed" string="Passed" domain="[('status', '=', 'passed')]"/>
+                <filter name="failed" string="Failed" domain="[('status', '=', 'failed')]"/>
+                <filter name="no_rule" string="No Rule" domain="[('status', '=', 'no_rule')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_rule" string="Rule Code" context="{'group_by': 'rule_code'}"/>
+                    <filter name="group_status" string="Status" context="{'group_by': 'status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_bond_compliance_evaluation" model="ir.actions.act_window">
+        <field name="name">Evaluation Log</field>
+        <field name="res_model">bond.compliance.evaluation</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

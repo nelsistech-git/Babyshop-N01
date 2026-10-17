@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) Nelsis Tech. Developer / Product Owner: Nur Uddin Ahammed -->
+<odoo>
+    <record id="view_bond_movement_reverse_form" model="ir.ui.view">
+        <field name="name">bond.warehouse.movement.reverse.form</field>
+        <field name="model">bond.warehouse.movement.reverse</field>
+        <field name="arch" type="xml">
+            <form string="Reverse Bond Movement" class="nl-ui">
+                <group>
+                    <field name="movement_id"/>
+                    <field name="reason" placeholder="Why is this posted movement being reversed?"/>
+                </group>
+                <footer>
+                    <button name="action_confirm" string="Reverse Movement" type="object"
+                            class="btn-primary nl-btn nl-danger" data-hotkey="q" icon="fa-exchange"/>
+                    <button string="Cancel" class="btn-secondary nl-btn nl-ghost" special="cancel" data-hotkey="x" icon="fa-times"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_bond_movement_reverse" model="ir.actions.act_window">
+        <field name="name">Reverse Bond Movement</field>
+        <field name="res_model">bond.warehouse.movement.reverse</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_movement_id': active_id}</field>
+    </record>
+</odoo>

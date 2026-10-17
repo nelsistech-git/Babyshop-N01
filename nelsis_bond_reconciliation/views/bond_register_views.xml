@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_bond_register_tree" model="ir.ui.view">
+        <field name="name">bond.warehouse.register.tree</field>
+        <field name="model">bond.warehouse.register</field>
+        <field name="arch" type="xml">
+            <tree string="Bond Register" create="0" edit="0" delete="0" sample="1"
+                  decoration-danger="verification_state == 'rejected'"
+                  decoration-warning="untraceable_balance_qty != 0">
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                <field name="untraceable_balance_qty" column_invisible="1"/>
+                <field name="license_ref" optional="show"/>
+                <field name="lc_ref"/>
+                <field name="boe_ref"/>
+                <field name="product_id"/>
+                <field name="hs_code" optional="show"/>
+                <field name="lot_id" optional="show"/>
+                <field name="bond_classification" widget="badge" optional="show"/>
+                <field name="warehouse_id" optional="hide"/>
+                <field name="location_id"/>
+                <field name="received_qty" sum="Received"/>
+                <field name="return_in_qty" sum="Returned In" optional="show"/>
+                <field name="issued_qty" sum="Issued"/>
+                <field name="return_out_qty" sum="Returned Out" optional="show"/>
+                <field name="transfer_in_qty" optional="hide"/>
+                <field name="transfer_out_qty" optional="hide"/>
+                <field name="adjusted_qty" sum="Adjusted" optional="show"/>
+                <field name="unapproved_adjusted_qty" optional="hide"/>
+                <field name="balance_qty" sum="Balance"/>
+                <field name="traceable_balance_qty" sum="Traceable" optional="hide"/>
+                <field name="product_uom_id" optional="show"/>
+                <field name="first_receipt_date" optional="hide"/>
+                <field name="last_move_date" optional="show"/>
+                <field name="receipt_refs" optional="show"/>
+                <field name="movement_count" optional="hide"/>
+                <field name="document_missing_count" optional="show"/>
+                <field name="verification_state" widget="badge"
+                       decoration-success="verification_state == 'verified'"
+                       decoration-danger="verification_state == 'rejected'"
+                       decoration-warning="verification_state == 'pending'"/>
+                <button name="action_view_ledger" type="object" icon="fa-list-alt" title="Open ledger"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_bond_register_form" model="ir.ui.view">
+        <field name="name">bond.warehouse.register.form</field>
+        <field name="model">bond.warehouse.register</field>
+        <field name="arch" type="xml">
+            <form string="Bond Register" create="0" edit="0" delete="0" class="nl-ui">
+                <header>
+                    <button name="action_view_ledger" type="object" string="Open Ledger"
+                            icon="fa-list-alt" class="btn-primary nl-btn nl-primary"/>
+                </header>
+                <sheet>
+                    <div class="alert alert-info" role="alert">
+                        Read-only view of validated Odoo stock movements. It is not a second inventory ledger.
+                    </div>
+                    <group>
+                        <group string="Traceability">
+                            <field name="license_ref"/>
+                            <field name="lc_ref"/>
+                            <field name="boe_ref"/>
+                            <field name="company_id" invisible="1"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group string="Item">
+                            <field name="product_id"/>
+                            <field name="hs_code"/>
+                            <field name="lot_id"/>
+                            <field name="bond_classification"/>
+                            <field name="warehouse_id"/>
+                            <field name="location_id"/>
+                            <field name="product_uom_id"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Quantities">
+                            <field name="received_qty"/>
+                            <field name="return_in_qty"/>
+                            <field name="issued_qty"/>
+                            <field name="return_out_qty"/>
+                            <field name="transfer_in_qty"/>
+                            <field name="transfer_out_qty"/>
+                            <field name="adjusted_qty"/>
+                            <field name="unapproved_adjusted_qty"/>
+                            <field name="balance_qty" class="fw-bold"/>
+                            <field name="traceable_balance_qty"/>
+                            <field name="untraceable_balance_qty"/>
+                        </group>
+                        <group string="Dates and Status">
+                            <field name="first_receipt_date"/>
+                            <field name="last_move_date"/>
+                            <field name="receipt_refs"/>
+                            <field name="movement_count"/>
+                            <field name="picking_count"/>
+                            <field name="document_missing_count"/>
+                            <field name="verification_state" widget="badge"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_bond_register_search" model="ir.ui.view">
+        <field name="name">bond.warehouse.register.search</field>
+        <field name="model">bond.warehouse.register</field>
+        <field name="arch" type="xml">
+            <search string="Bond Register">
+                <field name="product_id"/>
+                <field name="lot_id"/>
+                <field name="lc_ref"/>
+                <field name="boe_ref"/>
+                <field name="license_ref"/>
+                <field name="hs_code"/>
+                <field name="location_id"/>
+                <filter name="f_bonded" string="Bonded" domain="[('bond_classification', '=', 'bonded')]"/>
+                <filter name="f_non_bonded" string="Non-Bonded" domain="[('bond_classification', '=', 'non_bonded')]"/>
+                <separator/>
+                <filter name="f_stock" string="With Stock" domain="[('balance_qty', '!=', 0)]"/>
+                <filter name="f_untraceable" string="Missing LC / BoE" domain="[('untraceable_balance_qty', '!=', 0)]"/>
+                <filter name="f_no_docs" string="Missing Documents" domain="[('document_missing_count', '>', 0)]"/>
+                <filter name="f_unverified" string="Not Verified" domain="[('verification_state', '!=', 'verified')]"/>
+                <filter name="f_unapproved" string="Unapproved Adjustments" domain="[('unapproved_adjusted_qty', '!=', 0)]"/>
+                <group expand="0" string="Group By">
+                    <filter name="g_license" string="License" context="{'group_by': 'license_ref'}"/>
+                    <filter name="g_lc" string="LC" context="{'group_by': 'lc_ref'}"/>
+                    <filter name="g_boe" string="Bill of Entry" context="{'group_by': 'boe_ref'}"/>
+                    <filter name="g_product" string="Product" context="{'group_by': 'product_id'}"/>
+                    <filter name="g_hs" string="HS Code" context="{'group_by': 'hs_code'}"/>
+                    <filter name="g_class" string="Bond Classification" context="{'group_by': 'bond_classification'}"/>
+                    <filter name="g_location" string="Location" context="{'group_by': 'location_id'}"/>
+                    <filter name="g_warehouse" string="Warehouse" context="{'group_by': 'warehouse_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_bond_register_pivot" model="ir.ui.view">
+        <field name="name">bond.warehouse.register.pivot</field>
+        <field name="model">bond.warehouse.register</field>
+        <field name="arch" type="xml">
+            <pivot string="Bond Register Analysis" sample="1">
+                <field name="lc_ref" type="row"/>
+                <field name="product_id" type="row"/>
+                <field name="bond_classification" type="col"/>
+                <field name="balance_qty" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_bond_register_graph" model="ir.ui.view">
+        <field name="name">bond.warehouse.register.graph</field>
+        <field name="model">bond.warehouse.register</field>
+        <field name="arch" type="xml">
+            <graph string="Bond Register" type="bar" sample="1">
+                <field name="product_id"/>
+                <field name="bond_classification"/>
+                <field name="balance_qty" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_bond_register" model="ir.actions.act_window">
+        <field name="name">Bond Register</field>
+        <field name="res_model">bond.warehouse.register</field>
+        <field name="view_mode">tree,pivot,graph,form</field>
+        <field name="context">{'search_default_f_bonded': 1, 'search_default_f_stock': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">The bond register is empty</p>
+            <p>Classify locations as Bonded / Non-Bonded and validate stock transfers to populate it.</p>
+        </field>
+    </record>
+</odoo>

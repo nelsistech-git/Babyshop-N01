@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) Nelsis Tech. Developer / Product Owner: Nur Uddin Ahammed.
+     Default cards. Domains/fields were aligned with the real suite models (fields verified statically). Original note: ASSUMPTIONS until
+     checked against the approved contract: a mismatching card shows a configuration
+     message to administrators and is hidden from everyone else. -->
+<odoo noupdate="1">
+    <record id="kpi_licenses_active" model="bond.dashboard.kpi">
+        <field name="name">Active Licenses</field>
+        <field name="sequence">10</field>
+        <field name="section">license</field>
+        <field name="model_name">bond.warehouse.license</field>
+        <field name="domain">[('state', '=', 'active')]</field>
+        <field name="icon">fa-id-card-o</field>
+        <field name="color">success</field>
+        <field name="group_ids" eval="[(6, 0, [ref('group_bond_dash_bond_manager'), ref('group_bond_dash_auditor')])]"/>
+    </record>
+    <record id="kpi_licenses_renewal" model="bond.dashboard.kpi">
+        <field name="name">Licenses Needing Renewal Review</field>
+        <field name="sequence">20</field>
+        <field name="section">license</field>
+        <field name="model_name">bond.warehouse.license</field>
+        <field name="domain">[('state', '=', 'active'), ('expiry_date', '!=', False), ('expiry_date', '&lt;=', today + relativedelta(days=alert_days))]</field>
+        <field name="icon">fa-hourglass-half</field>
+        <field name="color">warning</field>
+        <field name="description">Window = system parameter nelsis_bond_dashboard.renewal_review_days (default 90). Review period must be confirmed by a customs professional.</field>
+        <field name="group_ids" eval="[(6, 0, [ref('group_bond_dash_bond_manager'), ref('group_bond_dash_auditor')])]"/>
+    </record>
+    <record id="kpi_licenses_expired" model="bond.dashboard.kpi">
+        <field name="name">Expired or Suspended Licenses</field>
+        <field name="sequence">30</field>
+        <field name="section">license</field>
+        <field name="model_name">bond.warehouse.license</field>
+        <field name="domain">[('state', 'in', ['expired', 'suspended'])]</field>
+        <field name="icon">fa-ban</field>
+        <field name="color">danger</field>
+        <field name="danger_if_positive" eval="True"/>
+        <field name="group_ids" eval="[(6, 0, [ref('group_bond_dash_bond_manager'), ref('group_bond_dash_auditor')])]"/>
+    </record>
+    <record id="kpi_entitlement_utilization" model="bond.dashboard.kpi">
+        <field name="name">Entitlement Utilization</field>
+        <field name="sequence">40</field>
+        <field name="section">license</field>
+        <field name="kpi_type">ratio</field>
+        <field name="model_name">bond.warehouse.entitlement</field>
+        <field name="measure_field">used_amount</field>
+        <field name="denominator_field">approved_total</field>
+        <field name="domain">[('state', '=', 'active'), ('basis', '=', 'quantity')]</field>
+        <field name="icon">fa-pie-chart</field>
+        <field name="color">info</field>
+        <field name="description">Used / approved quantity of active quantity-based entitlements. Value-based entitlements are excluded because quantity and value cannot be added.</field>
+        <field name="group_ids" eval="[(6, 0, [ref('group_bond_dash_bond_manager'), ref('group_bond_dash_commercial'), ref('group_bond_dash_auditor')])]"/>
+    </record>
+
+    <record id="kpi_documents_pending" model="bond.dashboard.kpi">
+        <field name="name">Pending Document Verifications</field>
+        <field name="sequence">10</field>
+        <field name="section">documents</field>
+        <field name="model_name">nelsis.commercial.document</field>
+        <field name="domain">[('state', '=', 'submitted')]</field>
+        <field name="icon">fa-hourglass-start</field>
+        <field name="color">warning</field>
+        <field name="group_ids" eval="[(6, 0, [ref('group_bond_dash_bond_manager'), ref('group_bond_dash_commercial'), ref('group_bond_dash_auditor')])]"/>
+    </record>
+    <record id="kpi_documents_missing" model="bond.dashboard.kpi">
+        <field name="name">Expired Commercial Documents</field>
+        <field name="sequence">20</field>
+        <field name="section">documents</field>
+        <field name="model_name">nelsis.commercial.document</field>
+        <field name="domain">[('expiry_date', '!=', False), ('expiry_date', '&lt;', today), ('state', 'not in', ['superseded', 'rejected'])]</field>
+        <field name="icon">fa-exclamation-triangle</field>
+        <field name="color">danger</field>
+        <field name="danger_if_positive" eval="True"/>
+        <field name="group_ids" eval="[(6, 0, [ref('group_bond_dash_bond_manager'), ref('group_bond_dash_commercial'), ref('group_bond_dash_auditor')])]"/>
+    </record>
+    <record id="kpi_receipts_pending" model="bond.dashboard.kpi">
+        <field name="name">Pending Receipts</field>
+        <field name="sequence">30</field>
+        <field name="section">documents</field>
+        <field name="model_name">stock.picking</field>
+        <field name="domain">[('picking_type_code', '=', 'incoming'), ('state', 'not in', ['draft', 'done', 'cancel'])]</field>
+        <field name="icon">fa-truck</field>
+        <field name="color">primary</field>
+        <field name="description">Standard Odoo fields only: all open incoming receipts. Add the bonded-receipt filter once its field is confirmed in the contract.</field>
+        <field name="group_ids" eval="[(6, 0, [ref('group_bond_dash_bond_manager'), ref('group_bond_dash_warehouse_manager'), ref('group_bond_dash_storekeeper'), ref('group_bond_dash_commercial')])]"/>
+    </record>
+
+    <record id="kpi_stock_by_category" model="bond.dashboard.kpi">
+        <field name="name">Internal Stock by Product Category</field>
+        <field name="sequence">10</field>
+        <field name="section">inventory</field>
+        <field name="kpi_type">breakdown</field>
+        <field name="model_name">stock.quant</field>
+        <field name="domain">[('location_id.usage', '=', 'internal')]</field>
+        <field name="measure_field">quantity</field>
+        <field name="groupby_field">product_categ_id</field>
+        <field name="icon">fa-cubes</field>
+        <field name="color">primary</field>
+        <field name="description">Values come from stock.quant. To show BONDED stock only, add your bonded classification condition to the domain once the field is confirmed (nothing is assumed here).</field>
+        <field name="group_ids" eval="[(6, 0, [ref('group_bond_dash_bond_manager'), ref('group_bond_dash_warehouse_manager'), ref('group_bond_dash_storekeeper'), ref('group_bond_dash_auditor')])]"/>
+    </record>
+    <record id="kpi_stock_by_location" model="bond.dashboard.kpi">
+        <field name="name">Stock by Location (Bonded vs Non-bonded)</field>
+        <field name="sequence">20</field>
+        <field name="section">inventory</field>
+        <field name="kpi_type">breakdown</field>
+        <field name="model_name">stock.quant</field>
+        <field name="domain">[('location_id.usage', '=', 'internal')]</field>
+        <field name="measure_field">quantity</field>
+        <field name="groupby_field">location_id</field>
+        <field name="icon">fa-exchange</field>
+        <field name="color">info</field>
+        <field name="description">Separates bonded and non-bonded stock only if they are held in separate locations. Adjust groupby to the contract's classification field if different.</field>
+        <field name="group_ids" eval="[(6, 0, [ref('group_bond_dash_bond_manager'), ref('group_bond_dash_warehouse_manager'), ref('group_bond_dash_storekeeper'), ref('group_bond_dash_auditor')])]"/>
+    </record>
+
+    <record id="kpi_reconciliation_outstanding" model="bond.dashboard.kpi">
+        <field name="name">Outstanding Reconciliations</field>
+        <field name="sequence">10</field>
+        <field name="section">compliance</field>
+        <field name="model_name">bond.warehouse.reconciliation</field>
+        <field name="domain">[('state', 'not in', ['reconciled', 'closed'])]</field>
+        <field name="icon">fa-balance-scale</field>
+        <field name="color">warning</field>
+        <field name="group_ids" eval="[(6, 0, [ref('group_bond_dash_bond_manager'), ref('group_bond_dash_auditor')])]"/>
+    </record>
+    <record id="kpi_physical_discrepancy" model="bond.dashboard.kpi">
+        <field name="name">Physical Stock Discrepancies</field>
+        <field name="sequence">20</field>
+        <field name="section">compliance</field>
+        <field name="model_name">bond.warehouse.reconciliation</field>
+        <field name="domain">[('state', '=', 'discrepancy')]</field>
+        <field name="icon">fa-search-minus</field>
+        <field name="color">danger</field>
+        <field name="danger_if_positive" eval="True"/>
+        <field name="group_ids" eval="[(6, 0, [ref('group_bond_dash_bond_manager'), ref('group_bond_dash_auditor')])]"/>
+    </record>
+    <record id="kpi_exceptions_unresolved" model="bond.dashboard.kpi">
+        <field name="name">Unresolved Compliance Exceptions</field>
+        <field name="sequence">30</field>
+        <field name="section">compliance</field>
+        <field name="model_name">bond.dashboard.alert</field>
+        <field name="domain">[('state', '!=', 'resolved')]</field>
+        <field name="icon">fa-bell</field>
+        <field name="color">danger</field>
+        <field name="danger_if_positive" eval="True"/>
+        <field name="description">Counts open alerts the current user may see (operational roles see only alerts addressed to them).</field>
+    </record>
+    <record id="kpi_unauthorized_attempts" model="bond.dashboard.kpi">
+        <field name="name">Open Unauthorized Attempts</field>
+        <field name="sequence">40</field>
+        <field name="section">compliance</field>
+        <field name="model_name">bond.dashboard.alert</field>
+        <field name="domain">[('state', '!=', 'resolved'), ('alert_type', '=', 'unauthorized_attempt')]</field>
+        <field name="icon">fa-user-secret</field>
+        <field name="color">danger</field>
+        <field name="danger_if_positive" eval="True"/>
+        <field name="group_ids" eval="[(6, 0, [ref('group_bond_dash_bond_manager'), ref('group_bond_dash_auditor')])]"/>
+    </record>
+
+    <record id="kpi_audit_validated_moves" model="bond.dashboard.kpi">
+        <field name="name">Validated Stock Movements (30 days)</field>
+        <field name="sequence">10</field>
+        <field name="section">audit</field>
+        <field name="model_name">stock.move.line</field>
+        <field name="domain">[('state', '=', 'done'), ('date', '&gt;=', today - relativedelta(days=30))]</field>
+        <field name="icon">fa-history</field>
+        <field name="color">secondary</field>
+        <field name="group_ids" eval="[(6, 0, [ref('group_bond_dash_bond_manager'), ref('group_bond_dash_warehouse_manager'), ref('group_bond_dash_auditor')])]"/>
+    </record>
+    <record id="kpi_audit_reconciliations" model="bond.dashboard.kpi">
+        <field name="name">Reconciliation History</field>
+        <field name="sequence">20</field>
+        <field name="section">audit</field>
+        <field name="model_name">bond.warehouse.reconciliation</field>
+        <field name="domain">[]</field>
+        <field name="icon">fa-list-alt</field>
+        <field name="color">secondary</field>
+        <field name="group_ids" eval="[(6, 0, [ref('group_bond_dash_bond_manager'), ref('group_bond_dash_auditor')])]"/>
+    </record>
+    <record id="kpi_audit_documents" model="bond.dashboard.kpi">
+        <field name="name">Supporting Documents (all)</field>
+        <field name="sequence">30</field>
+        <field name="section">audit</field>
+        <field name="model_name">nelsis.commercial.document</field>
+        <field name="domain">[]</field>
+        <field name="icon">fa-paperclip</field>
+        <field name="color">secondary</field>
+        <field name="group_ids" eval="[(6, 0, [ref('group_bond_dash_bond_manager'), ref('group_bond_dash_commercial'), ref('group_bond_dash_auditor')])]"/>
+    </record>
+</odoo>

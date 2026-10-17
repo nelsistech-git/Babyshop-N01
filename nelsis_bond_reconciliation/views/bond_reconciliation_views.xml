@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ================= Reconciliation ================= -->
+    <record id="view_bond_reconciliation_form" model="ir.ui.view">
+        <field name="name">bond.warehouse.reconciliation.form</field>
+        <field name="model">bond.warehouse.reconciliation</field>
+        <field name="arch" type="xml">
+            <form string="Bond Reconciliation" class="nl-ui">
+                <header>
+                    <button name="action_compute" type="object" string="Calculate"
+                            icon="fa-calculator" class="btn-primary nl-btn nl-info"
+                            invisible="state not in ('draft', 'in_progress', 'discrepancy')"/>
+                    <button name="action_refresh_state" type="object" string="Re-check Counts"
+                            icon="fa-refresh" class="btn-secondary nl-btn nl-info"
+                            invisible="state not in ('in_progress', 'discrepancy')"/>
+                    <button name="action_submit_review" type="object" string="Submit for Review"
+                            icon="fa-search" class="btn-primary nl-btn nl-primary"
+                            invisible="state not in ('in_progress', 'discrepancy') or line_count == 0"/>
+                    <button name="action_request_approval" type="object" string="Request Approval"
+                            icon="fa-paper-plane" class="btn-primary nl-btn nl-primary"
+                            invisible="state != 'review'"/>
+                    <button name="action_approve" type="object" string="Approve"
+                            icon="fa-check-circle" class="btn-success nl-btn nl-success"
+                            invisible="state != 'approval'"
+                            groups="nelsis_bond_reconciliation.group_bond_recon_manager"/>
+                    <button name="action_close" type="object" string="Close"
+                            icon="fa-lock" class="btn-secondary nl-btn nl-neutral"
+                            invisible="state != 'reconciled'"
+                            groups="nelsis_bond_reconciliation.group_bond_recon_manager"/>
+                    <button name="action_send_back" type="object" string="Send Back"
+                            icon="fa-undo" class="btn-secondary nl-btn nl-neutral"
+                            invisible="state not in ('review', 'approval')"/>
+                    <button name="action_open_reopen_wizard" type="object" string="Reopen"
+                            icon="fa-unlock" class="btn-warning nl-btn nl-neutral"
+                            invisible="state not in ('reconciled', 'closed')"
+                            groups="nelsis_bond_reconciliation.group_bond_recon_manager"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,in_progress,review,approval,reconciled,closed" class="nl-statusbar"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Closed" bg_color="text-bg-secondary" invisible="state != 'closed'"/>
+                    <widget name="web_ribbon" title="Reconciled" bg_color="text-bg-success" invisible="state != 'reconciled'"/>
+                    <widget name="web_ribbon" title="Discrepancy" bg_color="text-bg-danger" invisible="state != 'discrepancy'"/>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_ledger" type="object" class="oe_stat_button nl-stat" icon="fa-list-alt">
+                            <div class="o_stat_info"><span class="o_stat_text">Ledger</span></div>
+                        </button>
+                        <button name="action_open_discrepancies" type="object" class="oe_stat_button nl-stat"
+                                icon="fa-exclamation-triangle" invisible="discrepancy_count == 0">
+                            <field name="discrepancy_count" widget="statinfo" string="Discrepancies"/>
+                        </button>
+                        <button class="oe_stat_button nl-stat" icon="fa-history" disabled="1" invisible="reopen_count == 0">
+                            <field name="reopen_count" widget="statinfo" string="Reopened"/>
+                        </button>
+                    </div>
+                    <div class="alert alert-warning" role="alert">
+                        <strong>Internal management reconciliation.</strong> Not an official statutory customs form;
+                        legal acceptance has not been verified.
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group string="Period and Company">
+                            <field name="company_id" invisible="1"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                            <field name="tolerance"/>
+                        </group>
+                        <group string="Scope">
+                            <field name="bond_classification"/>
+                            <field name="warehouse_id"/>
+                            <field name="location_ids" widget="many2many_tags"/>
+                            <field name="product_ids" widget="many2many_tags"/>
+                            <field name="lot_ids" widget="many2many_tags"/>
+                        </group>
+                    </group>
+                    <group string="Traceability Filters (optional)">
+                        <group>
+                            <field name="license_ref"/>
+                            <field name="lc_ref"/>
+                        </group>
+                        <group>
+                            <field name="boe_ref"/>
+                            <field name="entitlement_ref"/>
+                        </group>
+                    </group>
+                    <div class="alert alert-info" role="alert" invisible="not line_count or system_check_applicable">
+                        Odoo stock comparison is not available while LC / Bill of Entry / license / entitlement
+                        filters are used, because standard stock quantities are not split by those references.
+                    </div>
+                    <notebook>
+                        <page string="Reconciliation Lines" name="lines">
+                            <field name="line_ids" readonly="state not in ('draft', 'in_progress', 'discrepancy')">
+                                <tree string="Lines" create="0" delete="0" editable="bottom"
+                                      decoration-danger="has_discrepancy" decoration-warning="unapproved_adjustment_qty != 0">
+                                    <field name="product_id"/>
+                                    <field name="lot_id" optional="show"/>
+                                    <field name="uom_id" optional="show"/>
+                                    <field name="lc_refs" optional="hide"/>
+                                    <field name="boe_refs" optional="hide"/>
+                                    <field name="opening_qty" sum="Opening"/>
+                                    <field name="receipt_qty" sum="Receipts"/>
+                                    <field name="return_in_qty" sum="Returns In"/>
+                                    <field name="transfer_in_qty" optional="hide"/>
+                                    <field name="issue_qty" sum="Issues"/>
+                                    <field name="return_out_qty" sum="Returns Out"/>
+                                    <field name="transfer_out_qty" optional="hide"/>
+                                    <field name="adjustment_qty" sum="Adjustments"/>
+                                    <field name="closing_qty" sum="Closing" decoration-bf="1"/>
+                                    <field name="system_available" column_invisible="1"/>
+                                    <field name="system_qty" optional="show"/>
+                                    <field name="system_diff" optional="show"/>
+                                    <field name="unapproved_adjustment_qty" optional="show"/>
+                                    <field name="physical_counted"/>
+                                    <field name="physical_qty" readonly="not physical_counted"/>
+                                    <field name="physical_diff"/>
+                                    <field name="has_discrepancy" column_invisible="1"/>
+                                    <field name="reason" required="has_discrepancy" placeholder="Explain the difference..."/>
+                                </tree>
+                            </field>
+                            <div class="text-muted small">
+                                Closing = Opening + Receipts + Returns In (+ Transfers In) - Issues - Returns Out
+                                (- Transfers Out) + Approved Adjustments. Transfers between locations inside the
+                                scope are ignored; draft and cancelled transactions are never counted.
+                            </div>
+                        </page>
+                        <page string="Workflow Audit" name="audit">
+                            <group>
+                                <group>
+                                    <field name="prepared_by_id"/>
+                                    <field name="computed_by"/>
+                                    <field name="computed_on"/>
+                                    <field name="reviewer_id"/>
+                                    <field name="reviewed_on"/>
+                                </group>
+                                <group>
+                                    <field name="approver_id"/>
+                                    <field name="approved_on"/>
+                                    <field name="closed_on"/>
+                                    <field name="system_check_applicable" invisible="1"/>
+                                    <field name="line_count" invisible="1"/>
+                                </group>
+                            </group>
+                            <separator string="Reopen History"/>
+                            <field name="reopen_ids">
+                                <tree>
+                                    <field name="date"/>
+                                    <field name="user_id"/>
+                                    <field name="from_state"/>
+                                    <field name="reason"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Notes" name="notes">
+                            <field name="notes" placeholder="Internal notes..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_bond_reconciliation_tree" model="ir.ui.view">
+        <field name="name">bond.warehouse.reconciliation.tree</field>
+        <field name="model">bond.warehouse.reconciliation</field>
+        <field name="arch" type="xml">
+            <tree string="Bond Reconciliations" sample="1"
+                  decoration-danger="state == 'discrepancy'"
+                  decoration-success="state == 'reconciled'"
+                  decoration-muted="state == 'closed'">
+                <field name="name"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="bond_classification" optional="show"/>
+                <field name="warehouse_id" optional="show"/>
+                <field name="line_count"/>
+                <field name="discrepancy_count"/>
+                <field name="unapproved_adjustment_count" optional="show"/>
+                <field name="prepared_by_id" optional="show"/>
+                <field name="approver_id" optional="hide"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                <field name="state" widget="badge"
+                       decoration-info="state in ('draft', 'in_progress')"
+                       decoration-danger="state == 'discrepancy'"
+                       decoration-warning="state in ('review', 'approval')"
+                       decoration-success="state == 'reconciled'"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_bond_reconciliation_search" model="ir.ui.view">
+        <field name="name">bond.warehouse.reconciliation.search</field>
+        <field name="model">bond.warehouse.reconciliation</field>
+        <field name="arch" type="xml">
+            <search string="Bond Reconciliations">
+                <field name="name"/>
+                <field name="lc_ref"/>
+                <field name="boe_ref"/>
+                <field name="license_ref"/>
+                <field name="warehouse_id"/>
+                <filter name="f_open" string="Open" domain="[('state', 'not in', ['reconciled', 'closed'])]"/>
+                <filter name="f_disc" string="Discrepancy Found" domain="[('state', '=', 'discrepancy')]"/>
+                <filter name="f_pending" string="Review / Approval" domain="[('state', 'in', ['review', 'approval'])]"/>
+                <filter name="f_done" string="Reconciled / Closed" domain="[('state', 'in', ['reconciled', 'closed'])]"/>
+                <filter name="f_mine" string="Prepared by Me" domain="[('prepared_by_id', '=', uid)]"/>
+                <group expand="0" string="Group By">
+                    <filter name="g_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="g_wh" string="Warehouse" context="{'group_by': 'warehouse_id'}"/>
+                    <filter name="g_month" string="Period End" context="{'group_by': 'date_to:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_bond_reconciliation" model="ir.actions.act_window">
+        <field name="name">Reconciliations</field>
+        <field name="res_model">bond.warehouse.reconciliation</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_f_open': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first bond reconciliation</p>
+            <p>Pick a period and scope, calculate from validated Odoo stock movements, resolve
+               discrepancies, then review and approve.</p>
+        </field>
+    </record>
+
+    <!-- ================= Lines ================= -->
+    <record id="view_bond_recon_line_tree" model="ir.ui.view">
+        <field name="name">bond.warehouse.reconciliation.line.tree</field>
+        <field name="model">bond.warehouse.reconciliation.line</field>
+        <field name="arch" type="xml">
+            <tree string="Reconciliation Lines" create="0" edit="0" delete="0"
+                  decoration-danger="has_discrepancy">
+                <field name="reconciliation_id"/>
+                <field name="product_id"/>
+                <field name="lot_id"/>
+                <field name="uom_id"/>
+                <field name="opening_qty"/>
+                <field name="closing_qty"/>
+                <field name="system_qty"/>
+                <field name="system_diff"/>
+                <field name="physical_qty"/>
+                <field name="physical_diff"/>
+                <field name="unapproved_adjustment_qty"/>
+                <field name="reason"/>
+                <field name="has_discrepancy" column_invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_bond_recon_line_form" model="ir.ui.view">
+        <field name="name">bond.warehouse.reconciliation.line.form</field>
+        <field name="model">bond.warehouse.reconciliation.line</field>
+        <field name="arch" type="xml">
+            <form string="Reconciliation Line" create="0" edit="0" delete="0" class="nl-ui">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="reconciliation_id"/>
+                            <field name="product_id"/>
+                            <field name="lot_id"/>
+                            <field name="uom_id"/>
+                            <field name="lc_refs"/>
+                            <field name="boe_refs"/>
+                            <field name="license_refs"/>
+                        </group>
+                        <group>
+                            <field name="opening_qty"/>
+                            <field name="receipt_qty"/>
+                            <field name="return_in_qty"/>
+                            <field name="transfer_in_qty"/>
+                            <field name="issue_qty"/>
+                            <field name="return_out_qty"/>
+                            <field name="transfer_out_qty"/>
+                            <field name="adjustment_qty"/>
+                            <field name="closing_qty" class="fw-bold"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="system_qty"/>
+                            <field name="system_diff"/>
+                            <field name="unapproved_adjustment_qty"/>
+                        </group>
+                        <group>
+                            <field name="physical_counted"/>
+                            <field name="physical_qty"/>
+                            <field name="physical_diff"/>
+                            <field name="reason"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_bond_recon_line_search" model="ir.ui.view">
+        <field name="name">bond.warehouse.reconciliation.line.search</field>
+        <field name="model">bond.warehouse.reconciliation.line</field>
+        <field name="arch" type="xml">
+            <search string="Reconciliation Lines">
+                <field name="product_id"/>
+                <field name="lot_id"/>
+                <field name="reconciliation_id"/>
+                <filter name="f_disc" string="Discrepancies" domain="[('has_discrepancy', '=', True)]"/>
+                <group expand="0" string="Group By">
+                    <filter name="g_recon" string="Reconciliation" context="{'group_by': 'reconciliation_id'}"/>
+                    <filter name="g_product" string="Product" context="{'group_by': 'product_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_bond_recon_line_pivot" model="ir.ui.view">
+        <field name="name">bond.warehouse.reconciliation.line.pivot</field>
+        <field name="model">bond.warehouse.reconciliation.line</field>
+        <field name="arch" type="xml">
+            <pivot string="Reconciliation Analysis">
+                <field name="product_id" type="row"/>
+                <field name="closing_qty" type="measure"/>
+                <field name="system_diff" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_bond_recon_line" model="ir.actions.act_window">
+        <field name="name">Reconciliation Lines</field>
+        <field name="res_model">bond.warehouse.reconciliation.line</field>
+        <field name="view_mode">tree,pivot,form</field>
+        <field name="context">{'search_default_f_disc': 1}</field>
+    </record>
+</odoo>

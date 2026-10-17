@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) Nelsis Tech. Developer / Product Owner: Nur Uddin Ahammed. -->
+<odoo>
+    <!-- Dashboard-scope role groups. If the approved shared contract already defines
+         role groups in another module, add them to implied_ids here instead of
+         duplicating users. -->
+    <record id="group_bond_dash_storekeeper" model="res.groups">
+        <field name="name">Bond Dashboard: Storekeeper</field>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    <record id="group_bond_dash_warehouse_manager" model="res.groups">
+        <field name="name">Bond Dashboard: Warehouse Manager</field>
+        <field name="implied_ids" eval="[(4, ref('group_bond_dash_storekeeper'))]"/>
+    </record>
+    <record id="group_bond_dash_commercial" model="res.groups">
+        <field name="name">Bond Dashboard: Commercial / LC Officer</field>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    <record id="group_bond_dash_bond_manager" model="res.groups">
+        <field name="name">Bond Dashboard: Bond Manager</field>
+        <field name="implied_ids" eval="[(4, ref('group_bond_dash_warehouse_manager')), (4, ref('group_bond_dash_commercial'))]"/>
+    </record>
+    <record id="group_bond_dash_auditor" model="res.groups">
+        <field name="name">Bond Dashboard: Compliance Officer / Auditor (read-only)</field>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    <record id="group_bond_dash_admin" model="res.groups">
+        <field name="name">Bond Dashboard: Administrator</field>
+        <field name="implied_ids" eval="[(4, ref('group_bond_dash_bond_manager')), (4, ref('group_bond_dash_auditor'))]"/>
+        <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+    </record>
+</odoo>

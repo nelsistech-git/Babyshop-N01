@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) Nelsis Tech. Developer / Product Owner: Nur Uddin Ahammed.
+     Read-only windows onto the AUTHORITATIVE Odoo stock records. No audit ledger is copied. -->
+<odoo>
+    <record id="view_bond_audit_move_line_list" model="ir.ui.view">
+        <field name="name">bond.audit.stock.move.line.list</field>
+        <field name="model">stock.move.line</field>
+        <field name="priority">90</field>
+        <field name="arch" type="xml">
+            <tree create="0" edit="0" delete="0">
+                <field name="date"/>
+                <field name="reference"/>
+                <field name="product_id"/>
+                <field name="lot_id"/>
+                <field name="quantity"/>
+                <field name="product_uom_id"/>
+                <field name="location_id"/>
+                <field name="location_dest_id"/>
+                <field name="write_uid" string="Validated by"/>
+                <field name="write_date" string="Last updated"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_bond_audit_move_line_form" model="ir.ui.view">
+        <field name="name">bond.audit.stock.move.line.form</field>
+        <field name="model">stock.move.line</field>
+        <field name="priority">90</field>
+        <field name="arch" type="xml">
+            <form create="0" edit="0" delete="0" class="nl-ui">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="company_id" invisible="1"/>
+                            <field name="product_uom_category_id" invisible="1"/>
+                            <field name="reference"/>
+                            <field name="picking_id"/>
+                            <field name="product_id"/>
+                            <field name="lot_id"/>
+                            <field name="quantity"/>
+                            <field name="product_uom_id"/>
+                        </group>
+                        <group>
+                            <field name="date"/>
+                            <field name="location_id"/>
+                            <field name="location_dest_id"/>
+                            <field name="create_uid" string="Created by"/>
+                            <field name="create_date"/>
+                            <field name="write_uid" string="Last updated by"/>
+                            <field name="write_date"/>
+                            <field name="state"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_bond_audit_move_line_search" model="ir.ui.view">
+        <field name="name">bond.audit.stock.move.line.search</field>
+        <field name="model">stock.move.line</field>
+        <field name="priority">90</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="product_id"/>
+                <field name="lot_id"/>
+                <field name="reference"/>
+                <field name="picking_id"/>
+                <filter name="last_30" string="Last 30 days" domain="[('date', '&gt;=', (context_today() - relativedelta(days=30)).strftime('%Y-%m-%d'))]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_product" string="Product" context="{'group_by': 'product_id'}"/>
+                    <filter name="group_lot" string="Lot / Serial" context="{'group_by': 'lot_id'}"/>
+                    <filter name="group_user" string="User" context="{'group_by': 'write_uid'}"/>
+                    <filter name="group_day" string="Date" context="{'group_by': 'date:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_bond_audit_move_line" model="ir.actions.act_window">
+        <field name="name">Validated Stock Movements</field>
+        <field name="res_model">stock.move.line</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('state', '=', 'done')]</field>
+        <field name="search_view_id" ref="view_bond_audit_move_line_search"/>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'tree', 'view_id': ref('view_bond_audit_move_line_list')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('view_bond_audit_move_line_form')})]"/>
+    </record>
+
+    <record id="view_bond_audit_picking_list" model="ir.ui.view">
+        <field name="name">bond.audit.stock.picking.list</field>
+        <field name="model">stock.picking</field>
+        <field name="priority">90</field>
+        <field name="arch" type="xml">
+            <tree create="0" edit="0" delete="0">
+                <field name="name"/>
+                <field name="picking_type_id"/>
+                <field name="partner_id"/>
+                <field name="origin"/>
+                <field name="date_done"/>
+                <field name="write_uid" string="Last updated by"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_bond_audit_picking_form" model="ir.ui.view">
+        <field name="name">bond.audit.stock.picking.form</field>
+        <field name="model">stock.picking</field>
+        <field name="priority">90</field>
+        <field name="arch" type="xml">
+            <form create="0" edit="0" delete="0" class="nl-ui">
+                <header><field name="state" widget="statusbar" class="nl-statusbar"/></header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="company_id" invisible="1"/>
+                            <field name="picking_type_id"/>
+                            <field name="partner_id"/>
+                            <field name="origin"/>
+                        </group>
+                        <group>
+                            <field name="location_id"/>
+                            <field name="location_dest_id"/>
+                            <field name="scheduled_date"/>
+                            <field name="date_done"/>
+                            <field name="create_uid" string="Created by"/>
+                            <field name="write_uid" string="Last updated by"/>
+                        </group>
+                    </group>
+                    <field name="move_line_ids" readonly="1">
+                        <tree>
+                            <field name="company_id" column_invisible="1"/>
+                            <field name="product_uom_category_id" column_invisible="1"/>
+                            <field name="product_id"/>
+                            <field name="lot_id"/>
+                            <field name="quantity"/>
+                            <field name="product_uom_id"/>
+                            <field name="location_id"/>
+                            <field name="location_dest_id"/>
+                        </tree>
+                    </field>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_bond_audit_picking" model="ir.actions.act_window">
+        <field name="name">Validated Transfers</field>
+        <field name="res_model">stock.picking</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('state', '=', 'done')]</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'tree', 'view_id': ref('view_bond_audit_picking_list')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('view_bond_audit_picking_form')})]"/>
+    </record>
+</odoo>

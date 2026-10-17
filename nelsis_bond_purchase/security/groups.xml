@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) Nelsis Tech. Developer / Product Owner: Nur Uddin Ahammed. -->
+<odoo>
+    <record id="group_bond_purchase_officer" model="res.groups">
+        <field name="name">Purchase Officer</field>
+        <field name="category_id" ref="nelsis_bond_warehouse.module_category_bond_suite"/>
+        <field name="comment">Raises and confirms purchase orders, links them to LC / commercial file / consignment.</field>
+        <field name="implied_ids" eval="[
+            (4, ref('purchase.group_purchase_user')),
+            (4, ref('nelsis_lc_management.group_lc_user')),
+            (4, ref('nelsis_commercial.group_commercial_user')),
+            (4, ref('nelsis_bond_inventory.group_bond_inventory_user')),
+        ]"/>
+    </record>
+    <record id="group_bond_purchase_manager" model="res.groups">
+        <field name="name">Purchase Manager</field>
+        <field name="category_id" ref="nelsis_bond_warehouse.module_category_bond_suite"/>
+        <field name="implied_ids" eval="[
+            (4, ref('group_bond_purchase_officer')),
+            (4, ref('purchase.group_purchase_manager')),
+        ]"/>
+    </record>
+</odoo>

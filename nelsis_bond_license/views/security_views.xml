@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_bond_security_tree" model="ir.ui.view">
+        <field name="name">bond.warehouse.security.tree</field>
+        <field name="model">bond.warehouse.security</field>
+        <field name="arch" type="xml">
+            <tree decoration-danger="state == 'expired'" decoration-muted="state in ('cancelled', 'released', 'renewed')">
+                <field name="name"/>
+                <field name="instrument_number"/>
+                <field name="instrument_type"/>
+                <field name="issuer_id"/>
+                <field name="license_id"/>
+                <field name="amount"/>
+                <field name="currency_id" invisible="1"/>
+                <field name="expiry_date"/>
+                <field name="days_to_expiry"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_bond_security_form" model="ir.ui.view">
+        <field name="name">bond.warehouse.security.form</field>
+        <field name="model">bond.warehouse.security</field>
+        <field name="arch" type="xml">
+            <form class="nl-ui">
+                <header>
+                    <button name="action_activate" string="Activate" type="object" class="btn-primary nl-btn nl-success"
+                            invisible="state != 'draft'" groups="nelsis_bond_license.group_bond_license_officer" icon="fa-play-circle"/>
+                    <button name="action_renew" string="Renew" type="object"
+                            invisible="state not in ('active', 'expired')" groups="nelsis_bond_license.group_bond_license_officer" class="nl-btn nl-violet" icon="fa-plus-circle"/>
+                    <button name="action_release" string="Release" type="object"
+                            invisible="state not in ('active', 'expired')" groups="nelsis_bond_license.group_bond_license_manager" class="nl-btn nl-success" icon="fa-play-circle"/>
+                    <button name="action_cancel" string="Cancel" type="object"
+                            invisible="state not in ('draft', 'active')" groups="nelsis_bond_license.group_bond_license_manager" class="nl-btn nl-danger" icon="fa-ban"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,active,expired,released" class="nl-statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <group>
+                        <group string="Instrument">
+                            <field name="instrument_number" readonly="state != 'draft'"/>
+                            <field name="instrument_type" readonly="state != 'draft'"/>
+                            <field name="issuer_id" readonly="state != 'draft'"/>
+                            <field name="beneficiary_id" readonly="state != 'draft'"/>
+                            <field name="license_id" readonly="state != 'draft'"/>
+                            <field name="company_id" invisible="1"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group string="Amount and Validity">
+                            <field name="currency_id" readonly="state != 'draft'"/>
+                            <field name="amount" readonly="state != 'draft'"/>
+                            <field name="issue_date" readonly="state != 'draft'"/>
+                            <field name="expiry_date" readonly="state != 'draft'"/>
+                            <field name="days_to_expiry"/>
+                            <field name="responsible_id"/>
+                            <field name="renewed_from_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Documents"><field name="attachment_ids" widget="many2many_binary"/></page>
+                        <page string="Renewal History">
+                            <field name="renewed_by_ids" readonly="1">
+                                <tree>
+                                    <field name="name"/><field name="instrument_number"/>
+                                    <field name="expiry_date"/><field name="state"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Audit Trail">
+                            <field name="history_ids" readonly="1">
+                                <tree>
+                                    <field name="timestamp"/><field name="user_id"/><field name="event"/>
+                                    <field name="from_state"/><field name="to_state"/>
+                                    <field name="event_date"/><field name="note"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Notes"><field name="note"/></page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_bond_security_search" model="ir.ui.view">
+        <field name="name">bond.warehouse.security.search</field>
+        <field name="model">bond.warehouse.security</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="instrument_number"/>
+                <field name="issuer_id"/>
+                <field name="license_id"/>
+                <filter name="active" string="Active" domain="[('state', '=', 'active')]"/>
+                <filter name="expired" string="Expired" domain="[('state', '=', 'expired')]"/>
+                <filter name="expiring" string="Expiring in 60 days"
+                        domain="[('state', '=', 'active'), ('expiry_date', '&lt;=', (context_today() + datetime.timedelta(days=60)).strftime('%Y-%m-%d'))]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_license" string="License" context="{'group_by': 'license_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_bond_security" model="ir.actions.act_window">
+        <field name="name">Bonds / Securities</field>
+        <field name="res_model">bond.warehouse.security</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

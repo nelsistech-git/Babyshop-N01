@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright © Nelsis Tech. Developer: Nur Uddin Ahammed. All rights reserved. -->
+<odoo>
+    <record id="action_report_file_summary" model="ir.actions.report">
+        <field name="name">Commercial File Summary</field>
+        <field name="model">nelsis.commercial.file</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">nelsis_commercial.report_file_summary</field>
+        <field name="report_file">nelsis_commercial.report_file_summary</field>
+        <field name="print_report_name">'Commercial File - %s' % (object.name)</field>
+        <field name="binding_model_id" ref="model_nelsis_commercial_file"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_file_summary">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Commercial File Summary: <span t-field="o.name"/></h2>
+                        <table class="table table-sm">
+                            <tr><th>Transaction</th><td><span t-field="o.transaction_type"/></td>
+                                <th>Status</th><td><span t-field="o.state"/></td></tr>
+                            <tr><th>LC</th><td><span t-field="o.lc_display"/></td>
+                                <th>Supplier</th><td><span t-field="o.partner_id"/></td></tr>
+                            <tr><th>Responsible</th><td><span t-field="o.user_id"/></td>
+                                <th>Missing required documents</th><td><span t-field="o.missing_count"/></td></tr>
+                        </table>
+
+                        <h4>Documents</h4>
+                        <table class="table table-sm">
+                            <thead><tr><th>Type</th><th>Number</th><th>Version</th><th>Expiry</th><th>Status</th></tr></thead>
+                            <tbody>
+                                <tr t-foreach="o.document_ids.filtered(lambda d: d.state != 'superseded')" t-as="d">
+                                    <td><span t-field="d.document_type_id"/></td>
+                                    <td><span t-field="d.number"/></td>
+                                    <td><span t-field="d.version"/></td>
+                                    <td><span t-field="d.expiry_date"/></td>
+                                    <td><span t-field="d.state"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4>Shipments</h4>
+                        <table class="table table-sm">
+                            <thead><tr><th>Ref</th><th>B/L or AWB</th><th>ETA</th><th>Arrival</th><th>Receipt</th></tr></thead>
+                            <tbody>
+                                <tr t-foreach="o.shipment_ids" t-as="s">
+                                    <td><span t-field="s.name"/></td>
+                                    <td><span t-field="s.transport_doc_no"/></td>
+                                    <td><span t-field="s.eta_date"/></td>
+                                    <td><span t-field="s.arrival_date"/></td>
+                                    <td><span t-field="s.receipt_state"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4>Bills of Entry</h4>
+                        <table class="table table-sm">
+                            <thead><tr><th>Number</th><th>Date</th><th>Station</th><th>Clearance</th><th>Status</th></tr></thead>
+                            <tbody>
+                                <tr t-foreach="o.boe_ids" t-as="b">
+                                    <td><span t-field="b.name"/></td>
+                                    <td><span t-field="b.date"/></td>
+                                    <td><span t-field="b.customs_station"/></td>
+                                    <td><span t-field="b.clearance_date"/></td>
+                                    <td><span t-field="b.state"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4>Documented vs Received Quantity</h4>
+                        <table class="table table-sm">
+                            <thead><tr><th>Product</th><th>Source</th><th>Documented</th><th>Received</th><th>Diff.</th><th>Status</th></tr></thead>
+                            <tbody>
+                                <tr t-foreach="o.discrepancy_ids" t-as="x">
+                                    <td><span t-field="x.product_id"/></td>
+                                    <td><span t-field="x.source_kind"/></td>
+                                    <td><span t-field="x.documented_qty"/> <span t-field="x.uom_id"/></td>
+                                    <td><span t-field="x.received_qty"/> <span t-field="x.received_uom_id"/></td>
+                                    <td><span t-field="x.difference"/></td>
+                                    <td><span t-field="x.state"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <p class="text-muted small">
+                            Sources: nelsis.commercial.file/document/shipment/boe/discrepancy records and validated
+                            standard Odoo stock moves. This is an operational summary, not an official statutory report.
+                            Copyright © Nelsis Tech. Developer: Nur Uddin Ahammed.
+                        </p>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

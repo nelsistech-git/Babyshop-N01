@@ -1,0 +1,436 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright © Nelsis Tech. Developer: Nur Uddin Ahammed. All rights reserved. -->
+<odoo>
+    <!-- ============================ FORM ============================ -->
+    <record id="view_nelsis_lc_form" model="ir.ui.view">
+        <field name="name">nelsis.lc.form</field>
+        <field name="model">nelsis.lc</field>
+        <field name="arch" type="xml">
+            <form string="Letter of Credit" class="nl-ui">
+                <header>
+                    <button name="action_submit" string="Submit for Review" type="object" class="btn-primary nl-btn nl-primary"
+                            icon="fa-paper-plane" invisible="state != 'draft'"
+                            groups="nelsis_lc_management.group_lc_user"/>
+                    <button name="action_approve" string="Approve" type="object" class="btn-success nl-btn nl-success"
+                            icon="fa-check-circle" invisible="state != 'review'"
+                            groups="nelsis_lc_management.group_lc_manager"/>
+                    <button name="action_reject" string="Return to Draft" type="object" class="btn-warning nl-btn nl-neutral"
+                            icon="fa-undo" invisible="state != 'review'"
+                            groups="nelsis_lc_management.group_lc_manager"/>
+                    <button name="action_open" string="Open LC" type="object" class="btn-primary nl-btn nl-primary"
+                            icon="fa-unlock" invisible="state != 'approved'"
+                            groups="nelsis_lc_management.group_lc_officer"/>
+                    <button name="action_new_amendment" string="Amendment" type="object"
+                            icon="fa-pencil-square-o"
+                            invisible="state not in ('opened', 'in_progress', 'partial', 'cleared', 'hold')"
+                            groups="nelsis_lc_management.group_lc_officer" class="nl-btn nl-violet"/>
+                    <button name="action_link_receipts" string="Link Receipts" type="object"
+                            icon="fa-link"
+                            invisible="state not in ('opened', 'in_progress', 'partial', 'cleared')"
+                            groups="nelsis_lc_management.group_lc_officer,nelsis_lc_management.group_lc_bond_officer" class="nl-btn nl-info"/>
+                    <button name="action_load_required_documents" string="Load Checklist" type="object"
+                            icon="fa-tasks" invisible="state in ('closed', 'cancelled')"
+                            groups="nelsis_lc_management.group_lc_officer" class="nl-btn nl-info"/>
+                    <button name="action_hold" string="Hold" type="object" icon="fa-pause-circle"
+                            invisible="state not in ('opened', 'in_progress', 'partial', 'cleared')"
+                            groups="nelsis_lc_management.group_lc_officer" class="nl-btn nl-warning"/>
+                    <button name="action_resume" string="Resume" type="object" class="btn-primary nl-btn nl-success"
+                            icon="fa-play-circle" invisible="state != 'hold'"
+                            groups="nelsis_lc_management.group_lc_officer"/>
+                    <button name="action_close" string="Close LC" type="object" class="btn-success nl-btn nl-neutral"
+                            icon="fa-flag-checkered"
+                            invisible="state not in ('opened', 'in_progress', 'partial', 'cleared')"
+                            groups="nelsis_lc_management.group_lc_manager"/>
+                    <button name="action_cancel" string="Cancel" type="object" icon="fa-ban"
+                            invisible="state not in ('draft', 'review', 'approved', 'opened')"
+                            groups="nelsis_lc_management.group_lc_officer" class="nl-btn nl-danger"/>
+                    <button name="action_reset_draft" string="Reset to Draft" type="object" icon="fa-refresh"
+                            invisible="state not in ('approved', 'cancelled')"
+                            groups="nelsis_lc_management.group_lc_manager" class="nl-btn nl-neutral"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,review,approved,opened,in_progress,partial,cleared,closed" class="nl-statusbar"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Cancelled" bg_color="text-bg-danger"
+                            invisible="state != 'cancelled'"/>
+                    <widget name="web_ribbon" title="On Hold" bg_color="text-bg-warning"
+                            invisible="state != 'hold'"/>
+                    <widget name="web_ribbon" title="Closed" bg_color="text-bg-success"
+                            invisible="state != 'closed'"/>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_shipments" type="object" class="oe_stat_button nl-stat" icon="fa-ship">
+                            <field name="shipment_count" widget="statinfo" string="Shipments"/>
+                        </button>
+                        <button name="action_view_amendments" type="object" class="oe_stat_button nl-stat"
+                                icon="fa-pencil-square-o">
+                            <field name="amendment_count" widget="statinfo" string="Amendments"/>
+                        </button>
+                        <button name="action_view_boes" type="object" class="oe_stat_button nl-stat" icon="fa-file-text-o">
+                            <field name="boe_count" widget="statinfo" string="Bills of Entry"/>
+                        </button>
+                        <button name="action_view_receipts" type="object" class="oe_stat_button nl-stat" icon="fa-truck"
+                                groups="stock.group_stock_user">
+                            <field name="picking_count" widget="statinfo" string="Receipts"/>
+                        </button>
+                        <button name="action_view_receipt_lines" type="object" class="oe_stat_button nl-stat"
+                                icon="fa-cubes" string="Received Qty" groups="stock.group_stock_user"/>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name" string="Internal Reference"/>
+                        <h1><field name="name" readonly="1"/></h1>
+                        <label for="lc_number" string="LC Number"/>
+                        <h2><field name="lc_number" placeholder="Bank-issued LC number"
+                                   readonly="state not in ('draft', 'approved')"/></h2>
+                    </div>
+                    <group>
+                        <group string="Parties" name="parties">
+                            <field name="lc_type" readonly="state != 'draft'"/>
+                            <field name="purpose" readonly="state in ('closed', 'cancelled')"/>
+                            <field name="applicant_id" readonly="state != 'draft'"/>
+                            <field name="partner_id" readonly="state != 'draft'"
+                                   options="{'no_create_edit': True}"/>
+                            <field name="country_id" readonly="state in ('closed', 'cancelled')"/>
+                            <field name="bank_id" readonly="state != 'draft'"/>
+                            <field name="bank_branch" readonly="state in ('closed', 'cancelled')"/>
+                        </group>
+                        <group string="Amount &amp; Dates" name="amounts">
+                            <field name="company_id" invisible="1"/>
+                            <field name="company_id" groups="base.group_multi_company" readonly="state != 'draft'"/>
+                            <field name="currency_id" readonly="state != 'draft'"/>
+                            <field name="original_amount" widget="monetary" readonly="state != 'draft'"/>
+                            <field name="tolerance_percent" readonly="state not in ('draft', 'approved')"/>
+                            <field name="opening_date" readonly="state not in ('draft', 'approved')"/>
+                            <field name="expiry_date" readonly="state not in ('draft', 'approved')"/>
+                            <field name="shipment_deadline" readonly="state not in ('draft', 'approved')"/>
+                            <field name="days_to_expiry" invisible="not expiry_date or state in ('closed', 'cancelled')"/>
+                            <field name="expiry_status" widget="badge" invisible="expiry_status == 'na'"
+                                   decoration-success="expiry_status == 'ok'"
+                                   decoration-warning="expiry_status == 'due_soon'"
+                                   decoration-danger="expiry_status == 'expired'"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Utilization (LC currency)" name="utilization">
+                            <field name="current_amount" widget="monetary"/>
+                            <field name="utilized_amount" widget="monetary"/>
+                            <field name="planned_amount" widget="monetary"/>
+                            <field name="balance_amount" widget="monetary" class="fw-bold"/>
+                            <field name="utilization_percent" widget="progressbar"/>
+                        </group>
+                        <group string="Reference &amp; Responsibility" name="reference">
+                            <field name="pi_number" readonly="state in ('closed', 'cancelled')"/>
+                            <field name="pi_date" readonly="state in ('closed', 'cancelled')"/>
+                            <field name="payment_term" readonly="state in ('closed', 'cancelled')"/>
+                            <field name="usance_days" invisible="payment_term != 'usance'"
+                                   readonly="state in ('closed', 'cancelled')"/>
+                            <field name="port_loading" readonly="state in ('closed', 'cancelled')"/>
+                            <field name="port_discharge" readonly="state in ('closed', 'cancelled')"/>
+                            <field name="incoterm" readonly="state in ('closed', 'cancelled')"/>
+                            <field name="bond_license_ref" readonly="state in ('closed', 'cancelled')"/>
+                            <field name="user_id" readonly="state in ('closed', 'cancelled')"/>
+                            <field name="department" readonly="state in ('closed', 'cancelled')"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Shipments" name="shipments" icon="fa-ship">
+                            <field name="shipment_ids" readonly="state not in ('opened', 'in_progress', 'partial', 'cleared')">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="bl_awb_no"/>
+                                    <field name="invoice_no"/>
+                                    <field name="invoice_value" sum="Total"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                    <field name="shipment_date"/>
+                                    <field name="eta_date"/>
+                                    <field name="state" widget="badge"
+                                           decoration-info="state in ('planned', 'shipped')"
+                                           decoration-warning="state in ('docs_received', 'customs_cleared')"
+                                           decoration-success="state == 'received'"
+                                           decoration-danger="state == 'cancelled'"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Amendments" name="amendments">
+                            <field name="amendment_ids" readonly="1">
+                                <tree decoration-success="state == 'approved'" decoration-danger="state == 'rejected'"
+                                      decoration-warning="state == 'submitted'">
+                                    <field name="name"/>
+                                    <field name="amendment_date"/>
+                                    <field name="amount_change"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                    <field name="new_expiry_date"/>
+                                    <field name="new_shipment_deadline"/>
+                                    <field name="state" widget="badge"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Bills of Entry" name="boes">
+                            <field name="boe_ids" readonly="1">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="boe_date"/>
+                                    <field name="shipment_id"/>
+                                    <field name="customs_house"/>
+                                    <field name="clearance_date"/>
+                                    <field name="state" widget="badge"
+                                           decoration-success="state == 'cleared'"
+                                           decoration-danger="state == 'cancelled'"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Documents Checklist" name="documents">
+                            <field name="document_ids" context="{'default_lc_id': id}">
+                                <tree editable="bottom" decoration-success="state == 'received'"
+                                      decoration-muted="state == 'waived'">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="type_id"/>
+                                    <field name="shipment_id" domain="[('lc_id', '=', parent.id)]"
+                                           options="{'no_create': True}"/>
+                                    <field name="name"/>
+                                    <field name="is_required"/>
+                                    <field name="due_date"/>
+                                    <field name="doc_date"/>
+                                    <field name="attachment_ids" widget="many2many_binary" optional="show"/>
+                                    <field name="state" widget="badge"
+                                           decoration-warning="state == 'pending'"
+                                           decoration-success="state == 'received'"/>
+                                    <button name="action_mark_received" type="object" icon="fa-check"
+                                            title="Mark received" invisible="state != 'pending'"
+                                            groups="nelsis_lc_management.group_lc_officer"/>
+                                    <button name="action_waive" type="object" icon="fa-ban"
+                                            title="Waive" invisible="state != 'pending'"
+                                            groups="nelsis_lc_management.group_lc_officer"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Warehouse Receipts" name="receipts" groups="stock.group_stock_user">
+                            <field name="picking_ids" readonly="1">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="partner_id"/>
+                                    <field name="lc_shipment_id"/>
+                                    <field name="scheduled_date"/>
+                                    <field name="date_done"/>
+                                    <field name="state" widget="badge"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Approval &amp; Audit Log" name="audit">
+                            <group>
+                                <field name="approved_by_id"/>
+                                <field name="approved_on"/>
+                            </group>
+                            <field name="log_ids" readonly="1">
+                                <tree>
+                                    <field name="date"/>
+                                    <field name="user_id"/>
+                                    <field name="event"/>
+                                    <field name="from_state" optional="show"/>
+                                    <field name="to_state" optional="show"/>
+                                    <field name="note"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Notes" name="notes">
+                            <field name="note" placeholder="Internal notes..."
+                                   readonly="state in ('closed', 'cancelled')"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- ============================ TREE ============================ -->
+    <record id="view_nelsis_lc_tree" model="ir.ui.view">
+        <field name="name">nelsis.lc.tree</field>
+        <field name="model">nelsis.lc</field>
+        <field name="arch" type="xml">
+            <tree string="Letters of Credit" decoration-muted="state in ('cancelled', 'closed')"
+                  decoration-danger="expiry_status == 'expired'"
+                  decoration-warning="expiry_status == 'due_soon'">
+                <field name="name"/>
+                <field name="lc_number"/>
+                <field name="partner_id"/>
+                <field name="bank_id" optional="show"/>
+                <field name="lc_type" optional="hide"/>
+                <field name="opening_date" optional="show"/>
+                <field name="expiry_date"/>
+                <field name="shipment_deadline" optional="hide"/>
+                <field name="currency_id" optional="show"/>
+                <field name="current_amount"/>
+                <field name="utilized_amount" optional="show"/>
+                <field name="balance_amount"/>
+                <field name="utilization_percent" widget="progressbar" optional="show"/>
+                <field name="user_id" widget="many2one_avatar_user" optional="show"/>
+                <field name="expiry_status" column_invisible="1"/>
+                <field name="state" widget="badge" decoration-info="state in ('draft', 'review')"
+                       decoration-success="state in ('approved', 'cleared', 'closed')"
+                       decoration-warning="state in ('opened', 'in_progress', 'partial', 'hold')"
+                       decoration-danger="state == 'cancelled'"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- ============================ KANBAN ============================ -->
+    <record id="view_nelsis_lc_kanban" model="ir.ui.view">
+        <field name="name">nelsis.lc.kanban</field>
+        <field name="model">nelsis.lc</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" class="o_kanban_small_column nelsis_lc_kanban nl-ui"
+                    quick_create="false" group_create="false" group_delete="false"
+                    records_draggable="false">
+                <field name="state"/>
+                <field name="currency_id"/>
+                <field name="expiry_status"/>
+                <field name="user_id"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click nelsis_lc_card">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <strong class="o_kanban_record_title"><field name="name"/></strong>
+                                    <div class="text-muted small"><field name="lc_number"/></div>
+                                </div>
+                                <t t-if="record.expiry_status.raw_value != 'na'">
+                                    <field name="expiry_status" widget="badge"
+                                           decoration-success="expiry_status == 'ok'"
+                                           decoration-warning="expiry_status == 'due_soon'"
+                                           decoration-danger="expiry_status == 'expired'"/>
+                                </t>
+                            </div>
+                            <div class="mt-2"><i class="fa fa-industry text-muted me-1" title="Supplier"/><field name="partner_id"/></div>
+                            <div class="mt-1 d-flex justify-content-between">
+                                <span><i class="fa fa-money text-muted me-1" title="Current amount"/>
+                                    <field name="current_amount" widget="monetary"/></span>
+                                <span class="text-muted small"><i class="fa fa-calendar-o me-1" title="Expiry"/>
+                                    <field name="expiry_date"/></span>
+                            </div>
+                            <div class="mt-2"><field name="utilization_percent" widget="progressbar"/></div>
+                            <div class="mt-1 d-flex justify-content-between align-items-center">
+                                <span class="small text-muted">Balance: <field name="balance_amount" widget="monetary"/></span>
+                                <field name="user_id" widget="many2one_avatar_user"/>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- ============================ GRAPH / PIVOT ============================ -->
+    <record id="view_nelsis_lc_graph" model="ir.ui.view">
+        <field name="name">nelsis.lc.graph</field>
+        <field name="model">nelsis.lc</field>
+        <field name="arch" type="xml">
+            <graph string="LC Utilization" type="bar" stacked="0">
+                <field name="partner_id"/>
+                <field name="current_amount" type="measure"/>
+                <field name="utilized_amount" type="measure"/>
+                <field name="balance_amount" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_nelsis_lc_pivot" model="ir.ui.view">
+        <field name="name">nelsis.lc.pivot</field>
+        <field name="model">nelsis.lc</field>
+        <field name="arch" type="xml">
+            <pivot string="LC Utilization and Balance (per currency)">
+                <field name="currency_id" type="col"/>
+                <field name="partner_id" type="row"/>
+                <field name="current_amount" type="measure"/>
+                <field name="utilized_amount" type="measure"/>
+                <field name="planned_amount" type="measure"/>
+                <field name="balance_amount" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- ============================ SEARCH ============================ -->
+    <record id="view_nelsis_lc_search" model="ir.ui.view">
+        <field name="name">nelsis.lc.search</field>
+        <field name="model">nelsis.lc</field>
+        <field name="arch" type="xml">
+            <search string="Search LC">
+                <field name="name" string="LC / Reference" filter_domain="['|', ('name', 'ilike', self), ('lc_number', 'ilike', self)]"/>
+                <field name="partner_id"/>
+                <field name="bank_id"/>
+                <field name="user_id"/>
+                <field name="pi_number"/>
+                <filter name="my_lc" string="My LCs" domain="[('user_id', '=', uid)]"/>
+                <separator/>
+                <filter name="f_draft" string="Draft" domain="[('state', '=', 'draft')]"/>
+                <filter name="f_review" string="Pending Approval" domain="[('state', '=', 'review')]"/>
+                <filter name="f_active" string="Active"
+                        domain="[('state', 'in', ['opened', 'in_progress', 'partial', 'cleared'])]"/>
+                <filter name="f_hold" string="On Hold" domain="[('state', '=', 'hold')]"/>
+                <filter name="f_closed" string="Closed" domain="[('state', '=', 'closed')]"/>
+                <separator/>
+                <filter name="f_expired" string="Expired (still active)"
+                        domain="[('state', 'in', ['opened', 'in_progress', 'partial', 'cleared']), ('expiry_date', '&lt;', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="f_expiring" string="Expiring in 30 days"
+                        domain="[('state', 'in', ['opened', 'in_progress', 'partial', 'cleared']), ('expiry_date', '&gt;=', context_today().strftime('%Y-%m-%d')), ('expiry_date', '&lt;=', (context_today() + relativedelta(days=30)).strftime('%Y-%m-%d'))]"/>
+                <filter name="f_balance" string="With Outstanding Balance" domain="[('balance_amount', '&gt;', 0), ('state', 'in', ['opened', 'in_progress', 'partial', 'cleared'])]"/>
+                <filter name="f_pending_amend" string="Pending Amendments" domain="[('amendment_ids.state', '=', 'submitted')]"/>
+                <separator/>
+                <filter name="f_archived_cancel" string="Cancelled" domain="[('state', '=', 'cancelled')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="g_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="g_partner" string="Supplier" context="{'group_by': 'partner_id'}"/>
+                    <filter name="g_bank" string="Issuing Bank" context="{'group_by': 'bank_id'}"/>
+                    <filter name="g_type" string="LC Type" context="{'group_by': 'lc_type'}"/>
+                    <filter name="g_purpose" string="Purpose" context="{'group_by': 'purpose'}"/>
+                    <filter name="g_currency" string="Currency" context="{'group_by': 'currency_id'}"/>
+                    <filter name="g_expiry" string="Expiry Month" context="{'group_by': 'expiry_date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ============================ ACTIONS ============================ -->
+    <record id="action_nelsis_lc_dashboard" model="ir.actions.act_window">
+        <field name="name">LC Dashboard</field>
+        <field name="res_model">nelsis.lc</field>
+        <field name="view_mode">kanban,graph,pivot,tree,form</field>
+        <field name="search_view_id" ref="view_nelsis_lc_search"/>
+        <field name="context">{'search_default_f_active': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first Letter of Credit</p>
+            <p>Track every LC from application to closure, with amendments, shipments, documents and receipts.</p>
+        </field>
+    </record>
+
+    <record id="action_nelsis_lc" model="ir.actions.act_window">
+        <field name="name">Letters of Credit</field>
+        <field name="res_model">nelsis.lc</field>
+        <field name="view_mode">tree,kanban,form,graph,pivot</field>
+        <field name="search_view_id" ref="view_nelsis_lc_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create a Letter of Credit</p>
+            <p>Start with a draft, submit it for review, then open it after approval.</p>
+        </field>
+    </record>
+
+    <record id="action_nelsis_lc_utilization" model="ir.actions.act_window">
+        <field name="name">Utilization &amp; Balance</field>
+        <field name="res_model">nelsis.lc</field>
+        <field name="view_mode">pivot,graph,tree</field>
+        <field name="search_view_id" ref="view_nelsis_lc_search"/>
+        <field name="domain">[('state', 'not in', ['draft', 'review', 'cancelled'])]</field>
+    </record>
+
+    <record id="action_nelsis_lc_expiry_watch" model="ir.actions.act_window">
+        <field name="name">Expiry Watch</field>
+        <field name="res_model">nelsis.lc</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_nelsis_lc_search"/>
+        <field name="context">{'search_default_f_expiring': 1}</field>
+    </record>
+</odoo>

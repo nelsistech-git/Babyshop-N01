@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright © Nelsis Tech. Developer: Nur Uddin Ahammed. All rights reserved. -->
+<odoo>
+    <record id="view_commercial_document_form" model="ir.ui.view">
+        <field name="name">nelsis.commercial.document.form</field>
+        <field name="model">nelsis.commercial.document</field>
+        <field name="arch" type="xml">
+            <form string="Commercial Document" class="nl-ui">
+                <header>
+                    <button name="action_submit" string="Submit" type="object" class="btn-primary nl-btn nl-primary" invisible="state != 'draft'" icon="fa-paper-plane"/>
+                    <button name="action_verify" string="Verify" type="object" class="btn-success nl-btn nl-success" invisible="state != 'submitted'" icon="fa-check-circle"/>
+                    <button name="action_reject" string="Reject" type="object" class="btn-danger nl-btn nl-danger" invisible="state != 'submitted'" icon="fa-times-circle"/>
+                    <button name="action_reset_draft" string="Reset to Draft" type="object" invisible="state != 'rejected'" class="nl-btn nl-neutral" icon="fa-undo"/>
+                    <button name="action_new_version" string="New Version" type="object" class="btn-secondary nl-btn nl-violet"
+                            invisible="state not in ('verified', 'submitted', 'rejected')" icon="fa-plus-circle"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,verified" class="nl-statusbar"/>
+                </header>
+                <sheet>
+                    <div class="alert alert-danger" role="alert" invisible="not is_expired or state == 'superseded'">
+                        This document has expired.
+                    </div>
+                    <group>
+                        <group>
+                            <field name="file_id"/>
+                            <field name="lc_display"/>
+                            <field name="shipment_id"/>
+                            <field name="document_type_id"/>
+                            <field name="number"/>
+                            <field name="version"/>
+                            <field name="previous_id"/>
+                        </group>
+                        <group>
+                            <field name="issue_date"/>
+                            <field name="expiry_date"/>
+                            <field name="is_expired" invisible="1"/>
+                            <field name="issuing_org"/>
+                            <field name="verified_by"/>
+                            <field name="verified_date"/>
+                        </group>
+                    </group>
+                    <group string="Attachments">
+                        <field name="attachment_ids" widget="many2many_binary" nolabel="1"/>
+                    </group>
+                    <group>
+                        <field name="rejection_reason" invisible="state not in ('submitted', 'rejected')"/>
+                        <field name="remarks"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_commercial_document_tree" model="ir.ui.view">
+        <field name="name">nelsis.commercial.document.tree</field>
+        <field name="model">nelsis.commercial.document</field>
+        <field name="arch" type="xml">
+            <tree string="Documents" decoration-success="state == 'verified'" decoration-danger="is_expired or state == 'rejected'"
+                  decoration-muted="state == 'superseded'">
+                <field name="file_id"/>
+                <field name="lc_display"/>
+                <field name="document_type_id"/>
+                <field name="number"/>
+                <field name="version"/>
+                <field name="issue_date"/>
+                <field name="expiry_date"/>
+                <field name="is_expired" column_invisible="1"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_commercial_document_search" model="ir.ui.view">
+        <field name="name">nelsis.commercial.document.search</field>
+        <field name="model">nelsis.commercial.document</field>
+        <field name="arch" type="xml">
+            <search string="Documents">
+                <field name="number"/>
+                <field name="file_id"/>
+                <field name="document_type_id"/>
+                <filter name="current" string="Current Versions" domain="[('state', '!=', 'superseded')]"/>
+                <filter name="pending" string="Pending Verification" domain="[('state', '=', 'submitted')]"/>
+                <filter name="expired" string="Expired"
+                        domain="[('expiry_date', '&lt;', context_today().strftime('%Y-%m-%d')), ('state', '!=', 'superseded')]"/>
+                <filter name="rejected" string="Rejected" domain="[('state', '=', 'rejected')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="g_file" string="Commercial File" context="{'group_by': 'file_id'}"/>
+                    <filter name="g_type" string="Document Type" context="{'group_by': 'document_type_id'}"/>
+                    <filter name="g_state" string="Status" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_commercial_document" model="ir.actions.act_window">
+        <field name="name">Documents</field>
+        <field name="res_model">nelsis.commercial.document</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_current': 1}</field>
+    </record>
+
+    <record id="action_commercial_document_missing" model="ir.actions.act_window">
+        <field name="name">Pending / Expired Documents</field>
+        <field name="res_model">nelsis.commercial.document</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">['|', ('state', 'in', ('submitted', 'rejected')), '&amp;', ('state', '=', 'verified'), ('expiry_date', '&lt;', context_today().strftime('%Y-%m-%d'))]</field>
+    </record>
+
+    <!-- Document types -->
+    <record id="view_commercial_document_type_tree" model="ir.ui.view">
+        <field name="name">nelsis.commercial.document.type.tree</field>
+        <field name="model">nelsis.commercial.document.type</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="active" widget="boolean_toggle"/>
+            </tree>
+        </field>
+    </record>
+    <record id="action_commercial_document_type" model="ir.actions.act_window">
+        <field name="name">Document Types</field>
+        <field name="res_model">nelsis.commercial.document.type</field>
+        <field name="view_mode">tree</field>
+    </record>
+
+    <!-- Compliance matrix -->
+    <record id="view_commercial_rule_form" model="ir.ui.view">
+        <field name="name">nelsis.commercial.rule.form</field>
+        <field name="model">nelsis.commercial.rule</field>
+        <field name="arch" type="xml">
+            <form string="Compliance Requirement" class="nl-ui">
+                <header>
+                    <button name="action_mark_reviewed" string="Mark as Reviewed" type="object" class="btn-primary nl-btn nl-success" icon="fa-check-circle"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="active"/>
+                            <field name="company_id" invisible="1"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="transaction_type"/>
+                            <field name="document_type_id"/>
+                            <field name="requirement"/>
+                            <field name="verification_required"/>
+                        </group>
+                        <group>
+                            <field name="source_reference"/>
+                            <field name="source_url" widget="url"/>
+                            <field name="effective_date"/>
+                            <field name="amendment_status"/>
+                            <field name="renewal_note"/>
+                            <field name="department"/>
+                            <field name="reviewed_by"/>
+                            <field name="review_date"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="applicability"/>
+                        <field name="legal_note"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+    <record id="view_commercial_rule_tree" model="ir.ui.view">
+        <field name="name">nelsis.commercial.rule.tree</field>
+        <field name="model">nelsis.commercial.rule</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="transaction_type"/>
+                <field name="document_type_id"/>
+                <field name="requirement"/>
+                <field name="source_reference"/>
+                <field name="effective_date"/>
+                <field name="amendment_status"/>
+                <field name="reviewed_by"/>
+            </tree>
+        </field>
+    </record>
+    <record id="action_commercial_rule" model="ir.actions.act_window">
+        <field name="name">Compliance Matrix</field>
+        <field name="res_model">nelsis.commercial.rule</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Settings -->
+    <record id="view_commercial_setting_form" model="ir.ui.view">
+        <field name="name">nelsis.commercial.setting.form</field>
+        <field name="model">nelsis.commercial.setting</field>
+        <field name="arch" type="xml">
+            <form string="Commercial Settings" class="nl-ui">
+                <sheet>
+                    <div class="alert alert-info" role="alert">
+                        Select the model of your existing LC Management module. LC records stay in that module;
+                        this addon only references them.
+                    </div>
+                    <group>
+                        <group string="LC Integration">
+                            <field name="name" invisible="1"/>
+                            <field name="company_id" invisible="1"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="lc_model_id" options="{'no_create': True}"/>
+                        </group>
+                        <group string="Policy">
+                            <field name="quantity_tolerance"/>
+                            <field name="max_file_size_mb"/>
+                            <field name="allowed_extensions"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_commercial_setting" model="ir.actions.server">
+        <field name="name">Commercial Settings</field>
+        <field name="model_id" ref="model_nelsis_commercial_setting"/>
+        <field name="state">code</field>
+        <field name="code">action = model.action_open_setting()</field>
+    </record>
+</odoo>

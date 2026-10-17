@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_bond_stock_report_tree" model="ir.ui.view">
+        <field name="name">bond.inventory.stock.report.tree</field>
+        <field name="model">bond.inventory.stock.report</field>
+        <field name="arch" type="xml">
+            <tree create="0" edit="0" delete="0">
+                <field name="location_id"/>
+                <field name="bond_status"/>
+                <field name="product_id"/>
+                <field name="lot_id"/>
+                <field name="hs_code" optional="show"/>
+                <field name="lc_label"/>
+                <field name="boe_number"/>
+                <field name="expiry_date" optional="show"/>
+                <field name="quantity" sum="Total"/>
+                <field name="reserved_quantity" optional="hide"/>
+                <field name="available_quantity" optional="show"/>
+                <field name="uom_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_bond_stock_report_pivot" model="ir.ui.view">
+        <field name="name">bond.inventory.stock.report.pivot</field>
+        <field name="model">bond.inventory.stock.report</field>
+        <field name="arch" type="xml">
+            <pivot>
+                <field name="location_id" type="row"/>
+                <field name="product_id" type="row"/>
+                <field name="quantity" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_bond_stock_report_search" model="ir.ui.view">
+        <field name="name">bond.inventory.stock.report.search</field>
+        <field name="model">bond.inventory.stock.report</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="product_id"/>
+                <field name="location_id"/>
+                <field name="lot_id"/>
+                <field name="lc_label"/>
+                <field name="boe_number"/>
+                <filter name="bonded" string="Bonded" domain="[('bond_status', '=', 'bonded')]"/>
+                <filter name="non_bonded" string="Non-Bonded" domain="[('bond_status', '=', 'non_bonded')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_location" string="Location" context="{'group_by': 'location_id'}"/>
+                    <filter name="group_product" string="Product" context="{'group_by': 'product_id'}"/>
+                    <filter name="group_lc" string="LC" context="{'group_by': 'lc_label'}"/>
+                    <filter name="group_boe" string="Bill of Entry" context="{'group_by': 'boe_number'}"/>
+                    <filter name="group_status" string="Bond Status" context="{'group_by': 'bond_status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_bond_stock_report" model="ir.actions.act_window">
+        <field name="name">Bond Stock</field>
+        <field name="res_model">bond.inventory.stock.report</field>
+        <field name="view_mode">tree,pivot</field>
+        <field name="search_view_id" ref="view_bond_stock_report_search"/>
+    </record>
+</odoo>

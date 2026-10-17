@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) Nelsis Tech. Developer / Product Owner: Nur Uddin Ahammed.
+     Lead times below are PLACEHOLDERS, not legal periods. Rules reading bond.warehouse.*
+     models are shipped INACTIVE: use "Preview Matches", fix fields to match the approved
+     contract, confirm periods with a customs professional, then activate. -->
+<odoo noupdate="1">
+    <record id="rule_license_expiry" model="bond.dashboard.alert.rule">
+        <field name="name">License expiry</field>
+        <field name="alert_type">license_expiry</field>
+        <field name="severity">critical</field>
+        <field name="model_name">bond.warehouse.license</field>
+        <field name="domain">[('state', '=', 'active')]</field>
+        <field name="date_field">expiry_date</field>
+        <field name="lead_days">90</field>
+        <field name="group_ids" eval="[(6, 0, [ref('group_bond_dash_bond_manager')])]"/>
+        <field name="active" eval="False"/>
+    </record>
+    <record id="rule_security_expiry" model="bond.dashboard.alert.rule">
+        <field name="name">Security / guarantee expiry</field>
+        <field name="alert_type">security_expiry</field>
+        <field name="severity">critical</field>
+        <field name="model_name">bond.warehouse.security</field>
+        <field name="domain">[('state', '=', 'active')]</field>
+        <field name="date_field">expiry_date</field>
+        <field name="lead_days">60</field>
+        <field name="group_ids" eval="[(6, 0, [ref('group_bond_dash_bond_manager')])]"/>
+        <field name="active" eval="False"/>
+    </record>
+    <record id="rule_missing_document" model="bond.dashboard.alert.rule">
+        <field name="name">Expired commercial document</field>
+        <field name="alert_type">missing_document</field>
+        <field name="severity">warning</field>
+        <field name="model_name">nelsis.commercial.document</field>
+        <field name="domain">[('expiry_date', '!=', False), ('expiry_date', '&lt;', today), ('state', 'not in', ['superseded', 'rejected'])]</field>
+        <field name="group_ids" eval="[(6, 0, [ref('group_bond_dash_bond_manager'), ref('group_bond_dash_commercial')])]"/>
+        <field name="active" eval="False"/>
+    </record>
+    <record id="rule_pending_verification" model="bond.dashboard.alert.rule">
+        <field name="name">Pending verification</field>
+        <field name="alert_type">pending_verification</field>
+        <field name="severity">info</field>
+        <field name="model_name">nelsis.commercial.document</field>
+        <field name="domain">[('state', '=', 'submitted')]</field>
+        <field name="group_ids" eval="[(6, 0, [ref('group_bond_dash_bond_manager')])]"/>
+        <field name="active" eval="False"/>
+    </record>
+    <record id="rule_reconciliation_discrepancy" model="bond.dashboard.alert.rule">
+        <field name="name">Reconciliation discrepancy</field>
+        <field name="alert_type">reconciliation_discrepancy</field>
+        <field name="severity">critical</field>
+        <field name="model_name">bond.warehouse.reconciliation</field>
+        <field name="domain">[('state', '=', 'discrepancy')]</field>
+        <field name="group_ids" eval="[(6, 0, [ref('group_bond_dash_bond_manager'), ref('group_bond_dash_auditor')])]"/>
+        <field name="active" eval="False"/>
+    </record>
+    <record id="rule_entitlement_threshold" model="bond.dashboard.alert.rule">
+        <field name="name">Entitlement threshold</field>
+        <field name="alert_type">entitlement_threshold</field>
+        <field name="severity">warning</field>
+        <field name="model_name">bond.warehouse.entitlement</field>
+        <field name="domain">[('state', '=', 'active'), ('basis', '=', 'quantity')]</field>
+        <field name="ratio_numerator_field">used_amount</field>
+        <field name="ratio_denominator_field">approved_total</field>
+        <field name="threshold_percent">80</field>
+        <field name="group_ids" eval="[(6, 0, [ref('group_bond_dash_bond_manager')])]"/>
+        <field name="active" eval="False"/>
+    </record>
+    <record id="rule_outstanding_approval" model="bond.dashboard.alert.rule">
+        <field name="name">Outstanding approval</field>
+        <field name="alert_type">outstanding_approval</field>
+        <field name="severity">warning</field>
+        <field name="model_name">bond.warehouse.register</field>
+        <field name="domain">[('verification_state', '=', 'pending')]</field>
+        <field name="group_ids" eval="[(6, 0, [ref('group_bond_dash_bond_manager')])]"/>
+        <field name="active" eval="False"/>
+    </record>
+    <record id="rule_unauthorized_attempt" model="bond.dashboard.alert.rule">
+        <field name="name">Unauthorized transaction attempt</field>
+        <field name="alert_type">unauthorized_attempt</field>
+        <field name="severity">critical</field>
+        <field name="group_ids" eval="[(6, 0, [ref('group_bond_dash_bond_manager'), ref('group_bond_dash_auditor')])]"/>
+        <field name="message_template">{rule}</field>
+    </record>
+</odoo>

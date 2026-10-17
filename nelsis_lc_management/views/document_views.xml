@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright © Nelsis Tech. Developer: Nur Uddin Ahammed. All rights reserved. -->
+<odoo>
+    <record id="view_nelsis_lc_document_form" model="ir.ui.view">
+        <field name="name">nelsis.lc.document.form</field>
+        <field name="model">nelsis.lc.document</field>
+        <field name="arch" type="xml">
+            <form string="LC Document" class="nl-ui">
+                <header>
+                    <button name="action_mark_received" string="Mark Received" type="object" class="btn-success nl-btn nl-success"
+                            icon="fa-check" invisible="state != 'pending'"
+                            groups="nelsis_lc_management.group_lc_officer"/>
+                    <button name="action_waive" string="Waive" type="object" icon="fa-ban"
+                            invisible="state != 'pending'" groups="nelsis_lc_management.group_lc_officer" class="nl-btn nl-warning"/>
+                    <field name="state" widget="statusbar" statusbar_visible="pending,received" class="nl-statusbar"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="type_id"/>
+                            <field name="lc_id" options="{'no_create': True}" readonly="id"/>
+                            <field name="shipment_id" options="{'no_create': True}"/>
+                            <field name="name"/>
+                        </group>
+                        <group>
+                            <field name="is_required"/>
+                            <field name="due_date"/>
+                            <field name="doc_date"/>
+                            <field name="waive_reason" invisible="state != 'waived'"/>
+                        </group>
+                    </group>
+                    <group string="Attachments">
+                        <field name="attachment_ids" widget="many2many_binary" nolabel="1"/>
+                    </group>
+                    <field name="note" placeholder="Notes..."/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_nelsis_lc_document_tree" model="ir.ui.view">
+        <field name="name">nelsis.lc.document.tree</field>
+        <field name="model">nelsis.lc.document</field>
+        <field name="arch" type="xml">
+            <tree string="Document Checklist" decoration-success="state == 'received'"
+                  decoration-muted="state == 'waived'" create="0">
+                <field name="lc_id"/>
+                <field name="shipment_id"/>
+                <field name="partner_id"/>
+                <field name="type_id"/>
+                <field name="name"/>
+                <field name="is_required"/>
+                <field name="due_date"/>
+                <field name="state" widget="badge" decoration-warning="state == 'pending'"
+                       decoration-success="state == 'received'"/>
+                <button name="action_mark_received" type="object" icon="fa-check" title="Mark received"
+                        invisible="state != 'pending'" groups="nelsis_lc_management.group_lc_officer"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_nelsis_lc_document_search" model="ir.ui.view">
+        <field name="name">nelsis.lc.document.search</field>
+        <field name="model">nelsis.lc.document</field>
+        <field name="arch" type="xml">
+            <search string="Search Documents">
+                <field name="lc_id"/>
+                <field name="shipment_id"/>
+                <field name="partner_id"/>
+                <field name="type_id"/>
+                <field name="name"/>
+                <filter name="f_pending" string="Pending" domain="[('state', '=', 'pending')]"/>
+                <filter name="f_req_pending" string="Required &amp; Pending"
+                        domain="[('state', '=', 'pending'), ('is_required', '=', True)]"/>
+                <filter name="f_overdue" string="Overdue"
+                        domain="[('state', '=', 'pending'), ('due_date', '&lt;', context_today().strftime('%Y-%m-%d'))]"/>
+                <group expand="0" string="Group By">
+                    <filter name="g_lc" string="LC" context="{'group_by': 'lc_id'}"/>
+                    <filter name="g_type" string="Document" context="{'group_by': 'type_id'}"/>
+                    <filter name="g_state" string="Status" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_nelsis_lc_document" model="ir.actions.act_window">
+        <field name="name">Document Checklist</field>
+        <field name="res_model">nelsis.lc.document</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_nelsis_lc_document_search"/>
+    </record>
+
+    <record id="action_nelsis_lc_document_outstanding" model="ir.actions.act_window">
+        <field name="name">Outstanding Documents</field>
+        <field name="res_model">nelsis.lc.document</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('state', '=', 'pending'), ('lc_id.state', 'not in', ['closed', 'cancelled', 'draft'])]</field>
+        <field name="context">{'search_default_f_req_pending': 1, 'search_default_g_lc': 1}</field>
+        <field name="search_view_id" ref="view_nelsis_lc_document_search"/>
+    </record>
+</odoo>

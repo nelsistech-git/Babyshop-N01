@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_bond_entitlement_tree" model="ir.ui.view">
+        <field name="name">bond.warehouse.entitlement.tree</field>
+        <field name="model">bond.warehouse.entitlement</field>
+        <field name="arch" type="xml">
+            <tree decoration-danger="over_utilized" decoration-muted="state in ('cancelled', 'closed')">
+                <field name="name"/>
+                <field name="reference"/>
+                <field name="license_id"/>
+                <field name="hs_code"/>
+                <field name="product_id"/>
+                <field name="basis"/>
+                <field name="approved_total"/>
+                <field name="used_amount"/>
+                <field name="available_amount"/>
+                <field name="unit_label"/>
+                <field name="effective_to"/>
+                <field name="over_utilized" column_invisible="1"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_bond_entitlement_form" model="ir.ui.view">
+        <field name="name">bond.warehouse.entitlement.form</field>
+        <field name="model">bond.warehouse.entitlement</field>
+        <field name="arch" type="xml">
+            <form class="nl-ui">
+                <header>
+                    <button name="action_activate" string="Activate" type="object" class="btn-primary nl-btn nl-success"
+                            invisible="state != 'draft'" groups="nelsis_bond_license.group_bond_license_officer" icon="fa-play-circle"/>
+                    <button name="action_close" string="Close" type="object"
+                            invisible="state not in ('active', 'expired')" groups="nelsis_bond_license.group_bond_license_manager" class="nl-btn nl-neutral" icon="fa-lock"/>
+                    <button name="action_cancel" string="Cancel" type="object"
+                            invisible="state not in ('draft', 'active')" groups="nelsis_bond_license.group_bond_license_manager" class="nl-btn nl-danger" icon="fa-ban"/>
+                    <button name="action_verify_rule" string="Verify Rule Basis" type="object"
+                            invisible="rule_verification_status == 'verified'" groups="nelsis_bond_license.group_bond_license_manager" class="nl-btn nl-success" icon="fa-check-circle"/>
+                    <button name="action_flag_rule_review" string="Flag for Review" type="object"
+                            invisible="rule_verification_status != 'verified'" groups="nelsis_bond_license.group_bond_license_manager" class="nl-btn nl-warning" icon="fa-flag"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,active,closed" class="nl-statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button nl-stat" icon="fa-pencil" type="object" name="action_view_amendments">
+                            <field name="amendment_count" widget="statinfo" string="Amendments"/>
+                        </button>
+                        <button class="oe_stat_button nl-stat" icon="fa-exchange" type="object" name="action_view_utilizations">
+                            <field name="utilization_count" widget="statinfo" string="Utilizations"/>
+                        </button>
+                    </div>
+                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <group>
+                        <group string="Entitlement">
+                            <field name="reference" readonly="state != 'draft'"/>
+                            <field name="license_id" readonly="state != 'draft'"
+                                   options="{'no_create': True}"/>
+                            <field name="company_id" invisible="1"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="approval_reference" readonly="state != 'draft'"/>
+                            <field name="approval_date" readonly="state != 'draft'"/>
+                        </group>
+                        <group string="Material">
+                            <field name="product_id" readonly="state != 'draft'"/>
+                            <field name="product_description"/>
+                            <field name="hs_code" readonly="state != 'draft'"/>
+                            <field name="basis" readonly="state != 'draft'"/>
+                            <field name="uom_id" invisible="basis != 'quantity'" readonly="state != 'draft'"/>
+                            <field name="currency_id" invisible="basis != 'value'" readonly="state != 'draft'"/>
+                        </group>
+                        <group string="Period">
+                            <field name="period_from" readonly="state != 'draft'"/>
+                            <field name="period_to" readonly="state != 'draft'"/>
+                            <field name="effective_from" readonly="state != 'draft'"/>
+                            <field name="effective_to" readonly="state != 'draft'"/>
+                            <field name="original_effective_to"/>
+                            <field name="days_to_expiry"/>
+                        </group>
+                        <group string="Balance (calculated)">
+                            <field name="unit_label"/>
+                            <field name="original_amount" readonly="state != 'draft'"/>
+                            <field name="amended_total"/>
+                            <field name="approved_total"/>
+                            <field name="used_amount"/>
+                            <field name="available_amount"/>
+                            <field name="utilization_percent" widget="progressbar"/>
+                            <field name="over_utilized" invisible="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Amendments" name="amendments">
+                            <field name="amendment_ids" readonly="1">
+                                <tree>
+                                    <field name="name"/><field name="amendment_date"/>
+                                    <field name="approval_reference"/><field name="change_amount"/>
+                                    <field name="previous_total"/><field name="new_total"/>
+                                    <field name="new_effective_to"/><field name="state"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Utilization" name="utilization">
+                            <field name="utilization_ids" readonly="1">
+                                <tree>
+                                    <field name="name"/><field name="picking_id"/><field name="stock_move_id"/>
+                                    <field name="move_date"/><field name="consumed_amount"/>
+                                    <field name="exception_used"/><field name="state"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Regulatory Basis" name="rule">
+                            <group>
+                                <group>
+                                    <field name="rule_reference"/>
+                                    <field name="rule_source_url" widget="url"/>
+                                    <field name="rule_published_date"/>
+                                    <field name="rule_effective_date"/>
+                                </group>
+                                <group>
+                                    <field name="rule_verification_status"/>
+                                    <field name="rule_verified_by_id"/>
+                                    <field name="rule_verified_date"/>
+                                </group>
+                            </group>
+                            <group>
+                                <field name="eligibility_note"/>
+                                <field name="rule_applicability"/>
+                                <field name="rule_required_document"/>
+                                <field name="rule_reviewer_note"/>
+                            </group>
+                        </page>
+                        <page string="Over-utilization Exception" name="exception" groups="nelsis_bond_license.group_bond_license_manager">
+                            <group>
+                                <field name="exception_authorized"/>
+                                <field name="exception_reference"/>
+                                <field name="exception_basis"/>
+                                <field name="exception_authorized_by_id"/>
+                                <field name="exception_date"/>
+                            </group>
+                        </page>
+                        <page string="Documents"><field name="attachment_ids" widget="many2many_binary"/></page>
+                        <page string="Audit Trail">
+                            <field name="history_ids" readonly="1">
+                                <tree>
+                                    <field name="timestamp"/><field name="user_id"/><field name="event"/>
+                                    <field name="from_state"/><field name="to_state"/>
+                                    <field name="event_date"/><field name="note"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Notes"><field name="note"/></page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_bond_entitlement_search" model="ir.ui.view">
+        <field name="name">bond.warehouse.entitlement.search</field>
+        <field name="model">bond.warehouse.entitlement</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="reference"/>
+                <field name="hs_code"/>
+                <field name="product_id"/>
+                <field name="license_id"/>
+                <filter name="active" string="Active" domain="[('state', '=', 'active')]"/>
+                <filter name="over" string="Over-utilized" domain="[('over_utilized', '=', True)]"/>
+                <filter name="expiring" string="Expiring in 60 days"
+                        domain="[('state', '=', 'active'), ('effective_to', '&lt;=', (context_today() + datetime.timedelta(days=60)).strftime('%Y-%m-%d'))]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_license" string="License" context="{'group_by': 'license_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_bond_entitlement" model="ir.actions.act_window">
+        <field name="name">Entitlements</field>
+        <field name="res_model">bond.warehouse.entitlement</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Amendments -->
+    <record id="view_bond_amendment_tree" model="ir.ui.view">
+        <field name="name">bond.warehouse.entitlement.amendment.tree</field>
+        <field name="model">bond.warehouse.entitlement.amendment</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/><field name="entitlement_id"/><field name="amendment_date"/>
+                <field name="approval_reference"/><field name="change_amount"/>
+                <field name="new_effective_to"/><field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_bond_amendment_form" model="ir.ui.view">
+        <field name="name">bond.warehouse.entitlement.amendment.form</field>
+        <field name="model">bond.warehouse.entitlement.amendment</field>
+        <field name="arch" type="xml">
+            <form class="nl-ui">
+                <header>
+                    <button name="action_approve" string="Approve" type="object" class="btn-primary nl-btn nl-success"
+                            invisible="state != 'draft'" groups="nelsis_bond_license.group_bond_license_manager" icon="fa-thumbs-up"/>
+                    <button name="action_reject" string="Reject" type="object"
+                            invisible="state != 'draft'" groups="nelsis_bond_license.group_bond_license_manager" class="nl-btn nl-danger" icon="fa-times-circle"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,approved" class="nl-statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="entitlement_id" readonly="state != 'draft'"/>
+                            <field name="amendment_date" readonly="state != 'draft'"/>
+                            <field name="approval_reference" readonly="state != 'draft'"/>
+                        </group>
+                        <group>
+                            <field name="change_amount" readonly="state != 'draft'"/>
+                            <field name="new_effective_to" readonly="state != 'draft'"/>
+                            <field name="previous_total"/>
+                            <field name="new_total"/>
+                            <field name="previous_effective_to"/>
+                            <field name="approved_by_id"/>
+                            <field name="approved_date"/>
+                        </group>
+                    </group>
+                    <group><field name="reason" readonly="state != 'draft'"/></group>
+                    <notebook>
+                        <page string="Documents"><field name="attachment_ids" widget="many2many_binary"/></page>
+                        <page string="Audit Trail">
+                            <field name="history_ids" readonly="1">
+                                <tree>
+                                    <field name="timestamp"/><field name="user_id"/><field name="event"/>
+                                    <field name="from_state"/><field name="to_state"/><field name="note"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_bond_amendment" model="ir.actions.act_window">
+        <field name="name">Entitlement Amendments</field>
+        <field name="res_model">bond.warehouse.entitlement.amendment</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Utilization -->
+    <record id="view_bond_utilization_tree" model="ir.ui.view">
+        <field name="name">bond.warehouse.entitlement.utilization.tree</field>
+        <field name="model">bond.warehouse.entitlement.utilization</field>
+        <field name="arch" type="xml">
+            <tree decoration-danger="exception_used" decoration-muted="state == 'reversed'">
+                <field name="name"/><field name="entitlement_id"/><field name="picking_id"/>
+                <field name="stock_move_id"/><field name="move_date"/>
+                <field name="consumed_amount"/><field name="exception_used"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_bond_utilization_form" model="ir.ui.view">
+        <field name="name">bond.warehouse.entitlement.utilization.form</field>
+        <field name="model">bond.warehouse.entitlement.utilization</field>
+        <field name="arch" type="xml">
+            <form class="nl-ui">
+                <header>
+                    <button name="action_validate" string="Validate" type="object" class="btn-primary nl-btn nl-success"
+                            invisible="state != 'draft'" groups="nelsis_bond_license.group_bond_license_officer" icon="fa-check-circle"/>
+                    <button name="action_reverse" string="Reverse" type="object"
+                            invisible="state != 'validated'" groups="nelsis_bond_license.group_bond_license_manager" class="nl-btn nl-danger" icon="fa-exchange"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,validated" class="nl-statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="entitlement_id" readonly="state != 'draft'"
+                                   domain="[('state', '=', 'active')]"/>
+                            <field name="stock_move_id" readonly="state != 'draft'"/>
+                            <field name="picking_id"/>
+                            <field name="product_id"/>
+                            <field name="move_date"/>
+                        </group>
+                        <group>
+                            <field name="basis"/>
+                            <field name="preview_amount"/>
+                            <field name="consumed_amount"/>
+                            <field name="exception_used"/>
+                            <field name="validated_by_id"/>
+                            <field name="validated_date"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Audit Trail">
+                            <field name="history_ids" readonly="1">
+                                <tree>
+                                    <field name="timestamp"/><field name="user_id"/><field name="event"/>
+                                    <field name="from_state"/><field name="to_state"/><field name="note"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                    <field name="note" placeholder="Notes..."/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_bond_utilization" model="ir.actions.act_window">
+        <field name="name">Entitlement Utilization</field>
+        <field name="res_model">bond.warehouse.entitlement.utilization</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

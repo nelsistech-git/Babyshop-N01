@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright © Nelsis Tech. Developer: Nur Uddin Ahammed. All rights reserved. -->
+<odoo>
+    <record id="view_nelsis_lc_amendment_form" model="ir.ui.view">
+        <field name="name">nelsis.lc.amendment.form</field>
+        <field name="model">nelsis.lc.amendment</field>
+        <field name="arch" type="xml">
+            <form string="LC Amendment" class="nl-ui">
+                <header>
+                    <button name="action_submit" string="Submit for Approval" type="object" class="btn-primary nl-btn nl-primary"
+                            icon="fa-paper-plane" invisible="state != 'draft'"
+                            groups="nelsis_lc_management.group_lc_officer"/>
+                    <button name="action_approve" string="Approve" type="object" class="btn-success nl-btn nl-success"
+                            icon="fa-check-circle" invisible="state != 'submitted'"
+                            groups="nelsis_lc_management.group_lc_manager"/>
+                    <button name="action_reject" string="Reject" type="object" class="btn-warning nl-btn nl-danger"
+                            icon="fa-times-circle" invisible="state != 'submitted'"
+                            groups="nelsis_lc_management.group_lc_manager"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved" class="nl-statusbar"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Rejected" bg_color="text-bg-danger"
+                            invisible="state != 'rejected'"/>
+                    <div class="oe_title"><h1><field name="name" readonly="1"/></h1></div>
+                    <group>
+                        <group string="Amendment">
+                            <field name="lc_id" readonly="id" options="{'no_create': True}"
+                                   domain="[('state', 'in', ['opened', 'in_progress', 'partial', 'cleared', 'hold'])]"/>
+                            <field name="partner_id"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="amendment_date" readonly="state != 'draft'"/>
+                            <field name="bank_reference" readonly="state != 'draft'"/>
+                        </group>
+                        <group string="Changes">
+                            <field name="amount_change" widget="monetary" readonly="state != 'draft'"/>
+                            <field name="new_expiry_date" readonly="state != 'draft'"/>
+                            <field name="new_shipment_deadline" readonly="state != 'draft'"/>
+                        </group>
+                    </group>
+                    <group string="Reason">
+                        <field name="reason" nolabel="1" readonly="state != 'draft'"/>
+                    </group>
+                    <group string="Before / After (recorded at approval)" invisible="state != 'approved'">
+                        <group>
+                            <field name="prev_amount" widget="monetary"/>
+                            <field name="new_amount" widget="monetary"/>
+                        </group>
+                        <group>
+                            <field name="prev_expiry_date"/>
+                            <field name="prev_shipment_deadline"/>
+                        </group>
+                    </group>
+                    <group string="Decision" invisible="state not in ('approved', 'rejected')">
+                        <field name="approved_by_id"/>
+                        <field name="approved_on"/>
+                        <field name="reject_reason" invisible="state != 'rejected'"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_nelsis_lc_amendment_tree" model="ir.ui.view">
+        <field name="name">nelsis.lc.amendment.tree</field>
+        <field name="model">nelsis.lc.amendment</field>
+        <field name="arch" type="xml">
+            <tree string="Amendments" decoration-success="state == 'approved'"
+                  decoration-danger="state == 'rejected'" decoration-warning="state == 'submitted'">
+                <field name="name"/>
+                <field name="lc_id"/>
+                <field name="partner_id"/>
+                <field name="amendment_date"/>
+                <field name="amount_change"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="new_expiry_date"/>
+                <field name="new_shipment_deadline"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_nelsis_lc_amendment_search" model="ir.ui.view">
+        <field name="name">nelsis.lc.amendment.search</field>
+        <field name="model">nelsis.lc.amendment</field>
+        <field name="arch" type="xml">
+            <search string="Search Amendments">
+                <field name="name"/>
+                <field name="lc_id"/>
+                <field name="partner_id"/>
+                <filter name="f_pending" string="Pending Approval" domain="[('state', '=', 'submitted')]"/>
+                <filter name="f_approved" string="Approved" domain="[('state', '=', 'approved')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="g_lc" string="LC" context="{'group_by': 'lc_id'}"/>
+                    <filter name="g_state" string="Status" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_nelsis_lc_amendment" model="ir.actions.act_window">
+        <field name="name">Amendments</field>
+        <field name="res_model">nelsis.lc.amendment</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_nelsis_lc_amendment_search"/>
+    </record>
+
+    <record id="action_nelsis_lc_amendment_pending" model="ir.actions.act_window">
+        <field name="name">Amendments Pending Approval</field>
+        <field name="res_model">nelsis.lc.amendment</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('state', '=', 'submitted')]</field>
+        <field name="search_view_id" ref="view_nelsis_lc_amendment_search"/>
+    </record>
+</odoo>

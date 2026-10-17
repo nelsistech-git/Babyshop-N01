@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright © Nelsis Tech. Developer: Nur Uddin Ahammed. All rights reserved. -->
+<odoo>
+    <record id="action_report_nelsis_lc" model="ir.actions.report">
+        <field name="name">LC Summary &amp; Checklist</field>
+        <field name="model">nelsis.lc</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">nelsis_lc_management.report_lc_summary</field>
+        <field name="report_file">nelsis_lc_management.report_lc_summary</field>
+        <field name="print_report_name">'LC-%s' % (object.name or 'draft').replace('/', '-')</field>
+        <field name="binding_model_id" ref="model_nelsis_lc"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_lc_summary">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Letter of Credit Summary
+                            <small class="text-muted"> <span t-field="o.name"/></small>
+                        </h2>
+                        <table class="table table-sm table-borderless">
+                            <tr>
+                                <td><strong>LC Number:</strong> <span t-field="o.lc_number"/></td>
+                                <td><strong>Status:</strong> <span t-field="o.state"/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Type:</strong> <span t-field="o.lc_type"/></td>
+                                <td><strong>Purpose:</strong> <span t-field="o.purpose"/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Applicant:</strong> <span t-field="o.applicant_id"/></td>
+                                <td><strong>Beneficiary / Supplier:</strong> <span t-field="o.partner_id"/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Issuing Bank:</strong> <span t-field="o.bank_id"/>
+                                    <t t-if="o.bank_branch"> - <span t-field="o.bank_branch"/></t></td>
+                                <td><strong>Bond License Ref.:</strong> <span t-field="o.bond_license_ref"/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Opening Date:</strong> <span t-field="o.opening_date"/></td>
+                                <td><strong>Expiry Date:</strong> <span t-field="o.expiry_date"/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Latest Shipment Date:</strong> <span t-field="o.shipment_deadline"/></td>
+                                <td><strong>Responsible:</strong> <span t-field="o.user_id"/></td>
+                            </tr>
+                        </table>
+
+                        <h4>Amounts (<span t-field="o.currency_id.name"/>)</h4>
+                        <table class="table table-sm">
+                            <tr><td>Original LC amount</td>
+                                <td class="text-end"><span t-field="o.original_amount" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td></tr>
+                            <tr><td>Current approved amount (original + approved amendments)</td>
+                                <td class="text-end"><span t-field="o.current_amount" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td></tr>
+                            <tr><td>Utilized (shipments from Shipped to Received)</td>
+                                <td class="text-end"><span t-field="o.utilized_amount" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td></tr>
+                            <tr><td>Planned (not yet shipped)</td>
+                                <td class="text-end"><span t-field="o.planned_amount" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td></tr>
+                            <tr><td><strong>Outstanding balance</strong></td>
+                                <td class="text-end"><strong><span t-field="o.balance_amount" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></strong></td></tr>
+                        </table>
+                        <p class="small text-muted">Single LC currency; no conversion. Cancelled shipments and rejected or pending
+                            amendments are excluded. LC value is not bonded stock or statutory entitlement.</p>
+
+                        <h4>Amendments</h4>
+                        <table class="table table-sm">
+                            <thead><tr><th>Ref.</th><th>Date</th><th class="text-end">Amount change</th>
+                                <th>New expiry</th><th>New shipment date</th><th>Status</th></tr></thead>
+                            <tbody>
+                                <tr t-foreach="o.amendment_ids" t-as="a">
+                                    <td><span t-field="a.name"/></td>
+                                    <td><span t-field="a.amendment_date"/></td>
+                                    <td class="text-end"><span t-field="a.amount_change"/></td>
+                                    <td><span t-field="a.new_expiry_date"/></td>
+                                    <td><span t-field="a.new_shipment_deadline"/></td>
+                                    <td><span t-field="a.state"/></td>
+                                </tr>
+                                <tr t-if="not o.amendment_ids"><td colspan="6" class="text-muted">None</td></tr>
+                            </tbody>
+                        </table>
+
+                        <h4>Shipments</h4>
+                        <table class="table table-sm">
+                            <thead><tr><th>Ref.</th><th>B/L / AWB</th><th>Invoice</th>
+                                <th class="text-end">Value</th><th>Shipped</th><th>Status</th></tr></thead>
+                            <tbody>
+                                <tr t-foreach="o.shipment_ids" t-as="s">
+                                    <td><span t-field="s.name"/></td>
+                                    <td><span t-field="s.bl_awb_no"/></td>
+                                    <td><span t-field="s.invoice_no"/></td>
+                                    <td class="text-end"><span t-field="s.invoice_value"/></td>
+                                    <td><span t-field="s.shipment_date"/></td>
+                                    <td><span t-field="s.state"/></td>
+                                </tr>
+                                <tr t-if="not o.shipment_ids"><td colspan="6" class="text-muted">None</td></tr>
+                            </tbody>
+                        </table>
+
+                        <h4>Bills of Entry</h4>
+                        <table class="table table-sm">
+                            <thead><tr><th>BoE No.</th><th>Date</th><th>Shipment</th><th>Cleared on</th><th>Status</th></tr></thead>
+                            <tbody>
+                                <tr t-foreach="o.boe_ids" t-as="b">
+                                    <td><span t-field="b.name"/></td>
+                                    <td><span t-field="b.boe_date"/></td>
+                                    <td><span t-field="b.shipment_id"/></td>
+                                    <td><span t-field="b.clearance_date"/></td>
+                                    <td><span t-field="b.state"/></td>
+                                </tr>
+                                <tr t-if="not o.boe_ids"><td colspan="5" class="text-muted">None</td></tr>
+                            </tbody>
+                        </table>
+
+                        <h4>Warehouse Receipts (links only; stock ledger is in Inventory)</h4>
+                        <table class="table table-sm">
+                            <thead><tr><th>Receipt</th><th>Shipment</th><th>Done on</th><th>Status</th></tr></thead>
+                            <tbody>
+                                <tr t-foreach="o.sudo().picking_ids" t-as="p">
+                                    <td><span t-field="p.name"/></td>
+                                    <td><span t-field="p.lc_shipment_id"/></td>
+                                    <td><span t-field="p.date_done"/></td>
+                                    <td><span t-field="p.state"/></td>
+                                </tr>
+                                <tr t-if="not o.sudo().picking_ids"><td colspan="4" class="text-muted">None</td></tr>
+                            </tbody>
+                        </table>
+
+                        <h4>Document Checklist</h4>
+                        <table class="table table-sm">
+                            <thead><tr><th>Document</th><th>Shipment</th><th>Reference</th><th>Required</th>
+                                <th>Due</th><th>Status</th><th>Check</th></tr></thead>
+                            <tbody>
+                                <tr t-foreach="o.document_ids" t-as="d">
+                                    <td><span t-field="d.type_id"/></td>
+                                    <td><span t-field="d.shipment_id"/></td>
+                                    <td><span t-field="d.name"/></td>
+                                    <td><t t-if="d.is_required">Yes</t><t t-else="">No</t></td>
+                                    <td><span t-field="d.due_date"/></td>
+                                    <td><span t-field="d.state"/></td>
+                                    <td><t t-if="d.state == 'received'">&#9745;</t><t t-else="">&#9744;</t></td>
+                                </tr>
+                                <tr t-if="not o.document_ids"><td colspan="7" class="text-muted">None</td></tr>
+                            </tbody>
+                        </table>
+
+                        <div class="row mt-5">
+                            <div class="col-4 text-center"><hr/>Prepared by</div>
+                            <div class="col-4 text-center"><hr/>Reviewed by</div>
+                            <div class="col-4 text-center"><hr/>Approved by <span t-field="o.approved_by_id"/></div>
+                        </div>
+                        <p class="small text-muted mt-3">Copyright © Nelsis Tech. Developer: Nur Uddin Ahammed. All rights reserved.</p>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

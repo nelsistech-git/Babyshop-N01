@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright © Nelsis Tech. Developer: Nur Uddin Ahammed. All rights reserved. -->
+<odoo>
+    <record id="view_commercial_file_form" model="ir.ui.view">
+        <field name="name">nelsis.commercial.file.form</field>
+        <field name="model">nelsis.commercial.file</field>
+        <field name="arch" type="xml">
+            <form string="Commercial File" class="nl-ui">
+                <header>
+                    <button name="action_submit" string="Submit" type="object" class="btn-primary nl-btn nl-primary"
+                            invisible="state not in ('draft', 'returned')" icon="fa-paper-plane"/>
+                    <button name="action_start_verification" string="Start Verification" type="object" class="btn-primary nl-btn nl-success"
+                            invisible="state != 'submitted'" icon="fa-check-circle"/>
+                    <button name="action_docs_complete" string="Documents Complete" type="object" class="btn-success nl-btn nl-success"
+                            invisible="state != 'verification'" icon="fa-check-circle"/>
+                    <button name="action_start_customs" string="Start Customs Clearance" type="object" class="btn-primary nl-btn nl-success"
+                            invisible="state != 'docs_complete'" icon="fa-flag-checkered"/>
+                    <button name="action_cleared" string="Mark Cleared" type="object" class="btn-success nl-btn nl-success"
+                            invisible="state != 'customs'" icon="fa-flag-checkered"/>
+                    <button name="action_done" string="Complete" type="object" class="btn-success nl-btn nl-success"
+                            invisible="state != 'receipt_pending'" icon="fa-check-circle"/>
+                    <button name="action_compute_discrepancies" string="Compute Quantity Comparison" type="object" class="btn-secondary nl-btn nl-info"
+                            invisible="state in ('draft', 'cancel', 'rejected')" icon="fa-calculator"/>
+                    <button name="action_return" string="Return" type="object" class="btn-warning nl-btn nl-warning"
+                            invisible="state not in ('submitted', 'verification', 'docs_complete')" icon="fa-reply"/>
+                    <button name="action_reject" string="Reject" type="object" class="btn-danger nl-btn nl-danger"
+                            invisible="state not in ('submitted', 'verification', 'docs_complete')"
+                            confirm="Reject this commercial file?" icon="fa-times-circle"/>
+                    <button name="action_hold" string="Hold" type="object"
+                            invisible="state in ('draft', 'done', 'cancel', 'rejected', 'hold')" class="nl-btn nl-warning" icon="fa-pause-circle"/>
+                    <button name="action_resume" string="Resume" type="object" class="btn-primary nl-btn nl-success"
+                            invisible="state != 'hold'" icon="fa-play-circle"/>
+                    <button name="action_cancel" string="Cancel" type="object"
+                            invisible="state not in ('draft', 'submitted', 'returned', 'hold')"
+                            confirm="Cancel this commercial file?" class="nl-btn nl-danger" icon="fa-ban"/>
+                    <button name="action_reset_draft" string="Reset to Draft" type="object"
+                            invisible="state not in ('returned', 'rejected', 'cancel')" class="nl-btn nl-neutral" icon="fa-undo"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,submitted,verification,docs_complete,customs,receipt_pending,done" class="nl-statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_documents" type="object" class="oe_stat_button nl-stat" icon="fa-file-text-o">
+                            <field name="document_count" widget="statinfo" string="Documents"/>
+                        </button>
+                        <button name="action_view_shipments" type="object" class="oe_stat_button nl-stat" icon="fa-ship">
+                            <field name="shipment_count" widget="statinfo" string="Shipments"/>
+                        </button>
+                        <button name="action_view_boes" type="object" class="oe_stat_button nl-stat" icon="fa-university">
+                            <field name="boe_count" widget="statinfo" string="Bills of Entry"/>
+                        </button>
+                        <button name="action_view_pickings" type="object" class="oe_stat_button nl-stat" icon="fa-truck">
+                            <field name="picking_count" widget="statinfo" string="Receipts"/>
+                        </button>
+                        <button name="action_view_discrepancies" type="object" class="oe_stat_button nl-stat" icon="fa-balance-scale">
+                            <field name="open_discrepancy_count" widget="statinfo" string="Open Discrepancies"/>
+                        </button>
+                    </div>
+                    <div class="alert alert-warning" role="alert"
+                         invisible="missing_count == 0 or state in ('done', 'cancel')">
+                        <strong>Missing verified documents:</strong>
+                        <field name="missing_type_ids" widget="many2many_tags" readonly="1" nolabel="1"/>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group string="Transaction">
+                            <field name="transaction_type"/>
+                            <field name="lc_ref" options="{'no_create': True}"/>
+                            <field name="lc_display"/>
+                            <field name="partner_id"/>
+                            <field name="importer_id"/>
+                        </group>
+                        <group string="Control">
+                            <field name="user_id" widget="many2one_avatar_user"/>
+                            <field name="company_id" invisible="1"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="missing_count"/>
+                            <field name="conditional_type_ids" widget="many2many_tags" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Documents" name="documents">
+                            <field name="document_ids" context="{'default_file_id': id}">
+                                <tree decoration-success="state == 'verified'" decoration-danger="is_expired or state == 'rejected'"
+                                      decoration-muted="state == 'superseded'">
+                                    <field name="document_type_id"/>
+                                    <field name="number"/>
+                                    <field name="version"/>
+                                    <field name="issue_date"/>
+                                    <field name="expiry_date"/>
+                                    <field name="is_expired" column_invisible="1"/>
+                                    <field name="state" widget="badge"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Shipments" name="shipments">
+                            <field name="shipment_ids">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="transport_doc_no"/>
+                                    <field name="shipment_date"/>
+                                    <field name="eta_date"/>
+                                    <field name="arrival_date"/>
+                                    <field name="is_partial"/>
+                                    <field name="receipt_state" widget="badge"/>
+                                    <field name="state" widget="badge"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Bills of Entry" name="boes">
+                            <field name="boe_ids">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="date"/>
+                                    <field name="customs_station"/>
+                                    <field name="clearance_date"/>
+                                    <field name="state" widget="badge"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Warehouse Receipts" name="receipts">
+                            <field name="picking_ids" domain="[('picking_type_code', '=', 'incoming')]">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="partner_id"/>
+                                    <field name="scheduled_date"/>
+                                    <field name="state" widget="badge"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Documented Quantities" name="lines">
+                            <field name="line_ids" context="{'default_file_id': id}">
+                                <tree editable="bottom">
+                                    <field name="file_id" column_invisible="1"/>
+                                    <field name="source_kind"/>
+                                    <field name="document_id"/>
+                                    <field name="shipment_id"/>
+                                    <field name="boe_id"/>
+                                    <field name="product_id"/>
+                                    <field name="uom_id"/>
+                                    <field name="qty"/>
+                                    <field name="value"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Quantity Comparison" name="discrepancies">
+                            <field name="discrepancy_ids" readonly="1">
+                                <tree decoration-danger="state == 'mismatch'" decoration-warning="state == 'uom_review'"
+                                      decoration-success="state in ('ok', 'approved')">
+                                    <field name="product_id"/>
+                                    <field name="source_kind"/>
+                                    <field name="documented_qty"/>
+                                    <field name="uom_id"/>
+                                    <field name="received_qty"/>
+                                    <field name="received_uom_id"/>
+                                    <field name="difference"/>
+                                    <field name="state" widget="badge"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Notes" name="notes">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_commercial_file_tree" model="ir.ui.view">
+        <field name="name">nelsis.commercial.file.tree</field>
+        <field name="model">nelsis.commercial.file</field>
+        <field name="arch" type="xml">
+            <tree string="Commercial Files" decoration-danger="missing_count > 0 and state not in ('done', 'cancel')"
+                  decoration-muted="state in ('cancel', 'rejected')">
+                <field name="name"/>
+                <field name="transaction_type"/>
+                <field name="lc_display"/>
+                <field name="partner_id"/>
+                <field name="user_id" widget="many2one_avatar_user"/>
+                <field name="document_count"/>
+                <field name="missing_count"/>
+                <field name="open_discrepancy_count"/>
+                <field name="state" widget="badge" decoration-success="state == 'done'"
+                       decoration-info="state in ('submitted', 'verification', 'customs')"
+                       decoration-warning="state in ('returned', 'hold')"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_commercial_file_kanban" model="ir.ui.view">
+        <field name="name">nelsis.commercial.file.kanban</field>
+        <field name="model">nelsis.commercial.file</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" class="o_nelsis_kanban nl-ui" sample="1">
+                <field name="name"/>
+                <field name="state"/>
+                <field name="missing_count"/>
+                <field name="document_count"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click o_nelsis_card">
+                            <div class="d-flex justify-content-between">
+                                <strong><field name="name"/></strong>
+                                <field name="transaction_type" widget="badge"/>
+                            </div>
+                            <div class="text-muted"><field name="partner_id"/></div>
+                            <div class="text-muted"><field name="lc_display"/></div>
+                            <div class="mt-1">
+                                <span t-if="record.missing_count.raw_value > 0" class="badge text-bg-warning">
+                                    <i class="fa fa-exclamation-triangle"/> <field name="missing_count"/> missing
+                                </span>
+                                <span class="badge text-bg-light"><i class="fa fa-file-text-o"/> <field name="document_count"/></span>
+                            </div>
+                            <div class="o_kanban_record_bottom">
+                                <div class="oe_kanban_bottom_left"/>
+                                <div class="oe_kanban_bottom_right">
+                                    <field name="user_id" widget="many2one_avatar_user"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_commercial_file_search" model="ir.ui.view">
+        <field name="name">nelsis.commercial.file.search</field>
+        <field name="model">nelsis.commercial.file</field>
+        <field name="arch" type="xml">
+            <search string="Commercial Files">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="lc_display"/>
+                <field name="user_id"/>
+                <filter name="my" string="My Files" domain="[('user_id', '=', uid)]"/>
+                <filter name="open" string="Open" domain="[('state', 'not in', ('done', 'cancel', 'rejected'))]"/>
+                <filter name="on_hold" string="On Hold" domain="[('state', '=', 'hold')]"/>
+                <filter name="pending_customs" string="Pending Customs" domain="[('state', '=', 'customs')]"/>
+                <filter name="receipt_pending" string="Receipt Pending" domain="[('state', '=', 'receipt_pending')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="g_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="g_partner" string="Supplier" context="{'group_by': 'partner_id'}"/>
+                    <filter name="g_user" string="Responsible" context="{'group_by': 'user_id'}"/>
+                    <filter name="g_type" string="Transaction Type" context="{'group_by': 'transaction_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_commercial_file_graph" model="ir.ui.view">
+        <field name="name">nelsis.commercial.file.graph</field>
+        <field name="model">nelsis.commercial.file</field>
+        <field name="arch" type="xml">
+            <graph string="Commercial Files by Status" type="bar">
+                <field name="state"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_commercial_file_pivot" model="ir.ui.view">
+        <field name="name">nelsis.commercial.file.pivot</field>
+        <field name="model">nelsis.commercial.file</field>
+        <field name="arch" type="xml">
+            <pivot string="Commercial Files">
+                <field name="state" type="row"/>
+                <field name="transaction_type" type="col"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_commercial_file" model="ir.actions.act_window">
+        <field name="name">Commercial Files</field>
+        <field name="res_model">nelsis.commercial.file</field>
+        <field name="view_mode">kanban,tree,form,graph,pivot</field>
+        <field name="context">{'search_default_open': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first commercial file</p>
+            <p>Track documents, shipments, Bills of Entry and warehouse receipts for each import transaction.</p>
+        </field>
+    </record>
+</odoo>
