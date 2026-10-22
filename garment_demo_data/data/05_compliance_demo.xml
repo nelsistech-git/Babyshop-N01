@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Compliance demo data (garment_compliance) — factory-level certificates,
+    one buyer social-compliance audit with checklist/findings, and one ESG
+    score snapshot for Nelsis Main Factory, Ashulia.
+
+    Field/selection values verified against:
+      garment_compliance/models/garment_compliance_certificate.py
+      garment_compliance/models/garment_compliance_audit.py
+      garment_compliance/models/garment_compliance_esg_score.py
+    Standards reused by ref from garment_compliance's own seed data
+    (garment_compliance/data/garment_compliance_standard_data.xml):
+      standard_bsci, standard_oeko_tex, standard_fire_license.
+
+    reference / audit_no / finding_no are left unset ("New") so the
+    ir.sequence codes defined in garment_compliance/data/ir_sequence_data.xml
+    generate them on creation.
+
+    responsible_user_id / auditor_id / responsible_user_id(finding) are all
+    Many2one('res.users') — following the convention already used across
+    this module's other demo files (no res.users demo record exists for the
+    named HR employees), they point at base.user_admin; the actual
+    responsible person is named in the record's text fields instead.
+
+    certificate.status and audit-line-driven audit.score are compute(store)
+    fields recomputed from expiry_date / checklist_line_ids at load time —
+    not set directly. The Fire Safety License below is dated to fall inside
+    the 30-day "expiring soon" window as of the current demo timeline
+    (module intended to be installed around Aug 2026) to demonstrate the
+    expiry alert.
+-->
+<odoo>
+<data noupdate="1">
+
+    <!-- ================================================================ -->
+    <!-- Certificates (garment.compliance.certificate)                    -->
+    <!-- ================================================================ -->
+
+    <record id="cert_bsci" model="garment.compliance.certificate">
+        <field name="name">BSCI Social Compliance Audit Certificate</field>
+        <field name="category">social_compliance</field>
+        <field name="standard_id" ref="garment_compliance.standard_bsci"/>
+        <field name="certificate_number">BSCI-BD-2025-118842</field>
+        <field name="issuing_authority">Amfori BSCI</field>
+        <field name="issue_date">2025-11-10</field>
+        <field name="expiry_date">2026-11-09</field>
+        <field name="responsible_user_id" ref="base.user_admin"/>
+        <field name="renewal_status">not_started</field>
+        <field name="notes">Rating: Good (Grade B). Issued following the on-site social audit conducted at Nelsis Main Factory, Ashulia. Renewal audit to be scheduled for Q3 2026.</field>
+    </record>
+
+    <record id="cert_oeko_tex" model="garment.compliance.certificate">
+        <field name="name">OEKO-TEX Standard 100 Certificate</field>
+        <field name="category">sustainability</field>
+        <field name="standard_id" ref="garment_compliance.standard_oeko_tex"/>
+        <field name="certificate_number">OTX-STD100-2025-06734</field>
+        <field name="issuing_authority">OEKO-TEX Association</field>
+        <field name="issue_date">2025-01-20</field>
+        <field name="expiry_date">2027-01-19</field>
+        <field name="responsible_user_id" ref="base.user_admin"/>
+        <field name="renewal_status">not_started</field>
+        <field name="notes">Covers knit fabric and trim inputs supplied by Delta Knit Fabrics Ltd for the Northwind and BalticHaus programs.</field>
+    </record>
+
+    <record id="cert_fire_license" model="garment.compliance.certificate">
+        <field name="name">Fire Safety License</field>
+        <field name="category">fire_safety</field>
+        <field name="standard_id" ref="garment_compliance.standard_fire_license"/>
+        <field name="certificate_number">FSCD-DHK-2024-33217</field>
+        <field name="issuing_authority">Bangladesh Fire Service and Civil Defence</field>
+        <field name="issue_date">2024-09-01</field>
+        <field name="expiry_date">2026-09-15</field>
+        <field name="responsible_user_id" ref="base.user_admin"/>
+        <field name="renewal_status">in_progress</field>
+        <field name="notes">Renewal application submitted to Fire Service and Civil Defence, Dhaka Division; fire drill and hydrant inspection reports attached in support of the renewal. Expiring soon — renewal in progress.</field>
+    </record>
+
+    <!-- ================================================================ -->
+    <!-- Audit (garment.compliance.audit) + checklist + findings          -->
+    <!-- ================================================================ -->
+
+    <record id="audit_bsci_2026" model="garment.compliance.audit">
+        <field name="name">BSCI Social Compliance Audit 2026 — Nelsis Main Factory</field>
+        <field name="audit_type">social</field>
+        <field name="standard_id" ref="garment_compliance.standard_bsci"/>
+        <field name="buyer_id" ref="garment_demo_data.buyer_northwind"/>
+        <field name="department_id" ref="garment_demo_data.dept_hr_admin"/>
+        <field name="auditor_id" ref="base.user_admin"/>
+        <field name="external_auditor">TÜV Rheinland Bangladesh (Amfori BSCI accredited)</field>
+        <field name="audit_date">2026-05-14</field>
+        <field name="scope">Full-scope BSCI social compliance audit covering labour standards, working hours, occupational health &amp; safety, and management systems at Nelsis Main Factory, Ashulia, commissioned by Northwind Apparel Sourcing Ltd ahead of the order_tee / order_polo shipments.</field>
+        <field name="status">corrective_action</field>
+    </record>
+
+    <record id="audit_bsci_2026_line_1" model="garment.compliance.audit.line">
+        <field name="audit_id" ref="audit_bsci_2026"/>
+        <field name="sequence">10</field>
+        <field name="checklist_item">Written employment contracts issued to all workers</field>
+        <field name="complied">True</field>
+    </record>
+
+    <record id="audit_bsci_2026_line_2" model="garment.compliance.audit.line">
+        <field name="audit_id" ref="audit_bsci_2026"/>
+        <field name="sequence">20</field>
+        <field name="checklist_item">Overtime hours within the legal 2-hour/day limit</field>
+        <field name="complied">False</field>
+        <field name="remarks">Peak-season overtime exceeded the legal limit on Sewing Line 1 &amp; 2 during May 2026.</field>
+    </record>
+
+    <record id="audit_bsci_2026_line_3" model="garment.compliance.audit.line">
+        <field name="audit_id" ref="audit_bsci_2026"/>
+        <field name="sequence">30</field>
+        <field name="checklist_item">Fire exits unobstructed and clearly marked</field>
+        <field name="complied">True</field>
+    </record>
+
+    <record id="audit_bsci_2026_line_4" model="garment.compliance.audit.line">
+        <field name="audit_id" ref="audit_bsci_2026"/>
+        <field name="sequence">40</field>
+        <field name="checklist_item">Valid fire safety certificate displayed and current</field>
+        <field name="complied">True</field>
+    </record>
+
+    <record id="audit_bsci_2026_line_5" model="garment.compliance.audit.line">
+        <field name="audit_id" ref="audit_bsci_2026"/>
+        <field name="sequence">50</field>
+        <field name="checklist_item">Chemical/accessory storage properly labelled and segregated with secondary containment</field>
+        <field name="complied">False</field>
+        <field name="remarks">Trim/accessory chemical store lacks secondary containment trays and complete GHS labelling.</field>
+    </record>
+
+    <record id="finding_bsci_2026_overtime" model="garment.compliance.finding">
+        <field name="audit_id" ref="audit_bsci_2026"/>
+        <field name="category">hr</field>
+        <field name="description">Overtime hours on Sewing Line 1 &amp; 2 exceeded the legal 2-hour/day limit during the May 2026 peak shipment period for order_tee/order_polo, non-compliant with the Bangladesh Labor Act and BSCI Code of Conduct Performance Area 6 (Decent Working Hours).</field>
+        <field name="severity">major</field>
+        <field name="responsible_department_id" ref="garment_demo_data.dept_production"/>
+        <field name="responsible_user_id" ref="base.user_admin"/>
+        <field name="due_date">2026-06-30</field>
+        <field name="status">in_progress</field>
+    </record>
+
+    <record id="finding_bsci_2026_chemical_storage" model="garment.compliance.finding">
+        <field name="audit_id" ref="audit_bsci_2026"/>
+        <field name="category">factory</field>
+        <field name="description">Chemical/accessory storage room lacks secondary containment trays and complete GHS labelling for dyeing-auxiliary and cleaning chemicals held for the trim store.</field>
+        <field name="severity">minor</field>
+        <field name="responsible_department_id" ref="garment_demo_data.dept_warehouse"/>
+        <field name="responsible_user_id" ref="base.user_admin"/>
+        <field name="due_date">2026-06-15</field>
+        <field name="status">open</field>
+    </record>
+
+    <!-- ================================================================ -->
+    <!-- ESG Score snapshot (garment.compliance.esg.score)                -->
+    <!-- ================================================================ -->
+
+    <record id="esg_score_h1_2026" model="garment.compliance.esg.score">
+        <field name="name">H1 2026</field>
+        <field name="period_date">2026-06-30</field>
+        <field name="environmental_score">72.5</field>
+        <field name="social_score">68.0</field>
+        <field name="governance_score">80.0</field>
+        <field name="carbon_reduction_percentage">12.5</field>
+        <field name="water_saving_percentage">18.0</field>
+        <field name="waste_recycling_percentage">45.0</field>
+        <field name="notes">First-half 2026 factory-wide ESG snapshot for Nelsis Main Factory, Ashulia. Social score reflects the overtime finding raised in the May 2026 BSCI audit (audit_bsci_2026); environmental gains driven by the compressor-air-leak and boiler-efficiency initiatives tracked under Energy/Water/Waste management.</field>
+    </record>
+
+</data>
+</odoo>

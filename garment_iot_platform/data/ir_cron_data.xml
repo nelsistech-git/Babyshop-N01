@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="ir_cron_garment_iot_prune_readings" model="ir.cron">
+        <field name="name">IoT Platform: Prune Readings Past Retention Window</field>
+        <field name="model_id" ref="model_garment_iot_reading"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_prune_old_readings()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field name="active">True</field>
+    </record>
+
+    <record id="ir_cron_garment_iot_flag_stale_devices" model="ir.cron">
+        <field name="name">IoT Platform: Flag Devices With No Recent Communication As Offline</field>
+        <field name="model_id" ref="model_garment_iot_device"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_flag_stale_devices()</field>
+        <field name="interval_number">15</field>
+        <field name="interval_type">minutes</field>
+        <field name="numbercall">-1</field>
+        <field name="active">True</field>
+    </record>
+
+</odoo>

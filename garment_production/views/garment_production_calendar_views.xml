@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_production_calendar_tree" model="ir.ui.view">
+        <field name="name">garment.production.calendar.tree</field>
+        <field name="model">garment.production.calendar</field>
+        <field name="arch" type="xml">
+            <tree string="Production Calendar">
+                <field name="date"/>
+                <field name="line_id"/>
+                <field name="shift"/>
+                <field name="day_type"/>
+                <field name="production_status"/>
+                <field name="is_maintenance_window"/>
+                <field name="capacity_load_pct"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_production_calendar_form" model="ir.ui.view">
+        <field name="name">garment.production.calendar.form</field>
+        <field name="model">garment.production.calendar</field>
+        <field name="arch" type="xml">
+            <form string="Production Calendar Entry">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="date"/>
+                            <field name="line_id"/>
+                            <field name="shift"/>
+                            <field name="day_type"/>
+                        </group>
+                        <group>
+                            <field name="production_status"/>
+                            <field name="is_maintenance_window"/>
+                            <field name="production_order_id"/>
+                            <field name="capacity_load_pct"/>
+                        </group>
+                    </group>
+                    <field name="notes"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_production_calendar_calendar" model="ir.ui.view">
+        <field name="name">garment.production.calendar.calendar</field>
+        <field name="model">garment.production.calendar</field>
+        <field name="arch" type="xml">
+            <calendar string="Production Calendar" date_start="date" color="line_id" mode="month">
+                <field name="line_id"/>
+                <field name="shift"/>
+                <field name="production_status"/>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="action_garment_production_calendar" model="ir.actions.act_window">
+        <field name="name">Production Calendar</field>
+        <field name="res_model">garment.production.calendar</field>
+        <field name="view_mode">calendar,tree,form</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,541 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Part of Smart Complete Garment Software. Copyright (c) Nelsis Tech (www.nelsistech.com) -->
+<!--
+     Time & Action calendars (garment.tna) — garment_tna. One TNA per order
+     (order_tee / order_polo / order_hoodie, created in 03_order_demo.xml),
+     each carrying its own Fabric Booking -> Fabric In-House -> Cutting ->
+     Sewing -> Finishing -> Final Inspection -> Ex-Factory -> Shipment
+     pipeline (garment.tna.activity for the work stages, garment.tna.milestone
+     for the two closing checkpoint gates), dated to match the real
+     order/shipment dates set in 03_order_demo.xml.
+
+     Reused rather than duplicated: the knitwear TNA template shipped as seed
+     data in garment_tna (data/garment_tna_template_data.xml,
+     tna_template_knitwear_example) is referenced by ref on all three
+     calendars — all three styles (tee/polo/hoodie) are knit/fleece per
+     DEMO_STORY.md, so the knitwear example fits all of them; no woven
+     template is used since none of the three styles is woven.
+
+     Narrative: order_tee's fabric delivery from Delta Knit Fabrics
+     (supplier_deltaknit / partner_deltaknit) arrives 8 days late (a mill
+     yarn shortage) — logged as a High-severity garment.tna.delay on the
+     "Fabric In-House" activity (flagged is_milestone) — and the factory
+     recovers the slip with a compressed cutting/sewing schedule so the
+     original shipment date is still met. order_polo and order_hoodie run
+     to plan with no delays, to keep the delay-tracking showcase isolated
+     to one clear example per DEMO_STORY.md's instructions.
+
+     All three TNAs are dated Mar-Jul 2026 (already in the past relative to
+     any later install), so status is set to 'closed' with every activity
+     'completed' throughout, matching the shipped/closed-out orders they
+     belong to.
+-->
+<odoo>
+<data noupdate="1">
+
+    <!-- =================================================================
+         TNA — tna_tee (order_tee, Northwind, Men's Crew Neck T-Shirt,
+         24,000 pcs) — WITH a logged fabric delivery delay
+         ================================================================= -->
+
+    <record id="tna_tee" model="garment.tna">
+        <field name="buyer_id" ref="buyer_northwind"/>
+        <field name="buying_house">Northwind Apparel Sourcing Ltd</field>
+        <field name="purchase_order">NW-PO-2026-1101</field>
+        <field name="order_confirmation_id" ref="order_confirmation_tee"/>
+        <field name="style_id" ref="style_tee"/>
+        <field name="order_number">ORD-NSG-TS-2601</field>
+        <field name="order_quantity">24000</field>
+        <field name="factory">Nelsis Apparel Ltd. — Ashulia Unit 1</field>
+        <field name="production_unit">Unit 1</field>
+        <field name="shipment_date">2026-06-10</field>
+        <field name="merchandiser_id" ref="base.user_admin"/>
+        <field name="owner_id" ref="base.user_admin"/>
+        <field name="template_id" ref="garment_tna.tna_template_knitwear_example"/>
+        <field name="techpack_id" ref="techpack_tee"/>
+        <field name="bom_id" ref="bom_tee"/>
+        <field name="costing_id" ref="costing_tee"/>
+        <field name="currency_id" ref="base.GBP"/>
+        <field name="port">Chattogram Sea Port, Bangladesh</field>
+        <field name="vessel">MV Chattogram Express</field>
+        <field name="forwarder">Kuehne+Nagel Bangladesh Ltd.</field>
+        <field name="buyer_country_id" ref="base.uk"/>
+        <field name="destination">Felixstowe, UK</field>
+        <field name="status">closed</field>
+    </record>
+
+    <record id="act_tee_fabric_booking" model="garment.tna.activity">
+        <field name="tna_id" ref="tna_tee"/>
+        <field name="sequence">10</field>
+        <field name="activity_code">TEE-A10</field>
+        <field name="activity_name">Fabric Booking</field>
+        <field name="category">material</field>
+        <field name="department">Fabric Sourcing</field>
+        <field name="responsible_person_id" ref="base.user_admin"/>
+        <field name="planned_start_date">2026-03-16</field>
+        <field name="planned_end_date">2026-03-20</field>
+        <field name="actual_start_date">2026-03-16</field>
+        <field name="actual_end_date">2026-03-20</field>
+        <field name="status">completed</field>
+        <field name="progress_pct">100.0</field>
+        <field name="remarks">Single jersey fabric booked with Delta Knit Fabrics Ltd against bom_tee.</field>
+    </record>
+
+    <record id="act_tee_fabric_inhouse" model="garment.tna.activity">
+        <field name="tna_id" ref="tna_tee"/>
+        <field name="sequence">20</field>
+        <field name="activity_code">TEE-A20</field>
+        <field name="activity_name">Fabric In-House</field>
+        <field name="category">material</field>
+        <field name="department">Fabric Store</field>
+        <field name="responsible_person_id" ref="base.user_admin"/>
+        <field name="planned_start_date">2026-03-21</field>
+        <field name="planned_end_date">2026-04-05</field>
+        <field name="actual_start_date">2026-03-21</field>
+        <field name="actual_end_date">2026-04-13</field>
+        <field name="status">completed</field>
+        <field name="progress_pct">100.0</field>
+        <field name="is_milestone" eval="True"/>
+        <field name="remarks">Delivered 8 days behind schedule — Delta Knit Fabrics hit a yarn shortage at the
+mill. See linked garment.tna.delay record (delay_tee_fabric) for the full corrective-action trail.</field>
+    </record>
+
+    <record id="act_tee_cutting" model="garment.tna.activity">
+        <field name="tna_id" ref="tna_tee"/>
+        <field name="sequence">30</field>
+        <field name="activity_code">TEE-A30</field>
+        <field name="activity_name">Cutting</field>
+        <field name="category">production</field>
+        <field name="department">Cutting</field>
+        <field name="responsible_person_id" ref="base.user_admin"/>
+        <field name="planned_start_date">2026-04-06</field>
+        <field name="planned_end_date">2026-04-16</field>
+        <field name="actual_start_date">2026-04-14</field>
+        <field name="actual_end_date">2026-04-23</field>
+        <field name="status">completed</field>
+        <field name="progress_pct">100.0</field>
+        <field name="is_milestone" eval="True"/>
+        <field name="remarks">Cutting start pushed back to Apr 14 by the late fabric receipt; ran a second
+cutting shift to recover most of the slip before sewing handover.</field>
+    </record>
+
+    <record id="act_tee_sewing" model="garment.tna.activity">
+        <field name="tna_id" ref="tna_tee"/>
+        <field name="sequence">40</field>
+        <field name="activity_code">TEE-A40</field>
+        <field name="activity_name">Sewing</field>
+        <field name="category">production</field>
+        <field name="department">Sewing - Line 1</field>
+        <field name="responsible_person_id" ref="base.user_admin"/>
+        <field name="planned_start_date">2026-04-17</field>
+        <field name="planned_end_date">2026-05-15</field>
+        <field name="actual_start_date">2026-04-24</field>
+        <field name="actual_end_date">2026-05-20</field>
+        <field name="status">completed</field>
+        <field name="progress_pct">100.0</field>
+        <field name="remarks">Ran with planned overtime on Sewing Line 1 to further close the gap opened
+upstream by the fabric delay.</field>
+    </record>
+
+    <record id="act_tee_finishing" model="garment.tna.activity">
+        <field name="tna_id" ref="tna_tee"/>
+        <field name="sequence">50</field>
+        <field name="activity_code">TEE-A50</field>
+        <field name="activity_name">Finishing</field>
+        <field name="category">production</field>
+        <field name="department">Finishing</field>
+        <field name="responsible_person_id" ref="base.user_admin"/>
+        <field name="planned_start_date">2026-05-16</field>
+        <field name="planned_end_date">2026-05-25</field>
+        <field name="actual_start_date">2026-05-21</field>
+        <field name="actual_end_date">2026-05-28</field>
+        <field name="status">completed</field>
+        <field name="progress_pct">100.0</field>
+    </record>
+
+    <record id="act_tee_final_inspection" model="garment.tna.activity">
+        <field name="tna_id" ref="tna_tee"/>
+        <field name="sequence">60</field>
+        <field name="activity_code">TEE-A60</field>
+        <field name="activity_name">Final Inspection</field>
+        <field name="category">quality</field>
+        <field name="department">Quality Assurance</field>
+        <field name="responsible_person_id" ref="base.user_admin"/>
+        <field name="planned_start_date">2026-05-29</field>
+        <field name="planned_end_date">2026-06-02</field>
+        <field name="actual_start_date">2026-05-29</field>
+        <field name="actual_end_date">2026-06-02</field>
+        <field name="status">completed</field>
+        <field name="progress_pct">100.0</field>
+        <field name="is_milestone" eval="True"/>
+        <field name="remarks">AQL 2.5 final random inspection passed — back on the original schedule despite
+the Fabric In-House delay.</field>
+    </record>
+
+    <record id="delay_tee_fabric" model="garment.tna.delay">
+        <field name="tna_id" ref="tna_tee"/>
+        <field name="activity_id" ref="act_tee_fabric_inhouse"/>
+        <field name="planned_date">2026-04-05</field>
+        <field name="actual_date">2026-04-13</field>
+        <field name="delay_reason">supplier_delay</field>
+        <field name="responsible_department">Fabric Sourcing</field>
+        <field name="corrective_action">Escalated to Delta Knit Fabrics' production head; the mill added a second
+shift and air-freighted the balance grey fabric roll in to protect the cutting start date. Cutting was
+resequenced to run the in-house lots first and a second cutting/sewing shift absorbed the rest of the slip, so
+the original Jun 10 shipment date still held.</field>
+        <field name="supplier_id" ref="partner_deltaknit"/>
+    </record>
+
+    <record id="mile_tee_exfactory" model="garment.tna.milestone">
+        <field name="tna_id" ref="tna_tee"/>
+        <field name="activity_id" ref="act_tee_final_inspection"/>
+        <field name="milestone_name">Ex-Factory</field>
+        <field name="due_date">2026-06-06</field>
+        <field name="responsible_person_id" ref="base.user_admin"/>
+        <field name="dependency">Final Inspection passed</field>
+        <field name="status">achieved</field>
+        <field name="risk_level">normal</field>
+    </record>
+
+    <record id="mile_tee_shipment" model="garment.tna.milestone">
+        <field name="tna_id" ref="tna_tee"/>
+        <field name="milestone_name">Shipment</field>
+        <field name="due_date">2026-06-10</field>
+        <field name="responsible_person_id" ref="base.user_admin"/>
+        <field name="dependency">Ex-Factory clearance and B/L issued</field>
+        <field name="status">achieved</field>
+        <field name="risk_level">normal</field>
+    </record>
+
+    <!-- =================================================================
+         TNA — tna_polo (order_polo, Northwind, Classic Pique Polo,
+         18,000 pcs) — runs to plan, no delays
+         ================================================================= -->
+
+    <record id="tna_polo" model="garment.tna">
+        <field name="buyer_id" ref="buyer_northwind"/>
+        <field name="buying_house">Northwind Apparel Sourcing Ltd</field>
+        <field name="purchase_order">NW-PO-2026-1102</field>
+        <field name="order_confirmation_id" ref="order_confirmation_polo"/>
+        <field name="style_id" ref="style_polo"/>
+        <field name="order_number">ORD-NSG-PL-2602</field>
+        <field name="order_quantity">18000</field>
+        <field name="factory">Nelsis Apparel Ltd. — Ashulia Unit 1</field>
+        <field name="production_unit">Unit 1</field>
+        <field name="shipment_date">2026-06-17</field>
+        <field name="merchandiser_id" ref="base.user_admin"/>
+        <field name="owner_id" ref="base.user_admin"/>
+        <field name="template_id" ref="garment_tna.tna_template_knitwear_example"/>
+        <field name="techpack_id" ref="techpack_polo"/>
+        <field name="bom_id" ref="bom_polo"/>
+        <field name="costing_id" ref="costing_polo"/>
+        <field name="currency_id" ref="base.GBP"/>
+        <field name="port">Chattogram Sea Port, Bangladesh</field>
+        <field name="vessel">MV Chattogram Express</field>
+        <field name="forwarder">Kuehne+Nagel Bangladesh Ltd.</field>
+        <field name="buyer_country_id" ref="base.uk"/>
+        <field name="destination">Felixstowe, UK</field>
+        <field name="status">closed</field>
+    </record>
+
+    <record id="act_polo_fabric_booking" model="garment.tna.activity">
+        <field name="tna_id" ref="tna_polo"/>
+        <field name="sequence">10</field>
+        <field name="activity_code">PLO-A10</field>
+        <field name="activity_name">Fabric Booking</field>
+        <field name="category">material</field>
+        <field name="department">Fabric Sourcing</field>
+        <field name="responsible_person_id" ref="base.user_admin"/>
+        <field name="planned_start_date">2026-03-18</field>
+        <field name="planned_end_date">2026-03-24</field>
+        <field name="actual_start_date">2026-03-18</field>
+        <field name="actual_end_date">2026-03-24</field>
+        <field name="status">completed</field>
+        <field name="progress_pct">100.0</field>
+        <field name="remarks">Pique knit fabric booked with Delta Knit Fabrics Ltd against bom_polo.</field>
+    </record>
+
+    <record id="act_polo_fabric_inhouse" model="garment.tna.activity">
+        <field name="tna_id" ref="tna_polo"/>
+        <field name="sequence">20</field>
+        <field name="activity_code">PLO-A20</field>
+        <field name="activity_name">Fabric In-House</field>
+        <field name="category">material</field>
+        <field name="department">Fabric Store</field>
+        <field name="responsible_person_id" ref="base.user_admin"/>
+        <field name="planned_start_date">2026-03-25</field>
+        <field name="planned_end_date">2026-04-10</field>
+        <field name="actual_start_date">2026-03-25</field>
+        <field name="actual_end_date">2026-04-10</field>
+        <field name="status">completed</field>
+        <field name="progress_pct">100.0</field>
+        <field name="is_milestone" eval="True"/>
+        <field name="remarks">Received in full and on time, GRN matched against bom_polo consumption.</field>
+    </record>
+
+    <record id="act_polo_cutting" model="garment.tna.activity">
+        <field name="tna_id" ref="tna_polo"/>
+        <field name="sequence">30</field>
+        <field name="activity_code">PLO-A30</field>
+        <field name="activity_name">Cutting</field>
+        <field name="category">production</field>
+        <field name="department">Cutting</field>
+        <field name="responsible_person_id" ref="base.user_admin"/>
+        <field name="planned_start_date">2026-04-11</field>
+        <field name="planned_end_date">2026-04-22</field>
+        <field name="actual_start_date">2026-04-11</field>
+        <field name="actual_end_date">2026-04-22</field>
+        <field name="status">completed</field>
+        <field name="progress_pct">100.0</field>
+        <field name="is_milestone" eval="True"/>
+    </record>
+
+    <record id="act_polo_sewing" model="garment.tna.activity">
+        <field name="tna_id" ref="tna_polo"/>
+        <field name="sequence">40</field>
+        <field name="activity_code">PLO-A40</field>
+        <field name="activity_name">Sewing</field>
+        <field name="category">production</field>
+        <field name="department">Sewing - Line 2</field>
+        <field name="responsible_person_id" ref="base.user_admin"/>
+        <field name="planned_start_date">2026-04-23</field>
+        <field name="planned_end_date">2026-05-22</field>
+        <field name="actual_start_date">2026-04-23</field>
+        <field name="actual_end_date">2026-05-22</field>
+        <field name="status">completed</field>
+        <field name="progress_pct">100.0</field>
+    </record>
+
+    <record id="act_polo_finishing" model="garment.tna.activity">
+        <field name="tna_id" ref="tna_polo"/>
+        <field name="sequence">50</field>
+        <field name="activity_code">PLO-A50</field>
+        <field name="activity_name">Finishing</field>
+        <field name="category">production</field>
+        <field name="department">Finishing</field>
+        <field name="responsible_person_id" ref="base.user_admin"/>
+        <field name="planned_start_date">2026-05-23</field>
+        <field name="planned_end_date">2026-06-02</field>
+        <field name="actual_start_date">2026-05-23</field>
+        <field name="actual_end_date">2026-06-02</field>
+        <field name="status">completed</field>
+        <field name="progress_pct">100.0</field>
+    </record>
+
+    <record id="act_polo_final_inspection" model="garment.tna.activity">
+        <field name="tna_id" ref="tna_polo"/>
+        <field name="sequence">60</field>
+        <field name="activity_code">PLO-A60</field>
+        <field name="activity_name">Final Inspection</field>
+        <field name="category">quality</field>
+        <field name="department">Quality Assurance</field>
+        <field name="responsible_person_id" ref="base.user_admin"/>
+        <field name="planned_start_date">2026-06-05</field>
+        <field name="planned_end_date">2026-06-09</field>
+        <field name="actual_start_date">2026-06-05</field>
+        <field name="actual_end_date">2026-06-09</field>
+        <field name="status">completed</field>
+        <field name="progress_pct">100.0</field>
+        <field name="is_milestone" eval="True"/>
+        <field name="remarks">AQL 2.5 final random inspection passed on first submission.</field>
+    </record>
+
+    <record id="mile_polo_exfactory" model="garment.tna.milestone">
+        <field name="tna_id" ref="tna_polo"/>
+        <field name="activity_id" ref="act_polo_final_inspection"/>
+        <field name="milestone_name">Ex-Factory</field>
+        <field name="due_date">2026-06-13</field>
+        <field name="responsible_person_id" ref="base.user_admin"/>
+        <field name="dependency">Final Inspection passed</field>
+        <field name="status">achieved</field>
+        <field name="risk_level">normal</field>
+    </record>
+
+    <record id="mile_polo_shipment" model="garment.tna.milestone">
+        <field name="tna_id" ref="tna_polo"/>
+        <field name="milestone_name">Shipment</field>
+        <field name="due_date">2026-06-17</field>
+        <field name="responsible_person_id" ref="base.user_admin"/>
+        <field name="dependency">Ex-Factory clearance and B/L issued</field>
+        <field name="status">achieved</field>
+        <field name="risk_level">normal</field>
+    </record>
+
+    <!-- =================================================================
+         TNA — tna_hoodie (order_hoodie, BalticHaus, Fleece Zip Hoodie,
+         12,000 pcs) — runs to plan, no delays
+         ================================================================= -->
+
+    <record id="tna_hoodie" model="garment.tna">
+        <field name="buyer_id" ref="buyer_baltichaus"/>
+        <field name="buying_house">BalticHaus Fashion GmbH</field>
+        <field name="purchase_order">BH-PO-2026-2201</field>
+        <field name="order_confirmation_id" ref="order_confirmation_hoodie"/>
+        <field name="style_id" ref="style_hoodie"/>
+        <field name="order_number">ORD-NSG-HD-2603</field>
+        <field name="order_quantity">12000</field>
+        <field name="factory">Nelsis Apparel Ltd. — Ashulia Unit 1</field>
+        <field name="production_unit">Unit 1</field>
+        <field name="shipment_date">2026-07-13</field>
+        <field name="merchandiser_id" ref="base.user_admin"/>
+        <field name="owner_id" ref="base.user_admin"/>
+        <field name="template_id" ref="garment_tna.tna_template_knitwear_example"/>
+        <field name="techpack_id" ref="techpack_hoodie"/>
+        <field name="bom_id" ref="bom_hoodie"/>
+        <field name="costing_id" ref="costing_hoodie"/>
+        <field name="currency_id" ref="base.EUR"/>
+        <field name="port">Chattogram Sea Port, Bangladesh</field>
+        <field name="vessel">MV Baltic Trader</field>
+        <field name="forwarder">DB Schenker Bangladesh Ltd.</field>
+        <field name="buyer_country_id" ref="base.de"/>
+        <field name="destination">Hamburg, Germany</field>
+        <field name="status">closed</field>
+    </record>
+
+    <record id="act_hoodie_fabric_booking" model="garment.tna.activity">
+        <field name="tna_id" ref="tna_hoodie"/>
+        <field name="sequence">10</field>
+        <field name="activity_code">HOD-A10</field>
+        <field name="activity_name">Fabric Booking</field>
+        <field name="category">material</field>
+        <field name="department">Fabric Sourcing</field>
+        <field name="responsible_person_id" ref="base.user_admin"/>
+        <field name="planned_start_date">2026-03-23</field>
+        <field name="planned_end_date">2026-04-01</field>
+        <field name="actual_start_date">2026-03-23</field>
+        <field name="actual_end_date">2026-04-01</field>
+        <field name="status">completed</field>
+        <field name="progress_pct">100.0</field>
+        <field name="remarks">Brushed fleece and YKK-type zipper trims booked against bom_hoodie (fabric with
+Delta Knit Fabrics Ltd, zipper/trims with Bright Trims &amp; Accessories).</field>
+    </record>
+
+    <record id="act_hoodie_fabric_inhouse" model="garment.tna.activity">
+        <field name="tna_id" ref="tna_hoodie"/>
+        <field name="sequence">20</field>
+        <field name="activity_code">HOD-A20</field>
+        <field name="activity_name">Fabric In-House</field>
+        <field name="category">material</field>
+        <field name="department">Fabric Store</field>
+        <field name="responsible_person_id" ref="base.user_admin"/>
+        <field name="planned_start_date">2026-04-02</field>
+        <field name="planned_end_date">2026-04-28</field>
+        <field name="actual_start_date">2026-04-02</field>
+        <field name="actual_end_date">2026-04-28</field>
+        <field name="status">completed</field>
+        <field name="progress_pct">100.0</field>
+        <field name="is_milestone" eval="True"/>
+        <field name="remarks">Fleece dyeing/brushing lead time held; received in full and on time.</field>
+    </record>
+
+    <record id="act_hoodie_cutting" model="garment.tna.activity">
+        <field name="tna_id" ref="tna_hoodie"/>
+        <field name="sequence">30</field>
+        <field name="activity_code">HOD-A30</field>
+        <field name="activity_name">Cutting</field>
+        <field name="category">production</field>
+        <field name="department">Cutting</field>
+        <field name="responsible_person_id" ref="base.user_admin"/>
+        <field name="planned_start_date">2026-04-29</field>
+        <field name="planned_end_date">2026-05-12</field>
+        <field name="actual_start_date">2026-04-29</field>
+        <field name="actual_end_date">2026-05-12</field>
+        <field name="status">completed</field>
+        <field name="progress_pct">100.0</field>
+        <field name="is_milestone" eval="True"/>
+    </record>
+
+    <record id="act_hoodie_sewing" model="garment.tna.activity">
+        <field name="tna_id" ref="tna_hoodie"/>
+        <field name="sequence">40</field>
+        <field name="activity_code">HOD-A40</field>
+        <field name="activity_name">Sewing</field>
+        <field name="category">production</field>
+        <field name="department">Sewing - Line 2</field>
+        <field name="responsible_person_id" ref="base.user_admin"/>
+        <field name="planned_start_date">2026-05-13</field>
+        <field name="planned_end_date">2026-06-20</field>
+        <field name="actual_start_date">2026-05-13</field>
+        <field name="actual_end_date">2026-06-20</field>
+        <field name="status">completed</field>
+        <field name="progress_pct">100.0</field>
+        <field name="remarks">Longer cycle time than the tee/polo lines — zip and hood/drawcord assembly add
+extra SMV per the IE time study.</field>
+    </record>
+
+    <record id="act_hoodie_finishing" model="garment.tna.activity">
+        <field name="tna_id" ref="tna_hoodie"/>
+        <field name="sequence">50</field>
+        <field name="activity_code">HOD-A50</field>
+        <field name="activity_name">Finishing</field>
+        <field name="category">production</field>
+        <field name="department">Finishing</field>
+        <field name="responsible_person_id" ref="base.user_admin"/>
+        <field name="planned_start_date">2026-06-21</field>
+        <field name="planned_end_date">2026-07-03</field>
+        <field name="actual_start_date">2026-06-21</field>
+        <field name="actual_end_date">2026-07-03</field>
+        <field name="status">completed</field>
+        <field name="progress_pct">100.0</field>
+    </record>
+
+    <record id="act_hoodie_final_inspection" model="garment.tna.activity">
+        <field name="tna_id" ref="tna_hoodie"/>
+        <field name="sequence">60</field>
+        <field name="activity_code">HOD-A60</field>
+        <field name="activity_name">Final Inspection</field>
+        <field name="category">quality</field>
+        <field name="department">Quality Assurance</field>
+        <field name="responsible_person_id" ref="base.user_admin"/>
+        <field name="planned_start_date">2026-07-06</field>
+        <field name="planned_end_date">2026-07-09</field>
+        <field name="actual_start_date">2026-07-06</field>
+        <field name="actual_end_date">2026-07-09</field>
+        <field name="status">completed</field>
+        <field name="progress_pct">100.0</field>
+        <field name="is_milestone" eval="True"/>
+        <field name="remarks">AQL 2.5 final random inspection passed, including zipper pull and puller
+security checks.</field>
+    </record>
+
+    <record id="mile_hoodie_exfactory" model="garment.tna.milestone">
+        <field name="tna_id" ref="tna_hoodie"/>
+        <field name="activity_id" ref="act_hoodie_final_inspection"/>
+        <field name="milestone_name">Ex-Factory</field>
+        <field name="due_date">2026-07-11</field>
+        <field name="responsible_person_id" ref="base.user_admin"/>
+        <field name="dependency">Final Inspection passed</field>
+        <field name="status">achieved</field>
+        <field name="risk_level">normal</field>
+    </record>
+
+    <record id="mile_hoodie_shipment" model="garment.tna.milestone">
+        <field name="tna_id" ref="tna_hoodie"/>
+        <field name="milestone_name">Shipment</field>
+        <field name="due_date">2026-07-13</field>
+        <field name="responsible_person_id" ref="base.user_admin"/>
+        <field name="dependency">Ex-Factory clearance and B/L issued</field>
+        <field name="status">achieved</field>
+        <field name="risk_level">normal</field>
+    </record>
+
+    <!-- =================================================================
+         Back-link the TNA Plan onto each order (garment.order.tna_id) —
+         same external IDs as 03_order_demo.xml, updated in place; tna_id
+         is not one of that model's locked/post-confirmation fields.
+         ================================================================= -->
+
+    <record id="order_tee" model="garment.order">
+        <field name="tna_id" ref="tna_tee"/>
+    </record>
+
+    <record id="order_polo" model="garment.order">
+        <field name="tna_id" ref="tna_polo"/>
+    </record>
+
+    <record id="order_hoodie" model="garment.order">
+        <field name="tna_id" ref="tna_hoodie"/>
+    </record>
+
+</data>
+</odoo>

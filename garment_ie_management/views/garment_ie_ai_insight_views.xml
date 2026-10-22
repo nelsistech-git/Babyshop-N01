@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_ie_ai_insight_form" model="ir.ui.view">
+        <field name="name">garment.ie.ai.insight.form</field>
+        <field name="model">garment.ie.ai.insight</field>
+        <field name="arch" type="xml">
+            <form string="AI IE Insight">
+                <header>
+                    <button name="action_mark_reviewed" type="object" string="Mark Reviewed"
+                            invisible="status != 'new'"/>
+                    <button name="action_apply" type="object" string="Apply"
+                            class="btn-primary" invisible="status not in ('new', 'reviewed')"/>
+                    <button name="action_dismiss" type="object" string="Dismiss"
+                            invisible="status in ('applied', 'dismissed')"/>
+                    <field name="status" widget="statusbar" statusbar_visible="new,reviewed,applied"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="insight_type"/>
+                            <field name="style_id"/>
+                            <field name="line_id"/>
+                            <field name="operation_id"/>
+                            <field name="employee_id"/>
+                        </group>
+                        <group>
+                            <field name="analysis_date"/>
+                            <field name="current_value"/>
+                            <field name="expected_value"/>
+                            <field name="confidence_pct"/>
+                        </group>
+                    </group>
+                    <group string="Analyzed Data">
+                        <field name="input_summary" nolabel="1"/>
+                    </group>
+                    <group string="Recommendation">
+                        <field name="recommendation" nolabel="1"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_ie_ai_insight_tree" model="ir.ui.view">
+        <field name="name">garment.ie.ai.insight.tree</field>
+        <field name="model">garment.ie.ai.insight</field>
+        <field name="arch" type="xml">
+            <tree string="AI IE Insights">
+                <field name="name"/>
+                <field name="insight_type"/>
+                <field name="style_id"/>
+                <field name="line_id"/>
+                <field name="confidence_pct"/>
+                <field name="analysis_date"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_ie_ai_insight_search" model="ir.ui.view">
+        <field name="name">garment.ie.ai.insight.search</field>
+        <field name="model">garment.ie.ai.insight</field>
+        <field name="arch" type="xml">
+            <search string="Search AI IE Insights">
+                <field name="name"/>
+                <field name="style_id"/>
+                <field name="line_id"/>
+                <group expand="0" string="Group By">
+                    <filter string="Insight Type" name="group_type" context="{'group_by': 'insight_type'}"/>
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_ie_ai_insight" model="ir.actions.act_window">
+        <field name="name">AI IE Insights</field>
+        <field name="res_model">garment.ie.ai.insight</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No AI insight logged yet.</p>
+        </field>
+    </record>
+
+</odoo>

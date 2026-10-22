@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ================================================================
+         Extend the standard /my landing page with a link into the
+         Supplier Portal (SRS sections 19-20).
+         ================================================================ -->
+    <template id="portal_my_home_garment_supplier" name="Supplier Portal: My Home"
+              inherit_id="portal.portal_my_home">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="before">
+            <t t-if="garment_supplier">
+                <h3>Supplier Dashboard</h3>
+            </t>
+        </xpath>
+    </template>
+
+    <!-- ================================================================
+         Supplier Dashboard (SRS section 20)
+         ================================================================ -->
+    <template id="portal_supplier_home" name="Supplier Portal Home">
+        <t t-call="portal.portal_layout">
+            <t t-if="not garment_supplier">
+                <p>Your portal login is not linked to a supplier record yet. Please contact the factory.</p>
+            </t>
+            <t t-else="">
+                <h3>Supplier Dashboard</h3>
+                <div class="row mt-2 mb-4">
+                    <div class="col-md-4 col-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h6 class="card-title">Purchase Summary</h6>
+                                <p class="mb-1">Total RFQ: <strong t-esc="dash_rfq_total"/></p>
+                                <p class="mb-1">Pending Quotations: <strong t-esc="dash_quotation_pending"/></p>
+                                <p class="mb-1">Confirmed PO: <strong t-esc="dash_po_confirmed"/></p>
+                                <p class="mb-0">Delivered Orders: <strong t-esc="dash_delivered_orders"/></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h6 class="card-title">Delivery Status</h6>
+                                <p class="mb-1">Upcoming: <strong t-esc="dash_delivery_upcoming"/></p>
+                                <p class="mb-1">Delayed: <strong t-esc="dash_delivery_delayed"/></p>
+                                <p class="mb-0">Completed: <strong t-esc="dash_delivery_completed"/></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h6 class="card-title">Payment Status</h6>
+                                <p class="mb-1">Pending Payment: <strong t-esc="dash_payment_pending"/></p>
+                                <p class="mb-1">Paid Invoices: <strong t-esc="dash_payment_paid"/></p>
+                                <p class="mb-0">Due Amount: <strong t-esc="dash_payment_due"/></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <h3>Supplier Portal Menu</h3>
+                <div class="row mt-2 mb-4">
+                    <div class="col-md-3 col-6 mb-2">
+                        <a href="/my/supplier/profile" class="btn btn-outline-primary w-100">Profile</a>
+                    </div>
+                    <div class="col-md-3 col-6 mb-2">
+                        <a href="/my/supplier/documents" class="btn btn-outline-primary w-100">Documents</a>
+                    </div>
+                    <div class="col-md-3 col-6 mb-2">
+                        <a href="/my/supplier/rfqs" class="btn btn-outline-primary w-100">RFQs</a>
+                    </div>
+                    <div class="col-md-3 col-6 mb-2">
+                        <a href="/my/supplier/pos" class="btn btn-outline-primary w-100">Purchase Orders</a>
+                    </div>
+                    <div class="col-md-3 col-6 mb-2">
+                        <a href="/my/supplier/deliveries" class="btn btn-outline-primary w-100">Deliveries</a>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <!-- ================================================================
+         Profile (SRS section 38 - Limited self-edit)
+         ================================================================ -->
+    <template id="portal_supplier_profile" name="Supplier Profile">
+        <t t-call="portal.portal_layout">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="my-0" t-esc="garment_supplier.name"/>
+                </div>
+                <div class="card-body">
+                    <form action="/my/supplier/profile/update" method="post">
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="contact_person">Contact Person</label>
+                                <input type="text" class="form-control" name="contact_person"
+                                       t-att-value="garment_supplier.contact_person"/>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="email">Email</label>
+                                <input type="email" class="form-control" name="email"
+                                       t-att-value="garment_supplier.email"/>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="phone">Phone</label>
+                                <input type="text" class="form-control" name="phone"
+                                       t-att-value="garment_supplier.phone"/>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="website">Website</label>
+                                <input type="text" class="form-control" name="website"
+                                       t-att-value="garment_supplier.website"/>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="factory_location">Factory Location</label>
+                                <input type="text" class="form-control" name="factory_location"
+                                       t-att-value="garment_supplier.factory_location"/>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="production_capacity">Production Capacity</label>
+                                <input type="text" class="form-control" name="production_capacity"
+                                       t-att-value="garment_supplier.production_capacity"/>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="employee_count">Employee Count</label>
+                                <input type="number" class="form-control" name="employee_count"
+                                       t-att-value="garment_supplier.employee_count"/>
+                            </div>
+                        </div>
+                        <p class="text-muted">Classification, rating, compliance and risk data are managed
+                            internally and cannot be edited here.</p>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </form>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- ================================================================
+         Documents (SRS section 19 - Document Upload)
+         ================================================================ -->
+    <template id="portal_supplier_documents" name="Supplier Documents">
+        <t t-call="portal.portal_layout">
+            <h3>My Documents</h3>
+            <t t-if="not documents">
+                <p>You have not uploaded any documents yet.</p>
+            </t>
+            <t t-else="">
+                <div class="table-responsive">
+                    <table class="table table-hover o_portal_my_doc_table">
+                        <thead>
+                            <tr class="active">
+                                <th>Document</th>
+                                <th>Type</th>
+                                <th>Expiry Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="documents" t-as="document">
+                                <td t-esc="document.name"/>
+                                <td t-esc="document.document_type"/>
+                                <td t-esc="document.expiry_date"/>
+                                <td t-esc="document.expiry_status"/>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
+            <h4 class="mt-4">Upload Document</h4>
+            <form action="/my/supplier/documents/upload" method="post" enctype="multipart/form-data" class="mt-2">
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                <div class="mb-3">
+                    <label for="name">Document Name</label>
+                    <input type="text" class="form-control" name="name" required="required"/>
+                </div>
+                <div class="mb-3">
+                    <label for="document_type">Document Type</label>
+                    <select class="form-control" name="document_type">
+                        <option value="trade_license">Trade License</option>
+                        <option value="tax_certificate">Tax Certificate</option>
+                        <option value="bank_details">Bank Details</option>
+                        <option value="compliance_certificate">Compliance Certificate</option>
+                        <option value="factory_license">Factory License</option>
+                        <option value="environmental_certificate">Environmental Certificate</option>
+                        <option value="quality_certificate">Quality Certificate</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="upload">File</label>
+                    <input type="file" class="form-control" name="upload" required="required"/>
+                </div>
+                <button type="submit" class="btn btn-primary">Upload</button>
+            </form>
+        </t>
+    </template>
+
+    <!-- ================================================================
+         RFQs (SRS section 22, read-only)
+         ================================================================ -->
+    <template id="portal_supplier_rfqs" name="My RFQs">
+        <t t-call="portal.portal_layout">
+            <h3>My RFQs</h3>
+            <t t-if="not rfqs">
+                <p>There are currently no RFQs for your account.</p>
+            </t>
+            <t t-else="">
+                <div class="table-responsive">
+                    <table class="table table-hover o_portal_my_doc_table">
+                        <thead>
+                            <tr class="active">
+                                <th>RFQ #</th>
+                                <th>Material</th>
+                                <th>Quantity</th>
+                                <th>Delivery Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="rfqs" t-as="rfq">
+                                <td t-esc="rfq.rfq_number"/>
+                                <td t-esc="rfq.material_name"/>
+                                <td t-esc="rfq.quantity"/>
+                                <td t-esc="rfq.delivery_date"/>
+                                <td t-esc="rfq.status"/>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <t t-call="portal.pager"/>
+            </t>
+        </t>
+    </template>
+
+    <!-- ================================================================
+         Purchase Orders (SRS section 23, read-only)
+         ================================================================ -->
+    <template id="portal_supplier_pos" name="My Purchase Orders">
+        <t t-call="portal.portal_layout">
+            <h3>My Purchase Orders</h3>
+            <t t-if="not orders">
+                <p>There are currently no purchase orders for your account.</p>
+            </t>
+            <t t-else="">
+                <div class="table-responsive">
+                    <table class="table table-hover o_portal_my_doc_table">
+                        <thead>
+                            <tr class="active">
+                                <th>PO #</th>
+                                <th>Order Date</th>
+                                <th>Delivery Date</th>
+                                <th>Total Value</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="orders" t-as="order">
+                                <td t-esc="order.po_number"/>
+                                <td t-esc="order.order_date"/>
+                                <td t-esc="order.delivery_date"/>
+                                <td t-esc="order.total_value"/>
+                                <td t-esc="order.status"/>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <t t-call="portal.pager"/>
+            </t>
+        </t>
+    </template>
+
+    <!-- ================================================================
+         Deliveries (SRS section 24, read-only)
+         ================================================================ -->
+    <template id="portal_supplier_deliveries" name="My Deliveries">
+        <t t-call="portal.portal_layout">
+            <h3>My Deliveries</h3>
+            <t t-if="not deliveries">
+                <p>There are currently no deliveries for your account.</p>
+            </t>
+            <t t-else="">
+                <div class="table-responsive">
+                    <table class="table table-hover o_portal_my_doc_table">
+                        <thead>
+                            <tr class="active">
+                                <th>GRN #</th>
+                                <th>Expected Date</th>
+                                <th>Actual Date</th>
+                                <th>Delivered Qty</th>
+                                <th>Pending Qty</th>
+                                <th>Quality Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="deliveries" t-as="delivery">
+                                <td t-esc="delivery.grn_number"/>
+                                <td t-esc="delivery.expected_date"/>
+                                <td t-esc="delivery.actual_date"/>
+                                <td t-esc="delivery.delivered_qty"/>
+                                <td t-esc="delivery.pending_qty"/>
+                                <td t-esc="delivery.quality_status"/>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <t t-call="portal.pager"/>
+            </t>
+        </t>
+    </template>
+
+</odoo>

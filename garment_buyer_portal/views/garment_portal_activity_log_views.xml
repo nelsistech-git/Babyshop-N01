@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_portal_activity_log_tree" model="ir.ui.view">
+        <field name="name">garment.portal.activity.log.tree</field>
+        <field name="model">garment.portal.activity.log</field>
+        <field name="arch" type="xml">
+            <tree string="Buyer Portal Activity Log" create="false" edit="false">
+                <field name="activity_date"/>
+                <field name="partner_id"/>
+                <field name="buyer_id"/>
+                <field name="activity_type"/>
+                <field name="description"/>
+                <field name="ip_address"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_portal_activity_log_search" model="ir.ui.view">
+        <field name="name">garment.portal.activity.log.search</field>
+        <field name="model">garment.portal.activity.log</field>
+        <field name="arch" type="xml">
+            <search string="Search Buyer Portal Activity Log">
+                <field name="partner_id"/>
+                <field name="buyer_id"/>
+                <field name="description"/>
+                <filter string="Logins" name="filter_login" domain="[('activity_type', '=', 'login')]"/>
+                <filter string="Approval Decisions" name="filter_approval"
+                        domain="[('activity_type', '=', 'approval_decision')]"/>
+                <filter string="Today" name="filter_today"
+                        domain="[('activity_date', '&gt;=', context_today().strftime('%Y-%m-%d 00:00:00'))]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Buyer" name="group_buyer" context="{'group_by': 'buyer_id'}"/>
+                    <filter string="Buyer User" name="group_partner" context="{'group_by': 'partner_id'}"/>
+                    <filter string="Activity Type" name="group_type" context="{'group_by': 'activity_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_portal_activity_log" model="ir.actions.act_window">
+        <field name="name">Buyer Portal Activity Log</field>
+        <field name="res_model">garment.portal.activity.log</field>
+        <field name="view_mode">tree</field>
+        <field name="search_view_id" ref="view_garment_portal_activity_log_search"/>
+        <field name="help" type="html">
+            <p>Login history, document views, downloads, approval decisions and comments (SRS section 46).</p>
+        </field>
+    </record>
+
+</odoo>

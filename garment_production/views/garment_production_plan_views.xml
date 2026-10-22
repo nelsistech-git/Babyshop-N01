@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_production_plan_tree" model="ir.ui.view">
+        <field name="name">garment.production.plan.tree</field>
+        <field name="model">garment.production.plan</field>
+        <field name="arch" type="xml">
+            <tree string="Production Plans" decoration-danger="load_status == 'delay_risk'" decoration-warning="load_status == 'over_capacity'">
+                <field name="plan_number"/>
+                <field name="buyer_id"/>
+                <field name="style_id"/>
+                <field name="quantity"/>
+                <field name="start_date"/>
+                <field name="end_date"/>
+                <field name="production_line_id"/>
+                <field name="priority"/>
+                <field name="load_status"/>
+                <field name="status"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_production_plan_form" model="ir.ui.view">
+        <field name="name">garment.production.plan.form</field>
+        <field name="model">garment.production.plan</field>
+        <field name="arch" type="xml">
+            <form string="Production Plan">
+                <header>
+                    <field name="status" widget="statusbar"
+                           statusbar_visible="draft,planned,manager_approval,approved,released,completed"/>
+                    <button name="action_submit_for_approval" type="object" string="Submit for Approval"
+                            class="btn-primary" invisible="status != 'draft'"/>
+                    <button name="action_approve" type="object" string="Approve" class="btn-primary"
+                            invisible="status != 'manager_approval'"
+                            groups="garment_production.group_production_manager"/>
+                    <button name="action_release" type="object" string="Release to Production" class="btn-primary"
+                            invisible="status != 'approved'"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                            invisible="status in ('completed', 'cancelled')"/>
+                    <button name="action_reset_draft" type="object" string="Reset to Draft"
+                            invisible="status == 'draft'"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_production_orders" type="object" class="oe_stat_button" icon="fa-industry">
+                            <field name="production_order_count" widget="statinfo" string="Production Orders"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="plan_number"/>
+                        <h1><field name="plan_number" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="plan_type"/>
+                            <field name="buyer_id"/>
+                            <field name="order_id"/>
+                            <field name="order_confirmation_id"/>
+                            <field name="handover_id"/>
+                            <field name="tna_id"/>
+                        </group>
+                        <group>
+                            <field name="style_id"/>
+                            <field name="bom_id"/>
+                            <field name="routing_id"/>
+                            <field name="production_line_id"/>
+                            <field name="priority"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="quantity"/>
+                            <field name="uom"/>
+                            <field name="start_date"/>
+                            <field name="end_date"/>
+                            <field name="delivery_date"/>
+                        </group>
+                        <group string="Capacity / Material Check">
+                            <field name="available_capacity"/>
+                            <field name="material_available"/>
+                            <field name="load_status"/>
+                            <field name="shortage_qty"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Capacity Plans">
+                            <field name="capacity_plan_ids">
+                                <tree editable="bottom">
+                                    <field name="line_id"/>
+                                    <field name="date"/>
+                                    <field name="operators"/>
+                                    <field name="working_hours"/>
+                                    <field name="efficiency_pct"/>
+                                    <field name="smv"/>
+                                    <field name="daily_capacity"/>
+                                    <field name="allocated_qty"/>
+                                    <field name="available_capacity"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Line Allocation">
+                            <field name="allocation_ids">
+                                <tree editable="bottom">
+                                    <field name="line_id"/>
+                                    <field name="style_id"/>
+                                    <field name="start_date"/>
+                                    <field name="end_date"/>
+                                    <field name="planned_qty"/>
+                                    <field name="delivery_priority"/>
+                                    <field name="status"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Approvals">
+                            <field name="approval_ids">
+                                <tree editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="approval_step"/>
+                                    <field name="approver_id"/>
+                                    <field name="status"/>
+                                    <field name="signed_date"/>
+                                    <field name="comments"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Notes">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_production_plan_search" model="ir.ui.view">
+        <field name="name">garment.production.plan.search</field>
+        <field name="model">garment.production.plan</field>
+        <field name="arch" type="xml">
+            <search string="Search Production Plans">
+                <field name="plan_number"/>
+                <field name="buyer_id"/>
+                <field name="style_id"/>
+                <field name="production_line_id"/>
+                <filter string="Delay Risk" name="filter_delay_risk" domain="[('load_status', '=', 'delay_risk')]"/>
+                <filter string="Pending Approval" name="filter_pending_approval" domain="[('status', '=', 'manager_approval')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Buyer" name="group_buyer" context="{'group_by': 'buyer_id'}"/>
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                    <filter string="Priority" name="group_priority" context="{'group_by': 'priority'}"/>
+                    <filter string="Production Line" name="group_line" context="{'group_by': 'production_line_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_production_plan" model="ir.actions.act_window">
+        <field name="name">Production Plans</field>
+        <field name="res_model">garment.production.plan</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_garment_production_plan_search"/>
+    </record>
+
+</odoo>

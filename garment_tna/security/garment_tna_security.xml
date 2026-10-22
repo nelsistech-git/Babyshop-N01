@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <record id="module_category_garment_tna" model="ir.module.category">
+            <field name="name">Smart Garment ERP - TNA</field>
+            <field name="sequence">57</field>
+        </record>
+
+        <record id="group_tna_merchandiser" model="res.groups">
+            <field name="name">Merchandiser (Owner - Create/Edit Own TNAs)</field>
+            <field name="category_id" ref="module_category_garment_tna"/>
+        </record>
+
+        <record id="group_tna_department" model="res.groups">
+            <field name="name">Department User (Update Own Activities)</field>
+            <field name="category_id" ref="module_category_garment_tna"/>
+        </record>
+
+        <!-- User Access Matrix (SRS section 36): Purchase/Production/QA/
+             Commercial Managers each Edit/View only their own department's
+             Activities and Approvals, per Record Rule (SRS section 37)
+             "Production cannot modify merchandising activities. Purchase
+             cannot modify production activities." -->
+        <record id="group_tna_purchase" model="res.groups">
+            <field name="name">Purchase Manager (Material Activities)</field>
+            <field name="category_id" ref="module_category_garment_tna"/>
+        </record>
+
+        <record id="group_tna_production" model="res.groups">
+            <field name="name">Production Manager (Production Activities)</field>
+            <field name="category_id" ref="module_category_garment_tna"/>
+        </record>
+
+        <record id="group_tna_quality" model="res.groups">
+            <field name="name">QA Manager (Quality Activities)</field>
+            <field name="category_id" ref="module_category_garment_tna"/>
+        </record>
+
+        <record id="group_tna_commercial" model="res.groups">
+            <field name="name">Commercial Manager (Shipment/Commercial Activities)</field>
+            <field name="category_id" ref="module_category_garment_tna"/>
+        </record>
+
+        <record id="group_tna_manager" model="res.groups">
+            <field name="name">TNA Manager (Full Access)</field>
+            <field name="category_id" ref="module_category_garment_tna"/>
+            <field name="implied_ids" eval="[(4, ref('group_tna_merchandiser')),
+                                              (4, ref('group_tna_department')),
+                                              (4, ref('group_tna_purchase')),
+                                              (4, ref('group_tna_production')),
+                                              (4, ref('group_tna_quality')),
+                                              (4, ref('group_tna_commercial'))]"/>
+        </record>
+
+        <record id="group_tna_top_management" model="res.groups">
+            <field name="name">Top Management (MD - Dashboard &amp; Reports)</field>
+            <field name="category_id" ref="module_category_garment_tna"/>
+            <field name="implied_ids" eval="[(4, ref('group_tna_manager'))]"/>
+        </record>
+
+        <record id="rule_garment_tna_owner" model="ir.rule">
+            <field name="name">Merchandiser: Own TNAs</field>
+            <field name="model_id" ref="model_garment_tna"/>
+            <field name="domain_force">['|', ('owner_id', '=', user.id), ('merchandiser_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_tna_merchandiser'))]"/>
+            <field name="perm_read">1</field>
+            <field name="perm_write">1</field>
+            <field name="perm_create">1</field>
+            <field name="perm_unlink">0</field>
+        </record>
+
+        <record id="rule_garment_tna_department_readonly" model="ir.rule">
+            <field name="name">Department User: Read All TNAs</field>
+            <field name="model_id" ref="model_garment_tna"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_tna_department'))]"/>
+            <field name="perm_read">1</field>
+            <field name="perm_write">0</field>
+            <field name="perm_create">0</field>
+            <field name="perm_unlink">0</field>
+        </record>
+
+        <record id="rule_garment_tna_manager_full" model="ir.rule">
+            <field name="name">TNA Manager: All TNAs</field>
+            <field name="model_id" ref="model_garment_tna"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_tna_manager'))]"/>
+        </record>
+
+        <record id="rule_garment_tna_portal_own_buyer" model="ir.rule">
+            <field name="name">Portal Buyer: Own TNAs Only</field>
+            <field name="model_id" ref="model_garment_tna"/>
+            <field name="domain_force">[('buyer_id.partner_id', '=', user.partner_id.id)]</field>
+            <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+            <field name="perm_read">1</field>
+            <field name="perm_write">0</field>
+            <field name="perm_create">0</field>
+            <field name="perm_unlink">0</field>
+        </record>
+
+        <!-- Record Rules (SRS section 37): department-scoped Activity/
+             Approval access, one rule per execution-department group so
+             Purchase/Production/QA/Commercial each only touch their own
+             category (Merchandiser/Merchandising Manager stay unrestricted
+             via group_tna_merchandiser/group_tna_manager above). group_tna_manager
+             implies all four department groups (Full Access), so it also
+             needs its own unrestricted rule below — ir.rule domains from a
+             user's several matched groups are OR'd together, and an
+             always-true domain here keeps the Manager's OR unrestricted
+             instead of being narrowed to just those four categories. -->
+        <record id="rule_garment_tna_activity_manager_full" model="ir.rule">
+            <field name="name">TNA Manager: All Activities</field>
+            <field name="model_id" ref="model_garment_tna_activity"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_tna_manager'))]"/>
+        </record>
+
+        <record id="rule_garment_tna_approval_manager_full" model="ir.rule">
+            <field name="name">TNA Manager: All Approvals</field>
+            <field name="model_id" ref="model_garment_tna_approval"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_tna_manager'))]"/>
+        </record>
+
+        <record id="rule_garment_tna_activity_purchase" model="ir.rule">
+            <field name="name">Purchase Manager: Material Activities Only</field>
+            <field name="model_id" ref="model_garment_tna_activity"/>
+            <field name="domain_force">[('category', '=', 'material')]</field>
+            <field name="groups" eval="[(4, ref('group_tna_purchase'))]"/>
+        </record>
+
+        <record id="rule_garment_tna_activity_production" model="ir.rule">
+            <field name="name">Production Manager: Production Activities Only</field>
+            <field name="model_id" ref="model_garment_tna_activity"/>
+            <field name="domain_force">[('category', '=', 'production')]</field>
+            <field name="groups" eval="[(4, ref('group_tna_production'))]"/>
+        </record>
+
+        <record id="rule_garment_tna_activity_quality" model="ir.rule">
+            <field name="name">QA Manager: Quality Activities Only</field>
+            <field name="model_id" ref="model_garment_tna_activity"/>
+            <field name="domain_force">[('category', '=', 'quality')]</field>
+            <field name="groups" eval="[(4, ref('group_tna_quality'))]"/>
+        </record>
+
+        <record id="rule_garment_tna_activity_commercial" model="ir.rule">
+            <field name="name">Commercial Manager: Commercial Activities Only</field>
+            <field name="model_id" ref="model_garment_tna_activity"/>
+            <field name="domain_force">[('category', '=', 'commercial')]</field>
+            <field name="groups" eval="[(4, ref('group_tna_commercial'))]"/>
+        </record>
+
+        <record id="rule_garment_tna_approval_purchase" model="ir.rule">
+            <field name="name">Purchase Manager: Material Approvals Only</field>
+            <field name="model_id" ref="model_garment_tna_approval"/>
+            <field name="domain_force">[('department', '=', 'material')]</field>
+            <field name="groups" eval="[(4, ref('group_tna_purchase'))]"/>
+        </record>
+
+        <record id="rule_garment_tna_approval_production" model="ir.rule">
+            <field name="name">Production Manager: Production Approvals Only</field>
+            <field name="model_id" ref="model_garment_tna_approval"/>
+            <field name="domain_force">[('department', '=', 'production')]</field>
+            <field name="groups" eval="[(4, ref('group_tna_production'))]"/>
+        </record>
+
+        <record id="rule_garment_tna_approval_quality" model="ir.rule">
+            <field name="name">QA Manager: Quality Approvals Only</field>
+            <field name="model_id" ref="model_garment_tna_approval"/>
+            <field name="domain_force">[('department', '=', 'quality')]</field>
+            <field name="groups" eval="[(4, ref('group_tna_quality'))]"/>
+        </record>
+
+        <record id="rule_garment_tna_approval_commercial" model="ir.rule">
+            <field name="name">Commercial Manager: Commercial Approvals Only</field>
+            <field name="model_id" ref="model_garment_tna_approval"/>
+            <field name="domain_force">[('department', '=', 'commercial')]</field>
+            <field name="groups" eval="[(4, ref('group_tna_commercial'))]"/>
+        </record>
+
+    </data>
+</odoo>

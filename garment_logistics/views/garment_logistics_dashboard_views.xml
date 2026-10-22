@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_shipment_graph" model="ir.ui.view">
+        <field name="name">garment.shipment.graph</field>
+        <field name="model">garment.shipment</field>
+        <field name="arch" type="xml">
+            <graph string="Shipments by Status" type="bar">
+                <field name="status"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_garment_shipment_pivot" model="ir.ui.view">
+        <field name="name">garment.shipment.pivot</field>
+        <field name="model">garment.shipment</field>
+        <field name="arch" type="xml">
+            <pivot string="Shipment Analysis">
+                <field name="buyer_id" type="row"/>
+                <field name="mode" type="col"/>
+                <field name="total_freight_cost" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_garment_logistics_dashboard" model="ir.actions.act_window">
+        <field name="name">Logistics Dashboard</field>
+        <field name="res_model">garment.shipment</field>
+        <field name="view_mode">graph,pivot,kanban,tree</field>
+    </record>
+
+    <!-- Shipment Status Dashboard (SRS section 42) -->
+    <record id="view_garment_shipment_status_kanban" model="ir.ui.view">
+        <field name="name">garment.shipment.status.kanban</field>
+        <field name="model">garment.shipment</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="status" class="o_kanban_small_column">
+                <field name="shipment_no"/>
+                <field name="buyer_id"/>
+                <field name="status"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click oe_kanban_card">
+                            <div class="o_kanban_record_top"><strong><field name="shipment_no"/></strong></div>
+                            <div><field name="buyer_id"/></div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="action_garment_shipment_status_dashboard" model="ir.actions.act_window">
+        <field name="name">Shipment Status Dashboard</field>
+        <field name="res_model">garment.shipment</field>
+        <field name="view_mode">kanban,tree,graph</field>
+        <field name="context">{'search_default_filter_open': 1}</field>
+    </record>
+
+    <!-- Container Monitoring Dashboard (SRS section 43) -->
+    <record id="view_garment_container_monitoring_kanban" model="ir.ui.view">
+        <field name="name">garment.container.monitoring.kanban</field>
+        <field name="model">garment.container</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="status" class="o_kanban_small_column">
+                <field name="container_no"/>
+                <field name="vessel_name"/>
+                <field name="current_location"/>
+                <field name="eta"/>
+                <field name="status"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click oe_kanban_card">
+                            <div class="o_kanban_record_top"><strong><field name="container_no"/></strong></div>
+                            <div><field name="vessel_name"/></div>
+                            <div class="text-muted"><field name="current_location"/></div>
+                            <div>ETA: <field name="eta"/></div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="action_garment_container_monitoring_dashboard" model="ir.actions.act_window">
+        <field name="name">Container Monitoring Dashboard</field>
+        <field name="res_model">garment.container</field>
+        <field name="view_mode">kanban,tree,graph</field>
+    </record>
+
+    <!-- Carrier Performance Dashboard (SRS section 45) -->
+    <record id="action_garment_carrier_performance_dashboard" model="ir.actions.act_window">
+        <field name="name">Carrier Performance Dashboard</field>
+        <field name="res_model">garment.forwarder</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

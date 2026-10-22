@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_tna_approval_tree" model="ir.ui.view">
+        <field name="name">garment.tna.approval.tree</field>
+        <field name="model">garment.tna.approval</field>
+        <field name="arch" type="xml">
+            <tree string="TNA Approvals" editable="bottom" decoration-success="status == 'approved'" decoration-danger="status == 'rejected'">
+                <field name="tna_id"/>
+                <field name="department"/>
+                <field name="approver_id"/>
+                <field name="status"/>
+                <field name="approval_date"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_tna_approval_form" model="ir.ui.view">
+        <field name="name">garment.tna.approval.form</field>
+        <field name="model">garment.tna.approval</field>
+        <field name="arch" type="xml">
+            <form string="TNA Approval">
+                <header>
+                    <field name="status" widget="statusbar" statusbar_visible="pending,approved"/>
+                    <button name="action_approve" type="object" string="Approve" class="btn-primary"
+                            invisible="status != 'pending'"/>
+                    <button name="action_reject" type="object" string="Reject" class="btn-secondary"
+                            invisible="status != 'pending'"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="tna_id"/>
+                            <field name="department"/>
+                            <field name="approver_id"/>
+                        </group>
+                        <group>
+                            <field name="approval_date" readonly="1"/>
+                        </group>
+                    </group>
+                    <field name="comments" placeholder="Comments..."/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_tna_approval" model="ir.actions.act_window">
+        <field name="name">TNA Approvals</field>
+        <field name="res_model">garment.tna.approval</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

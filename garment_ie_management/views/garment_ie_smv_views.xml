@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_ie_smv_form" model="ir.ui.view">
+        <field name="name">garment.ie.smv.form</field>
+        <field name="model">garment.ie.smv</field>
+        <field name="arch" type="xml">
+            <form string="SMV Master">
+                <header>
+                    <button name="action_submit_for_approval" type="object" string="Submit for Approval"
+                            class="btn-primary" invisible="status != 'draft'"/>
+                    <button name="action_approve" type="object" string="Approve"
+                            class="btn-primary" groups="garment_ie_management.group_ie_manager"
+                            invisible="status != 'pending_approval'"/>
+                    <button name="action_reject" type="object" string="Reject"
+                            groups="garment_ie_management.group_ie_manager"
+                            invisible="status != 'pending_approval'"/>
+                    <button name="action_reset_to_draft" type="object" string="Reset to Draft"
+                            invisible="status not in ('rejected', 'obsolete')"/>
+                    <button name="action_obsolete" type="object" string="Mark Obsolete"
+                            invisible="status != 'approved'"/>
+                    <field name="status" widget="statusbar"
+                           statusbar_visible="draft,pending_approval,approved"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_time_studies" type="object"
+                                class="oe_stat_button" icon="fa-clock-o">
+                            <field name="time_study_count" widget="statinfo" string="Time Studies"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="smv_number"/>
+                        <h1><field name="smv_number" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="style_id"/>
+                            <field name="operation_id"/>
+                            <field name="routing_line_id"/>
+                            <field name="version"/>
+                        </group>
+                        <group>
+                            <field name="machine_type"/>
+                            <field name="skill_level"/>
+                            <field name="approved_by_id" readonly="1"/>
+                            <field name="approved_date" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="SMV Calculation">
+                        <group>
+                            <field name="basic_time"/>
+                            <field name="allowance_pct" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="smv" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Allowance Breakdown">
+                            <field name="allowance_line_ids">
+                                <tree editable="bottom">
+                                    <field name="allowance_type_id"/>
+                                    <field name="percentage"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_ie_smv_tree" model="ir.ui.view">
+        <field name="name">garment.ie.smv.tree</field>
+        <field name="model">garment.ie.smv</field>
+        <field name="arch" type="xml">
+            <tree string="SMV Master" decoration-success="status == 'approved'" decoration-muted="status == 'obsolete'">
+                <field name="smv_number"/>
+                <field name="style_id"/>
+                <field name="operation_id"/>
+                <field name="machine_type"/>
+                <field name="basic_time"/>
+                <field name="allowance_pct"/>
+                <field name="smv"/>
+                <field name="version"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_ie_smv_search" model="ir.ui.view">
+        <field name="name">garment.ie.smv.search</field>
+        <field name="model">garment.ie.smv</field>
+        <field name="arch" type="xml">
+            <search string="Search SMV Master">
+                <field name="smv_number"/>
+                <field name="style_id"/>
+                <field name="operation_id"/>
+                <filter string="Draft" name="filter_draft" domain="[('status', '=', 'draft')]"/>
+                <filter string="Pending Approval" name="filter_pending" domain="[('status', '=', 'pending_approval')]"/>
+                <filter string="Approved" name="filter_approved" domain="[('status', '=', 'approved')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Style" name="group_style" context="{'group_by': 'style_id'}"/>
+                    <filter string="Operation" name="group_operation" context="{'group_by': 'operation_id'}"/>
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_ie_smv" model="ir.actions.act_window">
+        <field name="name">SMV Master</field>
+        <field name="res_model">garment.ie.smv</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first SMV Master record.</p>
+        </field>
+    </record>
+
+</odoo>

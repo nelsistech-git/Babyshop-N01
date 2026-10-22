@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_size_set_tree" model="ir.ui.view">
+        <field name="name">garment.size.set.tree</field>
+        <field name="model">garment.size.set</field>
+        <field name="arch" type="xml">
+            <tree string="Size Sets">
+                <field name="name"/>
+                <field name="size_system"/>
+                <field name="buyer_id"/>
+                <field name="status"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_size_set_form" model="ir.ui.view">
+        <field name="name">garment.size.set.form</field>
+        <field name="model">garment.size.set</field>
+        <field name="arch" type="xml">
+            <form string="Size Set">
+                <sheet>
+                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="size_set_code"/>
+                            <field name="size_system"/>
+                            <field name="buyer_id"/>
+                            <field name="brand"/>
+                        </group>
+                        <group>
+                            <field name="style_category_id"/>
+                            <field name="gender"/>
+                            <field name="age_group"/>
+                            <field name="season"/>
+                            <field name="status"/>
+                        </group>
+                    </group>
+                    <field name="line_ids">
+                        <tree editable="bottom">
+                            <field name="sequence" widget="handle"/>
+                            <field name="size_code"/>
+                            <field name="is_base_size"/>
+                        </tree>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_size_set" model="ir.actions.act_window">
+        <field name="name">Size Specifications</field>
+        <field name="res_model">garment.size.set</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

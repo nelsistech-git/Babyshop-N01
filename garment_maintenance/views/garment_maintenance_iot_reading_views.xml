@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_maintenance_iot_reading_form" model="ir.ui.view">
+        <field name="name">garment.maintenance.iot.reading.form</field>
+        <field name="model">garment.maintenance.iot.reading</field>
+        <field name="arch" type="xml">
+            <form string="IoT Sensor Reading">
+                <sheet>
+                    <widget name="web_ribbon" title="Critical" bg_color="text-bg-danger" invisible="condition != 'critical'"/>
+                    <widget name="web_ribbon" title="Warning" bg_color="text-bg-warning" invisible="condition != 'warning'"/>
+                    <group>
+                        <group>
+                            <field name="equipment_type"/>
+                            <field name="machine_id" invisible="equipment_type != 'machine'"/>
+                            <field name="asset_id" invisible="equipment_type != 'asset'"/>
+                            <field name="reading_datetime"/>
+                            <field name="running_status"/>
+                        </group>
+                        <group>
+                            <field name="speed"/>
+                            <field name="temperature"/>
+                            <field name="vibration"/>
+                            <field name="power_consumption"/>
+                            <field name="error_code"/>
+                        </group>
+                    </group>
+                    <group string="Alert">
+                        <group>
+                            <field name="condition" readonly="1"/>
+                            <field name="alert_triggered" readonly="1"/>
+                            <field name="workorder_id" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="temperature_warning"/>
+                            <field name="temperature_critical"/>
+                            <field name="vibration_warning"/>
+                            <field name="vibration_critical"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_maintenance_iot_reading_tree" model="ir.ui.view">
+        <field name="name">garment.maintenance.iot.reading.tree</field>
+        <field name="model">garment.maintenance.iot.reading</field>
+        <field name="arch" type="xml">
+            <tree string="IoT Sensor Readings" decoration-danger="condition == 'critical'" decoration-warning="condition == 'warning'">
+                <field name="equipment_name"/>
+                <field name="reading_datetime"/>
+                <field name="running_status"/>
+                <field name="temperature"/>
+                <field name="vibration"/>
+                <field name="speed"/>
+                <field name="condition" widget="badge"/>
+                <field name="alert_triggered"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_maintenance_iot_reading_search" model="ir.ui.view">
+        <field name="name">garment.maintenance.iot.reading.search</field>
+        <field name="model">garment.maintenance.iot.reading</field>
+        <field name="arch" type="xml">
+            <search string="Search IoT Readings">
+                <field name="equipment_name"/>
+                <filter string="Critical" name="filter_critical" domain="[('condition', '=', 'critical')]"/>
+                <filter string="Warning" name="filter_warning" domain="[('condition', '=', 'warning')]"/>
+                <filter string="Alerts Triggered" name="filter_alerts" domain="[('alert_triggered', '=', True)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Equipment" name="group_equipment" context="{'group_by': 'equipment_name'}"/>
+                    <filter string="Condition" name="group_condition" context="{'group_by': 'condition'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_maintenance_iot_reading" model="ir.actions.act_window">
+        <field name="name">IoT Sensor Readings</field>
+        <field name="res_model">garment.maintenance.iot.reading</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No IoT sensor readings logged yet.</p>
+        </field>
+    </record>
+
+</odoo>

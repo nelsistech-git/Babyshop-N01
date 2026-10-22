@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_maintenance_spare_request_form" model="ir.ui.view">
+        <field name="name">garment.maintenance.spare.request.form</field>
+        <field name="model">garment.maintenance.spare.request</field>
+        <field name="arch" type="xml">
+            <form string="Spare Parts Request">
+                <header>
+                    <button name="action_approve" type="object" string="Approve" class="btn-primary"
+                            invisible="status != 'draft'"
+                            groups="garment_maintenance.group_maintenance_store_officer"/>
+                    <button name="action_reject" type="object" string="Reject" class="btn-danger"
+                            invisible="status != 'draft'"
+                            groups="garment_maintenance.group_maintenance_store_officer"/>
+                    <button name="action_issue_from_stock" type="object" string="Issue From Stock" class="btn-primary"
+                            invisible="status != 'approved'"
+                            groups="garment_maintenance.group_maintenance_store_officer"/>
+                    <button name="action_create_purchase_requisition" type="object" string="Create Purchase Requisition" class="btn-secondary"
+                            invisible="status != 'approved'"
+                            groups="garment_maintenance.group_maintenance_manager"/>
+                    <field name="status" widget="statusbar" statusbar_visible="draft,approved,issued,po_requested"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="material_id"/>
+                            <field name="requested_qty"/>
+                            <field name="current_stock" readonly="1"/>
+                            <field name="minimum_stock" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="reason"/>
+                            <field name="workorder_id"/>
+                            <field name="requested_by_id"/>
+                            <field name="request_date"/>
+                        </group>
+                    </group>
+                    <group invisible="not requisition_id">
+                        <field name="requisition_id" readonly="1"/>
+                    </group>
+                    <group invisible="not approved_by_id">
+                        <group>
+                            <field name="approved_by_id" readonly="1"/>
+                            <field name="approval_date" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_maintenance_spare_request_tree" model="ir.ui.view">
+        <field name="name">garment.maintenance.spare.request.tree</field>
+        <field name="model">garment.maintenance.spare.request</field>
+        <field name="arch" type="xml">
+            <tree string="Spare Parts Requests" decoration-warning="status == 'draft'" decoration-danger="status == 'rejected'">
+                <field name="name"/>
+                <field name="material_id"/>
+                <field name="requested_qty"/>
+                <field name="reason"/>
+                <field name="requested_by_id"/>
+                <field name="request_date"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_maintenance_spare_request_search" model="ir.ui.view">
+        <field name="name">garment.maintenance.spare.request.search</field>
+        <field name="model">garment.maintenance.spare.request</field>
+        <field name="arch" type="xml">
+            <search string="Search Spare Requests">
+                <field name="name"/>
+                <field name="material_id"/>
+                <filter string="Draft" name="filter_draft" domain="[('status', '=', 'draft')]"/>
+                <filter string="Approved" name="filter_approved" domain="[('status', '=', 'approved')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                    <filter string="Reason" name="group_reason" context="{'group_by': 'reason'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_maintenance_spare_request" model="ir.actions.act_window">
+        <field name="name">Spare Parts Requests</field>
+        <field name="res_model">garment.maintenance.spare.request</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Raise your first spare parts request.</p>
+        </field>
+    </record>
+
+</odoo>

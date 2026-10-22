@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_order_line_tree" model="ir.ui.view">
+        <field name="name">garment.order.line.tree</field>
+        <field name="model">garment.order.line</field>
+        <field name="arch" type="xml">
+            <tree string="Order Lines">
+                <field name="order_id"/>
+                <field name="style_id"/>
+                <field name="color"/>
+                <field name="size_range"/>
+                <field name="quantity" sum="Total"/>
+                <field name="unit_price"/>
+                <field name="total_value" sum="Total Value" widget="monetary"/>
+                <field name="delivery_date"/>
+                <field name="currency_id" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_order_line_form" model="ir.ui.view">
+        <field name="name">garment.order.line.form</field>
+        <field name="model">garment.order.line</field>
+        <field name="arch" type="xml">
+            <form string="Order Line">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="order_id"/>
+                            <field name="style_id"/>
+                            <field name="product_name"/>
+                            <field name="color"/>
+                            <field name="size_set_id"/>
+                            <field name="size_range"/>
+                        </group>
+                        <group>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="quantity"/>
+                            <field name="unit_price"/>
+                            <field name="total_value" readonly="1" widget="monetary"/>
+                            <field name="delivery_date"/>
+                            <field name="size_qty_total" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Color Information">
+                            <field name="color_ids">
+                                <tree editable="bottom">
+                                    <field name="color_name"/>
+                                    <field name="buyer_color_code"/>
+                                    <field name="factory_color_code"/>
+                                    <field name="pantone_number"/>
+                                    <field name="shade_group"/>
+                                    <field name="lab_dip_reference"/>
+                                    <field name="approval_status"/>
+                                    <field name="approval_date"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Size Ratio / Breakdown">
+                            <field name="size_ids">
+                                <tree editable="bottom">
+                                    <field name="size_code"/>
+                                    <field name="ratio_pct"/>
+                                    <field name="quantity" sum="Total"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_order_line" model="ir.actions.act_window">
+        <field name="name">Order Lines</field>
+        <field name="res_model">garment.order.line</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

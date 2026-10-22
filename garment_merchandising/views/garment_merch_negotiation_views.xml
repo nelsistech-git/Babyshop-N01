@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_merch_negotiation_tree" model="ir.ui.view">
+        <field name="name">garment.merch.negotiation.tree</field>
+        <field name="model">garment.merch.negotiation</field>
+        <field name="arch" type="xml">
+            <tree string="Negotiations" decoration-success="decision == 'accepted'" decoration-danger="decision == 'rejected'">
+                <field name="negotiation_number"/>
+                <field name="quotation_id"/>
+                <field name="buyer_id"/>
+                <field name="negotiation_date"/>
+                <field name="requested_price"/>
+                <field name="counter_offer"/>
+                <field name="decision" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_merch_negotiation_form" model="ir.ui.view">
+        <field name="name">garment.merch.negotiation.form</field>
+        <field name="model">garment.merch.negotiation</field>
+        <field name="arch" type="xml">
+            <form string="Negotiation">
+                <header>
+                    <field name="decision" widget="statusbar"/>
+                    <button name="action_suggest_ai_counter" type="object" string="Suggest Counter (AI)" class="btn-secondary" icon="fa-magic"/>
+                    <button name="action_approve" type="object" string="Approve Final Price" class="btn-primary"
+                            invisible="decision == 'accepted'"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="negotiation_number" readonly="1"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="quotation_id"/>
+                            <field name="buyer_id"/>
+                            <field name="negotiation_date"/>
+                            <field name="discussion_type"/>
+                            <field name="handled_by_id"/>
+                        </group>
+                        <group>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="requested_price"/>
+                            <field name="offered_price"/>
+                            <field name="counter_offer"/>
+                            <field name="final_price"/>
+                            <field name="quantity_revision"/>
+                            <field name="delivery_revision"/>
+                            <field name="payment_revision"/>
+                            <field name="next_followup_date"/>
+                        </group>
+                    </group>
+                    <group string="Approval" col="4">
+                        <field name="approved_by_id" readonly="1"/>
+                        <field name="approval_date" readonly="1"/>
+                    </group>
+                    <field name="notes"/>
+                    <group string="AI Counter-offer Suggestion">
+                        <field name="ai_suggested_counter_note" readonly="1" nolabel="1"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_merch_negotiation" model="ir.actions.act_window">
+        <field name="name">Negotiations</field>
+        <field name="res_model">garment.merch.negotiation</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

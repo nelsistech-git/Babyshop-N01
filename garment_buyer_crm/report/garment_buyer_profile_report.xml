@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_report_garment_buyer_profile" model="ir.actions.report">
+        <field name="name">Buyer Profile</field>
+        <field name="model">garment.buyer</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">garment_buyer_crm.report_garment_buyer_profile</field>
+        <field name="report_file">garment_buyer_crm.report_garment_buyer_profile</field>
+        <field name="binding_model_id" ref="model_garment_buyer"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'Buyer Profile - %s' % (object.name)</field>
+    </record>
+
+    <template id="report_garment_buyer_profile">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2><span t-field="o.name"/> <small t-field="o.brand_name"/></h2>
+                        <p class="text-muted">Buyer Code: <span t-field="o.buyer_code"/> | Status:
+                            <span t-field="o.buyer_status"/></p>
+
+                        <h4>Business Information</h4>
+                        <table class="table table-sm">
+                            <tr><td>Category</td><td><span t-field="o.buyer_category"/></td></tr>
+                            <tr><td>Type</td><td><span t-field="o.buyer_type"/></td></tr>
+                            <tr><td>Country</td><td><span t-field="o.country_id.name"/></td></tr>
+                            <tr><td>Annual Purchase Volume</td><td><span t-field="o.annual_purchase_volume"/></td></tr>
+                            <tr><td>MOQ</td><td><span t-field="o.moq"/></td></tr>
+                            <tr><td>Payment Terms</td><td><span t-field="o.payment_term_id.name"/></td></tr>
+                            <tr><td>Incoterms</td><td><span t-field="o.incoterm_id.name"/></td></tr>
+                        </table>
+
+                        <h4>Contacts</h4>
+                        <table class="table table-sm">
+                            <thead><tr><th>Name</th><th>Designation</th><th>Email</th><th>Mobile</th></tr></thead>
+                            <tbody>
+                                <tr t-foreach="o.contact_ids" t-as="c">
+                                    <td><span t-field="c.name"/></td>
+                                    <td><span t-field="c.designation"/></td>
+                                    <td><span t-field="c.email"/></td>
+                                    <td><span t-field="c.mobile"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4>Compliance Certificates</h4>
+                        <p>
+                            <span t-if="o.cert_bsci">BSCI · </span>
+                            <span t-if="o.cert_sedex">SEDEX · </span>
+                            <span t-if="o.cert_wrap">WRAP · </span>
+                            <span t-if="o.cert_gots">GOTS · </span>
+                            <span t-if="o.cert_oeko_tex">OEKO-TEX · </span>
+                            <span t-if="o.cert_higg">HIGG · </span>
+                            <span t-if="o.cert_iso">ISO · </span>
+                            <span t-if="o.cert_grs">GRS · </span>
+                            <span t-if="o.cert_fsc">FSC</span>
+                        </p>
+
+                        <h4>AI Insight</h4>
+                        <p>
+                            Lead Score: <span t-field="o.ai_lead_score"/> / 100<br/>
+                            <span t-field="o.ai_last_insight"/>
+                        </p>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

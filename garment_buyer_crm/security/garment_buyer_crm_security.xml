@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <record id="module_category_garment_crm" model="ir.module.category">
+            <field name="name">Smart Garment ERP - Buyer CRM</field>
+            <field name="sequence">50</field>
+        </record>
+
+        <!-- Groups mapped 1-to-1 to the SRS "User Roles" table -->
+        <record id="group_garment_crm_marketing_executive" model="res.groups">
+            <field name="name">Marketing Executive (Create/Edit Own)</field>
+            <field name="category_id" ref="module_category_garment_crm"/>
+        </record>
+
+        <record id="group_garment_crm_merchandiser" model="res.groups">
+            <field name="name">Merchandiser (Read/Create RFQ)</field>
+            <field name="category_id" ref="module_category_garment_crm"/>
+        </record>
+
+        <record id="group_garment_crm_commercial_manager" model="res.groups">
+            <field name="name">Commercial Manager (Read Only)</field>
+            <field name="category_id" ref="module_category_garment_crm"/>
+        </record>
+
+        <record id="group_garment_crm_accounts_manager" model="res.groups">
+            <field name="name">Accounts Manager (Read Only)</field>
+            <field name="category_id" ref="module_category_garment_crm"/>
+        </record>
+
+        <record id="group_garment_crm_marketing_manager" model="res.groups">
+            <field name="name">Marketing Manager (Full Access)</field>
+            <field name="category_id" ref="module_category_garment_crm"/>
+            <field name="implied_ids" eval="[(4, ref('group_garment_crm_marketing_executive')),
+                                              (4, ref('group_garment_crm_merchandiser'))]"/>
+        </record>
+
+        <record id="group_garment_crm_administrator" model="res.groups">
+            <field name="name">CRM Administrator (Full Configuration)</field>
+            <field name="category_id" ref="module_category_garment_crm"/>
+            <field name="implied_ids" eval="[(4, ref('group_garment_crm_marketing_manager'))]"/>
+        </record>
+
+        <record id="group_garment_crm_top_management" model="res.groups">
+            <field name="name">Top Management (MD / CEO / GM - Full Access)</field>
+            <field name="category_id" ref="module_category_garment_crm"/>
+            <field name="implied_ids" eval="[(4, ref('group_garment_crm_administrator'))]"/>
+        </record>
+
+        <record id="group_garment_crm_auditor" model="res.groups">
+            <field name="name">Auditor (Read-Only)</field>
+            <field name="category_id" ref="module_category_garment_crm"/>
+        </record>
+
+        <!-- Record rule: Marketing Executives only see/edit their own buyers -->
+        <record id="rule_garment_buyer_own_records" model="ir.rule">
+            <field name="name">Marketing Executive: Own Buyers Only</field>
+            <field name="model_id" ref="model_garment_buyer"/>
+            <field name="domain_force">[('assigned_merchandiser_id.id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_garment_crm_marketing_executive'))]"/>
+            <field name="perm_read">1</field>
+            <field name="perm_write">1</field>
+            <field name="perm_create">1</field>
+            <field name="perm_unlink">0</field>
+        </record>
+
+        <record id="rule_garment_buyer_full_access" model="ir.rule">
+            <field name="name">Full Access Roles: All Buyers</field>
+            <field name="model_id" ref="model_garment_buyer"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_garment_crm_marketing_manager')),
+                                        (4, ref('group_garment_crm_commercial_manager')),
+                                        (4, ref('group_garment_crm_accounts_manager'))]"/>
+        </record>
+
+        <!-- Portal buyers can only ever see their own linked buyer record -->
+        <record id="rule_garment_buyer_portal_own" model="ir.rule">
+            <field name="name">Portal Buyer: Own Record Only</field>
+            <field name="model_id" ref="model_garment_buyer"/>
+            <field name="domain_force">[('partner_id', '=', user.partner_id.id)]</field>
+            <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+            <field name="perm_read">1</field>
+            <field name="perm_write">0</field>
+            <field name="perm_create">0</field>
+            <field name="perm_unlink">0</field>
+        </record>
+
+        <!-- Record rule: Merchandisers can access RFQs assigned to them (via the buyer's
+             assigned merchandiser) -->
+        <record id="rule_garment_rfq_assigned_merchandiser" model="ir.rule">
+            <field name="name">Merchandiser: RFQs Assigned To Them</field>
+            <field name="model_id" ref="model_garment_rfq"/>
+            <field name="domain_force">['|', ('buyer_id.assigned_merchandiser_id', '=', user.id),
+                                        ('opportunity_id.assigned_merchandiser_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_garment_crm_merchandiser'))]"/>
+            <field name="perm_read">1</field>
+            <field name="perm_write">1</field>
+            <field name="perm_create">1</field>
+            <field name="perm_unlink">0</field>
+        </record>
+
+        <!-- Auditor: read-only visibility on every Buyer CRM document -->
+        <record id="rule_garment_buyer_auditor_readonly" model="ir.rule">
+            <field name="name">Auditor: All Buyers (Read Only)</field>
+            <field name="model_id" ref="model_garment_buyer"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_garment_crm_auditor'))]"/>
+            <field name="perm_read">1</field>
+            <field name="perm_write">0</field>
+            <field name="perm_create">0</field>
+            <field name="perm_unlink">0</field>
+        </record>
+
+    </data>
+</odoo>

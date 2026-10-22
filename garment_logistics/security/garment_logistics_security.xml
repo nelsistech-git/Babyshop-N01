@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <record id="module_category_garment_logistics" model="ir.module.category">
+            <field name="name">Smart Garment ERP - Logistics</field>
+            <field name="sequence">63</field>
+        </record>
+
+        <record id="group_logistics_shipment_officer" model="res.groups">
+            <field name="name">Shipment Officer (Create/Edit)</field>
+            <field name="category_id" ref="module_category_garment_logistics"/>
+        </record>
+
+        <record id="group_logistics_transport_team" model="res.groups">
+            <field name="name">Transport Team (Vehicle Data)</field>
+            <field name="category_id" ref="module_category_garment_logistics"/>
+        </record>
+
+        <record id="group_logistics_freight_officer" model="res.groups">
+            <field name="name">Freight Officer (Freight Management)</field>
+            <field name="category_id" ref="module_category_garment_logistics"/>
+        </record>
+
+        <record id="group_logistics_documentation_officer" model="res.groups">
+            <field name="name">Documentation Officer (Documents)</field>
+            <field name="category_id" ref="module_category_garment_logistics"/>
+        </record>
+
+        <record id="group_logistics_manager" model="res.groups">
+            <field name="name">Logistics Manager (Approve)</field>
+            <field name="category_id" ref="module_category_garment_logistics"/>
+            <field name="implied_ids" eval="[(4, ref('group_logistics_shipment_officer')),
+                                              (4, ref('group_logistics_transport_team')),
+                                              (4, ref('group_logistics_freight_officer')),
+                                              (4, ref('group_logistics_documentation_officer'))]"/>
+        </record>
+
+        <record id="group_logistics_director" model="res.groups">
+            <field name="name">Logistics Director (Full Access)</field>
+            <field name="category_id" ref="module_category_garment_logistics"/>
+            <field name="implied_ids" eval="[(4, ref('group_logistics_manager'))]"/>
+        </record>
+
+        <record id="rule_garment_shipment_manager_full" model="ir.rule">
+            <field name="name">Logistics Manager+: All Shipments</field>
+            <field name="model_id" ref="model_garment_shipment"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_logistics_manager'))]"/>
+        </record>
+
+        <record id="rule_garment_shipment_portal_own_buyer" model="ir.rule">
+            <field name="name">Portal Buyer: Own Shipments Only</field>
+            <field name="model_id" ref="model_garment_shipment"/>
+            <field name="domain_force">[('buyer_id.partner_id', '=', user.partner_id.id)]</field>
+            <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+            <field name="perm_read">1</field>
+            <field name="perm_write">0</field>
+            <field name="perm_create">0</field>
+            <field name="perm_unlink">0</field>
+        </record>
+
+    </data>
+</odoo>

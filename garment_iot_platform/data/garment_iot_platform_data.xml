@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="0">
+
+    <!-- Example device-type-wide alert rules (SRS s.19 Environmental
+         Monitoring, s.28 Smart Andon, s.48 Real-Time Alert Management).
+         Editable/deletable — seeded so a fresh install already demonstrates
+         all three action types working end to end. -->
+
+    <record id="alert_rule_temperature_critical" model="garment.iot.alert.rule">
+        <field name="name">Sewing Floor Temperature Critical</field>
+        <field name="device_type">temperature_sensor</field>
+        <field name="reading_type">temperature</field>
+        <field name="operator">&gt;</field>
+        <field name="threshold_value">38.0</field>
+        <field name="severity">critical</field>
+        <field name="action_type">post_message</field>
+        <field name="action_summary">High temperature on {device}: {value}{unit} exceeds the safe threshold of {threshold}.</field>
+        <field name="cooldown_minutes">15</field>
+    </record>
+
+    <record id="alert_rule_energy_warning" model="garment.iot.alert.rule">
+        <field name="name">Energy Meter High Consumption</field>
+        <field name="device_type">energy_meter</field>
+        <field name="reading_type">energy</field>
+        <field name="operator">&gt;</field>
+        <field name="threshold_value">50.0</field>
+        <field name="severity">warning</field>
+        <field name="action_type">create_activity</field>
+        <field name="action_summary">Energy meter {device} reported {value}{unit}, above the {threshold} watch limit. Review for idle-machine waste.</field>
+        <field name="cooldown_minutes">60</field>
+    </record>
+
+    <!-- Bridges a Machine Sensor vibration reading straight into the
+         maintenance-side machine-condition reading history, reusing
+         garment_maintenance's own critical-condition -> breakdown Work
+         Order logic instead of duplicating it here (see
+         models/garment_maintenance_iot_reading_ext.py and
+         IMPLEMENTATION_NOTES.md). -->
+    <record id="alert_rule_machine_vibration_to_cmms" model="garment.iot.alert.rule">
+        <field name="name">Machine Sensor Vibration -&gt; CMMS Condition Log</field>
+        <field name="device_type">machine_sensor</field>
+        <field name="reading_type">vibration</field>
+        <field name="operator">&gt;=</field>
+        <field name="threshold_value">8.0</field>
+        <field name="severity">critical</field>
+        <field name="action_type">call_method</field>
+        <field name="action_model_id" ref="garment_maintenance.model_garment_maintenance_iot_reading"/>
+        <field name="action_method">create_from_iot_platform_reading</field>
+        <field name="cooldown_minutes">30</field>
+    </record>
+
+</odoo>

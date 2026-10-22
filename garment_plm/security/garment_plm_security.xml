@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <record id="module_category_garment_plm" model="ir.module.category">
+            <field name="name">Smart Garment ERP - PLM</field>
+            <field name="sequence">52</field>
+        </record>
+
+        <record id="group_plm_user" model="res.groups">
+            <field name="name">PLM Team Member (Read / Update Assigned Tasks)</field>
+            <field name="category_id" ref="module_category_garment_plm"/>
+        </record>
+
+        <record id="group_plm_coordinator" model="res.groups">
+            <field name="name">Product Developer / PLM Coordinator (Create/Manage Projects)</field>
+            <field name="category_id" ref="module_category_garment_plm"/>
+            <field name="implied_ids" eval="[(4, ref('group_plm_user'))]"/>
+        </record>
+
+        <record id="group_plm_approver" model="res.groups">
+            <field name="name">Gate Approver (Technical / Quality / Merchandising / Buyer Sign-Off)</field>
+            <field name="category_id" ref="module_category_garment_plm"/>
+            <field name="implied_ids" eval="[(4, ref('group_plm_user'))]"/>
+        </record>
+
+        <record id="group_plm_manager" model="res.groups">
+            <field name="name">PLM Manager (Full Access + Configuration)</field>
+            <field name="category_id" ref="module_category_garment_plm"/>
+            <field name="implied_ids" eval="[(4, ref('group_plm_coordinator')), (4, ref('group_plm_approver'))]"/>
+        </record>
+
+        <!-- Record rule: team members only see PLM projects they are assigned to -->
+        <record id="rule_garment_plm_project_team_member" model="ir.rule">
+            <field name="name">PLM Team Member: Assigned Projects Only</field>
+            <field name="model_id" ref="model_garment_plm_project"/>
+            <field name="domain_force">['|', ('team_ids.user_id', '=', user.id), ('create_uid', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_plm_user'))]"/>
+            <field name="perm_read">1</field>
+            <field name="perm_write">1</field>
+            <field name="perm_create">0</field>
+            <field name="perm_unlink">0</field>
+        </record>
+
+        <record id="rule_garment_plm_project_full_access" model="ir.rule">
+            <field name="name">Coordinator/Approver/Manager: All PLM Projects</field>
+            <field name="model_id" ref="model_garment_plm_project"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_plm_coordinator')), (4, ref('group_plm_approver'))]"/>
+        </record>
+
+    </data>
+</odoo>

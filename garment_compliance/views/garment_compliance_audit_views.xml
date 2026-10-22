@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_compliance_audit_tree" model="ir.ui.view">
+        <field name="name">garment.compliance.audit.tree</field>
+        <field name="model">garment.compliance.audit</field>
+        <field name="arch" type="xml">
+            <tree string="Compliance Audits">
+                <field name="audit_no"/>
+                <field name="name"/>
+                <field name="audit_type"/>
+                <field name="buyer_id"/>
+                <field name="department_id"/>
+                <field name="audit_date"/>
+                <field name="score" widget="percentage"/>
+                <field name="open_finding_count"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_compliance_audit_form" model="ir.ui.view">
+        <field name="name">garment.compliance.audit.form</field>
+        <field name="model">garment.compliance.audit</field>
+        <field name="arch" type="xml">
+            <form string="Compliance Audit">
+                <header>
+                    <button name="action_next_stage" type="object" string="Move to Next Stage" class="btn-primary"
+                            invisible="status == 'closed'"/>
+                    <field name="status" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_findings" type="object" class="oe_stat_button" icon="fa-exclamation-triangle">
+                            <field name="finding_count" widget="statinfo" string="Findings"/>
+                        </button>
+                        <button name="action_view_capa" type="object" class="oe_stat_button" icon="fa-wrench">
+                            <field name="capa_count" widget="statinfo" string="CAPA"/>
+                        </button>
+                    </div>
+                    <div class="oe_title"><h1><field name="audit_no" readonly="1"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="audit_type"/>
+                            <field name="standard_id"/>
+                            <field name="buyer_id"/>
+                        </group>
+                        <group>
+                            <field name="department_id"/>
+                            <field name="auditor_id"/>
+                            <field name="external_auditor"/>
+                            <field name="audit_date"/>
+                            <field name="score" widget="percentage"/>
+                        </group>
+                    </group>
+                    <field name="scope"/>
+                    <notebook>
+                        <page string="Checklist">
+                            <field name="checklist_line_ids">
+                                <tree editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="requirement_id"/>
+                                    <field name="checklist_item"/>
+                                    <field name="complied"/>
+                                    <field name="remarks"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Findings">
+                            <field name="finding_ids">
+                                <tree editable="bottom">
+                                    <field name="finding_no" readonly="1"/>
+                                    <field name="category"/>
+                                    <field name="description"/>
+                                    <field name="severity" widget="badge" decoration-danger="severity == 'critical'" decoration-warning="severity == 'major'"/>
+                                    <field name="responsible_department_id"/>
+                                    <field name="responsible_user_id"/>
+                                    <field name="due_date"/>
+                                    <field name="status" widget="badge"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Corrective Actions">
+                            <field name="capa_ids">
+                                <tree editable="bottom">
+                                    <field name="capa_no" readonly="1"/>
+                                    <field name="issue"/>
+                                    <field name="responsible_user_id"/>
+                                    <field name="due_date"/>
+                                    <field name="status" widget="badge"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_compliance_audit_search" model="ir.ui.view">
+        <field name="name">garment.compliance.audit.search</field>
+        <field name="model">garment.compliance.audit</field>
+        <field name="arch" type="xml">
+            <search string="Search Compliance Audits">
+                <field name="audit_no"/>
+                <field name="name"/>
+                <field name="buyer_id"/>
+                <field name="department_id"/>
+                <filter string="Open" name="filter_open" domain="[('status', '!=', 'closed')]"/>
+                <filter string="Closed" name="filter_closed" domain="[('status', '=', 'closed')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Audit Type" name="group_type" context="{'group_by': 'audit_type'}"/>
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                    <filter string="Department" name="group_department" context="{'group_by': 'department_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_compliance_audit" model="ir.actions.act_window">
+        <field name="name">Compliance Audits</field>
+        <field name="res_model">garment.compliance.audit</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Standalone Finding views/action, reachable from the audit and from its own menu -->
+    <record id="view_garment_compliance_finding_tree" model="ir.ui.view">
+        <field name="name">garment.compliance.finding.tree</field>
+        <field name="model">garment.compliance.finding</field>
+        <field name="arch" type="xml">
+            <tree string="Audit Findings" decoration-danger="severity == 'critical'" decoration-warning="severity == 'major'">
+                <field name="finding_no"/>
+                <field name="audit_id"/>
+                <field name="category"/>
+                <field name="description"/>
+                <field name="severity"/>
+                <field name="responsible_department_id"/>
+                <field name="due_date"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_compliance_finding_form" model="ir.ui.view">
+        <field name="name">garment.compliance.finding.form</field>
+        <field name="model">garment.compliance.finding</field>
+        <field name="arch" type="xml">
+            <form string="Audit Finding">
+                <header>
+                    <button name="action_close" type="object" string="Close Finding" class="btn-primary" invisible="status == 'closed'"/>
+                    <field name="status" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="%(action_garment_compliance_capa)d" type="action" class="oe_stat_button" icon="fa-wrench"
+                                context="{'default_finding_id': id}">
+                            <field name="capa_count" widget="statinfo" string="CAPA"/>
+                        </button>
+                    </div>
+                    <div class="oe_title"><h1><field name="finding_no" readonly="1"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="audit_id"/>
+                            <field name="category"/>
+                            <field name="severity"/>
+                        </group>
+                        <group>
+                            <field name="responsible_department_id"/>
+                            <field name="responsible_user_id"/>
+                            <field name="due_date"/>
+                        </group>
+                    </group>
+                    <field name="description"/>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_compliance_finding" model="ir.actions.act_window">
+        <field name="name">Audit Findings</field>
+        <field name="res_model">garment.compliance.finding</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

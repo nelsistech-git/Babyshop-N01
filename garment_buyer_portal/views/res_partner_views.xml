@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_partner_form_garment_buyer_portal" model="ir.ui.view">
+        <field name="name">res.partner.form.garment.buyer.portal</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_garment_portal_activity" type="object"
+                        class="oe_stat_button" icon="fa-history"
+                        invisible="not garment_buyer_id">
+                    <field name="garment_portal_activity_count" widget="statinfo" string="Portal Activity"/>
+                </button>
+            </xpath>
+            <xpath expr="//field[@name='category_id']" position="after">
+                <field name="garment_buyer_id" options="{'no_create': True}"/>
+                <field name="garment_portal_role" invisible="not garment_buyer_id"/>
+                <field name="garment_portal_department" invisible="not garment_buyer_id"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

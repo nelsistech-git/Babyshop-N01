@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_production_consumption_tree" model="ir.ui.view">
+        <field name="name">garment.production.consumption.tree</field>
+        <field name="model">garment.production.consumption</field>
+        <field name="arch" type="xml">
+            <tree string="Material Consumption" editable="bottom" decoration-danger="variance_pct &gt; 5">
+                <field name="production_order_id"/>
+                <field name="material_id"/>
+                <field name="department"/>
+                <field name="planned_qty"/>
+                <field name="actual_qty"/>
+                <field name="variance_qty"/>
+                <field name="variance_pct"/>
+                <field name="wastage_qty"/>
+                <field name="wastage_pct"/>
+                <field name="wastage_approved"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_production_consumption_form" model="ir.ui.view">
+        <field name="name">garment.production.consumption.form</field>
+        <field name="model">garment.production.consumption</field>
+        <field name="arch" type="xml">
+            <form string="Material Consumption">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="production_order_id"/>
+                            <field name="bom_line_id"/>
+                            <field name="material_id"/>
+                            <field name="department"/>
+                            <field name="uom"/>
+                        </group>
+                        <group>
+                            <field name="planned_qty"/>
+                            <field name="actual_qty"/>
+                            <field name="variance_qty"/>
+                            <field name="variance_pct"/>
+                        </group>
+                    </group>
+                    <group string="Wastage">
+                        <field name="wastage_qty"/>
+                        <field name="wastage_pct"/>
+                        <field name="wastage_reason"/>
+                        <field name="wastage_approved"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_production_consumption" model="ir.actions.act_window">
+        <field name="name">Material Consumption</field>
+        <field name="res_model">garment.production.consumption</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

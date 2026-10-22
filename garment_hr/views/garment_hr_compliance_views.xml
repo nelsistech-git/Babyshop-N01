@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_hr_compliance_tree" model="ir.ui.view">
+        <field name="name">garment.hr.compliance.tree</field>
+        <field name="model">garment.hr.compliance</field>
+        <field name="arch" type="xml">
+            <tree string="Labor Compliance Records" decoration-danger="compliant == False">
+                <field name="audit_date"/>
+                <field name="compliance_type"/>
+                <field name="department_id"/>
+                <field name="compliant"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_hr_compliance_form" model="ir.ui.view">
+        <field name="name">garment.hr.compliance.form</field>
+        <field name="model">garment.hr.compliance</field>
+        <field name="arch" type="xml">
+            <form string="Labor Compliance Record">
+                <header>
+                    <field name="status" widget="statusbar"/>
+                    <button name="action_close" type="object" string="Close" class="btn-primary"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="audit_date"/>
+                            <field name="compliance_type"/>
+                            <field name="department_id"/>
+                            <field name="auditor_id"/>
+                        </group>
+                        <group>
+                            <field name="compliant"/>
+                        </group>
+                    </group>
+                    <field name="finding"/>
+                    <field name="corrective_action"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_hr_compliance" model="ir.actions.act_window">
+        <field name="name">Labor Compliance</field>
+        <field name="res_model">garment.hr.compliance</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Log your first compliance record.</p>
+        </field>
+    </record>
+</odoo>

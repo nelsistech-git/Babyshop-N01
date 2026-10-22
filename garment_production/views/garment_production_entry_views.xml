@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_production_entry_tree" model="ir.ui.view">
+        <field name="name">garment.production.entry.tree</field>
+        <field name="model">garment.production.entry</field>
+        <field name="arch" type="xml">
+            <tree string="Production Entries" decoration-danger="efficiency_pct &lt; 60" decoration-warning="efficiency_pct &gt;= 60 and efficiency_pct &lt; 85">
+                <field name="name"/>
+                <field name="date"/>
+                <field name="hour"/>
+                <field name="production_order_id"/>
+                <field name="line_id"/>
+                <field name="department"/>
+                <field name="employee_id"/>
+                <field name="target_qty" sum="Target"/>
+                <field name="output_qty" sum="Output"/>
+                <field name="reject_qty" sum="Reject"/>
+                <field name="efficiency_pct" avg="Avg Efficiency"/>
+                <field name="status"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_production_entry_form" model="ir.ui.view">
+        <field name="name">garment.production.entry.form</field>
+        <field name="model">garment.production.entry</field>
+        <field name="arch" type="xml">
+            <form string="Production Entry">
+                <header>
+                    <field name="status" widget="statusbar" statusbar_visible="draft,confirmed,approved"/>
+                    <button name="action_confirm" type="object" string="Confirm" class="btn-primary"
+                            invisible="status != 'draft'"/>
+                    <button name="action_approve" type="object" string="Approve" class="btn-primary"
+                            invisible="status != 'confirmed'"
+                            groups="garment_production.group_production_supervisor"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="production_order_id"/>
+                            <field name="work_order_id"/>
+                            <field name="routing_line_id"/>
+                            <field name="line_id"/>
+                            <field name="work_center_id"/>
+                            <field name="department"/>
+                            <field name="bundle_id"/>
+                        </group>
+                        <group>
+                            <field name="employee_id"/>
+                            <field name="date"/>
+                            <field name="hour"/>
+                            <field name="shift"/>
+                            <field name="entry_method"/>
+                        </group>
+                    </group>
+                    <group string="Quantities">
+                        <group>
+                            <field name="target_qty"/>
+                            <field name="input_qty"/>
+                            <field name="output_qty"/>
+                            <field name="reject_qty"/>
+                            <field name="rework_qty"/>
+                        </group>
+                        <group string="Line Efficiency Inputs">
+                            <field name="smv"/>
+                            <field name="manpower"/>
+                            <field name="working_minutes"/>
+                        </group>
+                    </group>
+                    <group string="Computed KPIs">
+                        <field name="efficiency_pct"/>
+                        <field name="achievement_pct"/>
+                        <field name="quality_score"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_production_entry_search" model="ir.ui.view">
+        <field name="name">garment.production.entry.search</field>
+        <field name="model">garment.production.entry</field>
+        <field name="arch" type="xml">
+            <search string="Search Production Entries">
+                <field name="production_order_id"/>
+                <field name="line_id"/>
+                <field name="employee_id"/>
+                <filter string="Today" name="filter_today" domain="[('date', '=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter string="Low Efficiency (&lt;85%)" name="filter_low_eff" domain="[('efficiency_pct', '&lt;', 85)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Department" name="group_department" context="{'group_by': 'department'}"/>
+                    <filter string="Line" name="group_line" context="{'group_by': 'line_id'}"/>
+                    <filter string="Operator" name="group_employee" context="{'group_by': 'employee_id'}"/>
+                    <filter string="Date" name="group_date" context="{'group_by': 'date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_garment_production_entry_pivot" model="ir.ui.view">
+        <field name="name">garment.production.entry.pivot</field>
+        <field name="model">garment.production.entry</field>
+        <field name="arch" type="xml">
+            <pivot string="Production Entry Analysis">
+                <field name="line_id" type="row"/>
+                <field name="date" type="col"/>
+                <field name="output_qty" type="measure"/>
+                <field name="efficiency_pct" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_garment_production_entry_graph" model="ir.ui.view">
+        <field name="name">garment.production.entry.graph</field>
+        <field name="model">garment.production.entry</field>
+        <field name="arch" type="xml">
+            <graph string="Hourly Output by Line" type="bar">
+                <field name="line_id"/>
+                <field name="output_qty" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_garment_production_entry" model="ir.actions.act_window">
+        <field name="name">Production Entries</field>
+        <field name="res_model">garment.production.entry</field>
+        <field name="view_mode">tree,form,pivot,graph</field>
+        <field name="search_view_id" ref="view_garment_production_entry_search"/>
+    </record>
+
+</odoo>

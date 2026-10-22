@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_supplier_form" model="ir.ui.view">
+        <field name="name">garment.supplier.form</field>
+        <field name="model">garment.supplier</field>
+        <field name="arch" type="xml">
+            <form string="Supplier">
+                <header>
+                    <field name="status" widget="statusbar"
+                           statusbar_visible="registration,purchase_review,quality_review,compliance_review,management_approval,active"/>
+                    <button name="action_submit_purchase_review" type="object" string="Submit for Purchase Review" class="btn-primary"
+                            invisible="status != 'registration'"/>
+                    <button name="action_approve_purchase_review" type="object" string="Approve Purchase Review" class="btn-primary"
+                            invisible="status != 'purchase_review'"
+                            groups="garment_supplier.group_supplier_purchase_manager"/>
+                    <button name="action_approve_quality_review" type="object" string="Approve Quality Review" class="btn-primary"
+                            invisible="status != 'quality_review'"
+                            groups="garment_supplier.group_supplier_qa_manager,garment_supplier.group_supplier_purchase_manager"/>
+                    <button name="action_approve_compliance_review" type="object" string="Approve Compliance Review" class="btn-primary"
+                            invisible="status != 'compliance_review'"
+                            groups="garment_supplier.group_supplier_compliance_manager,garment_supplier.group_supplier_purchase_manager"/>
+                    <button name="action_approve_management" type="object" string="Grant Management Approval" class="btn-primary"
+                            invisible="status != 'management_approval'"
+                            groups="garment_supplier.group_supplier_top_management"/>
+                    <button name="action_run_ai_analysis" type="object" string="Run AI Risk Analysis" class="btn-secondary" icon="fa-magic"/>
+                    <button name="action_activate" type="object" string="Activate" class="btn-secondary"
+                            invisible="status == 'active'"/>
+                    <button name="action_blacklist" type="object" string="Blacklist" class="btn-secondary"
+                            invisible="is_blacklisted == True"/>
+                    <button name="action_remove_blacklist" type="object" string="Remove from Blacklist" class="btn-secondary"
+                            invisible="is_blacklisted == False"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Blacklisted" bg_color="bg-danger"
+                            invisible="is_blacklisted == False"/>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_create_related_partner" type="object" class="oe_stat_button" icon="fa-address-book"
+                                invisible="partner_id != False">
+                            <div class="o_stat_info"><span class="o_stat_text">Link Partner</span></div>
+                        </button>
+                        <div class="oe_stat_button" icon="fa-file-text-o">
+                            <div class="o_stat_info">
+                                <field name="rfq_count" class="o_stat_value"/>
+                                <span class="o_stat_text">RFQs</span>
+                            </div>
+                        </div>
+                        <div class="oe_stat_button" icon="fa-shopping-cart">
+                            <div class="o_stat_info">
+                                <field name="po_count" class="o_stat_value"/>
+                                <span class="o_stat_text">POs</span>
+                            </div>
+                        </div>
+                        <div class="oe_stat_button" icon="fa-truck">
+                            <div class="o_stat_info">
+                                <field name="on_time_delivery_pct" class="o_stat_value" widget="percentage"/>
+                                <span class="o_stat_text">On-Time %</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="supplier_code" readonly="1"/>
+                            <field name="supplier_type"/>
+                            <field name="category_id"/>
+                            <field name="classification"/>
+                            <field name="registration_source"/>
+                            <field name="country_id"/>
+                            <field name="partner_id" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="rating" widget="progressbar"/>
+                            <field name="ranking" widget="badge"/>
+                            <field name="risk_level" widget="badge"
+                                   decoration-danger="risk_level in ('high','critical')"/>
+                            <field name="compliance_status"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Contact &amp; Registration">
+                            <group>
+                                <group>
+                                    <field name="address"/>
+                                    <field name="contact_person"/>
+                                    <field name="email"/>
+                                    <field name="phone"/>
+                                    <field name="website"/>
+                                    <field name="tax_id"/>
+                                    <field name="registration_number"/>
+                                </group>
+                                <group>
+                                    <field name="currency_id"/>
+                                    <field name="payment_term_id"/>
+                                    <field name="year_established"/>
+                                    <field name="factory_location"/>
+                                    <field name="production_capacity"/>
+                                    <field name="employee_count"/>
+                                    <field name="monthly_capacity"/>
+                                    <field name="export_experience"/>
+                                    <field name="major_customers"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Product Catalog">
+                            <field name="product_ids">
+                                <tree editable="bottom">
+                                    <field name="product_name"/>
+                                    <field name="specification"/>
+                                    <field name="unit_price"/>
+                                    <field name="moq"/>
+                                    <field name="lead_time_days"/>
+                                    <field name="validity_date"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Documents">
+                            <field name="document_ids">
+                                <tree editable="bottom" decoration-danger="expiry_status in ('expiring_soon','expired')">
+                                    <field name="document_type"/>
+                                    <field name="attachment" filename="attachment_filename"/>
+                                    <field name="attachment_filename" invisible="1"/>
+                                    <field name="expiry_date"/>
+                                    <field name="expiry_status"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Performance Ratings">
+                            <field name="rating_ids">
+                                <tree>
+                                    <field name="rating_date"/>
+                                    <field name="quality_score"/>
+                                    <field name="delivery_score"/>
+                                    <field name="cost_score"/>
+                                    <field name="compliance_score"/>
+                                    <field name="final_score"/>
+                                    <field name="star_rating"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Audits">
+                            <field name="audit_ids">
+                                <tree>
+                                    <field name="audit_number"/>
+                                    <field name="audit_type"/>
+                                    <field name="audit_date"/>
+                                    <field name="status"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Corrective Actions">
+                            <field name="capa_ids">
+                                <tree editable="bottom">
+                                    <field name="issue"/>
+                                    <field name="responsible_person_id"/>
+                                    <field name="due_date"/>
+                                    <field name="completion_status"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Risks">
+                            <field name="risk_ids">
+                                <tree editable="bottom" decoration-danger="risk_level in ('high','critical')">
+                                    <field name="risk_factor"/>
+                                    <field name="risk_level"/>
+                                    <field name="status"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Blacklist">
+                            <group>
+                                <field name="is_blacklisted"/>
+                                <field name="blacklist_reason" invisible="not is_blacklisted"/>
+                                <field name="blacklist_date" invisible="not is_blacklisted"/>
+                                <field name="blacklisted_by_id" invisible="not is_blacklisted"/>
+                                <field name="blacklist_evidence" invisible="not is_blacklisted"/>
+                            </group>
+                        </page>
+                        <page string="Compliance Certifications">
+                            <group string="Bangladesh Garment Supplier Standards (SRS section 45)" col="3">
+                                <field name="cert_bsci"/>
+                                <field name="cert_sedex"/>
+                                <field name="cert_wrap"/>
+                                <field name="cert_iso"/>
+                                <field name="cert_oeko_tex"/>
+                                <field name="cert_gots"/>
+                            </group>
+                        </page>
+                        <page string="Approval Workflow">
+                            <group>
+                                <group string="Purchase Review">
+                                    <field name="purchase_review_by_id" readonly="1"/>
+                                    <field name="purchase_review_date" readonly="1"/>
+                                </group>
+                                <group string="Quality Review">
+                                    <field name="quality_review_by_id" readonly="1"/>
+                                    <field name="quality_review_date" readonly="1"/>
+                                </group>
+                                <group string="Compliance Review">
+                                    <field name="compliance_review_by_id" readonly="1"/>
+                                    <field name="compliance_review_date" readonly="1"/>
+                                </group>
+                                <group string="Management Approval">
+                                    <field name="management_approval_by_id" readonly="1"/>
+                                    <field name="management_approval_date" readonly="1"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="AI Risk Prediction">
+                            <field name="ai_last_run" readonly="1"/>
+                            <field name="ai_risk_prediction_note" readonly="1" nolabel="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_supplier_tree" model="ir.ui.view">
+        <field name="name">garment.supplier.tree</field>
+        <field name="model">garment.supplier</field>
+        <field name="arch" type="xml">
+            <!-- FIXED: Added is_blacklisted with column_invisible="1" so decoration can evaluate it -->
+            <tree string="Suppliers" decoration-danger="is_blacklisted == True" decoration-success="status == 'active'">
+                <field name="is_blacklisted" column_invisible="1"/>
+                <field name="supplier_code"/>
+                <field name="name"/>
+                <field name="supplier_type"/>
+                <field name="category_id"/>
+                <field name="country_id"/>
+                <field name="rating" widget="progressbar"/>
+                <field name="ranking" widget="badge"/>
+                <field name="risk_level" widget="badge"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_supplier_kanban" model="ir.ui.view">
+        <field name="name">garment.supplier.kanban</field>
+        <field name="model">garment.supplier</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="classification" class="o_kanban_small_column">
+                <field name="name"/>
+                <field name="ranking"/>
+                <field name="rating"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click oe_kanban_card">
+                            <div class="o_kanban_record_top"><strong><field name="name"/></strong></div>
+                            <div>Rating: <field name="rating" widget="progressbar"/></div>
+                            <field name="ranking" widget="badge"/>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_garment_supplier_search" model="ir.ui.view">
+        <field name="name">garment.supplier.search</field>
+        <field name="model">garment.supplier</field>
+        <field name="arch" type="xml">
+            <search string="Search Suppliers">
+                <field name="name"/>
+                <field name="supplier_code"/>
+                <field name="category_id"/>
+                <filter string="Active" name="filter_active" domain="[('status', '=', 'active')]"/>
+                <filter string="Approved" name="filter_approved" domain="[('classification', '=', 'approved')]"/>
+                <filter string="Blacklisted" name="filter_blacklisted" domain="[('is_blacklisted', '=', True)]"/>
+                <filter string="High/Critical Risk" name="filter_risk" domain="[('risk_level', 'in', ('high','critical'))]"/>
+                <filter string="Top Suppliers (Platinum)" name="filter_top" domain="[('ranking', '=', 'platinum')]"/>
+                <filter string="Expiring Documents" name="filter_expiring_documents"
+                        domain="[('document_ids.expiry_status', 'in', ('expiring_soon', 'expired'))]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Classification" name="group_classification" context="{'group_by': 'classification'}"/>
+                    <filter string="Ranking" name="group_ranking" context="{'group_by': 'ranking'}"/>
+                    <filter string="Category" name="group_category" context="{'group_by': 'category_id'}"/>
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_supplier" model="ir.actions.act_window">
+        <field name="name">Suppliers</field>
+        <field name="res_model">garment.supplier</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first supplier.</p>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_tna_graph" model="ir.ui.view">
+        <field name="name">garment.tna.graph</field>
+        <field name="model">garment.tna</field>
+        <field name="arch" type="xml">
+            <graph string="TNA by Risk Level" type="bar">
+                <field name="risk_level"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_garment_tna_pivot" model="ir.ui.view">
+        <field name="name">garment.tna.pivot</field>
+        <field name="model">garment.tna</field>
+        <field name="arch" type="xml">
+            <pivot string="TNA Analysis">
+                <field name="buyer_id" type="row"/>
+                <field name="status" type="col"/>
+                <field name="progress" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_garment_tna_dashboard" model="ir.actions.act_window">
+        <field name="name">TNA Dashboard</field>
+        <field name="res_model">garment.tna</field>
+        <field name="view_mode">graph,pivot,kanban,tree</field>
+    </record>
+
+    <!-- Department-wise TNA Dashboards (SRS section 22): each department
+         sees only its own category of activities, via the Activity search
+         view's filters/groupbys (SRS section 21). -->
+    <record id="view_garment_tna_activity_dept_graph" model="ir.ui.view">
+        <field name="name">garment.tna.activity.dept.graph</field>
+        <field name="model">garment.tna.activity</field>
+        <field name="arch" type="xml">
+            <graph string="Activities by Status" type="bar">
+                <field name="department"/>
+                <field name="status"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_garment_tna_activity_dept_pivot" model="ir.ui.view">
+        <field name="name">garment.tna.activity.dept.pivot</field>
+        <field name="model">garment.tna.activity</field>
+        <field name="arch" type="xml">
+            <pivot string="Department Activity Analysis">
+                <field name="responsible_person_id" type="row"/>
+                <field name="status" type="col"/>
+                <field name="progress_pct" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_garment_tna_dashboard_merchandising" model="ir.actions.act_window">
+        <field name="name">Merchandising Dashboard</field>
+        <field name="res_model">garment.tna.activity</field>
+        <field name="view_mode">graph,pivot,kanban,tree</field>
+        <field name="domain">[('category', 'in', ('merchandising', 'product_development'))]</field>
+        <field name="search_view_id" ref="view_garment_tna_activity_search"/>
+        <field name="context">{'search_default_group_status': 1}</field>
+    </record>
+
+    <record id="action_garment_tna_dashboard_purchase" model="ir.actions.act_window">
+        <field name="name">Purchase Dashboard</field>
+        <field name="res_model">garment.tna.activity</field>
+        <field name="view_mode">graph,pivot,kanban,tree</field>
+        <field name="domain">[('category', '=', 'material')]</field>
+        <field name="search_view_id" ref="view_garment_tna_activity_search"/>
+        <field name="context">{'search_default_group_status': 1}</field>
+    </record>
+
+    <record id="action_garment_tna_dashboard_production" model="ir.actions.act_window">
+        <field name="name">Production Dashboard</field>
+        <field name="res_model">garment.tna.activity</field>
+        <field name="view_mode">graph,pivot,kanban,tree</field>
+        <field name="domain">[('category', '=', 'production')]</field>
+        <field name="search_view_id" ref="view_garment_tna_activity_search"/>
+        <field name="context">{'search_default_group_status': 1}</field>
+    </record>
+
+    <record id="action_garment_tna_dashboard_quality" model="ir.actions.act_window">
+        <field name="name">Quality Dashboard</field>
+        <field name="res_model">garment.tna.activity</field>
+        <field name="view_mode">graph,pivot,kanban,tree</field>
+        <field name="domain">[('category', '=', 'quality')]</field>
+        <field name="search_view_id" ref="view_garment_tna_activity_search"/>
+        <field name="context">{'search_default_group_status': 1}</field>
+    </record>
+
+    <record id="action_garment_tna_dashboard_commercial" model="ir.actions.act_window">
+        <field name="name">Commercial Dashboard</field>
+        <field name="res_model">garment.tna.activity</field>
+        <field name="view_mode">graph,pivot,kanban,tree</field>
+        <field name="domain">[('category', '=', 'commercial')]</field>
+        <field name="search_view_id" ref="view_garment_tna_activity_search"/>
+        <field name="context">{'search_default_group_status': 1}</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_merch_task_tree" model="ir.ui.view">
+        <field name="name">garment.merch.task.tree</field>
+        <field name="model">garment.merch.task</field>
+        <field name="arch" type="xml">
+            <tree string="Merchandising Tasks" decoration-danger="is_overdue == True"
+                  decoration-success="status == 'done'" decoration-muted="status == 'cancelled'">
+                <field name="task_number"/>
+                <field name="name"/>
+                <field name="task_type"/>
+                <field name="buyer_id"/>
+                <field name="assigned_to_id"/>
+                <field name="due_date"/>
+                <field name="priority" widget="priority"/>
+                <field name="is_overdue" invisible="1"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_merch_task_form" model="ir.ui.view">
+        <field name="name">garment.merch.task.form</field>
+        <field name="model">garment.merch.task</field>
+        <field name="arch" type="xml">
+            <form string="Merchandising Task">
+                <header>
+                    <field name="status" widget="statusbar" statusbar_visible="draft,in_progress,done"/>
+                    <button name="action_start" type="object" string="Start" class="btn-primary"
+                            invisible="status != 'draft'"/>
+                    <button name="action_mark_done" type="object" string="Mark Done" class="btn-primary"
+                            invisible="status not in ('draft','in_progress')"/>
+                    <button name="action_cancel" type="object" string="Cancel" class="btn-secondary"
+                            invisible="status in ('done','cancelled')"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="task_number" readonly="1"/>
+                            <field name="task_type"/>
+                            <field name="inquiry_id"/>
+                            <field name="order_confirmation_id"/>
+                            <field name="buyer_id"/>
+                        </group>
+                        <group>
+                            <field name="assigned_to_id"/>
+                            <field name="department_role"/>
+                            <field name="priority" widget="priority"/>
+                            <field name="due_date"/>
+                            <field name="completed_date" readonly="1"/>
+                            <field name="is_overdue"/>
+                        </group>
+                    </group>
+                    <field name="description"/>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_merch_task_kanban" model="ir.ui.view">
+        <field name="name">garment.merch.task.kanban</field>
+        <field name="model">garment.merch.task</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="status" class="o_kanban_small_column">
+                <field name="name"/>
+                <field name="assigned_to_id"/>
+                <field name="due_date"/>
+                <field name="is_overdue"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_global_click oe_kanban_card #{record.is_overdue.raw_value ? 'oe_kanban_color_2' : ''}">
+                            <div class="o_kanban_record_top"><strong><field name="name"/></strong></div>
+                            <div><field name="assigned_to_id"/></div>
+                            <div><field name="due_date"/></div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_garment_merch_task_search" model="ir.ui.view">
+        <field name="name">garment.merch.task.search</field>
+        <field name="model">garment.merch.task</field>
+        <field name="arch" type="xml">
+            <search string="Search Tasks">
+                <field name="name"/>
+                <field name="buyer_id"/>
+                <field name="assigned_to_id"/>
+                <filter string="My Tasks" name="filter_my" domain="[('assigned_to_id', '=', uid)]"/>
+                <filter string="Overdue" name="filter_overdue" domain="[('is_overdue', '=', True)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                    <filter string="Assigned To" name="group_assigned" context="{'group_by': 'assigned_to_id'}"/>
+                    <filter string="Task Type" name="group_type" context="{'group_by': 'task_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_merch_task" model="ir.actions.act_window">
+        <field name="name">Merchandising Tasks</field>
+        <field name="res_model">garment.merch.task</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="context">{'search_default_filter_my': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first merchandising task.</p>
+        </field>
+    </record>
+
+</odoo>

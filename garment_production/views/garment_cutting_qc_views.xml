@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_cutting_qc_tree" model="ir.ui.view">
+        <field name="name">garment.cutting.qc.tree</field>
+        <field name="model">garment.cutting.qc</field>
+        <field name="arch" type="xml">
+            <tree string="Cutting QC" decoration-danger="result == 'fail'">
+                <field name="cutting_order_id"/>
+                <field name="bundle_id"/>
+                <field name="inspector_id"/>
+                <field name="inspection_date"/>
+                <field name="defect_qty"/>
+                <field name="result"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_cutting_qc_form" model="ir.ui.view">
+        <field name="name">garment.cutting.qc.form</field>
+        <field name="model">garment.cutting.qc</field>
+        <field name="arch" type="xml">
+            <form string="Cutting QC Inspection">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="cutting_order_id"/>
+                            <field name="bundle_id"/>
+                            <field name="inspector_id"/>
+                            <field name="inspection_date"/>
+                        </group>
+                        <group>
+                            <field name="panel_measurement_ok"/>
+                            <field name="notch_accuracy_ok"/>
+                            <field name="shade_matching_ok"/>
+                            <field name="quantity_accuracy_ok"/>
+                            <field name="checked_qty"/>
+                            <field name="defect_qty"/>
+                            <field name="result"/>
+                        </group>
+                    </group>
+                    <field name="remarks"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_cutting_qc" model="ir.actions.act_window">
+        <field name="name">Cutting QC</field>
+        <field name="res_model">garment.cutting.qc</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_iot_gateway_form" model="ir.ui.view">
+        <field name="name">garment.iot.gateway.form</field>
+        <field name="model">garment.iot.gateway</field>
+        <field name="arch" type="xml">
+            <form string="IoT Gateway">
+                <header>
+                    <button name="action_mark_online" type="object" string="Mark Online"
+                            class="btn-primary" invisible="connection_status == 'online'"/>
+                    <button name="action_mark_offline" type="object" string="Mark Offline"
+                            invisible="connection_status == 'offline'"/>
+                    <field name="connection_status" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Error" bg_color="text-bg-danger" invisible="connection_status != 'error'"/>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_devices" type="object" class="oe_stat_button" icon="fa-microchip">
+                            <field name="device_count" widget="statinfo" string="Devices"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="e.g. Sewing Floor-2 Gateway"/></h1>
+                        <h3><field name="gateway_code" readonly="1"/></h3>
+                    </div>
+                    <group>
+                        <group string="Location">
+                            <field name="warehouse_id"/>
+                            <field name="location_id"/>
+                            <field name="location_note"/>
+                        </group>
+                        <group string="Connectivity">
+                            <field name="protocol"/>
+                            <field name="broker_endpoint"/>
+                            <field name="ip_address"/>
+                            <field name="port"/>
+                            <field name="mac_address"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Status">
+                            <field name="last_heartbeat" readonly="1"/>
+                            <field name="installed_date"/>
+                            <field name="online_device_count" readonly="1"/>
+                        </group>
+                        <group string="API Access">
+                            <field name="api_key" readonly="1" password="True"/>
+                        </group>
+                    </group>
+                    <group string="Notes">
+                        <field name="notes" nolabel="1"/>
+                    </group>
+                    <notebook>
+                        <page string="Devices">
+                            <field name="device_ids">
+                                <tree>
+                                    <field name="device_code"/>
+                                    <field name="name"/>
+                                    <field name="device_type"/>
+                                    <field name="connection_status" widget="badge"
+                                           decoration-success="connection_status == 'online'"
+                                           decoration-muted="connection_status == 'offline'"
+                                           decoration-danger="connection_status == 'error'"/>
+                                    <field name="last_communication"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_iot_gateway_tree" model="ir.ui.view">
+        <field name="name">garment.iot.gateway.tree</field>
+        <field name="model">garment.iot.gateway</field>
+        <field name="arch" type="xml">
+            <tree string="IoT Gateways" decoration-success="connection_status == 'online'"
+                  decoration-muted="connection_status == 'offline'" decoration-danger="connection_status == 'error'">
+                <field name="gateway_code"/>
+                <field name="name"/>
+                <field name="protocol"/>
+                <field name="warehouse_id"/>
+                <field name="location_note"/>
+                <field name="device_count"/>
+                <field name="connection_status" widget="badge"/>
+                <field name="last_heartbeat"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_iot_gateway_search" model="ir.ui.view">
+        <field name="name">garment.iot.gateway.search</field>
+        <field name="model">garment.iot.gateway</field>
+        <field name="arch" type="xml">
+            <search string="Search IoT Gateways">
+                <field name="name"/>
+                <field name="gateway_code"/>
+                <field name="warehouse_id"/>
+                <filter string="Online" name="filter_online" domain="[('connection_status', '=', 'online')]"/>
+                <filter string="Offline" name="filter_offline" domain="[('connection_status', '=', 'offline')]"/>
+                <filter string="Error" name="filter_error" domain="[('connection_status', '=', 'error')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Protocol" name="group_protocol" context="{'group_by': 'protocol'}"/>
+                    <filter string="Status" name="group_status" context="{'group_by': 'connection_status'}"/>
+                    <filter string="Warehouse" name="group_warehouse" context="{'group_by': 'warehouse_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_iot_gateway" model="ir.actions.act_window">
+        <field name="name">IoT Gateways</field>
+        <field name="res_model">garment.iot.gateway</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Register the factory's first IoT gateway.</p>
+        </field>
+    </record>
+
+</odoo>

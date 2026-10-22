@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_order_risk_tree" model="ir.ui.view">
+        <field name="name">garment.order.risk.tree</field>
+        <field name="model">garment.order.risk</field>
+        <field name="arch" type="xml">
+            <tree string="Risk Factors" decoration-danger="risk_level in ('high','critical')"
+                  decoration-warning="risk_level == 'medium'">
+                <field name="order_id"/>
+                <field name="risk_category"/>
+                <field name="risk_factor"/>
+                <field name="risk_score"/>
+                <field name="risk_level"/>
+                <field name="source"/>
+                <field name="identified_date"/>
+                <field name="resolved"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_order_risk_form" model="ir.ui.view">
+        <field name="name">garment.order.risk.form</field>
+        <field name="model">garment.order.risk</field>
+        <field name="arch" type="xml">
+            <form string="Order Risk">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="order_id"/>
+                            <field name="risk_category"/>
+                            <field name="risk_factor"/>
+                            <field name="source"/>
+                        </group>
+                        <group>
+                            <field name="risk_score"/>
+                            <field name="risk_level"/>
+                            <field name="identified_date"/>
+                            <field name="resolved"/>
+                            <field name="resolved_date"/>
+                        </group>
+                    </group>
+                    <group string="Reason">
+                        <field name="reason" nolabel="1"/>
+                    </group>
+                    <group string="Recommendation">
+                        <field name="recommendation" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_order_risk" model="ir.actions.act_window">
+        <field name="name">Order Risks</field>
+        <field name="res_model">garment.order.risk</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

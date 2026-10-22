@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_tna_delay_tree" model="ir.ui.view">
+        <field name="name">garment.tna.delay.tree</field>
+        <field name="model">garment.tna.delay</field>
+        <field name="arch" type="xml">
+            <tree string="Delays" decoration-danger="severity in ('high','critical')" decoration-warning="severity == 'medium'">
+                <field name="tna_id"/>
+                <field name="activity_id"/>
+                <field name="planned_date"/>
+                <field name="actual_date"/>
+                <field name="delay_days"/>
+                <field name="severity"/>
+                <field name="delay_reason"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_tna_delay_form" model="ir.ui.view">
+        <field name="name">garment.tna.delay.form</field>
+        <field name="model">garment.tna.delay</field>
+        <field name="arch" type="xml">
+            <form string="Delay">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="tna_id"/>
+                            <field name="activity_id"/>
+                            <field name="planned_date"/>
+                            <field name="actual_date"/>
+                        </group>
+                        <group>
+                            <field name="delay_days" readonly="1"/>
+                            <field name="severity" readonly="1"/>
+                            <field name="delay_reason"/>
+                            <field name="responsible_department"/>
+                            <field name="supplier_id"/>
+                        </group>
+                    </group>
+                    <field name="corrective_action"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_tna_delay" model="ir.actions.act_window">
+        <field name="name">Delays</field>
+        <field name="res_model">garment.tna.delay</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

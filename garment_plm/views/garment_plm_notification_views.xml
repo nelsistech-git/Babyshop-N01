@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_plm_notification_tree" model="ir.ui.view">
+        <field name="name">garment.plm.notification.tree</field>
+        <field name="model">garment.plm.notification</field>
+        <field name="arch" type="xml">
+            <tree string="PLM Notifications" decoration-warning="status == 'pending'" decoration-muted="status == 'sent'">
+                <field name="project_id"/>
+                <field name="style_id"/>
+                <field name="notification_type"/>
+                <field name="subject"/>
+                <field name="recipient_id"/>
+                <field name="status"/>
+                <field name="sent_date"/>
+                <button name="action_mark_sent" type="object" string="Mark Sent" icon="fa-check"
+                        invisible="status != 'pending'"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_plm_notification_form" model="ir.ui.view">
+        <field name="name">garment.plm.notification.form</field>
+        <field name="model">garment.plm.notification</field>
+        <field name="arch" type="xml">
+            <form string="PLM Notification">
+                <header>
+                    <button name="action_mark_sent" type="object" string="Mark Sent" class="btn-primary"
+                            invisible="status != 'pending'"/>
+                    <field name="status" widget="statusbar" statusbar_visible="pending,sent"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="project_id"/>
+                            <field name="style_id" readonly="1"/>
+                            <field name="notification_type"/>
+                        </group>
+                        <group>
+                            <field name="recipient_id"/>
+                            <field name="sent_date" readonly="1"/>
+                        </group>
+                    </group>
+                    <field name="subject"/>
+                    <field name="message"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_plm_notification_search" model="ir.ui.view">
+        <field name="name">garment.plm.notification.search</field>
+        <field name="model">garment.plm.notification</field>
+        <field name="arch" type="xml">
+            <search string="Search Notifications">
+                <field name="project_id"/>
+                <field name="subject"/>
+                <filter string="Pending" name="filter_pending" domain="[('status', '=', 'pending')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Type" name="groupby_type" context="{'group_by': 'notification_type'}"/>
+                    <filter string="Status" name="groupby_status" context="{'group_by': 'status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_plm_notification" model="ir.actions.act_window">
+        <field name="name">Notifications</field>
+        <field name="res_model">garment.plm.notification</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_garment_plm_notification_search"/>
+        <field name="context">{'search_default_filter_pending': 1}</field>
+    </record>
+
+</odoo>

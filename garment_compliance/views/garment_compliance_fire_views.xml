@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_compliance_fire_equipment_tree" model="ir.ui.view">
+        <field name="name">garment.compliance.fire.equipment.tree</field>
+        <field name="model">garment.compliance.fire.equipment</field>
+        <field name="arch" type="xml">
+            <tree string="Fire Equipment" decoration-danger="status == 'expired'" decoration-warning="status == 'needs_service'">
+                <field name="name"/>
+                <field name="equipment_type"/>
+                <field name="location_id"/>
+                <field name="location_text"/>
+                <field name="last_inspection_date"/>
+                <field name="next_inspection_date"/>
+                <field name="expiry_date"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_compliance_fire_equipment_form" model="ir.ui.view">
+        <field name="name">garment.compliance.fire.equipment.form</field>
+        <field name="model">garment.compliance.fire.equipment</field>
+        <field name="arch" type="xml">
+            <form string="Fire Equipment">
+                <sheet>
+                    <div class="oe_title"><h1><field name="name" placeholder="Equipment ID"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="equipment_type"/>
+                            <field name="location_id"/>
+                            <field name="location_text"/>
+                            <field name="responsible_user_id"/>
+                        </group>
+                        <group>
+                            <field name="installation_date"/>
+                            <field name="last_inspection_date"/>
+                            <field name="next_inspection_date"/>
+                            <field name="expiry_date"/>
+                            <field name="accessible"/>
+                            <field name="status"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_compliance_fire_equipment" model="ir.actions.act_window">
+        <field name="name">Fire Equipment</field>
+        <field name="res_model">garment.compliance.fire.equipment</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="view_garment_compliance_fire_drill_tree" model="ir.ui.view">
+        <field name="name">garment.compliance.fire.drill.tree</field>
+        <field name="model">garment.compliance.fire.drill</field>
+        <field name="arch" type="xml">
+            <tree string="Fire Drills">
+                <field name="name"/>
+                <field name="drill_date"/>
+                <field name="department_id"/>
+                <field name="participant_count"/>
+                <field name="evacuation_time_minutes"/>
+                <field name="result" widget="badge"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_compliance_fire_drill_form" model="ir.ui.view">
+        <field name="name">garment.compliance.fire.drill.form</field>
+        <field name="model">garment.compliance.fire.drill</field>
+        <field name="arch" type="xml">
+            <form string="Fire Drill">
+                <header>
+                    <field name="status" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="drill_date"/>
+                            <field name="department_id"/>
+                            <field name="participant_count"/>
+                            <field name="evacuation_time_minutes"/>
+                        </group>
+                        <group>
+                            <field name="result"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="findings"/>
+                        <field name="improvement_plan"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_compliance_fire_drill" model="ir.actions.act_window">
+        <field name="name">Fire Drills</field>
+        <field name="res_model">garment.compliance.fire.drill</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

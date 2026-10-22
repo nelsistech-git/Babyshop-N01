@@ -1,0 +1,760 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Part of Smart Complete Garment Software. Copyright (c) Nelsis Tech (www.nelsistech.com) -->
+<!--
+     Shop-floor execution (garment_production) — the suite's flagship module.
+
+     Masters: 2 sewing lines (line_sewing_1 / line_sewing_2) with their
+     machines (single-needle/overlock/flatlock), 2 work centers (cutting,
+     sewing), and 1 operation routing for style_tee (10-operation sewing
+     bulletin with SMV).
+
+     order_tee is the deep example: prod_order_tee is 'running' on
+     line_sewing_1, with 4 work orders (cutting/sewing/finishing/packing), a
+     cutting order + marker + 4 bundles, 6 daily production entries
+     (2026-04-20 to 2026-04-25) showing a first-week efficiency ramp-up as
+     the line balances onto the new style, 1 OEE snapshot, 1 resolved machine
+     breakdown, and 1 fabric material issue from wh_main.
+
+     order_polo / order_hoodie stay light: prod_order_polo is 'planned'
+     (queued behind the tee run on line_sewing_1), prod_order_hoodie is
+     'released' and queued onto line_sewing_2 (BalticHaus AW26 style,
+     production starting after the tee run completes, per DEMO_STORY.md's
+     Apr-May 2026 production window).
+-->
+<odoo>
+<data noupdate="1">
+
+    <!-- =================================================================
+         Work Centers (garment.work.center)
+         ================================================================= -->
+
+    <record id="wc_cutting" model="garment.work.center">
+        <field name="name">Cutting Section</field>
+        <field name="sequence">10</field>
+        <field name="code">WC-CUT-01</field>
+        <field name="work_center_type">cutting</field>
+        <field name="department">cutting</field>
+        <field name="factory">Ashulia Factory Complex</field>
+        <field name="floor">Ground Floor</field>
+        <field name="location">Cutting Hall, Building A</field>
+        <field name="capacity">6000</field>
+        <field name="capacity_per_hour">750</field>
+        <field name="machine_count">4</field>
+        <field name="operator_count">18</field>
+        <field name="working_hours">8.0</field>
+        <field name="status">active</field>
+    </record>
+
+    <record id="wc_sewing" model="garment.work.center">
+        <field name="name">Sewing Section — Line 1 &amp; 2</field>
+        <field name="sequence">20</field>
+        <field name="code">WC-SEW-01</field>
+        <field name="work_center_type">sewing</field>
+        <field name="department">sewing</field>
+        <field name="factory">Ashulia Factory Complex</field>
+        <field name="floor">1st Floor</field>
+        <field name="location">Sewing Floor, Building A</field>
+        <field name="supervisor_id" ref="emp_line_supervisor"/>
+        <field name="capacity">1800</field>
+        <field name="capacity_per_hour">225</field>
+        <field name="machine_count">9</field>
+        <field name="operator_count">62</field>
+        <field name="working_hours">8.0</field>
+        <field name="status">active</field>
+    </record>
+
+    <!-- =================================================================
+         Production Lines (garment.production.line)
+         current_order_id is set on both lines in the second-pass block at
+         the bottom of this file, once the production orders exist.
+         ================================================================= -->
+
+    <record id="line_sewing_1" model="garment.production.line">
+        <field name="line_number">L-01</field>
+        <field name="name">Sewing Line 1</field>
+        <field name="department">sewing</field>
+        <field name="factory">Ashulia Factory Complex</field>
+        <field name="floor">1st Floor</field>
+        <field name="supervisor_id" ref="emp_line_supervisor"/>
+        <field name="line_leader_id" ref="emp_operator_1"/>
+        <field name="operator_count">32</field>
+        <field name="machine_count">5</field>
+        <field name="working_hours">8.0</field>
+        <field name="capacity_per_day">1000</field>
+        <field name="efficiency_target_pct">65.0</field>
+        <field name="current_style_id" ref="style_tee"/>
+        <field name="hourly_target">125</field>
+        <field name="daily_target">1000</field>
+        <field name="status">running</field>
+        <field name="andon_status">yellow</field>
+    </record>
+
+    <record id="line_sewing_2" model="garment.production.line">
+        <field name="line_number">L-02</field>
+        <field name="name">Sewing Line 2</field>
+        <field name="department">sewing</field>
+        <field name="factory">Ashulia Factory Complex</field>
+        <field name="floor">1st Floor</field>
+        <field name="supervisor_id" ref="emp_line_supervisor"/>
+        <field name="line_leader_id" ref="emp_operator_3"/>
+        <field name="operator_count">28</field>
+        <field name="machine_count">4</field>
+        <field name="working_hours">8.0</field>
+        <field name="capacity_per_day">800</field>
+        <field name="efficiency_target_pct">60.0</field>
+        <field name="current_style_id" ref="style_hoodie"/>
+        <field name="hourly_target">100</field>
+        <field name="daily_target">800</field>
+        <field name="status">idle</field>
+        <field name="andon_status">green</field>
+    </record>
+
+    <!-- =================================================================
+         Machines (garment.production.machine)
+         ================================================================= -->
+
+    <record id="machine_l1_sn1" model="garment.production.machine">
+        <field name="machine_number">L1-SN-01</field>
+        <field name="name">Single Needle Lock Stitch 1 — Line 1</field>
+        <field name="machine_type">single_needle</field>
+        <field name="brand">Juki</field>
+        <field name="model_reference">DDL-8700</field>
+        <field name="work_center_id" ref="wc_sewing"/>
+        <field name="line_id" ref="line_sewing_1"/>
+        <field name="location">Sewing Floor, Building A, Line 1</field>
+        <field name="purchase_date">2021-02-10</field>
+        <field name="status">running</field>
+    </record>
+
+    <record id="machine_l1_sn2" model="garment.production.machine">
+        <field name="machine_number">L1-SN-02</field>
+        <field name="name">Single Needle Lock Stitch 2 — Line 1</field>
+        <field name="machine_type">single_needle</field>
+        <field name="brand">Juki</field>
+        <field name="model_reference">DDL-8700</field>
+        <field name="work_center_id" ref="wc_sewing"/>
+        <field name="line_id" ref="line_sewing_1"/>
+        <field name="location">Sewing Floor, Building A, Line 1</field>
+        <field name="purchase_date">2021-02-10</field>
+        <field name="status">running</field>
+    </record>
+
+    <record id="machine_l1_ol1" model="garment.production.machine">
+        <field name="machine_number">L1-OL-01</field>
+        <field name="name">Overlock 1 — Line 1</field>
+        <field name="machine_type">overlock</field>
+        <field name="brand">Juki</field>
+        <field name="model_reference">MO-6714S</field>
+        <field name="work_center_id" ref="wc_sewing"/>
+        <field name="line_id" ref="line_sewing_1"/>
+        <field name="location">Sewing Floor, Building A, Line 1</field>
+        <field name="purchase_date">2020-11-05</field>
+        <field name="status">running</field>
+        <field name="iot_enabled" eval="True"/>
+        <field name="running_hours_total">3120.5</field>
+        <field name="idle_hours_total">184.0</field>
+        <field name="breakdown_hours_total">14.2</field>
+        <field name="last_output_count">168</field>
+        <field name="last_speed">4200</field>
+        <field name="last_vibration">0.42</field>
+        <field name="last_energy_consumption">1.85</field>
+        <field name="last_data_sync">2026-04-25 17:00:00</field>
+    </record>
+
+    <record id="machine_l1_ol2" model="garment.production.machine">
+        <field name="machine_number">L1-OL-02</field>
+        <field name="name">Overlock 2 — Line 1</field>
+        <field name="machine_type">overlock</field>
+        <field name="brand">Juki</field>
+        <field name="model_reference">MO-6714S</field>
+        <field name="work_center_id" ref="wc_sewing"/>
+        <field name="line_id" ref="line_sewing_1"/>
+        <field name="location">Sewing Floor, Building A, Line 1</field>
+        <field name="purchase_date">2020-11-05</field>
+        <field name="status">running</field>
+    </record>
+
+    <record id="machine_l1_fl1" model="garment.production.machine">
+        <field name="machine_number">L1-FL-01</field>
+        <field name="name">Flatlock 1 — Line 1</field>
+        <field name="machine_type">flatlock</field>
+        <field name="brand">Yamato</field>
+        <field name="model_reference">AZ8000</field>
+        <field name="work_center_id" ref="wc_sewing"/>
+        <field name="line_id" ref="line_sewing_1"/>
+        <field name="location">Sewing Floor, Building A, Line 1</field>
+        <field name="purchase_date">2021-06-18</field>
+        <field name="status">running</field>
+    </record>
+
+    <record id="machine_l2_sn1" model="garment.production.machine">
+        <field name="machine_number">L2-SN-01</field>
+        <field name="name">Single Needle Lock Stitch 1 — Line 2</field>
+        <field name="machine_type">single_needle</field>
+        <field name="brand">Juki</field>
+        <field name="model_reference">DDL-8700</field>
+        <field name="work_center_id" ref="wc_sewing"/>
+        <field name="line_id" ref="line_sewing_2"/>
+        <field name="location">Sewing Floor, Building A, Line 2</field>
+        <field name="purchase_date">2021-02-10</field>
+        <field name="status">idle</field>
+    </record>
+
+    <record id="machine_l2_ol1" model="garment.production.machine">
+        <field name="machine_number">L2-OL-01</field>
+        <field name="name">Overlock 1 — Line 2</field>
+        <field name="machine_type">overlock</field>
+        <field name="brand">Juki</field>
+        <field name="model_reference">MO-6714S</field>
+        <field name="work_center_id" ref="wc_sewing"/>
+        <field name="line_id" ref="line_sewing_2"/>
+        <field name="location">Sewing Floor, Building A, Line 2</field>
+        <field name="purchase_date">2020-11-05</field>
+        <field name="status">idle</field>
+    </record>
+
+    <record id="machine_l2_ol2" model="garment.production.machine">
+        <field name="machine_number">L2-OL-02</field>
+        <field name="name">Overlock 2 — Line 2</field>
+        <field name="machine_type">overlock</field>
+        <field name="brand">Juki</field>
+        <field name="model_reference">MO-6714S</field>
+        <field name="work_center_id" ref="wc_sewing"/>
+        <field name="line_id" ref="line_sewing_2"/>
+        <field name="location">Sewing Floor, Building A, Line 2</field>
+        <field name="purchase_date">2020-11-05</field>
+        <field name="status">idle</field>
+    </record>
+
+    <record id="machine_l2_fl1" model="garment.production.machine">
+        <field name="machine_number">L2-FL-01</field>
+        <field name="name">Flatlock 1 — Line 2</field>
+        <field name="machine_type">flatlock</field>
+        <field name="brand">Yamato</field>
+        <field name="model_reference">AZ8000</field>
+        <field name="work_center_id" ref="wc_sewing"/>
+        <field name="line_id" ref="line_sewing_2"/>
+        <field name="location">Sewing Floor, Building A, Line 2</field>
+        <field name="purchase_date">2021-06-18</field>
+        <field name="status">idle</field>
+    </record>
+
+    <!-- =================================================================
+         Operation Routing — style_tee sewing operation bulletin
+         (garment.operation.routing / .routing.line)
+         ================================================================= -->
+
+    <record id="routing_tee" model="garment.operation.routing">
+        <field name="name">Sewing Operation Bulletin — Men's Crew Neck T-Shirt (NSG-TS-2601)</field>
+        <field name="style_id" ref="style_tee"/>
+        <field name="bom_id" ref="bom_tee"/>
+        <field name="version">1.0</field>
+        <field name="status">active</field>
+    </record>
+
+    <record id="routing_tee_l10" model="garment.operation.routing.line">
+        <field name="routing_id" ref="routing_tee"/>
+        <field name="sequence">10</field>
+        <field name="operation_name">Shoulder Join</field>
+        <field name="department">sewing</field>
+        <field name="work_center_id" ref="wc_sewing"/>
+        <field name="machine_type">overlock</field>
+        <field name="smv">0.45</field>
+        <field name="skill_level">skilled</field>
+        <field name="operator_requirement">2</field>
+    </record>
+
+    <record id="routing_tee_l20" model="garment.operation.routing.line">
+        <field name="routing_id" ref="routing_tee"/>
+        <field name="sequence">20</field>
+        <field name="operation_name">Attach Neck Rib to Body</field>
+        <field name="department">sewing</field>
+        <field name="work_center_id" ref="wc_sewing"/>
+        <field name="machine_type">overlock</field>
+        <field name="smv">0.65</field>
+        <field name="skill_level">skilled</field>
+        <field name="operator_requirement">3</field>
+    </record>
+
+    <record id="routing_tee_l30" model="garment.operation.routing.line">
+        <field name="routing_id" ref="routing_tee"/>
+        <field name="sequence">30</field>
+        <field name="operation_name">Neck Rib Top Stitch</field>
+        <field name="department">sewing</field>
+        <field name="work_center_id" ref="wc_sewing"/>
+        <field name="machine_type">flatlock</field>
+        <field name="smv">0.50</field>
+        <field name="skill_level">skilled</field>
+        <field name="operator_requirement">2</field>
+    </record>
+
+    <record id="routing_tee_l40" model="garment.operation.routing.line">
+        <field name="routing_id" ref="routing_tee"/>
+        <field name="sequence">40</field>
+        <field name="operation_name">Sleeve Attach (Set-In)</field>
+        <field name="department">sewing</field>
+        <field name="work_center_id" ref="wc_sewing"/>
+        <field name="machine_type">overlock</field>
+        <field name="smv">0.75</field>
+        <field name="skill_level">skilled</field>
+        <field name="operator_requirement">4</field>
+    </record>
+
+    <record id="routing_tee_l50" model="garment.operation.routing.line">
+        <field name="routing_id" ref="routing_tee"/>
+        <field name="sequence">50</field>
+        <field name="operation_name">Side Seam &amp; Sleeve Close</field>
+        <field name="department">sewing</field>
+        <field name="work_center_id" ref="wc_sewing"/>
+        <field name="machine_type">overlock</field>
+        <field name="smv">0.70</field>
+        <field name="skill_level">skilled</field>
+        <field name="operator_requirement">4</field>
+    </record>
+
+    <record id="routing_tee_l60" model="garment.operation.routing.line">
+        <field name="routing_id" ref="routing_tee"/>
+        <field name="sequence">60</field>
+        <field name="operation_name">Sleeve Hem</field>
+        <field name="department">sewing</field>
+        <field name="work_center_id" ref="wc_sewing"/>
+        <field name="machine_type">flatlock</field>
+        <field name="smv">0.45</field>
+        <field name="skill_level">intermediate</field>
+        <field name="operator_requirement">3</field>
+    </record>
+
+    <record id="routing_tee_l70" model="garment.operation.routing.line">
+        <field name="routing_id" ref="routing_tee"/>
+        <field name="sequence">70</field>
+        <field name="operation_name">Bottom Hem</field>
+        <field name="department">sewing</field>
+        <field name="work_center_id" ref="wc_sewing"/>
+        <field name="machine_type">flatlock</field>
+        <field name="smv">0.55</field>
+        <field name="skill_level">intermediate</field>
+        <field name="operator_requirement">3</field>
+    </record>
+
+    <record id="routing_tee_l80" model="garment.operation.routing.line">
+        <field name="routing_id" ref="routing_tee"/>
+        <field name="sequence">80</field>
+        <field name="operation_name">Main Label Attach</field>
+        <field name="department">sewing</field>
+        <field name="work_center_id" ref="wc_sewing"/>
+        <field name="machine_type">single_needle</field>
+        <field name="smv">0.30</field>
+        <field name="skill_level">intermediate</field>
+        <field name="operator_requirement">2</field>
+    </record>
+
+    <record id="routing_tee_l90" model="garment.operation.routing.line">
+        <field name="routing_id" ref="routing_tee"/>
+        <field name="sequence">90</field>
+        <field name="operation_name">Care/Size Label Attach</field>
+        <field name="department">sewing</field>
+        <field name="work_center_id" ref="wc_sewing"/>
+        <field name="machine_type">single_needle</field>
+        <field name="smv">0.25</field>
+        <field name="skill_level">beginner</field>
+        <field name="operator_requirement">2</field>
+    </record>
+
+    <record id="routing_tee_l100" model="garment.operation.routing.line">
+        <field name="routing_id" ref="routing_tee"/>
+        <field name="sequence">100</field>
+        <field name="operation_name">Trimming, Thread Sucking &amp; Final Check</field>
+        <field name="department">sewing</field>
+        <field name="work_center_id" ref="wc_sewing"/>
+        <field name="machine_type">manual</field>
+        <field name="smv">0.35</field>
+        <field name="skill_level">beginner</field>
+        <field name="operator_requirement">6</field>
+    </record>
+
+    <!-- =================================================================
+         Production Orders (garment.production.order) — one per garment.order
+         ================================================================= -->
+
+    <record id="prod_order_tee" model="garment.production.order">
+        <field name="buyer_id" ref="buyer_northwind"/>
+        <field name="order_id" ref="order_tee"/>
+        <field name="order_confirmation_id" ref="order_confirmation_tee"/>
+        <field name="tna_id" ref="tna_tee"/>
+        <field name="style_id" ref="style_tee"/>
+        <field name="bom_id" ref="bom_tee"/>
+        <field name="routing_id" ref="routing_tee"/>
+        <field name="production_line_id" ref="line_sewing_1"/>
+        <field name="quantity">24000</field>
+        <field name="start_date">2026-04-14</field>
+        <field name="deadline">2026-06-08</field>
+        <field name="priority">high</field>
+        <field name="status">running</field>
+        <field name="notes">Fabric In-House ran 8 days late (Delta Knit yarn shortage, see tna_tee delay). Cutting
+started 2026-04-14 with a compressed spreading/cutting schedule; sewing began 2026-04-20 on Line 1 and is in
+its first-week ramp-up. Shipment window unaffected — still targeting 2026-06-10 per order_tee.</field>
+    </record>
+
+    <record id="prod_order_polo" model="garment.production.order">
+        <field name="buyer_id" ref="buyer_northwind"/>
+        <field name="order_id" ref="order_polo"/>
+        <field name="order_confirmation_id" ref="order_confirmation_polo"/>
+        <field name="tna_id" ref="tna_polo"/>
+        <field name="style_id" ref="style_polo"/>
+        <field name="bom_id" ref="bom_polo"/>
+        <field name="production_line_id" ref="line_sewing_1"/>
+        <field name="quantity">18000</field>
+        <field name="start_date">2026-05-11</field>
+        <field name="deadline">2026-06-15</field>
+        <field name="priority">normal</field>
+        <field name="status">planned</field>
+        <field name="notes">Queued behind order_tee on Line 1 — planned to start once the tee run clears cutting
+and sewing in early May 2026.</field>
+    </record>
+
+    <record id="prod_order_hoodie" model="garment.production.order">
+        <field name="buyer_id" ref="buyer_baltichaus"/>
+        <field name="order_id" ref="order_hoodie"/>
+        <field name="order_confirmation_id" ref="order_confirmation_hoodie"/>
+        <field name="tna_id" ref="tna_hoodie"/>
+        <field name="style_id" ref="style_hoodie"/>
+        <field name="bom_id" ref="bom_hoodie"/>
+        <field name="production_line_id" ref="line_sewing_2"/>
+        <field name="quantity">12000</field>
+        <field name="start_date">2026-05-18</field>
+        <field name="deadline">2026-07-08</field>
+        <field name="priority">normal</field>
+        <field name="status">released</field>
+        <field name="notes">Released to Line 2 — fabric material status is 'shortage' on order_hoodie
+(Delta Knit fleece delivery still being chased), so cutting has not yet started.</field>
+    </record>
+
+    <!-- =================================================================
+         Work Orders (garment.work.order) — prod_order_tee only
+         ================================================================= -->
+
+    <record id="wo_tee_cutting" model="garment.work.order">
+        <field name="sequence">10</field>
+        <field name="production_order_id" ref="prod_order_tee"/>
+        <field name="operation_name">Cutting — Fabric Spreading, Cutting &amp; Bundling</field>
+        <field name="work_center_id" ref="wc_cutting"/>
+        <field name="quantity">24000</field>
+        <field name="actual_qty">7200</field>
+        <field name="planned_duration">190.0</field>
+        <field name="actual_duration">58.0</field>
+        <field name="date_start">2026-04-14 08:00:00</field>
+        <field name="status">running</field>
+    </record>
+
+    <record id="wo_tee_sewing" model="garment.work.order">
+        <field name="sequence">20</field>
+        <field name="production_order_id" ref="prod_order_tee"/>
+        <field name="operation_name">Sewing — Full Garment Assembly</field>
+        <field name="work_center_id" ref="wc_sewing"/>
+        <field name="line_id" ref="line_sewing_1"/>
+        <field name="quantity">24000</field>
+        <field name="actual_qty">4800</field>
+        <field name="planned_duration">384.0</field>
+        <field name="actual_duration">48.0</field>
+        <field name="date_start">2026-04-20 08:00:00</field>
+        <field name="status">running</field>
+    </record>
+
+    <record id="wo_tee_finishing" model="garment.work.order">
+        <field name="sequence">30</field>
+        <field name="production_order_id" ref="prod_order_tee"/>
+        <field name="operation_name">Finishing — Trim, Iron &amp; Fold</field>
+        <field name="quantity">24000</field>
+        <field name="actual_qty">0</field>
+        <field name="planned_duration">96.0</field>
+        <field name="status">planned</field>
+    </record>
+
+    <record id="wo_tee_packing" model="garment.work.order">
+        <field name="sequence">40</field>
+        <field name="production_order_id" ref="prod_order_tee"/>
+        <field name="operation_name">Packing — Poly Bag &amp; Export Carton</field>
+        <field name="quantity">24000</field>
+        <field name="actual_qty">0</field>
+        <field name="planned_duration">72.0</field>
+        <field name="status">planned</field>
+    </record>
+
+    <!-- =================================================================
+         Cutting: Marker, Cutting Order, Bundles — prod_order_tee, Lot 1
+         ================================================================= -->
+
+    <record id="marker_tee" model="garment.cutting.marker">
+        <field name="style_id" ref="style_tee"/>
+        <field name="size_ratio">S:1 M:2 L:2 XL:1</field>
+        <field name="marker_length">18.5</field>
+        <field name="fabric_width">60</field>
+        <field name="ply_count">120</field>
+        <field name="used_area">45.24</field>
+        <field name="total_fabric_area">53.55</field>
+    </record>
+
+    <record id="cutting_order_tee" model="garment.cutting.order">
+        <field name="production_order_id" ref="prod_order_tee"/>
+        <field name="style_id" ref="style_tee"/>
+        <field name="fabric_material_id" ref="mat_fabric_jersey"/>
+        <field name="color">Optic White / Navy (Mixed Lay)</field>
+        <field name="quantity">2000</field>
+        <field name="marker_id" ref="marker_tee"/>
+        <field name="cutting_date">2026-04-14</field>
+        <field name="cutter_team">Cutting Team A</field>
+        <field name="required_fabric_qty">422.0</field>
+        <field name="issued_fabric_qty">422.0</field>
+        <field name="status">completed</field>
+    </record>
+
+    <record id="bundle_tee_white_m" model="garment.cutting.bundle">
+        <field name="cutting_order_id" ref="cutting_order_tee"/>
+        <field name="size">M</field>
+        <field name="color">Optic White</field>
+        <field name="quantity">600</field>
+        <field name="destination_line_id" ref="line_sewing_1"/>
+        <field name="current_line_id" ref="line_sewing_1"/>
+        <field name="current_operation">Side Seam &amp; Sleeve Close</field>
+        <field name="status">sewing</field>
+    </record>
+
+    <record id="bundle_tee_white_l" model="garment.cutting.bundle">
+        <field name="cutting_order_id" ref="cutting_order_tee"/>
+        <field name="size">L</field>
+        <field name="color">Optic White</field>
+        <field name="quantity">600</field>
+        <field name="destination_line_id" ref="line_sewing_1"/>
+        <field name="current_line_id" ref="line_sewing_1"/>
+        <field name="current_operation">Sleeve Attach (Set-In)</field>
+        <field name="status">sewing</field>
+    </record>
+
+    <record id="bundle_tee_navy_m" model="garment.cutting.bundle">
+        <field name="cutting_order_id" ref="cutting_order_tee"/>
+        <field name="size">M</field>
+        <field name="color">Navy</field>
+        <field name="quantity">400</field>
+        <field name="destination_line_id" ref="line_sewing_1"/>
+        <field name="status">bundling</field>
+    </record>
+
+    <record id="bundle_tee_navy_l" model="garment.cutting.bundle">
+        <field name="cutting_order_id" ref="cutting_order_tee"/>
+        <field name="size">L</field>
+        <field name="color">Navy</field>
+        <field name="quantity">400</field>
+        <field name="destination_line_id" ref="line_sewing_1"/>
+        <field name="current_line_id" ref="line_sewing_1"/>
+        <field name="status">completed</field>
+    </record>
+
+    <!-- =================================================================
+         Production Entries — daily shop-floor sewing output on Line 1,
+         2026-04-20 to 2026-04-25, ramping up as the line balances onto the
+         new style. smv is the routing's total garment SMV (4.95), so
+         efficiency_pct follows the standard Line Efficiency formula.
+         ================================================================= -->
+
+    <record id="entry_tee_apr20" model="garment.production.entry">
+        <field name="production_order_id" ref="prod_order_tee"/>
+        <field name="work_order_id" ref="wo_tee_sewing"/>
+        <field name="line_id" ref="line_sewing_1"/>
+        <field name="work_center_id" ref="wc_sewing"/>
+        <field name="department">sewing</field>
+        <field name="employee_id" ref="emp_operator_1"/>
+        <field name="bundle_id" ref="bundle_tee_white_m"/>
+        <field name="date">2026-04-20</field>
+        <field name="shift">general</field>
+        <field name="entry_method">tablet</field>
+        <field name="target_qty">650</field>
+        <field name="input_qty">560</field>
+        <field name="output_qty">520</field>
+        <field name="reject_qty">18</field>
+        <field name="rework_qty">12</field>
+        <field name="smv">4.95</field>
+        <field name="manpower">26</field>
+        <field name="working_minutes">480</field>
+        <field name="status">approved</field>
+        <field name="approved_by_id" ref="base.user_admin"/>
+    </record>
+
+    <record id="entry_tee_apr21" model="garment.production.entry">
+        <field name="production_order_id" ref="prod_order_tee"/>
+        <field name="work_order_id" ref="wo_tee_sewing"/>
+        <field name="line_id" ref="line_sewing_1"/>
+        <field name="work_center_id" ref="wc_sewing"/>
+        <field name="department">sewing</field>
+        <field name="employee_id" ref="emp_operator_2"/>
+        <field name="bundle_id" ref="bundle_tee_white_l"/>
+        <field name="date">2026-04-21</field>
+        <field name="shift">general</field>
+        <field name="entry_method">tablet</field>
+        <field name="target_qty">750</field>
+        <field name="input_qty">690</field>
+        <field name="output_qty">650</field>
+        <field name="reject_qty">15</field>
+        <field name="rework_qty">10</field>
+        <field name="smv">4.95</field>
+        <field name="manpower">28</field>
+        <field name="working_minutes">480</field>
+        <field name="status">approved</field>
+        <field name="approved_by_id" ref="base.user_admin"/>
+    </record>
+
+    <record id="entry_tee_apr22" model="garment.production.entry">
+        <field name="production_order_id" ref="prod_order_tee"/>
+        <field name="work_order_id" ref="wo_tee_sewing"/>
+        <field name="line_id" ref="line_sewing_1"/>
+        <field name="work_center_id" ref="wc_sewing"/>
+        <field name="department">sewing</field>
+        <field name="employee_id" ref="emp_operator_3"/>
+        <field name="date">2026-04-22</field>
+        <field name="shift">general</field>
+        <field name="entry_method">tablet</field>
+        <field name="target_qty">850</field>
+        <field name="input_qty">810</field>
+        <field name="output_qty">780</field>
+        <field name="reject_qty">14</field>
+        <field name="rework_qty">9</field>
+        <field name="smv">4.95</field>
+        <field name="manpower">30</field>
+        <field name="working_minutes">480</field>
+        <field name="status">approved</field>
+        <field name="approved_by_id" ref="base.user_admin"/>
+    </record>
+
+    <record id="entry_tee_apr23" model="garment.production.entry">
+        <field name="production_order_id" ref="prod_order_tee"/>
+        <field name="work_order_id" ref="wo_tee_sewing"/>
+        <field name="line_id" ref="line_sewing_1"/>
+        <field name="work_center_id" ref="wc_sewing"/>
+        <field name="department">sewing</field>
+        <field name="employee_id" ref="emp_operator_1"/>
+        <field name="date">2026-04-23</field>
+        <field name="shift">general</field>
+        <field name="entry_method">tablet</field>
+        <field name="target_qty">900</field>
+        <field name="input_qty">895</field>
+        <field name="output_qty">880</field>
+        <field name="reject_qty">10</field>
+        <field name="rework_qty">7</field>
+        <field name="smv">4.95</field>
+        <field name="manpower">30</field>
+        <field name="working_minutes">480</field>
+        <field name="status">approved</field>
+        <field name="approved_by_id" ref="base.user_admin"/>
+    </record>
+
+    <record id="entry_tee_apr24" model="garment.production.entry">
+        <field name="production_order_id" ref="prod_order_tee"/>
+        <field name="work_order_id" ref="wo_tee_sewing"/>
+        <field name="line_id" ref="line_sewing_1"/>
+        <field name="work_center_id" ref="wc_sewing"/>
+        <field name="department">sewing</field>
+        <field name="employee_id" ref="emp_operator_2"/>
+        <field name="date">2026-04-24</field>
+        <field name="shift">general</field>
+        <field name="entry_method">tablet</field>
+        <field name="target_qty">950</field>
+        <field name="input_qty">970</field>
+        <field name="output_qty">960</field>
+        <field name="reject_qty">8</field>
+        <field name="rework_qty">6</field>
+        <field name="smv">4.95</field>
+        <field name="manpower">32</field>
+        <field name="working_minutes">480</field>
+        <field name="status">confirmed</field>
+    </record>
+
+    <record id="entry_tee_apr25" model="garment.production.entry">
+        <field name="production_order_id" ref="prod_order_tee"/>
+        <field name="work_order_id" ref="wo_tee_sewing"/>
+        <field name="line_id" ref="line_sewing_1"/>
+        <field name="work_center_id" ref="wc_sewing"/>
+        <field name="department">sewing</field>
+        <field name="employee_id" ref="emp_operator_3"/>
+        <field name="date">2026-04-25</field>
+        <field name="shift">general</field>
+        <field name="entry_method">tablet</field>
+        <field name="target_qty">1000</field>
+        <field name="input_qty">1030</field>
+        <field name="output_qty">1010</field>
+        <field name="reject_qty">6</field>
+        <field name="rework_qty">5</field>
+        <field name="smv">4.95</field>
+        <field name="manpower">32</field>
+        <field name="working_minutes">480</field>
+        <field name="status">confirmed</field>
+    </record>
+
+    <!-- =================================================================
+         OEE Snapshot (garment.production.oee) — mid-week, Line 1
+         ================================================================= -->
+
+    <record id="oee_tee_line1_apr23" model="garment.production.oee">
+        <field name="line_id" ref="line_sewing_1"/>
+        <field name="date">2026-04-23</field>
+        <field name="shift">general</field>
+        <field name="availability_pct">88.5</field>
+        <field name="performance_pct">76.4</field>
+        <field name="quality_pct">98.9</field>
+    </record>
+
+    <!-- =================================================================
+         Machine Downtime (garment.machine.downtime) — resolved breakdown
+         ================================================================= -->
+
+    <record id="downtime_l1_ol1_apr22" model="garment.machine.downtime">
+        <field name="machine_id" ref="machine_l1_ol1"/>
+        <field name="line_id" ref="line_sewing_1"/>
+        <field name="work_center_id" ref="wc_sewing"/>
+        <field name="production_order_id" ref="prod_order_tee"/>
+        <field name="start_datetime">2026-04-22 10:15:00</field>
+        <field name="end_datetime">2026-04-22 11:05:00</field>
+        <field name="reason">machine_failure</field>
+        <field name="reported_by_id" ref="base.user_admin"/>
+        <field name="action_taken">Needle bar timing fault on Overlock L1-OL-01. Maintenance technician replaced
+the needle bar bushing and re-timed the looper; machine test-run and returned to the line within the hour.</field>
+        <field name="production_loss_qty">95</field>
+        <field name="status">resolved</field>
+    </record>
+
+    <!-- =================================================================
+         Material Issue (garment.production.material.issue) — fabric,
+         wh_main -> Cutting, backing cutting_order_tee's Lot 1
+         ================================================================= -->
+
+    <record id="matissue_tee_fabric_lot1" model="garment.production.material.issue">
+        <field name="production_order_id" ref="prod_order_tee"/>
+        <field name="material_id" ref="mat_fabric_jersey"/>
+        <field name="warehouse_id" ref="wh_main"/>
+        <field name="department">cutting</field>
+        <field name="requested_qty">430.0</field>
+        <field name="approved_qty">430.0</field>
+        <field name="issued_qty">422.0</field>
+        <field name="uom">Kg</field>
+        <field name="request_date">2026-04-12</field>
+        <field name="approval_date">2026-04-13</field>
+        <field name="issue_date">2026-04-14</field>
+        <field name="requested_by_id" ref="base.user_admin"/>
+        <field name="approved_by_id" ref="base.user_admin"/>
+        <field name="issued_by_id" ref="base.user_admin"/>
+        <field name="status">issued</field>
+    </record>
+
+    <!-- =================================================================
+         Second pass — link lines to the production orders queued/running
+         on them (garment.production.order records above must exist first)
+         ================================================================= -->
+
+    <record id="line_sewing_1" model="garment.production.line">
+        <field name="current_order_id" ref="prod_order_tee"/>
+    </record>
+
+    <record id="line_sewing_2" model="garment.production.line">
+        <field name="current_order_id" ref="prod_order_hoodie"/>
+    </record>
+
+</data>
+</odoo>

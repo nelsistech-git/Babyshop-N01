@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_merch_quotation_form" model="ir.ui.view">
+        <field name="name">garment.merch.quotation.form</field>
+        <field name="model">garment.merch.quotation</field>
+        <field name="arch" type="xml">
+            <form string="Quotation">
+                <header>
+                    <field name="status" widget="statusbar"
+                           statusbar_visible="draft,internal_approval,sent,buyer_review,negotiation,accepted"/>
+                    <button name="action_suggest_ai_price" type="object" string="Suggest Price (AI)" class="btn-secondary" icon="fa-magic"/>
+                    <button name="action_send" type="object" string="Send to Buyer" class="btn-primary"
+                            invisible="status not in ('draft','internal_approval')"/>
+                    <button name="action_accept" type="object" string="Mark Accepted" class="btn-primary"
+                            invisible="status not in ('sent','buyer_review','negotiation')"/>
+                    <button name="action_reject" type="object" string="Mark Rejected" class="btn-secondary"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_negotiations" type="object" class="oe_stat_button" icon="fa-handshake-o">
+                            <field name="negotiation_count" widget="statinfo" string="Negotiations"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="quotation_number"/>
+                        <h1><field name="quotation_number" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="quotation_date"/>
+                            <field name="inquiry_id"/>
+                            <field name="buyer_id"/>
+                            <field name="rfq_id"/>
+                            <field name="style_id"/>
+                            <field name="bom_id"/>
+                        </group>
+                        <group>
+                            <field name="currency_id"/>
+                            <field name="incoterm_id"/>
+                            <field name="payment_term_id"/>
+                            <field name="delivery_terms"/>
+                            <field name="valid_until"/>
+                        </group>
+                    </group>
+                    <field name="line_ids">
+                        <tree editable="bottom">
+                            <field name="style_id"/>
+                            <field name="quantity"/>
+                            <field name="fob_price"/>
+                            <field name="unit_price"/>
+                            <field name="total_value"/>
+                            <field name="delivery_date"/>
+                        </tree>
+                    </field>
+                    <group>
+                        <field name="total_value" readonly="1"/>
+                    </group>
+                    <group string="AI Price Suggestion">
+                        <field name="ai_suggested_price_note" readonly="1" nolabel="1"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_merch_quotation_tree" model="ir.ui.view">
+        <field name="name">garment.merch.quotation.tree</field>
+        <field name="model">garment.merch.quotation</field>
+        <field name="arch" type="xml">
+            <tree string="Quotations" decoration-success="status == 'accepted'" decoration-danger="status in ('rejected','expired')">
+                <field name="quotation_number"/>
+                <field name="quotation_date"/>
+                <field name="buyer_id"/>
+                <field name="total_value"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_merch_quotation_search" model="ir.ui.view">
+        <field name="name">garment.merch.quotation.search</field>
+        <field name="model">garment.merch.quotation</field>
+        <field name="arch" type="xml">
+            <search string="Search Quotations">
+                <field name="quotation_number"/>
+                <field name="buyer_id"/>
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                    <filter string="Buyer" name="group_buyer" context="{'group_by': 'buyer_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_merch_quotation" model="ir.actions.act_window">
+        <field name="name">Quotations</field>
+        <field name="res_model">garment.merch.quotation</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first quotation.</p>
+        </field>
+    </record>
+
+</odoo>

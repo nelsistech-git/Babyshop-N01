@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_production_material_issue_tree" model="ir.ui.view">
+        <field name="name">garment.production.material.issue.tree</field>
+        <field name="model">garment.production.material.issue</field>
+        <field name="arch" type="xml">
+            <tree string="Material Issues">
+                <field name="name"/>
+                <field name="production_order_id"/>
+                <field name="material_id"/>
+                <field name="department"/>
+                <field name="requested_qty"/>
+                <field name="approved_qty"/>
+                <field name="issued_qty"/>
+                <field name="status"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_production_material_issue_form" model="ir.ui.view">
+        <field name="name">garment.production.material.issue.form</field>
+        <field name="model">garment.production.material.issue</field>
+        <field name="arch" type="xml">
+            <form string="Material Issue">
+                <header>
+                    <field name="status" widget="statusbar" statusbar_visible="requested,store_approved,issued"/>
+                    <button name="action_store_approve" type="object" string="Store Approve" class="btn-primary"
+                            invisible="status != 'requested'"/>
+                    <button name="action_issue" type="object" string="Issue Material" class="btn-primary"
+                            invisible="status != 'store_approved'"/>
+                    <button name="action_reject" type="object" string="Reject" invisible="status != 'requested'"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="production_order_id"/>
+                            <field name="material_id"/>
+                            <field name="warehouse_id"/>
+                            <field name="stock_move_id"/>
+                            <field name="department"/>
+                        </group>
+                        <group>
+                            <field name="requested_qty"/>
+                            <field name="approved_qty"/>
+                            <field name="issued_qty"/>
+                            <field name="uom"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="request_date"/>
+                            <field name="requested_by_id"/>
+                        </group>
+                        <group>
+                            <field name="approval_date"/>
+                            <field name="approved_by_id"/>
+                            <field name="issue_date"/>
+                            <field name="issued_by_id"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_production_material_issue" model="ir.actions.act_window">
+        <field name="name">Material Issue to Floor</field>
+        <field name="res_model">garment.production.material.issue</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

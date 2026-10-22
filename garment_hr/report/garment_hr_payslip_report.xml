@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_report_garment_hr_payslip" model="ir.actions.report">
+        <field name="name">Payslip</field>
+        <field name="model">garment.hr.payroll</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">garment_hr.report_garment_hr_payslip</field>
+        <field name="report_file">garment_hr.report_garment_hr_payslip</field>
+        <field name="binding_model_id" ref="model_garment_hr_payroll"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'Payslip - %s' % (object.payslip_number)</field>
+    </record>
+
+    <template id="report_garment_hr_payslip">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Payslip <span t-field="o.payslip_number"/></h2>
+                        <p class="text-muted">
+                            Employee: <span t-field="o.employee_id.name"/> | Period: <span t-field="o.period_start"/> - <span t-field="o.period_end"/>
+                        </p>
+
+                        <h4>Earnings</h4>
+                        <table class="table table-sm">
+                            <tr><td>Basic Salary</td><td><span t-field="o.basic_salary"/></td></tr>
+                            <tr><td>House Rent</td><td><span t-field="o.house_rent"/></td></tr>
+                            <tr><td>Medical Allowance</td><td><span t-field="o.medical_allowance"/></td></tr>
+                            <tr><td>Food Allowance</td><td><span t-field="o.food_allowance"/></td></tr>
+                            <tr><td>Transport Allowance</td><td><span t-field="o.transport_allowance"/></td></tr>
+                            <tr><td>Overtime (<span t-field="o.overtime_hours"/> hrs @ <span t-field="o.overtime_rate_multiplier"/>x)</td><td><span t-field="o.overtime_amount"/></td></tr>
+                            <tr><td>Attendance Bonus</td><td><span t-field="o.attendance_bonus"/></td></tr>
+                            <tr><td>Festival Bonus</td><td><span t-field="o.festival_bonus"/></td></tr>
+                            <tr><td>Production Incentive</td><td><span t-field="o.production_incentive_amount"/></td></tr>
+                            <tr><td>Other Bonus</td><td><span t-field="o.bonus_amount"/></td></tr>
+                            <tr><td><strong>Gross Earnings</strong></td><td><strong><span t-field="o.gross_earnings"/></strong></td></tr>
+                        </table>
+
+                        <h4>Deductions</h4>
+                        <table class="table table-sm">
+                            <tr><td>Late Deduction</td><td><span t-field="o.late_deduction"/></td></tr>
+                            <tr><td>Advance Deduction</td><td><span t-field="o.advance_deduction"/></td></tr>
+                            <tr><td>Loan Recovery</td><td><span t-field="o.loan_recovery"/></td></tr>
+                            <tr><td>Tax</td><td><span t-field="o.tax_deduction"/></td></tr>
+                            <tr><td>Provident Fund (Employee)</td><td><span t-field="o.provident_fund_deduction"/></td></tr>
+                            <tr><td><strong>Total Deductions</strong></td><td><strong><span t-field="o.total_deductions"/></strong></td></tr>
+                        </table>
+
+                        <h3>Net Salary: <span t-field="o.net_salary"/></h3>
+                        <p class="text-muted">
+                            Provident Fund (Employer, informational): <span t-field="o.provident_fund_employer_contribution"/>
+                            | Gratuity Accrual (informational): <span t-field="o.gratuity_accrual"/>
+                        </p>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

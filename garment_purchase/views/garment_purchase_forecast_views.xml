@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_purchase_forecast_tree" model="ir.ui.view">
+        <field name="name">garment.purchase.forecast.tree</field>
+        <field name="model">garment.purchase.forecast</field>
+        <field name="arch" type="xml">
+            <tree string="Purchase Forecasts" decoration-info="forecast_type == 'price_prediction'"
+                  decoration-danger="forecast_type == 'delay_risk' and risk_level == 'high'">
+                <field name="forecast_type"/>
+                <field name="material_category"/>
+                <field name="material_name"/>
+                <field name="supplier_id"/>
+                <field name="forecast_period"/>
+                <field name="expected_requirement_qty"/>
+                <field name="predicted_price_change_pct"/>
+                <field name="risk_level"/>
+                <field name="confidence_pct"/>
+                <field name="generated_date"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_purchase_forecast_form" model="ir.ui.view">
+        <field name="name">garment.purchase.forecast.form</field>
+        <field name="model">garment.purchase.forecast</field>
+        <field name="arch" type="xml">
+            <form string="Purchase Forecast">
+                <header>
+                    <button name="action_create_requisition" type="object" string="Create Purchase Requisition"
+                            class="btn-primary"
+                            invisible="forecast_type != 'demand' or requisition_id != False"/>
+                </header>
+                <sheet>
+                    <!-- FIXED: Added hidden field so the 'invisible' modifier can evaluate it -->
+                    <field name="requisition_id" invisible="1"/>
+
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_requisition" type="object" class="oe_stat_button"
+                                icon="fa-file-text-o" invisible="requisition_id == False" string="Requisition"/>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="forecast_type"/>
+                            <field name="material_category"/>
+                            <field name="material_name"/>
+                            <field name="supplier_id" invisible="forecast_type != 'delay_risk'"/>
+                            <field name="forecast_period"/>
+                            <field name="uom"/>
+                        </group>
+                        <group>
+                            <field name="expected_requirement_qty" invisible="forecast_type != 'demand'"/>
+                            <field name="current_price" invisible="forecast_type != 'price_prediction'"/>
+                            <field name="predicted_price_change_pct" invisible="forecast_type != 'price_prediction'"/>
+                            <field name="risk_level" invisible="forecast_type != 'delay_risk'"/>
+                            <field name="confidence_pct"/>
+                            <field name="generated_date"/>
+                        </group>
+                    </group>
+                    <field name="basis_note"/>
+                    <field name="recommendation"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_purchase_forecast_search" model="ir.ui.view">
+        <field name="name">garment.purchase.forecast.search</field>
+        <field name="model">garment.purchase.forecast</field>
+        <field name="arch" type="xml">
+            <search string="Search Forecasts">
+                <field name="material_name"/>
+                <field name="supplier_id"/>
+                <filter string="Demand" name="filter_demand" domain="[('forecast_type', '=', 'demand')]"/>
+                <filter string="Price Prediction" name="filter_price" domain="[('forecast_type', '=', 'price_prediction')]"/>
+                <filter string="Delay Risk" name="filter_delay" domain="[('forecast_type', '=', 'delay_risk')]"/>
+                <filter string="High Risk" name="filter_high_risk" domain="[('risk_level', '=', 'high')]"/>
+                <filter string="No Requisition Yet" name="filter_no_requisition" domain="[('requisition_id', '=', False)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Forecast Type" name="group_type" context="{'group_by': 'forecast_type'}"/>
+                    <filter string="Material Category" name="group_category" context="{'group_by': 'material_category'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_purchase_forecast" model="ir.actions.act_window">
+        <field name="name">Purchase Forecasts</field>
+        <field name="res_model">garment.purchase.forecast</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

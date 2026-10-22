@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_hr_promotion_tree" model="ir.ui.view">
+        <field name="name">garment.hr.promotion.tree</field>
+        <field name="model">garment.hr.promotion</field>
+        <field name="arch" type="xml">
+            <tree string="Promotions" decoration-success="status == 'approved'">
+                <field name="employee_id"/>
+                <field name="promotion_type"/>
+                <field name="new_designation_id"/>
+                <field name="new_salary"/>
+                <field name="effective_date"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_hr_promotion_form" model="ir.ui.view">
+        <field name="name">garment.hr.promotion.form</field>
+        <field name="model">garment.hr.promotion</field>
+        <field name="arch" type="xml">
+            <form string="Promotion">
+                <header>
+                    <field name="status" widget="statusbar"/>
+                    <button name="action_approve" type="object" string="Approve" class="btn-primary"
+                            invisible="status == 'approved'"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="employee_id"/>
+                            <field name="promotion_type"/>
+                            <field name="previous_designation_id"/>
+                            <field name="new_designation_id"/>
+                            <field name="previous_department_id"/>
+                            <field name="new_department_id"/>
+                            <field name="previous_line_assignment"/>
+                            <field name="new_line_assignment"/>
+                        </group>
+                        <group>
+                            <field name="currency_id"/>
+                            <field name="previous_salary"/>
+                            <field name="new_salary"/>
+                            <field name="effective_date"/>
+                            <field name="approved_by_id" readonly="1"/>
+                        </group>
+                    </group>
+                    <field name="reason"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_hr_promotion" model="ir.actions.act_window">
+        <field name="name">Promotions</field>
+        <field name="res_model">garment.hr.promotion</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Record your first promotion.</p>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_portal_approval_action_tree" model="ir.ui.view">
+        <field name="name">garment.portal.approval.action.tree</field>
+        <field name="model">garment.portal.approval.action</field>
+        <field name="arch" type="xml">
+            <tree string="Buyer Portal Approvals" decoration-success="decision == 'approved'"
+                  decoration-danger="decision == 'rejected'" decoration-warning="decision == 'revision_required'">
+                <field name="name"/>
+                <field name="buyer_id"/>
+                <field name="approval_type"/>
+                <field name="techpack_id"/>
+                <field name="sample_id"/>
+                <field name="style_id"/>
+                <field name="requested_date"/>
+                <field name="decision" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_portal_approval_action_form" model="ir.ui.view">
+        <field name="name">garment.portal.approval.action.form</field>
+        <field name="model">garment.portal.approval.action</field>
+        <field name="arch" type="xml">
+            <form string="Buyer Portal Approval">
+                <header>
+                    <field name="decision" widget="statusbar" statusbar_visible="pending,approved"/>
+                    <button name="action_apply_decision" type="object" string="Apply Decision"
+                            class="btn-primary" invisible="decision == 'pending'"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="buyer_id"/>
+                            <field name="partner_id"/>
+                            <field name="approval_type"/>
+                            <field name="order_id"/>
+                            <field name="version"/>
+                        </group>
+                        <group>
+                            <field name="techpack_id" invisible="approval_type != 'techpack'"/>
+                            <field name="techpack_approval_id" invisible="approval_type != 'techpack'"/>
+                            <field name="sample_id" invisible="approval_type != 'sample'"/>
+                            <field name="sample_approval_id" invisible="approval_type != 'sample'"/>
+                            <field name="style_id" invisible="approval_type != 'style'"/>
+                            <field name="style_approval_id" invisible="approval_type != 'style'"/>
+                        </group>
+                    </group>
+                    <group string="Buyer Decision (SRS section 26)">
+                        <field name="comments"/>
+                        <field name="attachment" filename="attachment_filename"/>
+                        <field name="attachment_filename" invisible="1"/>
+                        <field name="requested_date"/>
+                        <field name="decision_date" readonly="1"/>
+                        <field name="ip_address" readonly="1"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_portal_approval_action_search" model="ir.ui.view">
+        <field name="name">garment.portal.approval.action.search</field>
+        <field name="model">garment.portal.approval.action</field>
+        <field name="arch" type="xml">
+            <search string="Search Buyer Portal Approvals">
+                <field name="name"/>
+                <field name="buyer_id"/>
+                <field name="techpack_id"/>
+                <field name="sample_id"/>
+                <field name="style_id"/>
+                <filter string="Pending" name="filter_pending" domain="[('decision', '=', 'pending')]"/>
+                <filter string="Approved" name="filter_approved" domain="[('decision', '=', 'approved')]"/>
+                <filter string="Revision Required" name="filter_revision"
+                        domain="[('decision', '=', 'revision_required')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Buyer" name="group_buyer" context="{'group_by': 'buyer_id'}"/>
+                    <filter string="Approval Type" name="group_type" context="{'group_by': 'approval_type'}"/>
+                    <filter string="Decision" name="group_decision" context="{'group_by': 'decision'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_portal_approval_action" model="ir.actions.act_window">
+        <field name="name">Buyer Portal Approvals</field>
+        <field name="res_model">garment.portal.approval.action</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_garment_portal_approval_action_search"/>
+        <field name="context">{'search_default_filter_pending': 1}</field>
+    </record>
+
+</odoo>

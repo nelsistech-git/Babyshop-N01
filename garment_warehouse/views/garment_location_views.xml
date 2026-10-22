@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_location_tree" model="ir.ui.view">
+        <field name="name">garment.location.tree</field>
+        <field name="model">garment.location</field>
+        <field name="arch" type="xml">
+            <tree string="Locations" editable="bottom" decoration-danger="capacity and utilization_percent >= 100">
+                <field name="warehouse_id"/>
+                <field name="zone"/>
+                <field name="rack"/>
+                <field name="shelf"/>
+                <field name="bin"/>
+                <field name="location_code"/>
+                <field name="location_type"/>
+                <field name="location_purpose"/>
+                <field name="capacity"/>
+                <field name="occupied_qty"/>
+                <field name="utilization_percent" widget="progressbar"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_location_form" model="ir.ui.view">
+        <field name="name">garment.location.form</field>
+        <field name="model">garment.location</field>
+        <field name="arch" type="xml">
+            <form string="Location">
+                <sheet>
+                    <div class="oe_title"><h1><field name="location_code" readonly="1"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="warehouse_id"/>
+                            <field name="zone"/>
+                            <field name="rack"/>
+                            <field name="shelf"/>
+                            <field name="bin"/>
+                            <field name="location_type"/>
+                            <field name="location_purpose"/>
+                        </group>
+                        <group>
+                            <field name="capacity"/>
+                            <field name="capacity_uom"/>
+                            <field name="occupied_qty" readonly="1"/>
+                            <field name="utilization_percent" readonly="1" widget="progressbar"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_location_search" model="ir.ui.view">
+        <field name="name">garment.location.search</field>
+        <field name="model">garment.location</field>
+        <field name="arch" type="xml">
+            <search string="Search Locations">
+                <field name="location_code"/>
+                <field name="warehouse_id"/>
+                <filter string="Gate Locations" name="filter_gate" domain="[('location_purpose', '=', 'gate')]"/>
+                <filter string="Quality Hold" name="filter_hold" domain="[('location_purpose', '=', 'quality_hold')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Warehouse" name="group_warehouse" context="{'group_by': 'warehouse_id'}"/>
+                    <filter string="Purpose" name="group_purpose" context="{'group_by': 'location_purpose'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_location" model="ir.actions.act_window">
+        <field name="name">Locations</field>
+        <field name="res_model">garment.location</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_garment_location_search"/>
+    </record>
+</odoo>

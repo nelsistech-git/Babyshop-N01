@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_rfq_tree" model="ir.ui.view">
+        <field name="name">garment.rfq.tree</field>
+        <field name="model">garment.rfq</field>
+        <field name="arch" type="xml">
+            <tree string="RFQs">
+                <field name="rfq_number"/>
+                <field name="rfq_date"/>
+                <field name="buyer_id"/>
+                <field name="style_name"/>
+                <field name="product_category"/>
+                <field name="order_quantity"/>
+                <field name="target_fob_price"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_rfq_form" model="ir.ui.view">
+        <field name="name">garment.rfq.form</field>
+        <field name="model">garment.rfq</field>
+        <field name="arch" type="xml">
+            <form string="RFQ">
+                <header>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,under_review,costing,sample_development,quotation_ready,submitted,buyer_review,approved"/>
+                    <button name="action_submit" type="object" string="Submit to Buyer" class="btn-primary"
+                            invisible="state not in ['quotation_ready', 'draft', 'under_review']"/>
+                    <button name="action_approve" type="object" string="Approve" class="btn-primary"
+                            invisible="state != 'buyer_review'"/>
+                    <button name="action_reject" type="object" string="Reject" class="btn-secondary"
+                            invisible="state != 'buyer_review'"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="rfq_number" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="rfq_date"/>
+                            <field name="buyer_id"/>
+                            <field name="buyer_contact_id"/>
+                            <field name="opportunity_id"/>
+                            <field name="inquiry_number"/>
+                            <field name="season"/>
+                            <field name="brand"/>
+                            <field name="collection"/>
+                        </group>
+                        <group>
+                            <field name="department"/>
+                            <field name="product_category"/>
+                            <field name="product_type"/>
+                            <field name="style_name"/>
+                            <field name="style_number"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Product Information">
+                            <group>
+                                <group>
+                                    <field name="fabric_type"/>
+                                    <field name="fabric_composition"/>
+                                    <field name="gsm"/>
+                                    <field name="color"/>
+                                    <field name="print_type"/>
+                                    <field name="embroidery"/>
+                                    <field name="wash_type"/>
+                                </group>
+                                <group>
+                                    <field name="size_range"/>
+                                    <field name="packing_type"/>
+                                    <field name="label_type"/>
+                                    <field name="hang_tag"/>
+                                    <field name="poly_bag"/>
+                                    <field name="carton"/>
+                                </group>
+                            </group>
+                            <field name="product_description"/>
+                        </page>
+                        <page string="Quantity">
+                            <group>
+                                <field name="moq"/>
+                                <field name="order_quantity"/>
+                                <field name="delivery_schedule"/>
+                            </group>
+                            <group>
+                                <field name="size_breakdown"/>
+                                <field name="color_breakdown"/>
+                                <field name="country_wise_quantity"/>
+                            </group>
+                        </page>
+                        <page string="Commercial">
+                            <group>
+                                <group>
+                                    <field name="currency_id"/>
+                                    <field name="target_fob_price"/>
+                                    <field name="target_cm"/>
+                                    <field name="payment_term_id"/>
+                                </group>
+                                <group>
+                                    <field name="delivery_term"/>
+                                    <field name="incoterm_id"/>
+                                    <field name="destination_port"/>
+                                    <field name="shipment_mode"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Dates">
+                            <group>
+                                <field name="rfq_received_date"/>
+                                <field name="costing_due_date"/>
+                                <field name="sample_due_date"/>
+                                <field name="quotation_due_date"/>
+                                <field name="buyer_response_date"/>
+                                <field name="expected_po_date"/>
+                            </group>
+                        </page>
+                        <page string="Attachments">
+                            <group>
+                                <field name="tech_pack_file" filename="'Tech Pack'"/>
+                                <field name="artwork_file" filename="'Artwork'"/>
+                                <field name="measurement_sheet_file" filename="'Measurement Sheet'"/>
+                                <field name="color_standard_file" filename="'Color Standard'"/>
+                                <field name="fabric_standard_file" filename="'Fabric Standard'"/>
+                                <field name="trim_sheet_file" filename="'Trim Sheet'"/>
+                                <field name="packaging_instruction_file" filename="'Packaging Instructions'"/>
+                                <field name="cad_file" filename="'CAD File'"/>
+                                <field name="reference_image" filename="'Reference Image'"/>
+                            </group>
+                        </page>
+                        <page string="Notes">
+                            <group>
+                                <field name="branch"/>
+                            </group>
+                            <field name="internal_notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_rfq_search" model="ir.ui.view">
+        <field name="name">garment.rfq.search</field>
+        <field name="model">garment.rfq</field>
+        <field name="arch" type="xml">
+            <search string="Search RFQs">
+                <field name="rfq_number"/>
+                <field name="buyer_id"/>
+                <field name="style_name"/>
+                <group expand="0" string="Group By">
+                    <filter string="Buyer" name="group_buyer" context="{'group_by': 'buyer_id'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_rfq" model="ir.actions.act_window">
+        <field name="name">RFQs</field>
+        <field name="res_model">garment.rfq</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Log your first buyer RFQ.</p>
+        </field>
+    </record>
+
+</odoo>

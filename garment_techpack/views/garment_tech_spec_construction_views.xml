@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_tech_spec_tree" model="ir.ui.view">
+        <field name="name">garment.tech.spec.tree</field>
+        <field name="model">garment.tech.spec</field>
+        <field name="arch" type="xml">
+            <tree string="Technical Specifications">
+                <field name="techpack_id"/>
+                <field name="sewing_method"/>
+                <field name="stitch_type"/>
+                <field name="seam_type"/>
+                <field name="spi"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_tech_spec_form" model="ir.ui.view">
+        <field name="name">garment.tech.spec.form</field>
+        <field name="model">garment.tech.spec</field>
+        <field name="arch" type="xml">
+            <form string="Technical Specification">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="techpack_id"/>
+                            <field name="sewing_method"/>
+                            <field name="stitch_type"/>
+                            <field name="stitch_density"/>
+                            <field name="seam_type"/>
+                            <field name="seam_allowance"/>
+                        </group>
+                        <group>
+                            <field name="thread_type"/>
+                            <field name="thread_count"/>
+                            <field name="spi"/>
+                            <field name="needle_specification"/>
+                            <field name="machine_requirement"/>
+                        </group>
+                    </group>
+                    <field name="notes"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_tech_spec" model="ir.actions.act_window">
+        <field name="name">Technical Specifications</field>
+        <field name="res_model">garment.tech.spec</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="view_garment_construction_detail_tree" model="ir.ui.view">
+        <field name="name">garment.construction.detail.tree</field>
+        <field name="model">garment.construction.detail</field>
+        <field name="arch" type="xml">
+            <tree string="Construction Details">
+                <field name="techpack_id"/>
+                <field name="component"/>
+                <field name="construction_notes"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_construction_detail_form" model="ir.ui.view">
+        <field name="name">garment.construction.detail.form</field>
+        <field name="model">garment.construction.detail</field>
+        <field name="arch" type="xml">
+            <form string="Construction Detail">
+                <sheet>
+                    <group>
+                        <field name="techpack_id"/>
+                        <field name="component"/>
+                    </group>
+                    <field name="construction_notes"/>
+                    <group string="Sleeve" invisible="component not in ('sleeve', 'cuff')">
+                        <field name="sleeve_attachment"/>
+                        <field name="sleeve_opening"/>
+                        <field name="sleeve_measurement"/>
+                    </group>
+                    <group string="Collar" invisible="component != 'collar'">
+                        <field name="collar_height"/>
+                        <field name="collar_width"/>
+                        <field name="collar_interlining"/>
+                        <field name="collar_stitching"/>
+                    </group>
+                    <group string="Pocket" invisible="component != 'pocket'">
+                        <field name="pocket_position"/>
+                        <field name="pocket_size"/>
+                        <field name="pocket_shape"/>
+                        <field name="pocket_opening"/>
+                        <field name="pocket_stitching"/>
+                    </group>
+                    <group string="Closure" invisible="component != 'closure'">
+                        <field name="closure_type"/>
+                        <field name="closure_size"/>
+                        <field name="closure_brand"/>
+                        <field name="closure_color"/>
+                        <field name="closure_placement"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_construction_detail" model="ir.actions.act_window">
+        <field name="name">Construction Details</field>
+        <field name="res_model">garment.construction.detail</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

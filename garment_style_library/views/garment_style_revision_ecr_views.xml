@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_style_revision_tree" model="ir.ui.view">
+        <field name="name">garment.style.revision.tree</field>
+        <field name="model">garment.style.revision</field>
+        <field name="arch" type="xml">
+            <tree string="Revisions">
+                <field name="style_id"/>
+                <field name="version_number"/>
+                <field name="change_type"/>
+                <field name="changed_by_id"/>
+                <field name="changed_date"/>
+                <field name="approval_status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_style_revision_form" model="ir.ui.view">
+        <field name="name">garment.style.revision.form</field>
+        <field name="model">garment.style.revision</field>
+        <field name="arch" type="xml">
+            <form string="Style Revision">
+                <header>
+                    <field name="approval_status" widget="statusbar"/>
+                    <button name="action_approve" type="object" string="Approve" class="btn-primary"
+                            invisible="approval_status == 'approved'"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="style_id"/>
+                            <field name="version_number"/>
+                            <field name="revision_number"/>
+                            <field name="parent_version_id"/>
+                        </group>
+                        <group>
+                            <field name="change_type"/>
+                            <field name="changed_by_id"/>
+                            <field name="changed_date"/>
+                            <field name="buyer_reference"/>
+                        </group>
+                    </group>
+                    <field name="change_reason"/>
+                    <field name="snapshot_note"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_style_revision" model="ir.actions.act_window">
+        <field name="name">Revisions</field>
+        <field name="res_model">garment.style.revision</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="view_garment_ecr_tree" model="ir.ui.view">
+        <field name="name">garment.ecr.tree</field>
+        <field name="model">garment.ecr</field>
+        <field name="arch" type="xml">
+            <tree string="Engineering Change Requests">
+                <field name="ecr_number"/>
+                <field name="style_id"/>
+                <field name="change_category"/>
+                <field name="priority" widget="priority"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_ecr_form" model="ir.ui.view">
+        <field name="name">garment.ecr.form</field>
+        <field name="model">garment.ecr</field>
+        <field name="arch" type="xml">
+            <form string="Engineering Change Request">
+                <header>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,technical_review,merchandising_review,qa_review,approval,implemented,closed"/>
+                    <button name="action_next_stage" type="object" string="Move to Next Stage" class="btn-primary"
+                            invisible="state == 'closed'"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="ecr_number" readonly="1"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="style_id"/>
+                            <field name="requested_by_id"/>
+                            <field name="department"/>
+                            <field name="date"/>
+                        </group>
+                        <group>
+                            <field name="priority" widget="priority"/>
+                            <field name="change_category"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="description"/>
+                        <field name="business_reason"/>
+                        <field name="impact_analysis"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_ecr_search" model="ir.ui.view">
+        <field name="name">garment.ecr.search</field>
+        <field name="model">garment.ecr</field>
+        <field name="arch" type="xml">
+            <search string="Search ECRs">
+                <field name="ecr_number"/>
+                <field name="style_id"/>
+                <field name="change_category"/>
+                <filter string="Open" name="filter_open" domain="[('state', 'not in', ['closed'])]"/>
+                <filter string="Closed" name="filter_closed" domain="[('state', '=', 'closed')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Change Category" name="group_category" context="{'group_by': 'change_category'}"/>
+                    <filter string="Style" name="group_style" context="{'group_by': 'style_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_ecr" model="ir.actions.act_window">
+        <field name="name">Engineering Change Requests</field>
+        <field name="res_model">garment.ecr</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

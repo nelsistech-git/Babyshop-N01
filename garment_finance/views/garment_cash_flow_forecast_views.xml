@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_cash_flow_forecast_tree" model="ir.ui.view">
+        <field name="name">garment.cash.flow.forecast.tree</field>
+        <field name="model">garment.cash.flow.forecast</field>
+        <field name="arch" type="xml">
+            <tree string="Cash Flow Forecasts" decoration-danger="closing_balance &lt; 0">
+                <field name="name"/>
+                <field name="period_start"/>
+                <field name="period_end"/>
+                <field name="opening_balance"/>
+                <field name="expected_inflow"/>
+                <field name="expected_outflow"/>
+                <field name="closing_balance"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_cash_flow_forecast_form" model="ir.ui.view">
+        <field name="name">garment.cash.flow.forecast.form</field>
+        <field name="model">garment.cash.flow.forecast</field>
+        <field name="arch" type="xml">
+            <form string="Cash Flow Forecast">
+                <header>
+                    <button name="action_recompute" type="object" string="Recompute" class="btn-secondary"/>
+                    <button name="action_run_ai_analysis" type="object" string="Run AI Risk Analysis"
+                            class="btn-secondary" icon="fa-magic"/>
+                    <button name="action_confirm" type="object" string="Confirm" class="btn-primary"
+                            invisible="state == 'confirmed'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="period_start"/>
+                            <field name="period_end"/>
+                        </group>
+                        <group>
+                            <field name="currency_id"/>
+                        </group>
+                    </group>
+                    <group string="Forecast">
+                        <group>
+                            <field name="opening_balance" readonly="1"/>
+                            <field name="expected_inflow" readonly="1"/>
+                            <field name="expected_outflow" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="net_cash" readonly="1"/>
+                            <field name="closing_balance" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="AI Cash Flow Risk">
+                            <field name="ai_last_run" readonly="1"/>
+                            <field name="ai_cash_flow_risk_note" readonly="1" nolabel="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_cash_flow_forecast" model="ir.actions.act_window">
+        <field name="name">Cash Flow Forecast</field>
+        <field name="res_model">garment.cash.flow.forecast</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create a cash flow forecast for an upcoming period.</p>
+        </field>
+    </record>
+
+</odoo>

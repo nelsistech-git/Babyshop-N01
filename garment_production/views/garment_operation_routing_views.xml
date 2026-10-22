@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_operation_routing_tree" model="ir.ui.view">
+        <field name="name">garment.operation.routing.tree</field>
+        <field name="model">garment.operation.routing</field>
+        <field name="arch" type="xml">
+            <tree string="Operation Routings">
+                <field name="routing_number"/>
+                <field name="name"/>
+                <field name="style_id"/>
+                <field name="version"/>
+                <field name="total_smv"/>
+                <field name="status"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_operation_routing_form" model="ir.ui.view">
+        <field name="name">garment.operation.routing.form</field>
+        <field name="model">garment.operation.routing</field>
+        <field name="arch" type="xml">
+            <form string="Operation Routing">
+                <header>
+                    <field name="status" widget="statusbar" statusbar_visible="draft,active,obsolete"/>
+                    <button name="action_activate" type="object" string="Activate" class="btn-primary"
+                            invisible="status != 'draft'"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="routing_number" readonly="1"/>
+                            <field name="style_id"/>
+                            <field name="bom_id"/>
+                            <field name="version"/>
+                        </group>
+                        <group>
+                            <field name="total_smv"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Operations (Operation Bulletin / SMV)">
+                            <field name="line_ids">
+                                <tree editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="operation_name"/>
+                                    <field name="department"/>
+                                    <field name="work_center_id"/>
+                                    <field name="machine_type"/>
+                                    <field name="smv"/>
+                                    <field name="skill_level"/>
+                                    <field name="operator_requirement"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_operation_routing_search" model="ir.ui.view">
+        <field name="name">garment.operation.routing.search</field>
+        <field name="model">garment.operation.routing</field>
+        <field name="arch" type="xml">
+            <search string="Search Routings">
+                <field name="routing_number"/>
+                <field name="style_id"/>
+                <group expand="0" string="Group By">
+                    <filter string="Style" name="group_style" context="{'group_by': 'style_id'}"/>
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_operation_routing" model="ir.actions.act_window">
+        <field name="name">Operation Routing / SMV</field>
+        <field name="res_model">garment.operation.routing</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_garment_operation_routing_search"/>
+    </record>
+
+</odoo>

@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<data noupdate="1">
+
+    <!-- =====================================================================
+         garment_maintenance demo data
+         Non-production assets (generator, air compressor), a sewing-machine
+         PM checklist, a monthly PM plan, one completed breakdown work order
+         and a maintenance KPI snapshot (MTTR/MTBF) for June 2026.
+
+         NOTE ON MACHINE REFERENCE: data/04_production_demo.xml (loaded just
+         before this file per the manifest) is expected to create
+         garment.production.machine records on line_sewing_1/line_sewing_2,
+         but it was not yet present on disk when this file was written, so a
+         small fallback machine record is created below (machine_fallback_sewing_sn14)
+         so this batch is not blocked. If garment_demo_data.line_sewing_1 /
+         a real production machine id from that file already exists by the
+         time this module is installed, this fallback machine simply becomes
+         a harmless duplicate machine in the register.
+         ===================================================================== -->
+
+    <!-- Flag the existing HR employee as a maintenance technician (field added
+         by garment_maintenance's extension of garment.hr.employee). -->
+    <record id="emp_maintenance_tech" model="garment.hr.employee">
+        <field name="is_maintenance_technician">1</field>
+        <field name="maintenance_specialization">mechanical</field>
+        <field name="maintenance_certification">Diploma in Mechanical Engineering (BTEB); Certified Industrial Sewing Machine Technician</field>
+        <field name="maintenance_experience_years">8.0</field>
+    </record>
+
+    <!-- ===============================================================
+         Fallback production machine (see note above)
+         =============================================================== -->
+    <record id="machine_fallback_sewing_sn14" model="garment.production.machine">
+        <field name="machine_number">SM-L1-014</field>
+        <field name="name">Juki DDL-8700 Single Needle #14</field>
+        <field name="machine_type">single_needle</field>
+        <field name="brand">Juki</field>
+        <field name="model_reference">DDL-8700</field>
+        <field name="location">Sewing Line 1, Bay 2, Ashulia</field>
+        <field name="purchase_date">2022-03-10</field>
+        <field name="status">running</field>
+        <field name="iot_enabled">1</field>
+        <field name="running_hours_total">3120.0</field>
+        <field name="idle_hours_total">240.0</field>
+        <field name="breakdown_hours_total">5.5</field>
+    </record>
+
+    <!-- ===============================================================
+         Non-production assets (garment.asset)
+         =============================================================== -->
+    <record id="asset_generator_01" model="garment.asset">
+        <field name="name">Standby Diesel Generator - 500 kVA</field>
+        <field name="category">utility_generator</field>
+        <field name="brand">Cummins</field>
+        <field name="model_reference">C500D5</field>
+        <field name="serial_number">CUM500D5-20191187</field>
+        <field name="motor_power">500 kVA</field>
+        <field name="voltage">400V / 3-phase</field>
+        <field name="capacity">500 kVA</field>
+        <field name="factory">Nelsis Main Factory, Ashulia</field>
+        <field name="floor">Ground Floor - Utility Yard</field>
+        <field name="department_id" ref="dept_maintenance"/>
+        <field name="line_position">Utility Yard - Genset Room</field>
+        <field name="purchase_date">2019-11-20</field>
+        <field name="installation_date">2019-12-05</field>
+        <field name="purchase_value">4200000</field>
+        <field name="current_value">2100000</field>
+        <field name="state">active</field>
+        <field name="warranty_start_date">2019-12-05</field>
+        <field name="warranty_end_date">2021-12-05</field>
+        <field name="warranty_terms">2-year OEM warranty on engine and alternator, parts and labor, via local Cummins dealer.</field>
+        <field name="responsible_technician_id" ref="emp_maintenance_tech"/>
+    </record>
+
+    <record id="asset_air_compressor_01" model="garment.asset">
+        <field name="name">Sewing Floor Air Compressor</field>
+        <field name="category">utility_compressor</field>
+        <field name="brand">Atlas Copco</field>
+        <field name="model_reference">GA 30 VSD</field>
+        <field name="serial_number">AC-GA30-20221056</field>
+        <field name="motor_power">30 kW</field>
+        <field name="voltage">400V / 3-phase</field>
+        <field name="capacity">5.2 m3/min @ 7.5 bar</field>
+        <field name="factory">Nelsis Main Factory, Ashulia</field>
+        <field name="floor">1st Floor - Compressor Room</field>
+        <field name="department_id" ref="dept_maintenance"/>
+        <field name="line_position">Compressor Room, adjacent to Sewing Line 1 &amp; 2</field>
+        <field name="purchase_date">2022-02-14</field>
+        <field name="installation_date">2022-03-01</field>
+        <field name="purchase_value">1850000</field>
+        <field name="current_value">1300000</field>
+        <field name="state">active</field>
+        <field name="warranty_start_date">2022-03-01</field>
+        <field name="warranty_end_date">2024-03-01</field>
+        <field name="warranty_terms">2-year parts warranty; annual service contract with local Atlas Copco distributor.</field>
+        <field name="responsible_technician_id" ref="emp_maintenance_tech"/>
+    </record>
+
+    <!-- ===============================================================
+         Maintenance checklist template (Sewing Machine PM)
+         =============================================================== -->
+    <record id="maintenance_checklist_sewing_pm" model="garment.maintenance.checklist">
+        <field name="name">Sewing Machine Monthly PM Checklist</field>
+        <field name="sequence">10</field>
+        <field name="equipment_type">machine</field>
+        <field name="machine_type">Single Needle</field>
+        <field name="notes">Standard monthly preventive maintenance checklist for single-needle sewing machines on the sewing lines.</field>
+    </record>
+
+    <record id="maintenance_checklist_sewing_pm_line_01" model="garment.maintenance.checklist.line">
+        <field name="checklist_id" ref="maintenance_checklist_sewing_pm"/>
+        <field name="sequence">10</field>
+        <field name="check_item">Oil reservoir level and lubrication points</field>
+        <field name="is_mandatory">1</field>
+        <field name="instructions">Top up sewing machine oil to the mark; lubricate hook race and needle bar linkage.</field>
+    </record>
+
+    <record id="maintenance_checklist_sewing_pm_line_02" model="garment.maintenance.checklist.line">
+        <field name="checklist_id" ref="maintenance_checklist_sewing_pm"/>
+        <field name="sequence">20</field>
+        <field name="check_item">Needle condition and alignment</field>
+        <field name="is_mandatory">1</field>
+        <field name="instructions">Replace bent/blunt needles; check needle-to-hook timing.</field>
+    </record>
+
+    <record id="maintenance_checklist_sewing_pm_line_03" model="garment.maintenance.checklist.line">
+        <field name="checklist_id" ref="maintenance_checklist_sewing_pm"/>
+        <field name="sequence">30</field>
+        <field name="check_item">Belt tension and motor mounting</field>
+        <field name="is_mandatory">1</field>
+        <field name="instructions">Check V-belt tension and servo motor mounting bolts for looseness/vibration.</field>
+    </record>
+
+    <record id="maintenance_checklist_sewing_pm_line_04" model="garment.maintenance.checklist.line">
+        <field name="checklist_id" ref="maintenance_checklist_sewing_pm"/>
+        <field name="sequence">40</field>
+        <field name="check_item">Lint / dust cleaning of bobbin case and feed dog area</field>
+        <field name="is_mandatory">1</field>
+        <field name="instructions">Blow out lint and thread waste using compressed air; wipe down machine bed.</field>
+    </record>
+
+    <record id="maintenance_checklist_sewing_pm_line_05" model="garment.maintenance.checklist.line">
+        <field name="checklist_id" ref="maintenance_checklist_sewing_pm"/>
+        <field name="sequence">50</field>
+        <field name="check_item">Foot pedal and electrical cable condition</field>
+        <field name="is_mandatory">0</field>
+        <field name="instructions">Inspect pedal linkage and power cable insulation for wear/damage.</field>
+    </record>
+
+    <!-- ===============================================================
+         Preventive Maintenance plan (monthly PM schedule)
+         =============================================================== -->
+    <record id="maintenance_plan_sewing_sn14_monthly" model="garment.maintenance.plan">
+        <field name="equipment_type">machine</field>
+        <field name="machine_id" ref="machine_fallback_sewing_sn14"/>
+        <field name="task_description">Monthly Preventive Maintenance - Oiling, Lubrication &amp; Inspection</field>
+        <field name="maintenance_type">monthly</field>
+        <field name="checklist_id" ref="maintenance_checklist_sewing_pm"/>
+        <field name="technician_id" ref="emp_maintenance_tech"/>
+        <field name="start_date">2026-01-15</field>
+        <field name="last_done_date">2026-05-20</field>
+        <field name="next_due_date">2026-06-20</field>
+        <field name="status">scheduled</field>
+    </record>
+
+    <!-- ===============================================================
+         Breakdown work order (completed) - motor bearing failure and repair
+         =============================================================== -->
+    <record id="maintenance_wo_breakdown_sn14_202606" model="garment.maintenance.workorder">
+        <field name="wo_type">breakdown</field>
+        <field name="equipment_type">machine</field>
+        <field name="machine_id" ref="machine_fallback_sewing_sn14"/>
+        <field name="problem_description">Machine stopped abruptly mid-shift; motor emitting a burning smell and grinding noise, needle bar not moving. Operator raised an andon call from Sewing Line 1.</field>
+        <field name="priority">high</field>
+        <field name="production_impact">Sewing Line 1 lost approx. 260 pcs of output on order_tee during the ~5.5 hour stoppage; operator was temporarily reassigned to an adjacent single-needle machine.</field>
+        <field name="reported_date">2026-06-10 09:40:00</field>
+        <field name="engineer_id" ref="emp_maintenance_tech"/>
+        <field name="technician_id" ref="emp_maintenance_tech"/>
+        <field name="start_datetime">2026-06-10 09:55:00</field>
+        <field name="end_datetime">2026-06-10 15:25:00</field>
+        <field name="action_taken">Diagnosed a seized main motor bearing caused by lubrication starvation. Replaced motor bearing set and drive belt, re-aligned pulley and re-timed needle-to-hook, ran the machine under load for 30 minutes - vibration and noise level back within normal range. Advised line supervisor to raise PM oiling frequency for older single-needle units.</field>
+        <field name="test_result">pass</field>
+        <field name="labor_hours">5.5</field>
+        <field name="labor_rate">350.0</field>
+        <field name="cost_estimate">3200.0</field>
+        <field name="approval_status">approved</field>
+        <field name="state">completed</field>
+    </record>
+
+    <!-- ===============================================================
+         Maintenance KPI snapshot for June 2026 (MTTR/MTBF)
+         =============================================================== -->
+    <record id="maintenance_kpi_sewing_sn14_202606" model="garment.maintenance.kpi">
+        <field name="equipment_type">machine</field>
+        <field name="machine_id" ref="machine_fallback_sewing_sn14"/>
+        <field name="period_date">2026-06-30</field>
+        <field name="planned_hours">720.0</field>
+    </record>
+
+</data>
+</odoo>

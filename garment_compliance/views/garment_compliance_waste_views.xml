@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_compliance_waste_tree" model="ir.ui.view">
+        <field name="name">garment.compliance.waste.tree</field>
+        <field name="model">garment.compliance.waste</field>
+        <field name="arch" type="xml">
+            <tree string="Waste Records">
+                <field name="record_date"/>
+                <field name="waste_type"/>
+                <field name="department_id"/>
+                <field name="quantity"/>
+                <field name="uom"/>
+                <field name="disposal_method"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_compliance_waste_form" model="ir.ui.view">
+        <field name="name">garment.compliance.waste.form</field>
+        <field name="model">garment.compliance.waste</field>
+        <field name="arch" type="xml">
+            <form string="Waste Record">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="record_date"/>
+                            <field name="waste_type"/>
+                            <field name="department_id"/>
+                        </group>
+                        <group>
+                            <field name="quantity"/>
+                            <field name="uom"/>
+                            <field name="disposal_method"/>
+                            <field name="disposal_vendor"/>
+                            <field name="status"/>
+                        </group>
+                    </group>
+                    <field name="notes"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_compliance_waste_pivot" model="ir.ui.view">
+        <field name="name">garment.compliance.waste.pivot</field>
+        <field name="model">garment.compliance.waste</field>
+        <field name="arch" type="xml">
+            <pivot string="Waste Analysis">
+                <field name="waste_type" type="row"/>
+                <field name="disposal_method" type="col"/>
+                <field name="quantity" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_garment_compliance_waste" model="ir.actions.act_window">
+        <field name="name">Waste Records</field>
+        <field name="res_model">garment.compliance.waste</field>
+        <field name="view_mode">tree,pivot,form</field>
+    </record>
+</odoo>

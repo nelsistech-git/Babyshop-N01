@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_purchase_requisition_form" model="ir.ui.view">
+        <field name="name">garment.purchase.requisition.form</field>
+        <field name="model">garment.purchase.requisition</field>
+        <field name="arch" type="xml">
+            <form string="Purchase Requisition">
+                <header>
+                    <field name="status" widget="statusbar"
+                           statusbar_visible="draft,department_approval,purchase_review,finance_approval,rfq_generated,closed"/>
+                    <button name="action_import_from_bom" type="object" string="Import From BOM" class="btn-secondary"
+                            invisible="not bom_id"/>
+                    <button name="action_generate_rfq" type="object" string="Generate RFQ" class="btn-primary"
+                            invisible="status != 'finance_approval'"/>
+                    <button name="action_check_shortage_alerts" type="object" string="Check Shortage Alerts"
+                            class="btn-secondary" invisible="not has_shortage"/>
+                </header>
+                <sheet>
+                    <!-- FIXED: Added hidden field so the 'invisible' modifier can evaluate it -->
+                    <field name="has_shortage" invisible="1"/>
+
+                    <widget name="web_ribbon" title="Shortage" bg_color="text-bg-danger" invisible="not has_shortage"/>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_rfqs" type="object" class="oe_stat_button" icon="fa-file-text-o">
+                            <field name="rfq_count" widget="statinfo" string="RFQs"/>
+                        </button>
+                    </div>
+                    <div class="oe_title"><h1><field name="pr_number" readonly="1"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="source"/>
+                            <field name="material_type"/>
+                            <field name="bom_id"/>
+                            <field name="style_id"/>
+                            <field name="order_id"/>
+                        </group>
+                        <group>
+                            <field name="department_id"/>
+                            <field name="request_department"/>
+                            <field name="requested_by_id"/>
+                            <field name="request_date"/>
+                            <field name="required_date"/>
+                            <field name="required_for_order"/>
+                            <field name="priority" widget="badge"/>
+                        </group>
+                    </group>
+                    <field name="line_ids">
+                        <tree editable="bottom" decoration-danger="is_shortage">
+                            <field name="material_category"/>
+                            <field name="material_name"/>
+                            <field name="uom"/>
+                            <field name="required_qty"/>
+                            <field name="available_stock"/>
+                            <field name="incoming_stock"/>
+                            <field name="purchase_qty"/>
+                            <field name="is_shortage" column_invisible="1"/>
+                            <field name="buyer_color_code" optional="hide"/>
+                            <field name="supplier_color_code" optional="hide"/>
+                            <field name="lab_dip_status" optional="hide"/>
+                            <field name="accessory_size" optional="hide"/>
+                            <field name="accessory_color" optional="hide"/>
+                            <field name="supplier_id"/>
+                        </tree>
+                    </field>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_purchase_requisition_tree" model="ir.ui.view">
+        <field name="name">garment.purchase.requisition.tree</field>
+        <field name="model">garment.purchase.requisition</field>
+        <field name="arch" type="xml">
+            <tree string="Purchase Requisitions" decoration-danger="priority == 'critical'" decoration-warning="priority == 'high'">
+                <field name="pr_number"/>
+                <field name="source"/>
+                <field name="request_date"/>
+                <field name="required_date"/>
+                <field name="priority" widget="badge"/>
+                <field name="has_shortage" widget="boolean_toggle"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_purchase_requisition_search" model="ir.ui.view">
+        <field name="name">garment.purchase.requisition.search</field>
+        <field name="model">garment.purchase.requisition</field>
+        <field name="arch" type="xml">
+            <search string="Search Requisitions">
+                <field name="pr_number"/>
+                <field name="style_id"/>
+                <filter string="My Requisitions" name="filter_my" domain="[('requested_by_id', '=', uid)]"/>
+                <filter string="Critical/High Priority" name="filter_priority" domain="[('priority', 'in', ('critical','high'))]"/>
+                <filter string="Material Shortage" name="filter_shortage" domain="[('has_shortage', '=', True)]"/>
+                <filter string="Pending Approval" name="filter_pending_approval"
+                        domain="[('status', 'in', ('department_approval', 'purchase_review', 'finance_approval'))]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                    <filter string="Priority" name="group_priority" context="{'group_by': 'priority'}"/>
+                    <filter string="Source" name="group_source" context="{'group_by': 'source'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_purchase_requisition" model="ir.actions.act_window">
+        <field name="name">Purchase Requisitions</field>
+        <field name="res_model">garment.purchase.requisition</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first purchase requisition.</p>
+        </field>
+    </record>
+
+</odoo>

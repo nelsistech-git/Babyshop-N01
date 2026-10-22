@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_whatsapp_template_tree" model="ir.ui.view">
+        <field name="name">garment.whatsapp.template.tree</field>
+        <field name="model">garment.whatsapp.template</field>
+        <field name="arch" type="xml">
+            <tree string="WhatsApp Templates" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="trigger_event"/>
+                <field name="supports_media"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_whatsapp_template_form" model="ir.ui.view">
+        <field name="name">garment.whatsapp.template.form</field>
+        <field name="model">garment.whatsapp.template</field>
+        <field name="arch" type="xml">
+            <form string="WhatsApp Template">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="trigger_event"/>
+                        <field name="supports_media"/>
+                        <field name="active"/>
+                    </group>
+                    <field name="message_body" placeholder="Message text, e.g. Hello ${object.buyer_id.name}, ..."/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_whatsapp_template" model="ir.actions.act_window">
+        <field name="name">WhatsApp Templates</field>
+        <field name="res_model">garment.whatsapp.template</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="view_garment_crm_tag_tree" model="ir.ui.view">
+        <field name="name">garment.crm.tag.tree</field>
+        <field name="model">garment.crm.tag</field>
+        <field name="arch" type="xml">
+            <tree string="Tags" editable="bottom">
+                <field name="name"/>
+                <field name="color" widget="color_picker"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_garment_crm_tag" model="ir.actions.act_window">
+        <field name="name">Tags</field>
+        <field name="res_model">garment.crm.tag</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="action_garment_email_templates" model="ir.actions.act_window">
+        <field name="name">Email Templates</field>
+        <field name="res_model">mail.template</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('model', '=', 'garment.buyer')]</field>
+        <field name="context">{'default_model': 'garment.buyer'}</field>
+    </record>
+
+</odoo>

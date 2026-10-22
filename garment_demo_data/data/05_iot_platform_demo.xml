@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Part of Smart Complete Garment Software. Copyright (c) Nelsis Tech (www.nelsistech.com) -->
+<!--
+     garment_iot_platform demo data — one gateway on the Sewing Line 1 floor,
+     3 devices behind it (an RFID gate reader at the cutting WIP handover, a
+     machine sensor kit on the real Overlock 1 / Line 1 machine created in
+     04_production_demo.xml (machine_l1_ol1, already flagged iot_enabled and
+     carrying last_speed/last_vibration/last_energy_consumption "last sync"
+     values — the readings below are consistent with those numbers), and an
+     energy meter on the Line 1 panel), a handful of sample readings, and one
+     threshold alert rule on the machine sensor.
+
+     gateway_code / device_code / api_key are left unset so the models'
+     own create() override auto-generates them (sequence + secrets.token_hex)
+     exactly as it would for a real device — nothing here is a fabricated
+     "real-looking" credential, it is a genuinely random token like
+     production would create.
+-->
+<odoo>
+<data noupdate="1">
+
+    <!-- =================================================================
+         Gateway (garment.iot.gateway)
+         ================================================================= -->
+
+    <record id="gateway_sewing_floor1" model="garment.iot.gateway">
+        <field name="name">Sewing Floor Line 1 Gateway</field>
+        <field name="protocol">mqtt</field>
+        <field name="warehouse_id" ref="wh_main"/>
+        <field name="location_note">Sewing Floor, Building A, 1st Floor — Line 1</field>
+        <field name="ip_address">10.20.4.11</field>
+        <field name="port">1883</field>
+        <field name="broker_endpoint">mqtt://10.20.4.5:1883/nelsis/sewing-floor-1</field>
+        <field name="connection_status">online</field>
+        <field name="last_heartbeat">2026-04-25 17:05:00</field>
+        <field name="installed_date">2026-03-02</field>
+        <field name="notes">Covers Line 1 machine sensors, the cutting-to-sewing handover RFID gate and the
+Line 1 sub-panel energy meter. Reports to the on-prem MQTT broker; forwarded to Odoo via /api/iot/ingest.</field>
+    </record>
+
+    <!-- =================================================================
+         Devices (garment.iot.device)
+         ================================================================= -->
+
+    <record id="device_rfid_cutting_gate" model="garment.iot.device">
+        <field name="name">RFID Gate Reader — Cutting/Sewing Handover</field>
+        <field name="device_type">rfid_reader</field>
+        <field name="gateway_id" ref="gateway_sewing_floor1"/>
+        <field name="location_id" ref="loc_cutting_wip"/>
+        <field name="location_note">Cutting WIP exit gate, Building A Ground Floor</field>
+        <field name="manufacturer">Zebra</field>
+        <field name="model_reference">FX9600</field>
+        <field name="serial_number">FX9600-BD-0041</field>
+        <field name="ip_address">10.20.4.21</field>
+        <field name="default_unit">PCS</field>
+        <field name="connection_status">online</field>
+        <field name="last_communication">2026-04-25 17:02:00</field>
+        <field name="installed_date">2026-03-05</field>
+        <field name="last_reading_value">1.0</field>
+        <field name="last_reading_unit">PCS</field>
+    </record>
+
+    <record id="device_machine_sensor_ol1" model="garment.iot.device">
+        <field name="name">Machine Sensor Kit — Overlock 1, Line 1</field>
+        <field name="device_type">machine_sensor</field>
+        <field name="gateway_id" ref="gateway_sewing_floor1"/>
+        <field name="machine_id" ref="machine_l1_ol1"/>
+        <field name="location_note">Sewing Floor, Building A, Line 1</field>
+        <field name="manufacturer">Juki</field>
+        <field name="model_reference">MO-6714S IoT Retrofit Kit</field>
+        <field name="serial_number">IOT-MC-L1OL1-0001</field>
+        <field name="ip_address">10.20.4.32</field>
+        <field name="default_unit">RPM</field>
+        <field name="connection_status">online</field>
+        <field name="last_communication">2026-04-25 17:00:00</field>
+        <field name="installed_date">2026-03-10</field>
+        <field name="last_reading_value">82.0</field>
+        <field name="last_reading_unit">°C</field>
+    </record>
+
+    <record id="device_energy_meter_line1" model="garment.iot.device">
+        <field name="name">Energy Meter — Sewing Line 1 Sub-Panel</field>
+        <field name="device_type">energy_meter</field>
+        <field name="gateway_id" ref="gateway_sewing_floor1"/>
+        <field name="location_note">Sewing Floor, Building A, Line 1 Sub-Panel</field>
+        <field name="manufacturer">Schneider Electric</field>
+        <field name="model_reference">iEM3155</field>
+        <field name="serial_number">IEM3155-L1-0007</field>
+        <field name="ip_address">10.20.4.33</field>
+        <field name="default_unit">kWh</field>
+        <field name="connection_status">online</field>
+        <field name="last_communication">2026-04-25 17:00:00</field>
+        <field name="installed_date">2026-03-10</field>
+        <field name="last_reading_value">1.85</field>
+        <field name="last_reading_unit">kWh</field>
+    </record>
+
+    <!-- =================================================================
+         Readings (garment.iot.reading)
+         ================================================================= -->
+
+    <record id="reading_rfid_scan_apr22" model="garment.iot.reading">
+        <field name="device_id" ref="device_rfid_cutting_gate"/>
+        <field name="reading_type">rfid_scan</field>
+        <field name="text_value">E200341201987A5B003C1F09</field>
+        <field name="timestamp">2026-04-22 09:15:00</field>
+    </record>
+
+    <record id="reading_ol1_speed_apr25" model="garment.iot.reading">
+        <field name="device_id" ref="device_machine_sensor_ol1"/>
+        <field name="reading_type">speed</field>
+        <field name="value">4200.0</field>
+        <field name="unit">RPM</field>
+        <field name="timestamp">2026-04-25 16:45:00</field>
+    </record>
+
+    <record id="reading_ol1_temp_apr25" model="garment.iot.reading">
+        <field name="device_id" ref="device_machine_sensor_ol1"/>
+        <field name="reading_type">temperature</field>
+        <field name="value">82.0</field>
+        <field name="unit">°C</field>
+        <field name="timestamp">2026-04-25 17:00:00</field>
+    </record>
+
+    <record id="reading_ol1_vibration_apr25" model="garment.iot.reading">
+        <field name="device_id" ref="device_machine_sensor_ol1"/>
+        <field name="reading_type">vibration</field>
+        <field name="value">0.42</field>
+        <field name="unit">mm/s</field>
+        <field name="timestamp">2026-04-25 17:00:00</field>
+    </record>
+
+    <record id="reading_line1_energy_apr25" model="garment.iot.reading">
+        <field name="device_id" ref="device_energy_meter_line1"/>
+        <field name="reading_type">energy</field>
+        <field name="value">1.85</field>
+        <field name="unit">kWh</field>
+        <field name="timestamp">2026-04-25 17:00:00</field>
+    </record>
+
+    <!-- =================================================================
+         Alert Rule (garment.iot.alert.rule)
+         ================================================================= -->
+
+    <record id="rule_ol1_temp_critical" model="garment.iot.alert.rule">
+        <field name="name">Overlock 1 (Line 1) Temperature Critical</field>
+        <field name="device_id" ref="device_machine_sensor_ol1"/>
+        <field name="reading_type">temperature</field>
+        <field name="operator">&gt;</field>
+        <field name="threshold_value">75.0</field>
+        <field name="severity">critical</field>
+        <field name="action_type">post_message</field>
+        <field name="action_summary">{device}: temperature reading {value}{unit} exceeds critical threshold {threshold}{unit} — inspect motor/bearing lubrication and cooling immediately.</field>
+        <field name="cooldown_minutes">30</field>
+    </record>
+
+</data>
+</odoo>

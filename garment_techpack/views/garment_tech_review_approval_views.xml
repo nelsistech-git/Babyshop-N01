@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_tech_review_tree" model="ir.ui.view">
+        <field name="name">garment.tech.review.tree</field>
+        <field name="model">garment.tech.review</field>
+        <field name="arch" type="xml">
+            <tree string="Technical Reviews">
+                <field name="techpack_id"/>
+                <field name="reviewer_id"/>
+                <field name="review_date"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_tech_review_form" model="ir.ui.view">
+        <field name="name">garment.tech.review.form</field>
+        <field name="model">garment.tech.review</field>
+        <field name="arch" type="xml">
+            <form string="Technical Review">
+                <header>
+                    <field name="status" widget="statusbar"/>
+                    <button name="action_mark_completed" type="object" string="Mark Completed" class="btn-primary"/>
+                </header>
+                <sheet>
+                    <group>
+                        <field name="techpack_id"/>
+                        <field name="reviewer_id"/>
+                        <field name="review_date"/>
+                    </group>
+                    <group string="Product Checklist" col="1">
+                        <field name="chk_product_description_verified"/>
+                        <field name="chk_style_number_verified"/>
+                        <field name="chk_buyer_requirement_checked"/>
+                        <field name="chk_construction_reviewed"/>
+                        <field name="chk_design_details_confirmed"/>
+                    </group>
+                    <group string="Fabric Checklist" col="1">
+                        <field name="chk_fabric_composition_verified"/>
+                        <field name="chk_gsm_verified"/>
+                        <field name="chk_width_verified"/>
+                        <field name="chk_shrinkage_verified"/>
+                        <field name="chk_color_standard_received"/>
+                    </group>
+                    <group string="Measurement Checklist" col="1">
+                        <field name="chk_measurement_chart_attached"/>
+                        <field name="chk_size_range_confirmed"/>
+                        <field name="chk_tolerance_defined"/>
+                        <field name="chk_grade_rules_available"/>
+                    </group>
+                    <group string="Trim Checklist" col="1">
+                        <field name="chk_labels_confirmed"/>
+                        <field name="chk_accessories_confirmed"/>
+                        <field name="chk_color_matching_verified"/>
+                        <field name="chk_supplier_info_available"/>
+                    </group>
+                    <group string="Packaging Checklist" col="1">
+                        <field name="chk_poly_bag_spec"/>
+                        <field name="chk_carton_spec"/>
+                        <field name="chk_folding_method"/>
+                        <field name="chk_barcode_requirement"/>
+                        <field name="chk_shipping_mark_requirement"/>
+                    </group>
+                    <field name="comments"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_tech_review" model="ir.actions.act_window">
+        <field name="name">Technical Reviews</field>
+        <field name="res_model">garment.tech.review</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="view_garment_tech_approval_tree" model="ir.ui.view">
+        <field name="name">garment.tech.approval.tree</field>
+        <field name="model">garment.tech.approval</field>
+        <field name="arch" type="xml">
+            <tree string="Approvals">
+                <field name="techpack_id"/>
+                <field name="approval_stage"/>
+                <field name="approver_id"/>
+                <field name="status" widget="badge"/>
+                <field name="signed_date"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_tech_approval_form" model="ir.ui.view">
+        <field name="name">garment.tech.approval.form</field>
+        <field name="model">garment.tech.approval</field>
+        <field name="arch" type="xml">
+            <form string="Approval">
+                <header>
+                    <button name="action_approve" type="object" string="Approve" class="btn-primary"
+                            invisible="status == 'approved'"/>
+                    <button name="action_reject" type="object" string="Reject" class="btn-secondary"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="techpack_id"/>
+                            <field name="approval_stage"/>
+                            <field name="approver_id"/>
+                            <field name="status"/>
+                        </group>
+                        <group>
+                            <field name="signer_name"/>
+                            <field name="designation"/>
+                            <field name="signed_date"/>
+                            <field name="document_version"/>
+                            <field name="signature_ip_address"/>
+                        </group>
+                    </group>
+                    <field name="electronic_signature" widget="image"/>
+                    <field name="comments"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_tech_approval" model="ir.actions.act_window">
+        <field name="name">Approvals</field>
+        <field name="res_model">garment.tech.approval</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="action_garment_tech_approval_pending" model="ir.actions.act_window">
+        <field name="name">Pending Approval</field>
+        <field name="res_model">garment.tech.approval</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('status', '=', 'pending')]</field>
+    </record>
+
+</odoo>

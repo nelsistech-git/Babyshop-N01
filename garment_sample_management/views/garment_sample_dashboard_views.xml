@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_sample_graph" model="ir.ui.view">
+        <field name="name">garment.sample.graph</field>
+        <field name="model">garment.sample</field>
+        <field name="arch" type="xml">
+            <graph string="Samples by Status" type="bar">
+                <field name="status"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_garment_sample_pivot" model="ir.ui.view">
+        <field name="name">garment.sample.pivot</field>
+        <field name="model">garment.sample</field>
+        <field name="arch" type="xml">
+            <pivot string="Sample Analysis">
+                <field name="buyer_id" type="row"/>
+                <field name="sample_type_id" type="col"/>
+                <field name="id" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_garment_sample_dashboard" model="ir.actions.act_window">
+        <field name="name">Sample Dashboard</field>
+        <field name="res_model">garment.sample</field>
+        <field name="view_mode">graph,pivot,kanban,tree</field>
+    </record>
+
+    <!-- Sample Room Dashboard (SRS section 27): Today's Samples, Pending Work, Operator Load,
+         Machine Utilization, Delayed Samples — grouped by responsible person / sample room. -->
+    <record id="view_garment_sample_activity_room_pivot" model="ir.ui.view">
+        <field name="name">garment.sample.activity.room.pivot</field>
+        <field name="model">garment.sample.activity</field>
+        <field name="arch" type="xml">
+            <pivot string="Sample Room Load">
+                <field name="responsible_person_id" type="row"/>
+                <field name="status" type="col"/>
+                <field name="id" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_garment_sample_activity_room_search" model="ir.ui.view">
+        <field name="name">garment.sample.activity.room.search</field>
+        <field name="model">garment.sample.activity</field>
+        <field name="arch" type="xml">
+            <search string="Sample Room Dashboard">
+                <field name="sample_room"/>
+                <field name="responsible_person_id"/>
+                <filter string="Today's Samples" name="filter_today"
+                        domain="[('start_date', '=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter string="Pending Work" name="filter_pending" domain="[('status', 'in', ('pending', 'in_progress'))]"/>
+                <filter string="Delayed" name="filter_delayed" domain="[('status', '=', 'delayed')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Operator" name="group_operator" context="{'group_by': 'responsible_person_id'}"/>
+                    <filter string="Machine" name="group_machine" context="{'group_by': 'machine'}"/>
+                    <filter string="Sample Room" name="group_room" context="{'group_by': 'sample_room'}"/>
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_sample_room_dashboard" model="ir.actions.act_window">
+        <field name="name">Sample Room Dashboard</field>
+        <field name="res_model">garment.sample.activity</field>
+        <field name="view_mode">pivot,tree</field>
+        <field name="search_view_id" ref="view_garment_sample_activity_room_search"/>
+        <field name="context">{'search_default_filter_pending': 1}</field>
+    </record>
+
+</odoo>

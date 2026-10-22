@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_costing_form" model="ir.ui.view">
+        <field name="name">garment.costing.form</field>
+        <field name="model">garment.costing</field>
+        <field name="arch" type="xml">
+            <form string="Costing Sheet">
+                <header>
+                    <field name="status" widget="statusbar"
+                           statusbar_visible="draft,material_costing,production_costing,management_review,buyer_submission,negotiation,approved"/>
+                    <button name="action_run_ai_analysis" type="object" string="Run AI Analysis" class="btn-secondary" icon="fa-magic"/>
+                    <button name="action_open_cost_simulation" type="object" string="AI Cost Simulation" class="btn-secondary" icon="fa-flask"/>
+                    <button name="action_create_revision" type="object" string="New Revision" class="btn-secondary"
+                            invisible="not is_locked"/>
+                    <button name="action_lock" type="object" string="Approve &amp; Lock" class="btn-primary"
+                            invisible="is_locked"/>
+                    <button name="action_unlock" type="object" string="Unlock" class="btn-secondary"
+                            invisible="not is_locked"
+                            groups="garment_costing.group_costing_manager"/>
+                </header>
+                <sheet>
+                    <!-- Added missing field required for invisible modifiers to evaluate -->
+                    <field name="is_locked" invisible="1"/>
+
+                    <widget name="web_ribbon" title="Locked" bg_color="bg-danger"
+                            invisible="not is_locked"/>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_revisions" type="object" class="oe_stat_button" icon="fa-history">
+                            <field name="revision_count" widget="statinfo" string="Revisions"/>
+                        </button>
+                        <button name="action_view_variances" type="object" class="oe_stat_button" icon="fa-balance-scale">
+                            <field name="variance_count" widget="statinfo" string="Variances"/>
+                        </button>
+                        <button name="action_view_negotiations" type="object" class="oe_stat_button" icon="fa-handshake-o">
+                            <field name="negotiation_count" widget="statinfo" string="Negotiations"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="costing_number" readonly="1"/>
+                            <field name="costing_type"/>
+                            <field name="style_id"/>
+                            <field name="buyer_id" readonly="1"/>
+                            <field name="season" readonly="1"/>
+                            <field name="product_category_id" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="sample_id"/>
+                            <field name="bom_id"/>
+                            <field name="quotation_id"/>
+                            <field name="order_quantity"/>
+                            <field name="currency_id"/>
+                            <field name="costing_date"/>
+                            <field name="validity_period"/>
+                        </group>
+                    </group>
+                    <group string="Incoterm &amp; Currency">
+                        <group>
+                            <field name="incoterm"/>
+                            <field name="international_freight_cost" invisible="incoterm not in ('cif', 'cfr')"/>
+                            <field name="insurance_cost" invisible="incoterm != 'cif'"/>
+                            <field name="incoterm_price" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="company_currency_id" invisible="1"/>
+                            <field name="fob_price_company_currency" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Material Cost (read from BOM)">
+                        <group>
+                            <field name="fabric_cost" readonly="1"/>
+                            <field name="trim_cost" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="packaging_cost" readonly="1"/>
+                            <field name="material_cost" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Manufacturing Cost (CM)">
+                            <field name="cm_cost_ids">
+                                <tree editable="bottom">
+                                    <field name="calculation_mode"/>
+                                    <field name="direct_labor_cost"/>
+                                    <field name="machine_cost_total"/>
+                                    <field name="factory_overhead_total"/>
+                                    <field name="smv_minutes"/>
+                                    <field name="cost_per_minute"/>
+                                    <field name="total_cm"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Overhead &amp; Additional Costs">
+                            <group>
+                                <group>
+                                    <field name="overhead_cost"/>
+                                    <field name="testing_cost"/>
+                                    <field name="inspection_cost"/>
+                                    <field name="sample_cost"/>
+                                </group>
+                                <group>
+                                    <field name="development_cost"/>
+                                    <field name="freight_cost"/>
+                                    <field name="commission_cost"/>
+                                    <field name="bank_charge_cost"/>
+                                    <field name="additional_cost_total" readonly="1"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Profit &amp; FOB">
+                            <group>
+                                <group>
+                                    <field name="profit_margin_type"/>
+                                    <field name="profit_margin_pct"
+                                           invisible="profit_margin_type != 'percentage'"/>
+                                    <field name="profit_margin_fixed"
+                                           invisible="profit_margin_type != 'fixed'"/>
+                                    <field name="profit_amount" readonly="1"/>
+                                    <field name="profit_margin_actual_pct" readonly="1"/>
+                                </group>
+                                <group>
+                                    <field name="cm_cost" readonly="1"/>
+                                    <field name="fob_price" readonly="1" class="oe_subtotal_footer_separator"/>
+                                    <field name="fob_value_total" readonly="1"/>
+                                    <field name="margin_risk_note" readonly="1"
+                                           invisible="not margin_risk_note"
+                                           class="text-danger"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Buyer Negotiation">
+                            <field name="negotiation_ids">
+                                <tree editable="bottom" decoration-success="approval_status == 'approved'" decoration-danger="approval_status == 'rejected'">
+                                    <field name="negotiation_date"/>
+                                    <field name="submitted_price"/>
+                                    <field name="buyer_target_price"/>
+                                    <field name="negotiated_price"/>
+                                    <field name="final_price"/>
+                                    <field name="approval_status" widget="badge"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Payment Terms">
+                            <field name="payment_term_ids">
+                                <tree editable="bottom">
+                                    <field name="payment_type"/>
+                                    <field name="payment_percentage"/>
+                                    <field name="due_date"/>
+                                    <field name="bank_requirement"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Supplier Price History">
+                            <field name="price_history_ids">
+                                <tree editable="bottom" decoration-success="is_recommended == True">
+                                    <field name="material_reference"/>
+                                    <field name="supplier_id"/>
+                                    <field name="current_price"/>
+                                    <field name="quality_rating"/>
+                                    <field name="delivery_rating"/>
+                                    <field name="compliance_ok"/>
+                                    <field name="is_recommended"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Approvals">
+                            <field name="approval_ids">
+                                <tree editable="bottom">
+                                    <field name="approval_level"/>
+                                    <field name="approver_id"/>
+                                    <field name="status"/>
+                                    <field name="approval_date"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="AI Assistant">
+                            <field name="ai_last_run" readonly="1"/>
+                            <group string="Cost Prediction"><field name="ai_cost_prediction_note" readonly="1" nolabel="1"/></group>
+                            <group string="Cost Optimization"><field name="ai_cost_optimization_note" readonly="1" nolabel="1"/></group>
+                            <group string="Buyer Price / Negotiation Range"><field name="ai_buyer_price_note" readonly="1" nolabel="1"/></group>
+                            <group string="Cost Saving Analysis">
+                                <field name="cost_saving_note" readonly="1" nolabel="1" colspan="2"/>
+                                <field name="expected_saving_per_unit" readonly="1"/>
+                                <field name="annual_saving_estimate" readonly="1"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_costing_tree" model="ir.ui.view">
+        <field name="name">garment.costing.tree</field>
+        <field name="model">garment.costing</field>
+        <field name="arch" type="xml">
+            <tree string="Costing Sheets" decoration-success="status in ('approved','closed')">
+                <field name="costing_number"/>
+                <field name="style_id"/>
+                <field name="buyer_id"/>
+                <field name="costing_type"/>
+                <field name="material_cost"/>
+                <field name="cm_cost"/>
+                <field name="fob_price"/>
+                <field name="profit_margin_actual_pct"/>
+                <field name="incoterm"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_costing_kanban" model="ir.ui.view">
+        <field name="name">garment.costing.kanban</field>
+        <field name="model">garment.costing</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="status" class="o_kanban_small_column">
+                <field name="costing_number"/>
+                <field name="buyer_id"/>
+                <field name="fob_price"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click oe_kanban_card">
+                            <div class="o_kanban_record_top"><strong><field name="costing_number"/></strong></div>
+                            <div><field name="buyer_id"/></div>
+                            <div>FOB: <field name="fob_price"/></div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_garment_costing_search" model="ir.ui.view">
+        <field name="name">garment.costing.search</field>
+        <field name="model">garment.costing</field>
+        <field name="arch" type="xml">
+            <search string="Search Costings">
+                <field name="costing_number"/>
+                <field name="style_id"/>
+                <field name="buyer_id"/>
+                <filter string="Approved" name="filter_approved" domain="[('status', '=', 'approved')]"/>
+                <filter string="Pending Approval" name="filter_pending_approval"
+                        domain="[('status', 'not in', ('approved', 'closed'))]"/>
+                <filter string="In Negotiation" name="filter_negotiation" domain="[('status', '=', 'negotiation')]"/>
+                <filter string="Low Margin (&lt; 8%)" name="filter_low_margin"
+                        domain="[('profit_margin_actual_pct', '&lt;', 8)]"/>
+                <filter string="My Cost Sheets" name="filter_my_costings"
+                        domain="[('create_uid', '=', uid)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                    <filter string="Buyer" name="group_buyer" context="{'group_by': 'buyer_id'}"/>
+                    <filter string="Costing Type" name="group_type" context="{'group_by': 'costing_type'}"/>
+                    <filter string="Product Category" name="group_category" context="{'group_by': 'product_category_id'}"/>
+                    <filter string="Incoterm" name="group_incoterm" context="{'group_by': 'incoterm'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_costing" model="ir.actions.act_window">
+        <field name="name">Costing Sheets</field>
+        <field name="res_model">garment.costing</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first costing sheet.</p>
+        </field>
+    </record>
+
+</odoo>

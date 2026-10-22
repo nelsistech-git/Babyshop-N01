@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_fabric_roll_tree" model="ir.ui.view">
+        <field name="name">garment.fabric.roll.tree</field>
+        <field name="model">garment.fabric.roll</field>
+        <field name="arch" type="xml">
+            <tree string="Fabric Rolls" decoration-muted="status == 'consumed'" decoration-danger="status in ('damaged', 'rejected')">
+                <field name="roll_number"/>
+                <field name="material_id"/>
+                <field name="color"/>
+                <field name="shade_number"/>
+                <field name="meter_qty"/>
+                <field name="warehouse_id"/>
+                <field name="location_id"/>
+                <field name="inspection_status"/>
+                <field name="status"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_fabric_roll_form" model="ir.ui.view">
+        <field name="name">garment.fabric.roll.form</field>
+        <field name="model">garment.fabric.roll</field>
+        <field name="arch" type="xml">
+            <form string="Fabric Roll">
+                <header>
+                    <field name="status" widget="statusbar"/>
+                    <button name="action_mark_consumed" type="object" string="Mark Consumed" class="btn-primary"
+                            invisible="status in ('consumed', 'damaged', 'rejected')"/>
+                    <button name="action_mark_damaged" type="object" string="Mark Damaged" class="btn-secondary"
+                            invisible="status in ('consumed', 'damaged', 'rejected')"/>
+                    <button name="action_mark_rejected" type="object" string="Mark Rejected" class="btn-secondary"
+                            invisible="status in ('consumed', 'damaged', 'rejected')"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="roll_number" readonly="1"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="batch_number"/>
+                            <field name="lot_number"/>
+                            <field name="material_id"/>
+                            <field name="color"/>
+                            <field name="shade_number"/>
+                            <field name="shade_approval_status"/>
+                            <field name="gsm"/>
+                            <field name="width"/>
+                            <field name="meter_qty"/>
+                        </group>
+                        <group>
+                            <field name="supplier_id"/>
+                            <field name="warehouse_id"/>
+                            <field name="location_id"/>
+                            <field name="received_date"/>
+                            <field name="production_date"/>
+                            <field name="expiry_date"/>
+                            <field name="relaxation_time"/>
+                            <field name="inspection_status"/>
+                            <field name="used_in_order"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_fabric_roll_search" model="ir.ui.view">
+        <field name="name">garment.fabric.roll.search</field>
+        <field name="model">garment.fabric.roll</field>
+        <field name="arch" type="xml">
+            <search string="Search Fabric Rolls">
+                <field name="roll_number"/>
+                <field name="material_id"/>
+                <field name="shade_number"/>
+                <field name="batch_number"/>
+                <filter string="In Stock" name="filter_in_stock" domain="[('status', '=', 'in_stock')]"/>
+                <filter string="Pending Inspection" name="filter_pending_inspection" domain="[('inspection_status', '=', 'pending')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Warehouse" name="group_warehouse" context="{'group_by': 'warehouse_id'}"/>
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                    <filter string="Material" name="group_material" context="{'group_by': 'material_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_fabric_roll" model="ir.actions.act_window">
+        <field name="name">Fabric Rolls</field>
+        <field name="res_model">garment.fabric.roll</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_garment_fabric_roll_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Register your first fabric roll.</p>
+        </field>
+    </record>
+</odoo>

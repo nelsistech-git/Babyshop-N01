@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_exp_form_graph" model="ir.ui.view">
+        <field name="name">garment.exp.form.graph</field>
+        <field name="model">garment.exp.form</field>
+        <field name="arch" type="xml">
+            <graph string="Export Value by Buyer" type="bar">
+                <field name="buyer_id"/>
+                <field name="export_value" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_garment_exp_form_pivot" model="ir.ui.view">
+        <field name="name">garment.exp.form.pivot</field>
+        <field name="model">garment.exp.form</field>
+        <field name="arch" type="xml">
+            <pivot string="Export Value Analysis">
+                <field name="buyer_id" type="row"/>
+                <field name="workflow_stage" type="col"/>
+                <field name="export_value" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_garment_commercial_export_dashboard" model="ir.actions.act_window">
+        <field name="name">Commercial &amp; Export Dashboard</field>
+        <field name="res_model">garment.exp.form</field>
+        <field name="view_mode">graph,pivot,tree</field>
+    </record>
+
+</odoo>

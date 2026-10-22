@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_bank_statement_line_tree" model="ir.ui.view">
+        <field name="name">garment.bank.statement.line.tree</field>
+        <field name="model">garment.bank.statement.line</field>
+        <field name="arch" type="xml">
+            <tree string="Bank Statement Lines" editable="bottom" decoration-success="match_status == 'reconciled'"
+                  decoration-muted="match_status == 'matched'">
+                <field name="bank_account_id"/>
+                <field name="statement_date"/>
+                <field name="description"/>
+                <field name="reference"/>
+                <field name="amount"/>
+                <field name="match_status" widget="badge"/>
+                <field name="matched_transaction_id"/>
+                <button name="action_auto_match" type="object" string="Auto-Match" icon="fa-link"
+                        invisible="match_status != 'unmatched'"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_bank_statement_line_form" model="ir.ui.view">
+        <field name="name">garment.bank.statement.line.form</field>
+        <field name="model">garment.bank.statement.line</field>
+        <field name="arch" type="xml">
+            <form string="Bank Statement Line">
+                <header>
+                    <button name="action_auto_match" type="object" string="Auto-Match" class="btn-primary"
+                            invisible="match_status != 'unmatched'"/>
+                    <button name="action_reset_match" type="object" string="Reset Match"
+                            invisible="match_status == 'unmatched'"/>
+                    <field name="match_status" widget="statusbar" statusbar_visible="unmatched,matched,reconciled"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="bank_account_id"/>
+                            <field name="statement_date"/>
+                            <field name="description"/>
+                            <field name="reference"/>
+                        </group>
+                        <group>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="amount"/>
+                            <field name="matched_transaction_id" readonly="1"/>
+                            <field name="imported_by_id" readonly="1"/>
+                            <field name="import_date" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_bank_statement_line_search" model="ir.ui.view">
+        <field name="name">garment.bank.statement.line.search</field>
+        <field name="model">garment.bank.statement.line</field>
+        <field name="arch" type="xml">
+            <search string="Search Bank Statement Lines">
+                <field name="bank_account_id"/>
+                <field name="reference"/>
+                <filter string="Unmatched" name="filter_unmatched" domain="[('match_status', '=', 'unmatched')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Bank Account" name="group_bank_account" context="{'group_by': 'bank_account_id'}"/>
+                    <filter string="Match Status" name="group_status" context="{'group_by': 'match_status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_bank_statement_line" model="ir.actions.act_window">
+        <field name="name">Bank Statement Lines</field>
+        <field name="res_model">garment.bank.statement.line</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_filter_unmatched': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Import or enter a bank statement line to match it against ERP transactions.</p>
+        </field>
+    </record>
+
+</odoo>

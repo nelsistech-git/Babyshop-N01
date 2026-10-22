@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_mobile_offline_sync_log_form" model="ir.ui.view">
+        <field name="name">garment.mobile.offline.sync.log.form</field>
+        <field name="model">garment.mobile.offline.sync.log</field>
+        <field name="arch" type="xml">
+            <form string="Offline Sync Log">
+                <header>
+                    <button name="action_mark_synced" type="object" string="Mark Synced"
+                            class="btn-primary" invisible="sync_status == 'synced'"/>
+                    <field name="sync_status" widget="statusbar" statusbar_visible="pending,synced"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="sync_number"/>
+                        <h1><field name="sync_number" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="device_id"/>
+                            <field name="user_id"/>
+                            <field name="sync_type"/>
+                        </group>
+                        <group>
+                            <field name="source_model"/>
+                            <field name="source_res_id"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="offline_created_at"/>
+                            <field name="synced_at"/>
+                        </group>
+                        <group>
+                            <field name="error_message" invisible="sync_status != 'failed'"/>
+                        </group>
+                    </group>
+                    <group string="Raw Payload">
+                        <field name="payload" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_mobile_offline_sync_log_tree" model="ir.ui.view">
+        <field name="name">garment.mobile.offline.sync.log.tree</field>
+        <field name="model">garment.mobile.offline.sync.log</field>
+        <field name="arch" type="xml">
+            <tree string="Offline Sync Log" decoration-danger="sync_status in ('failed', 'conflict')"
+                  decoration-success="sync_status == 'synced'">
+                <field name="sync_number"/>
+                <field name="device_id"/>
+                <field name="user_id"/>
+                <field name="sync_type"/>
+                <field name="source_model"/>
+                <field name="offline_created_at"/>
+                <field name="synced_at"/>
+                <field name="sync_status"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_mobile_offline_sync_log_search" model="ir.ui.view">
+        <field name="name">garment.mobile.offline.sync.log.search</field>
+        <field name="model">garment.mobile.offline.sync.log</field>
+        <field name="arch" type="xml">
+            <search string="Search Offline Sync Log">
+                <field name="sync_number"/>
+                <field name="device_id"/>
+                <field name="user_id"/>
+                <field name="source_model"/>
+                <filter name="filter_pending" string="Pending" domain="[('sync_status', '=', 'pending')]"/>
+                <filter name="filter_failed" string="Failed" domain="[('sync_status', '=', 'failed')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_by_type" string="Sync Type" context="{'group_by': 'sync_type'}"/>
+                    <filter name="group_by_status" string="Sync Status" context="{'group_by': 'sync_status'}"/>
+                    <filter name="group_by_device" string="Device" context="{'group_by': 'device_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_mobile_offline_sync_log" model="ir.actions.act_window">
+        <field name="name">Offline Sync Log</field>
+        <field name="res_model">garment.mobile.offline.sync.log</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_garment_mobile_offline_sync_log_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No offline syncs recorded yet.</p>
+            <p>Rows are created automatically by the mobile production-entry
+               and QC-scan API endpoints.</p>
+        </field>
+    </record>
+
+</odoo>

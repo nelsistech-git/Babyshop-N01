@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_ie_work_sampling_form" model="ir.ui.view">
+        <field name="name">garment.ie.work.sampling.form</field>
+        <field name="model">garment.ie.work.sampling</field>
+        <field name="arch" type="xml">
+            <form string="Work Sampling Study">
+                <header>
+                    <button name="action_complete" type="object" string="Mark Completed"
+                            class="btn-primary" invisible="status != 'draft'"/>
+                    <field name="status" widget="statusbar" statusbar_visible="draft,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="study_number"/>
+                        <h1><field name="study_number" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="line_id"/>
+                            <field name="date"/>
+                            <field name="observer_id"/>
+                        </group>
+                        <group>
+                            <field name="total_observations" readonly="1"/>
+                            <field name="working_pct" readonly="1"/>
+                            <field name="idle_pct" readonly="1"/>
+                            <field name="waiting_pct" readonly="1"/>
+                            <field name="other_pct" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Observations">
+                            <field name="observation_ids">
+                                <tree editable="bottom">
+                                    <field name="observation_time"/>
+                                    <field name="operator_id"/>
+                                    <field name="operation_id"/>
+                                    <field name="activity"/>
+                                    <field name="remarks"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_ie_work_sampling_tree" model="ir.ui.view">
+        <field name="name">garment.ie.work.sampling.tree</field>
+        <field name="model">garment.ie.work.sampling</field>
+        <field name="arch" type="xml">
+            <tree string="Work Sampling Studies">
+                <field name="study_number"/>
+                <field name="line_id"/>
+                <field name="date"/>
+                <field name="total_observations"/>
+                <field name="working_pct"/>
+                <field name="idle_pct"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_garment_ie_work_sampling" model="ir.actions.act_window">
+        <field name="name">Work Sampling</field>
+        <field name="res_model">garment.ie.work.sampling</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Start your first work sampling study.</p>
+        </field>
+    </record>
+
+</odoo>

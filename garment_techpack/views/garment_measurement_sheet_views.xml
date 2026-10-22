@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_measurement_sheet_tree" model="ir.ui.view">
+        <field name="name">garment.measurement.sheet.tree</field>
+        <field name="model">garment.measurement.sheet</field>
+        <field name="arch" type="xml">
+            <tree string="Measurement Sheets">
+                <field name="techpack_id"/>
+                <field name="style_id"/>
+                <field name="measurement_chart_id"/>
+                <field name="size_set_id"/>
+                <field name="pattern_id"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_measurement_sheet_form" model="ir.ui.view">
+        <field name="name">garment.measurement.sheet.form</field>
+        <field name="model">garment.measurement.sheet</field>
+        <field name="arch" type="xml">
+            <form string="Measurement Sheet">
+                <header>
+                    <field name="status" widget="statusbar"/>
+                    <button name="action_import_from_style" type="object" string="Import From Style" class="btn-secondary"/>
+                    <button name="action_submit_review" type="object" string="Submit For Review" class="btn-secondary"
+                            invisible="status != 'draft'"/>
+                    <button name="action_approve" type="object" string="Approve Measurements" class="btn-primary"
+                            invisible="status == 'approved'"/>
+                    <button name="action_compare_revision" type="object" string="Compare Revision" class="btn-secondary"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="techpack_id"/>
+                            <field name="style_id" readonly="1"/>
+                            <field name="measurement_chart_id"/>
+                            <field name="size_set_id"/>
+                            <field name="pattern_id"/>
+                        </group>
+                        <group>
+                            <field name="imported_date"/>
+                            <field name="tolerance_tracked"/>
+                            <field name="compare_sheet_id"/>
+                        </group>
+                    </group>
+                    <field name="notes"/>
+                    <separator string="Comparison Result"/>
+                    <field name="comparison_result" readonly="1"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_measurement_sheet" model="ir.actions.act_window">
+        <field name="name">Measurement Sheets</field>
+        <field name="res_model">garment.measurement.sheet</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_washing_recipe_tree" model="ir.ui.view">
+        <field name="name">garment.washing.recipe.tree</field>
+        <field name="model">garment.washing.recipe</field>
+        <field name="arch" type="xml">
+            <tree string="Washing Recipes">
+                <field name="name"/>
+                <field name="wash_type"/>
+                <field name="temperature"/>
+                <field name="duration_minutes"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_washing_recipe_form" model="ir.ui.view">
+        <field name="name">garment.washing.recipe.form</field>
+        <field name="model">garment.washing.recipe</field>
+        <field name="arch" type="xml">
+            <form string="Washing Recipe">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="wash_type"/>
+                            <field name="temperature"/>
+                            <field name="duration_minutes"/>
+                            <field name="machine_setting"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Chemical List">
+                            <field name="chemical_line_ids">
+                                <tree editable="bottom">
+                                    <field name="chemical_name"/>
+                                    <field name="material_id"/>
+                                    <field name="uom"/>
+                                    <field name="required_qty"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_washing_recipe" model="ir.actions.act_window">
+        <field name="name">Washing Recipes</field>
+        <field name="res_model">garment.washing.recipe</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

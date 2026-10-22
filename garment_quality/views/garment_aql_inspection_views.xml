@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_aql_inspection_form" model="ir.ui.view">
+        <field name="name">garment.aql.inspection.form</field>
+        <field name="model">garment.aql.inspection</field>
+        <field name="arch" type="xml">
+            <form string="AQL / Final Inspection">
+                <header>
+                    <button name="action_start" type="object" string="Start" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_complete" type="object" string="Complete Inspection" class="btn-primary"
+                            invisible="state != 'inspecting'"/>
+                    <button name="action_submit_buyer" type="object" string="Submit to Buyer" class="btn-secondary"
+                            invisible="state != 'completed'"/>
+                    <button name="action_buyer_approve" type="object" string="Buyer Approve" class="btn-primary"
+                            invisible="state != 'buyer_review'"/>
+                    <button name="action_buyer_reject" type="object" string="Buyer Reject" class="btn-danger"
+                            invisible="state != 'buyer_review'"/>
+                    <button name="action_release_shipment" type="object" string="Release Shipment" class="btn-primary"
+                            invisible="state != 'buyer_review' or buyer_approval_status != 'approved'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,inspecting,completed,buyer_review,released"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Rejected" bg_color="bg-danger" invisible="result != 'fail'"/>
+                    <div class="oe_title">
+                        <label for="aql_no"/>
+                        <h1><field name="aql_no" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="inspection_type"/>
+                            <field name="inspection_scope"/>
+                            <field name="buyer_id"/>
+                            <field name="style_id"/>
+                            <field name="order_reference"/>
+                            <field name="production_order_id"/>
+                            <field name="supplier_id"/>
+                        </group>
+                        <group>
+                            <field name="inspector_id"/>
+                            <field name="inspection_date"/>
+                            <field name="result" readonly="1"/>
+                            <field name="buyer_approval_status"/>
+                            <field name="shipment_release" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="AQL Sampling Parameters">
+                        <group>
+                            <field name="lot_size"/>
+                            <field name="sample_size"/>
+                            <field name="inspection_level"/>
+                        </group>
+                        <group>
+                            <field name="aql_critical"/>
+                            <field name="aql_major"/>
+                            <field name="aql_minor"/>
+                        </group>
+                    </group>
+                    <group string="Accept / Reject Numbers">
+                        <group>
+                            <field name="accept_number_major"/>
+                            <field name="reject_number_major"/>
+                        </group>
+                        <group>
+                            <field name="accept_number_minor"/>
+                            <field name="reject_number_minor"/>
+                        </group>
+                    </group>
+                    <group string="Defects Found">
+                        <group>
+                            <field name="critical_defect_qty"/>
+                            <field name="major_defect_qty" readonly="1"/>
+                            <field name="minor_defect_qty" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Packing &amp; Documentation">
+                        <group>
+                            <field name="carton_qty"/>
+                            <field name="packing_ok"/>
+                            <field name="documentation_ok"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Defect Lines">
+                            <field name="defect_ids">
+                                <tree editable="bottom">
+                                    <field name="defect_code_id"/>
+                                    <field name="name"/>
+                                    <field name="severity"/>
+                                    <field name="quantity"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Buyer Comments">
+                            <field name="buyer_comments" nolabel="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_aql_inspection_tree" model="ir.ui.view">
+        <field name="name">garment.aql.inspection.tree</field>
+        <field name="model">garment.aql.inspection</field>
+        <field name="arch" type="xml">
+            <tree string="AQL / Final Inspections" decoration-danger="result == 'fail'" decoration-success="result == 'pass'">
+                <field name="aql_no"/>
+                <field name="inspection_date"/>
+                <field name="buyer_id"/>
+                <field name="style_id"/>
+                <field name="lot_size"/>
+                <field name="sample_size"/>
+                <field name="result"/>
+                <field name="buyer_approval_status"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_aql_inspection_search" model="ir.ui.view">
+        <field name="name">garment.aql.inspection.search</field>
+        <field name="model">garment.aql.inspection</field>
+        <field name="arch" type="xml">
+            <search string="Search AQL Inspections">
+                <field name="aql_no"/>
+                <field name="buyer_id"/>
+                <field name="style_id"/>
+                <filter string="Pass" name="filter_pass" domain="[('result', '=', 'pass')]"/>
+                <filter string="Fail" name="filter_fail" domain="[('result', '=', 'fail')]"/>
+                <filter string="Pending Buyer Approval" name="filter_pending" domain="[('buyer_approval_status', '=', 'pending')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Buyer" name="group_buyer" context="{'group_by': 'buyer_id'}"/>
+                    <filter string="Result" name="group_result" context="{'group_by': 'result'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_aql_inspection" model="ir.actions.act_window">
+        <field name="name">AQL / Final Inspections</field>
+        <field name="res_model">garment.aql.inspection</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first AQL / final inspection.</p>
+        </field>
+    </record>
+
+</odoo>

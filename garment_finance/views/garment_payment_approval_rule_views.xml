@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_payment_approval_rule_tree" model="ir.ui.view">
+        <field name="name">garment.payment.approval.rule.tree</field>
+        <field name="model">garment.payment.approval.rule</field>
+        <field name="arch" type="xml">
+            <tree string="Payment Approval Matrix" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="applies_to"/>
+                <field name="min_amount"/>
+                <field name="max_amount"/>
+                <field name="approver_group_id"/>
+                <field name="active" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_payment_approval_rule_form" model="ir.ui.view">
+        <field name="name">garment.payment.approval.rule.form</field>
+        <field name="model">garment.payment.approval.rule</field>
+        <field name="arch" type="xml">
+            <form string="Payment Approval Rule">
+                <sheet>
+                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="applies_to"/>
+                            <field name="sequence"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="currency_id"/>
+                            <field name="min_amount"/>
+                            <field name="max_amount"/>
+                            <field name="approver_group_id"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_payment_approval_rule" model="ir.actions.act_window">
+        <field name="name">Payment Approval Matrix</field>
+        <field name="res_model">garment.payment.approval.rule</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Define which approver group is required for a payment/expense amount range.</p>
+        </field>
+    </record>
+
+</odoo>

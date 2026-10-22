@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_receivable_graph" model="ir.ui.view">
+        <field name="name">garment.receivable.graph</field>
+        <field name="model">garment.receivable</field>
+        <field name="arch" type="xml">
+            <graph string="Receivables by Aging" type="bar">
+                <field name="aging_bucket"/>
+                <field name="outstanding_amount" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_garment_receivable_pivot" model="ir.ui.view">
+        <field name="name">garment.receivable.pivot</field>
+        <field name="model">garment.receivable</field>
+        <field name="arch" type="xml">
+            <pivot string="Receivable Analysis">
+                <field name="buyer_id" type="row"/>
+                <field name="aging_bucket" type="col"/>
+                <field name="outstanding_amount" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_garment_finance_dashboard" model="ir.actions.act_window">
+        <field name="name">Finance Dashboard</field>
+        <field name="res_model">garment.receivable</field>
+        <field name="view_mode">graph,pivot,tree</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Approval Sheet (SRS section 32 Print Formats) -->
+    <record id="action_report_garment_style_approval_sheet" model="ir.actions.report">
+        <field name="name">Approval Sheet</field>
+        <field name="model">garment.style</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">garment_style_library.report_garment_style_approval_sheet</field>
+        <field name="report_file">garment_style_library.report_garment_style_approval_sheet</field>
+        <field name="binding_model_id" ref="model_garment_style"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'Approval Sheet - %s' % (object.style_number or object.style_name)</field>
+    </record>
+
+    <template id="report_garment_style_approval_sheet">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Approval Sheet</h2>
+                        <p>
+                            <strong>Style:</strong> <span t-field="o.style_number"/> — <span t-field="o.style_name"/><br/>
+                            <strong>Buyer:</strong> <span t-field="o.buyer_id.name"/>
+                        </p>
+                        <table class="table table-sm table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Approval Step</th>
+                                    <th>Approver</th>
+                                    <th>Status</th>
+                                    <th>Signed Date</th>
+                                    <th>Comments</th>
+                                    <th>Signature</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="o.approval_ids" t-as="a">
+                                    <td><span t-field="a.approval_step"/></td>
+                                    <td><span t-field="a.approver_id.name"/></td>
+                                    <td><span t-field="a.status"/></td>
+                                    <td><span t-field="a.signed_date"/></td>
+                                    <td><span t-field="a.comments"/></td>
+                                    <td>
+                                        <img t-if="a.electronic_signature" t-att-src="image_data_uri(a.electronic_signature)"
+                                             style="max-height:40px;"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <p t-if="not o.approval_ids"><em>No approval steps recorded yet.</em></p>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

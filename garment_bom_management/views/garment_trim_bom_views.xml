@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_trim_bom_tree" model="ir.ui.view">
+        <field name="name">garment.trim.bom.tree</field>
+        <field name="model">garment.trim.bom</field>
+        <field name="arch" type="xml">
+            <tree string="Trim BOM">
+                <field name="bom_id"/>
+                <field name="trim_type"/>
+                <field name="description"/>
+                <field name="required_qty"/>
+                <field name="line_cost"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_trim_bom_form" model="ir.ui.view">
+        <field name="name">garment.trim.bom.form</field>
+        <field name="model">garment.trim.bom</field>
+        <field name="arch" type="xml">
+            <form string="Trim BOM Line">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="bom_id"/>
+                            <field name="trim_type"/>
+                            <field name="description"/>
+                            <field name="color"/>
+                            <field name="size_spec"/>
+                            <field name="supplier_id"/>
+                        </group>
+                        <group>
+                            <field name="uom"/>
+                            <field name="consumption_per_piece"/>
+                            <field name="unit_price"/>
+                            <field name="required_qty" readonly="1"/>
+                            <field name="line_cost" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Thread" invisible="trim_type != 'thread'">
+                        <field name="thread_type"/>
+                        <field name="thread_count"/>
+                        <field name="thread_brand"/>
+                    </group>
+                    <group string="Zipper" invisible="trim_type != 'zipper'">
+                        <field name="zipper_type"/>
+                        <field name="zipper_length"/>
+                        <field name="zipper_slider_type"/>
+                    </group>
+                    <group string="Button" invisible="trim_type != 'button'">
+                        <field name="button_type"/>
+                        <field name="button_size"/>
+                        <field name="button_material"/>
+                        <field name="button_hole_type"/>
+                    </group>
+                    <group string="Label" invisible="trim_type != 'label'">
+                        <field name="label_type"/>
+                        <field name="label_material"/>
+                        <field name="label_artwork_reference"/>
+                        <field name="label_position"/>
+                    </group>
+                    <group string="Buyer Requirements &amp; Compliance">
+                        <group>
+                            <field name="buyer_material_code"/>
+                            <field name="buyer_description"/>
+                            <field name="is_restricted"/>
+                            <field name="restriction_reason" invisible="not is_restricted"/>
+                        </group>
+                        <group>
+                            <field name="compliance_oekotex"/>
+                            <field name="compliance_chemical_status"/>
+                        </group>
+                    </group>
+                    <group string="Purchase Requirement">
+                        <group>
+                            <field name="available_stock"/>
+                            <field name="incoming_stock"/>
+                        </group>
+                        <group>
+                            <field name="safety_stock"/>
+                            <field name="purchase_qty" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_trim_bom" model="ir.actions.act_window">
+        <field name="name">Trim BOM</field>
+        <field name="res_model">garment.trim.bom</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

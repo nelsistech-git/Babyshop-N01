@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="0">
+    <data>
+
+        <!-- Default retention policies — SRS section 50 examples -->
+
+        <record id="retention_policy_hr" model="garment.document.retention.policy">
+            <field name="name">HR / Employee Document Retention</field>
+            <field name="code">RETAIN_HR</field>
+            <field name="department">hr</field>
+            <field name="retention_years">7</field>
+            <field name="notice_days">60</field>
+            <field name="action_on_expiry">notify</field>
+            <field name="sequence">10</field>
+        </record>
+
+        <record id="retention_policy_finance" model="garment.document.retention.policy">
+            <field name="name">Financial Document Retention</field>
+            <field name="code">RETAIN_FINANCE</field>
+            <field name="department">finance</field>
+            <field name="retention_years">10</field>
+            <field name="notice_days">60</field>
+            <field name="action_on_expiry">archive</field>
+            <field name="sequence">20</field>
+        </record>
+
+        <record id="retention_policy_audit" model="garment.document.retention.policy">
+            <field name="name">Audit Document Retention (Permanent)</field>
+            <field name="code">RETAIN_AUDIT</field>
+            <field name="category_id" ref="cat_compliance_audit"/>
+            <field name="is_permanent">True</field>
+            <field name="action_on_expiry">notify</field>
+            <field name="sequence">30</field>
+        </record>
+
+        <record id="retention_policy_certificate" model="garment.document.retention.policy">
+            <field name="name">Certificate Retention</field>
+            <field name="code">RETAIN_CERTIFICATE</field>
+            <field name="category_id" ref="cat_compliance_certificates"/>
+            <field name="retention_years">3</field>
+            <field name="notice_days">30</field>
+            <field name="action_on_expiry">notify</field>
+            <field name="sequence">40</field>
+        </record>
+
+        <record id="retention_policy_general" model="garment.document.retention.policy">
+            <field name="name">General Document Retention</field>
+            <field name="code">RETAIN_GENERAL</field>
+            <field name="retention_years">3</field>
+            <field name="notice_days">30</field>
+            <field name="action_on_expiry">notify</field>
+            <field name="sequence">90</field>
+        </record>
+
+    </data>
+</odoo>

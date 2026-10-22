@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_hr_loan_tree" model="ir.ui.view">
+        <field name="name">garment.hr.loan.tree</field>
+        <field name="model">garment.hr.loan</field>
+        <field name="arch" type="xml">
+            <tree string="Loans / Advances" decoration-success="status == 'closed'" decoration-danger="status == 'rejected'">
+                <field name="loan_number"/>
+                <field name="employee_id"/>
+                <field name="loan_type"/>
+                <field name="amount"/>
+                <field name="monthly_recovery_amount"/>
+                <field name="outstanding_balance"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_hr_loan_form" model="ir.ui.view">
+        <field name="name">garment.hr.loan.form</field>
+        <field name="model">garment.hr.loan</field>
+        <field name="arch" type="xml">
+            <form string="Employee Loan / Advance">
+                <header>
+                    <field name="status" widget="statusbar"/>
+                    <button name="action_hr_approve" type="object" string="HR Approve" class="btn-primary"
+                            invisible="status != 'draft'"/>
+                    <button name="action_finance_approve" type="object" string="Finance Approve" class="btn-primary"
+                            invisible="status != 'hr_approved'"/>
+                    <button name="action_disburse" type="object" string="Disburse" class="btn-primary"
+                            invisible="status != 'finance_approved'"/>
+                    <button name="action_record_monthly_recovery" type="object" string="Record Monthly Recovery"
+                            class="btn-secondary" invisible="status != 'disbursed'"/>
+                    <button name="action_reject" type="object" string="Reject" class="btn-secondary"
+                            invisible="status not in ('draft', 'hr_approved')"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="loan_number" readonly="1"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="employee_id"/>
+                            <field name="loan_type"/>
+                            <field name="request_date"/>
+                        </group>
+                        <group>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="amount"/>
+                            <field name="monthly_recovery_amount"/>
+                            <field name="outstanding_balance"/>
+                            <field name="disbursement_date" readonly="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="hr_approved_by_id" readonly="1"/>
+                        <field name="finance_approved_by_id" readonly="1"/>
+                    </group>
+                    <field name="reason"/>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_hr_loan" model="ir.actions.act_window">
+        <field name="name">Loans / Advances</field>
+        <field name="res_model">garment.hr.loan</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Record your first loan/advance request.</p>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_supplier_comparison_wizard_form" model="ir.ui.view">
+        <field name="name">garment.supplier.comparison.wizard.form</field>
+        <field name="model">garment.supplier.comparison.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Compare Suppliers">
+                <group>
+                    <field name="supplier_ids" widget="many2many_tags"/>
+                </group>
+                <field name="line_ids" invisible="not line_ids">
+                    <tree editable="false" decoration-success="overall_score &gt;= 90">
+                        <field name="supplier_id"/>
+                        <field name="avg_price"/>
+                        <field name="quality_score"/>
+                        <field name="delivery_score"/>
+                        <field name="cost_score"/>
+                        <field name="compliance_score"/>
+                        <field name="capacity"/>
+                        <field name="payment_term_id"/>
+                        <field name="overall_score"/>
+                    </tree>
+                </field>
+                <footer>
+                    <button name="action_compare" type="object" string="Compare" class="btn-primary"/>
+                    <button string="Close" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_supplier_comparison_wizard" model="ir.actions.act_window">
+        <field name="name">Compare Suppliers</field>
+        <field name="res_model">garment.supplier.comparison.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

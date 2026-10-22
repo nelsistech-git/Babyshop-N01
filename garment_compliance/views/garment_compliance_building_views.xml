@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- FIXED: Moved the action definition to the TOP so it is available when the form view references it -->
+    <record id="action_garment_compliance_building_inspection" model="ir.actions.act_window">
+        <field name="name">Building Inspections</field>
+        <field name="res_model">garment.compliance.building.inspection</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="view_garment_compliance_building_tree" model="ir.ui.view">
+        <field name="name">garment.compliance.building.tree</field>
+        <field name="model">garment.compliance.building</field>
+        <field name="arch" type="xml">
+            <tree string="Factory Buildings">
+                <field name="name"/>
+                <field name="address"/>
+                <field name="floors"/>
+                <field name="worker_capacity"/>
+                <field name="approval_status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_compliance_building_form" model="ir.ui.view">
+        <field name="name">garment.compliance.building.form</field>
+        <field name="model">garment.compliance.building</field>
+        <field name="arch" type="xml">
+            <form string="Factory Building">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="%(action_garment_compliance_building_inspection)d" type="action" class="oe_stat_button" icon="fa-wrench"
+                                context="{'default_building_id': id}">
+                            <field name="inspection_count" widget="statinfo" string="Inspections"/>
+                        </button>
+                    </div>
+                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="address"/>
+                            <field name="floors"/>
+                            <field name="worker_capacity"/>
+                        </group>
+                        <group>
+                            <field name="warehouse_ids" widget="many2many_tags"/>
+                            <field name="approval_status"/>
+                            <field name="approval_certificate_id"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <field name="inspection_ids">
+                        <tree editable="bottom">
+                            <field name="inspection_type"/>
+                            <field name="inspection_date"/>
+                            <field name="inspector"/>
+                            <field name="condition"/>
+                            <field name="next_inspection_date"/>
+                            <field name="status"/>
+                        </tree>
+                    </field>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_compliance_building" model="ir.actions.act_window">
+        <field name="name">Factory Buildings</field>
+        <field name="res_model">garment.compliance.building</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="view_garment_compliance_building_inspection_tree" model="ir.ui.view">
+        <field name="name">garment.compliance.building.inspection.tree</field>
+        <field name="model">garment.compliance.building.inspection</field>
+        <field name="arch" type="xml">
+            <tree string="Building Inspections">
+                <field name="building_id"/>
+                <field name="inspection_type"/>
+                <field name="inspection_date"/>
+                <field name="inspector"/>
+                <field name="condition" widget="badge"/>
+                <field name="next_inspection_date"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_compliance_building_inspection_form" model="ir.ui.view">
+        <field name="name">garment.compliance.building.inspection.form</field>
+        <field name="model">garment.compliance.building.inspection</field>
+        <field name="arch" type="xml">
+            <form string="Building Inspection">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="building_id"/>
+                            <field name="inspection_type"/>
+                            <field name="inspection_date"/>
+                            <field name="inspector"/>
+                        </group>
+                        <group>
+                            <field name="condition"/>
+                            <field name="next_inspection_date"/>
+                            <field name="status"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="findings"/>
+                        <field name="corrective_action"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+</odoo>

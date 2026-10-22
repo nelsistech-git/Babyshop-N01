@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_sample_courier_tree" model="ir.ui.view">
+        <field name="name">garment.sample.courier.tree</field>
+        <field name="model">garment.sample.courier</field>
+        <field name="arch" type="xml">
+            <tree string="Sample Couriers">
+                <field name="courier_number"/>
+                <field name="sample_id"/>
+                <field name="buyer_id"/>
+                <field name="courier_company"/>
+                <field name="tracking_number"/>
+                <field name="delivery_status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_sample_courier_form" model="ir.ui.view">
+        <field name="name">garment.sample.courier.form</field>
+        <field name="model">garment.sample.courier</field>
+        <field name="arch" type="xml">
+            <form string="Sample Courier">
+                <header>
+                    <field name="delivery_status" widget="statusbar"/>
+                    <button name="action_next_status" type="object" string="Move to Next Status" class="btn-primary"
+                            invisible="delivery_status == 'buyer_received'"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="courier_number" readonly="1"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="sample_id"/>
+                            <field name="buyer_id" readonly="1"/>
+                            <field name="courier_company"/>
+                            <field name="tracking_number"/>
+                        </group>
+                        <group>
+                            <field name="dispatch_date"/>
+                            <field name="destination_country_id"/>
+                            <field name="expected_delivery_date"/>
+                            <field name="submitted_by_id"/>
+                            <field name="expected_feedback_date"/>
+                        </group>
+                    </group>
+                    <field name="buyer_address"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_sample_courier" model="ir.actions.act_window">
+        <field name="name">Sample Couriers</field>
+        <field name="res_model">garment.sample.courier</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

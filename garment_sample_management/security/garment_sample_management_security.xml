@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <record id="module_category_garment_sample" model="ir.module.category">
+            <field name="name">Smart Garment ERP - Sample Development</field>
+            <field name="sequence">53</field>
+        </record>
+
+        <record id="group_sample_merchandiser" model="res.groups">
+            <field name="name">Merchandiser (Manage Assigned Samples)</field>
+            <field name="category_id" ref="module_category_garment_sample"/>
+        </record>
+
+        <record id="group_sample_room_manager" model="res.groups">
+            <field name="name">Sample Room Manager (Sample Production)</field>
+            <field name="category_id" ref="module_category_garment_sample"/>
+        </record>
+
+        <record id="group_sample_qa_manager" model="res.groups">
+            <field name="name">QA Manager (Sample Quality)</field>
+            <field name="category_id" ref="module_category_garment_sample"/>
+        </record>
+
+        <record id="group_sample_production_manager" model="res.groups">
+            <field name="name">Production Manager (Bulk Transfer)</field>
+            <field name="category_id" ref="module_category_garment_sample"/>
+        </record>
+
+        <record id="group_sample_designer" model="res.groups">
+            <field name="name">Designer (Design Information)</field>
+            <field name="category_id" ref="module_category_garment_sample"/>
+        </record>
+
+        <record id="group_sample_pattern_master" model="res.groups">
+            <field name="name">Pattern Master (Pattern Development)</field>
+            <field name="category_id" ref="module_category_garment_sample"/>
+        </record>
+
+        <record id="group_sample_manager" model="res.groups">
+            <field name="name">Product Development / Merchandising Manager (Full Control)</field>
+            <field name="category_id" ref="module_category_garment_sample"/>
+            <field name="implied_ids" eval="[(4, ref('group_sample_merchandiser')),
+                                              (4, ref('group_sample_room_manager')),
+                                              (4, ref('group_sample_qa_manager')),
+                                              (4, ref('group_sample_production_manager')),
+                                              (4, ref('group_sample_designer')),
+                                              (4, ref('group_sample_pattern_master'))]"/>
+        </record>
+
+        <record id="group_sample_top_management" model="res.groups">
+            <field name="name">Top Management (MD - Dashboard &amp; Reports)</field>
+            <field name="category_id" ref="module_category_garment_sample"/>
+            <field name="implied_ids" eval="[(4, ref('group_sample_manager'))]"/>
+        </record>
+
+        <record id="rule_garment_sample_merchandiser_assigned" model="ir.rule">
+            <field name="name">Merchandiser: Assigned Samples Only</field>
+            <field name="model_id" ref="model_garment_sample"/>
+            <field name="domain_force">[('assigned_merchandiser_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_sample_merchandiser'))]"/>
+            <field name="perm_read">1</field>
+            <field name="perm_write">1</field>
+            <field name="perm_create">1</field>
+            <field name="perm_unlink">0</field>
+        </record>
+
+        <record id="rule_garment_sample_full_access" model="ir.rule">
+            <field name="name">Full Access Roles: All Samples</field>
+            <field name="model_id" ref="model_garment_sample"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_sample_room_manager')),
+                                        (4, ref('group_sample_qa_manager')),
+                                        (4, ref('group_sample_manager'))]"/>
+        </record>
+
+        <record id="rule_garment_sample_production_approved_only" model="ir.rule">
+            <field name="name">Production Manager: Approved Samples Only</field>
+            <field name="model_id" ref="model_garment_sample"/>
+            <field name="domain_force">[('status', 'in', ('approved', 'bulk_production'))]</field>
+            <field name="groups" eval="[(4, ref('group_sample_production_manager'))]"/>
+            <field name="perm_read">1</field>
+            <field name="perm_write">1</field>
+            <field name="perm_create">0</field>
+            <field name="perm_unlink">0</field>
+        </record>
+
+        <record id="rule_garment_sample_portal_own_buyer" model="ir.rule">
+            <field name="name">Portal Buyer: Own Samples Only</field>
+            <field name="model_id" ref="model_garment_sample"/>
+            <field name="domain_force">[('buyer_id.partner_id', '=', user.partner_id.id)]</field>
+            <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+            <field name="perm_read">1</field>
+            <field name="perm_write">0</field>
+            <field name="perm_create">0</field>
+            <field name="perm_unlink">0</field>
+        </record>
+
+    </data>
+</odoo>

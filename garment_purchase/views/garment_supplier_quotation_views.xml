@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_supplier_quotation_tree" model="ir.ui.view">
+        <field name="name">garment.supplier.quotation.tree</field>
+        <field name="model">garment.supplier.quotation</field>
+        <field name="arch" type="xml">
+            <tree string="Supplier Quotations" editable="bottom" decoration-success="status == 'selected'" decoration-muted="status == 'rejected'">
+                <field name="rfq_id"/>
+                <field name="supplier_id"/>
+                <field name="material_name"/>
+                <field name="price"/>
+                <field name="quality_rating_pct"/>
+                <field name="delivery_rating_pct"/>
+                <field name="status"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_supplier_quotation_form" model="ir.ui.view">
+        <field name="name">garment.supplier.quotation.form</field>
+        <field name="model">garment.supplier.quotation</field>
+        <field name="arch" type="xml">
+            <form string="Supplier Quotation">
+                <header>
+                    <button name="action_select" type="object" string="Select This Quotation" class="btn-primary"
+                            invisible="status == 'selected'"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="rfq_id"/>
+                            <field name="supplier_id"/>
+                            <field name="price"/>
+                            <field name="currency_id"/>
+                            <field name="moq"/>
+                        </group>
+                        <group>
+                            <field name="lead_time_days"/>
+                            <field name="payment_term_id"/>
+                            <field name="validity_date"/>
+                            <field name="quality_rating_pct"/>
+                            <field name="delivery_rating_pct"/>
+                            <field name="status"/>
+                        </group>
+                    </group>
+                    <field name="previous_performance_note"/>
+                    <field name="attachment" filename="attachment_filename"/>
+                    <field name="attachment_filename" invisible="1"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_supplier_quotation" model="ir.actions.act_window">
+        <field name="name">Supplier Quotations</field>
+        <field name="res_model">garment.supplier.quotation</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

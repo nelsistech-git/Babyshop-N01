@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_port_tree" model="ir.ui.view">
+        <field name="name">garment.port.tree</field>
+        <field name="model">garment.port</field>
+        <field name="arch" type="xml">
+            <tree string="Ports" editable="bottom">
+                <field name="name"/>
+                <field name="port_type"/>
+                <field name="location"/>
+                <field name="country_id"/>
+                <field name="contact"/>
+                <field name="operating_hours"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_port_form" model="ir.ui.view">
+        <field name="name">garment.port.form</field>
+        <field name="model">garment.port</field>
+        <field name="arch" type="xml">
+            <form string="Port">
+                <sheet>
+                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="port_type"/>
+                            <field name="location"/>
+                            <field name="country_id"/>
+                        </group>
+                        <group>
+                            <field name="contact"/>
+                            <field name="operating_hours"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_port_search" model="ir.ui.view">
+        <field name="name">garment.port.search</field>
+        <field name="model">garment.port</field>
+        <field name="arch" type="xml">
+            <search string="Search Ports">
+                <field name="name"/>
+                <field name="location"/>
+                <group expand="0" string="Group By">
+                    <filter string="Port Type" name="group_port_type" context="{'group_by': 'port_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_port" model="ir.actions.act_window">
+        <field name="name">Ports</field>
+        <field name="res_model">garment.port</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Add an export port (Chittagong Port, Mongla Port, Dhaka ICD...).</p>
+        </field>
+    </record>
+</odoo>

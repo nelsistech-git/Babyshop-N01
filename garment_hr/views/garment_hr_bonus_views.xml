@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_hr_bonus_tree" model="ir.ui.view">
+        <field name="name">garment.hr.bonus.tree</field>
+        <field name="model">garment.hr.bonus</field>
+        <field name="arch" type="xml">
+            <tree string="Bonuses" decoration-success="status == 'paid'">
+                <field name="employee_id"/>
+                <field name="bonus_type"/>
+                <field name="period"/>
+                <field name="amount"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_hr_bonus_form" model="ir.ui.view">
+        <field name="name">garment.hr.bonus.form</field>
+        <field name="model">garment.hr.bonus</field>
+        <field name="arch" type="xml">
+            <form string="Bonus">
+                <header>
+                    <field name="status" widget="statusbar"/>
+                    <button name="action_suggest_festival_amount" type="object" string="Suggest Amount (1 Month Basic)"
+                            class="btn-secondary" invisible="bonus_type != 'festival' or status != 'draft'"/>
+                    <button name="action_approve" type="object" string="Approve" class="btn-primary"
+                            invisible="status != 'draft'"/>
+                    <button name="action_mark_paid" type="object" string="Mark Paid" class="btn-primary"
+                            invisible="status != 'approved'"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="employee_id"/>
+                            <field name="bonus_type"/>
+                            <field name="period"/>
+                        </group>
+                        <group>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="amount"/>
+                            <field name="approved_by_id" readonly="1"/>
+                            <field name="payroll_id" readonly="1"/>
+                        </group>
+                    </group>
+                    <field name="note"/>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_hr_bonus" model="ir.actions.act_window">
+        <field name="name">Bonuses</field>
+        <field name="res_model">garment.hr.bonus</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Record your first bonus.</p>
+        </field>
+    </record>
+
+    <record id="view_garment_hr_incentive_tree" model="ir.ui.view">
+        <field name="name">garment.hr.incentive.tree</field>
+        <field name="model">garment.hr.incentive</field>
+        <field name="arch" type="xml">
+            <tree string="Production Incentives" decoration-success="status == 'paid'">
+                <field name="employee_id"/>
+                <field name="production_reference"/>
+                <field name="period_end"/>
+                <field name="target_output"/>
+                <field name="actual_output"/>
+                <field name="extra_output"/>
+                <field name="incentive_amount"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_hr_incentive_form" model="ir.ui.view">
+        <field name="name">garment.hr.incentive.form</field>
+        <field name="model">garment.hr.incentive</field>
+        <field name="arch" type="xml">
+            <form string="Production Incentive">
+                <header>
+                    <field name="status" widget="statusbar"/>
+                    <button name="action_approve" type="object" string="Approve" class="btn-primary"
+                            invisible="status != 'draft'"/>
+                    <button name="action_mark_paid" type="object" string="Mark Paid" class="btn-primary"
+                            invisible="status != 'approved'"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="employee_id"/>
+                            <field name="production_reference"/>
+                            <field name="period_start"/>
+                            <field name="period_end"/>
+                        </group>
+                        <group>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="target_output"/>
+                            <field name="actual_output"/>
+                            <field name="extra_output" readonly="1"/>
+                            <field name="rate_per_unit"/>
+                            <field name="incentive_amount" readonly="1"/>
+                            <field name="payroll_id" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_hr_incentive" model="ir.actions.act_window">
+        <field name="name">Production Incentives</field>
+        <field name="res_model">garment.hr.incentive</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Record your first production incentive.</p>
+        </field>
+    </record>
+
+</odoo>

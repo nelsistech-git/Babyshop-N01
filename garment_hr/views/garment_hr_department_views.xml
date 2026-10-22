@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_hr_department_tree" model="ir.ui.view">
+        <field name="name">garment.hr.department.tree</field>
+        <field name="model">garment.hr.department</field>
+        <field name="arch" type="xml">
+            <tree string="Departments" editable="bottom">
+                <field name="name"/>
+                <field name="factory"/>
+                <field name="manager_id"/>
+                <field name="parent_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_hr_department_form" model="ir.ui.view">
+        <field name="name">garment.hr.department.form</field>
+        <field name="model">garment.hr.department</field>
+        <field name="arch" type="xml">
+            <form string="Department">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="%(action_garment_hr_employee)d"
+                                type="action"
+                                class="oe_stat_button"
+                                icon="fa-users"
+                                context="{'default_department_id': id}"
+                                domain="[('department_id', '=', id)]">
+                            <div class="o_stat_info">
+                                <field name="employee_count" class="o_stat_value"/>
+                                <span class="o_stat_text">Employees</span>
+                            </div>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="factory"/>
+                            <field name="parent_id"/>
+                        </group>
+                        <group>
+                            <field name="manager_id"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_hr_department" model="ir.actions.act_window">
+        <field name="name">Departments</field>
+        <field name="res_model">garment.hr.department</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

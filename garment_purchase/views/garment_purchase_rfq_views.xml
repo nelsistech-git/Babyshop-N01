@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_purchase_rfq_form" model="ir.ui.view">
+        <field name="name">garment.purchase.rfq.form</field>
+        <field name="model">garment.purchase.rfq</field>
+        <field name="arch" type="xml">
+            <form string="Supplier RFQ">
+                <header>
+                    <field name="status" widget="statusbar"/>
+                    <button name="action_run_ai_recommendation" type="object" string="AI Recommend Supplier" class="btn-secondary" icon="fa-magic"/>
+                    <button name="action_run_ai_price_delay_prediction" type="object" string="AI Price/Delay Prediction"
+                            class="btn-secondary" icon="fa-line-chart"/>
+                    <button name="action_send" type="object" string="Send to Supplier" class="btn-primary"
+                            invisible="status != 'draft'"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_quotations" type="object" class="oe_stat_button" icon="fa-file-text-o">
+                            <field name="quotation_count" widget="statinfo" string="Quotations"/>
+                        </button>
+                    </div>
+                    <div class="oe_title"><h1><field name="rfq_number" readonly="1"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="rfq_source"/>
+                            <field name="requisition_id"/>
+                            <field name="requisition_line_id"/>
+                            <field name="supplier_id"/>
+                            <field name="material_name"/>
+                            <field name="specification"/>
+                        </group>
+                        <group>
+                            <field name="quantity"/>
+                            <field name="uom"/>
+                            <field name="delivery_date"/>
+                            <field name="payment_term_id"/>
+                            <field name="incoterm_id"/>
+                        </group>
+                    </group>
+                    <field name="quotation_ids">
+                        <tree>
+                            <field name="supplier_id"/>
+                            <field name="price"/>
+                            <field name="moq"/>
+                            <field name="lead_time_days"/>
+                            <field name="quality_rating_pct"/>
+                            <field name="delivery_rating_pct"/>
+                            <field name="status"/>
+                        </tree>
+                    </field>
+                    <group string="AI Recommendation">
+                        <field name="ai_recommended_supplier_id" readonly="1"/>
+                        <field name="ai_recommendation_note" readonly="1" nolabel="1"/>
+                    </group>
+                    <group string="AI Price Trend / Delivery Delay Risk (SRS section 41)">
+                        <field name="ai_price_trend_note" readonly="1" nolabel="1"/>
+                        <field name="ai_delay_risk_note" readonly="1" nolabel="1"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_purchase_rfq_tree" model="ir.ui.view">
+        <field name="name">garment.purchase.rfq.tree</field>
+        <field name="model">garment.purchase.rfq</field>
+        <field name="arch" type="xml">
+            <tree string="Supplier RFQs">
+                <field name="rfq_number"/>
+                <field name="supplier_id"/>
+                <field name="material_name"/>
+                <field name="quantity"/>
+                <field name="delivery_date"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_garment_purchase_rfq" model="ir.actions.act_window">
+        <field name="name">Supplier RFQs</field>
+        <field name="res_model">garment.purchase.rfq</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first supplier RFQ.</p>
+        </field>
+    </record>
+
+</odoo>

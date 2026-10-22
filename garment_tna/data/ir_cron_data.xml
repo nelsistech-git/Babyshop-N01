@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <!-- Reminder System (SRS section 27): 7/3/1 days before due date. -->
+    <record id="cron_garment_tna_pre_due_reminders" model="ir.cron">
+        <field name="name">Garment TNA: Pre-Due Reminders (7/3/1 Days Before)</field>
+        <field name="model_id" ref="model_garment_tna_activity"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_send_pre_due_reminders()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active">True</field>
+    </record>
+
+    <!-- Reminder System (SRS section 27): daily reminder after due date. -->
+    <record id="cron_garment_tna_overdue_reminders" model="ir.cron">
+        <field name="name">Garment TNA: Daily Overdue Reminders</field>
+        <field name="model_id" ref="model_garment_tna_activity"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_send_overdue_reminders()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active">True</field>
+    </record>
+
+    <!-- Auto Escalation (SRS section 17): 4-level escalation of overdue activities. -->
+    <record id="cron_garment_tna_auto_escalate" model="ir.cron">
+        <field name="name">Garment TNA: Auto Escalate Overdue Activities</field>
+        <field name="model_id" ref="model_garment_tna_activity"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_auto_escalate()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active">True</field>
+    </record>
+
+</odoo>

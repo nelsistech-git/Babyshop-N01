@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Smart Complete Garment Software
+    Demo Data: Purchase (garment_purchase)
+
+    Copyright (c) Nelsis Tech (www.nelsistech.com)
+    License: LGPL-3
+
+    NOTE on supplier linkage: garment.purchase.request.line.supplier_id,
+    garment.purchase.rfq.supplier_id and garment.purchase.order.supplier_id
+    are all Many2one to res.partner (not garment.supplier) — see the model
+    sources under garment_purchase/models/. partner_deltaknit / partner_brighttrim
+    (defined in 01_supplier_demo.xml) are the same underlying contacts as
+    supplier_deltaknit / supplier_brighttrim (garment.supplier), so the records
+    below point at the same real-world companies the story refers to.
+
+    NOTE on material linkage: garment.purchase.request.line and
+    garment.purchase.order.line have no Many2one field to garment.material
+    (only descriptive Char fields such as material_name/specification/
+    composition/gsm). Per house style, those descriptive fields are kept in
+    lock-step with the matching batch-1 garment.material record
+    (mat_fabric_jersey / mat_trim_label / mat_pack_polybag) so the two are
+    recognizably "the same material" even though the schema has no direct
+    relation between them.
+
+    Story: fabric requisition for style_tee's BOM (bom_tee) against
+    supplier_deltaknit (Delta Knit Fabrics Ltd) -> RFQ -> quotation -> PO
+    (approved) -> partial goods receipt. Plus a smaller trims/packaging PO
+    against supplier_brighttrim. Timeline: requisition Mar 2026, PO Apr 2026,
+    delivery May 2026.
+-->
+<odoo>
+<data noupdate="1">
+
+    <!-- =================================================================
+         Purchase Requisition — fabric for style_tee / bom_tee
+         ================================================================= -->
+
+    <record id="requisition_fabric_tee" model="garment.purchase.requisition">
+        <field name="pr_number">PR-2026-TS-001</field>
+        <field name="source">bom</field>
+        <field name="bom_id" ref="bom_tee"/>
+        <field name="style_id" ref="style_tee"/>
+        <field name="order_id" ref="order_tee"/>
+        <field name="material_type">fabric</field>
+        <field name="department_id" ref="dept_merchandising"/>
+        <field name="requested_by_id" ref="base.user_admin"/>
+        <field name="request_date">2026-03-02</field>
+        <field name="required_date">2026-03-25</field>
+        <field name="required_for_order">order_tee / NW-TS-001 (24,000 pcs)</field>
+        <field name="priority">high</field>
+        <field name="status">closed</field>
+    </record>
+
+    <record id="reqline_fabric_tee" model="garment.purchase.request.line">
+        <field name="requisition_id" ref="requisition_fabric_tee"/>
+        <field name="sequence">10</field>
+        <field name="material_category">fabric</field>
+        <field name="material_name">Single Jersey Cotton 180 GSM</field>
+        <field name="specification">100% Cotton, 180 GSM, Single Jersey Knit, 60 inch tubular, piece-dyed</field>
+        <field name="composition">100% Cotton</field>
+        <field name="gsm">180</field>
+        <field name="width">60 inch tubular</field>
+        <field name="color">Per colorway (Optic White / Navy)</field>
+        <field name="pantone_code">11-0601 TPX / 19-3832 TPX</field>
+        <field name="consumption">0.2128</field>
+        <field name="buyer_color_code">NW-COL-WHT / NW-COL-NVY</field>
+        <field name="supplier_color_code">DK-WHT-01 / DK-NVY-04</field>
+        <field name="shade_band">Band A</field>
+        <field name="lab_dip_status">buyer_approved</field>
+        <field name="color_approval_status">approved</field>
+        <field name="uom">Kg</field>
+        <field name="required_qty">5100</field>
+        <field name="available_stock">0</field>
+        <field name="incoming_stock">0</field>
+        <field name="supplier_id" ref="partner_deltaknit"/>
+        <field name="delivery_date">2026-03-25</field>
+    </record>
+
+    <!-- =================================================================
+         RFQ + Supplier Quotation — fabric for style_tee
+         ================================================================= -->
+
+    <record id="purchase_rfq_fabric_tee" model="garment.purchase.rfq">
+        <field name="rfq_number">RFQ-2026-TS-001</field>
+        <field name="rfq_source">approved_pr</field>
+        <field name="requisition_id" ref="requisition_fabric_tee"/>
+        <field name="requisition_line_id" ref="reqline_fabric_tee"/>
+        <field name="supplier_id" ref="partner_deltaknit"/>
+        <field name="material_name">Single Jersey Cotton 180 GSM</field>
+        <field name="specification">100% Cotton, 180 GSM, Single Jersey Knit, 60 inch tubular, piece-dyed</field>
+        <field name="quantity">5100</field>
+        <field name="uom">Kg</field>
+        <field name="delivery_date">2026-03-25</field>
+        <field name="status">quoted</field>
+    </record>
+
+    <record id="purchase_quotation_deltaknit_tee" model="garment.supplier.quotation">
+        <field name="rfq_id" ref="purchase_rfq_fabric_tee"/>
+        <field name="supplier_id" ref="partner_deltaknit"/>
+        <field name="price">4.85</field>
+        <field name="currency_id" ref="base.GBP"/>
+        <field name="moq">500</field>
+        <field name="lead_time_days">21</field>
+        <field name="validity_date">2026-12-31</field>
+        <field name="quality_rating_pct">92.0</field>
+        <field name="delivery_rating_pct">95.0</field>
+        <field name="previous_performance_note">Consistent GSM/shade accuracy on prior Northwind knit programs.</field>
+        <field name="status">selected</field>
+    </record>
+
+    <!-- =================================================================
+         Purchase Order — fabric for style_tee (approved) + partial delivery
+         ================================================================= -->
+
+    <record id="purchase_order_fabric_tee" model="garment.purchase.order">
+        <field name="po_number">PO-2026-TS-001</field>
+        <field name="requisition_id" ref="requisition_fabric_tee"/>
+        <field name="rfq_id" ref="purchase_rfq_fabric_tee"/>
+        <field name="supplier_id" ref="partner_deltaknit"/>
+        <field name="style_id" ref="style_tee"/>
+        <field name="order_date">2026-04-06</field>
+        <field name="delivery_date">2026-05-10</field>
+        <field name="terms_conditions">Delivery per agreed schedule; GSM/shade/shrinkage test reports required with each lot; payment per standard 30-day term.</field>
+        <field name="currency_id" ref="base.GBP"/>
+        <field name="purchase_type">local</field>
+        <field name="vat_percentage">15.0</field>
+        <field name="delivery_location">Nelsis Main Factory Warehouse, Ashulia</field>
+        <field name="department_budget_amount">30000</field>
+        <field name="status">approved</field>
+
+        <field name="line_ids" eval="[
+            (0, 0, {
+                'sequence': 10,
+                'material_category': 'fabric',
+                'material_name': 'Single Jersey Cotton 180 GSM',
+                'specification': '100% Cotton, 180 GSM, Single Jersey Knit, 60 inch tubular, piece-dyed',
+                'quantity': 5100,
+                'uom': 'Kg',
+                'unit_price': 4.85,
+                'delivery_date': '2026-05-10',
+            }),
+        ]"/>
+    </record>
+
+    <record id="purchase_delivery_fabric_tee" model="garment.purchase.delivery">
+        <field name="grn_number">GRN-2026-TS-001</field>
+        <field name="order_id" ref="purchase_order_fabric_tee"/>
+        <field name="material_category">fabric</field>
+        <field name="challan_number">DK-CHLN-2026-0512</field>
+        <field name="ordered_qty">5100</field>
+        <field name="delivered_qty">3600</field>
+        <field name="expected_date">2026-05-10</field>
+        <field name="actual_date">2026-05-14</field>
+        <field name="quality_status">passed</field>
+        <field name="gsm_test_result">pass</field>
+        <field name="shade_test_result">pass</field>
+        <field name="shrinkage_test_result">pass</field>
+        <field name="color_fastness_result">pass</field>
+        <field name="size_check_result">na</field>
+        <field name="color_match_result">pass</field>
+        <field name="quantity_check_result">pass</field>
+        <field name="return_status">none</field>
+    </record>
+
+    <!-- =================================================================
+         Purchase Order — trims/packaging for style_tee (against
+         supplier_brighttrim), smaller / fewer details
+         ================================================================= -->
+
+    <record id="purchase_order_trims_tee" model="garment.purchase.order">
+        <field name="po_number">PO-2026-TS-002</field>
+        <field name="supplier_id" ref="partner_brighttrim"/>
+        <field name="style_id" ref="style_tee"/>
+        <field name="order_date">2026-04-10</field>
+        <field name="delivery_date">2026-05-05</field>
+        <field name="currency_id" ref="base.GBP"/>
+        <field name="purchase_type">local</field>
+        <field name="vat_percentage">15.0</field>
+        <field name="delivery_location">Nelsis Main Factory Warehouse, Ashulia</field>
+        <field name="status">approved</field>
+
+        <field name="line_ids" eval="[
+            (0, 0, {
+                'sequence': 10,
+                'material_category': 'trim',
+                'material_name': 'Woven Main Label',
+                'specification': 'Damask woven main label, 4-color, folded, 3cm x 5cm',
+                'quantity': 26000,
+                'uom': 'Pcs',
+                'unit_price': 0.018,
+                'delivery_date': '2026-05-05',
+            }),
+            (0, 0, {
+                'sequence': 20,
+                'material_category': 'packaging',
+                'material_name': 'Printed LDPE Poly Bag',
+                'specification': 'Printed poly bag with self-adhesive strip, buyer logo, 12x16 inch',
+                'quantity': 26000,
+                'uom': 'Pcs',
+                'unit_price': 0.012,
+                'delivery_date': '2026-05-05',
+            }),
+        ]"/>
+    </record>
+
+</data>
+</odoo>

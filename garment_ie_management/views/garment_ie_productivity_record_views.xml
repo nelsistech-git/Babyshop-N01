@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_ie_productivity_record_form" model="ir.ui.view">
+        <field name="name">garment.ie.productivity.record.form</field>
+        <field name="model">garment.ie.productivity.record</field>
+        <field name="arch" type="xml">
+            <form string="Productivity Record">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="employee_id"/>
+                            <field name="operation_id"/>
+                            <field name="line_id"/>
+                            <field name="production_order_id"/>
+                            <field name="work_order_id"/>
+                            <field name="date"/>
+                        </group>
+                        <group>
+                            <field name="target_output"/>
+                            <field name="actual_output"/>
+                            <field name="productivity_pct" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="SMV Variance">
+                        <group>
+                            <field name="standard_smv"/>
+                            <field name="worked_minutes"/>
+                        </group>
+                        <group>
+                            <field name="actual_time_per_pc" readonly="1"/>
+                            <field name="smv_variance" readonly="1"/>
+                            <field name="efficiency_pct" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_ie_productivity_record_tree" model="ir.ui.view">
+        <field name="name">garment.ie.productivity.record.tree</field>
+        <field name="model">garment.ie.productivity.record</field>
+        <field name="arch" type="xml">
+            <tree string="Productivity Records" editable="bottom"
+                  decoration-danger="efficiency_pct != 0 and efficiency_pct &lt; 60"
+                  decoration-success="efficiency_pct &gt;= 100">
+                <field name="date"/>
+                <field name="employee_id"/>
+                <field name="operation_id"/>
+                <field name="line_id"/>
+                <field name="target_output"/>
+                <field name="actual_output"/>
+                <field name="productivity_pct"/>
+                <field name="standard_smv"/>
+                <field name="worked_minutes"/>
+                <field name="smv_variance"/>
+                <field name="efficiency_pct"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_ie_productivity_record_search" model="ir.ui.view">
+        <field name="name">garment.ie.productivity.record.search</field>
+        <field name="model">garment.ie.productivity.record</field>
+        <field name="arch" type="xml">
+            <search string="Search Productivity Records">
+                <field name="employee_id"/>
+                <field name="operation_id"/>
+                <field name="line_id"/>
+                <group expand="0" string="Group By">
+                    <filter string="Employee" name="group_employee" context="{'group_by': 'employee_id'}"/>
+                    <filter string="Operation" name="group_operation" context="{'group_by': 'operation_id'}"/>
+                    <filter string="Line" name="group_line" context="{'group_by': 'line_id'}"/>
+                    <filter string="Date" name="group_date" context="{'group_by': 'date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_ie_productivity_record" model="ir.actions.act_window">
+        <field name="name">Productivity Records</field>
+        <field name="res_model">garment.ie.productivity.record</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Record your first target-vs-actual productivity entry.</p>
+        </field>
+    </record>
+
+</odoo>

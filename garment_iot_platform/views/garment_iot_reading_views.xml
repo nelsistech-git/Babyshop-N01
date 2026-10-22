@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_iot_reading_form" model="ir.ui.view">
+        <field name="name">garment.iot.reading.form</field>
+        <field name="model">garment.iot.reading</field>
+        <field name="arch" type="xml">
+            <form string="IoT Reading">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="device_id"/>
+                            <field name="device_type" readonly="1"/>
+                            <field name="gateway_id" readonly="1"/>
+                            <field name="machine_id" readonly="1"/>
+                            <field name="location_id" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="reading_type"/>
+                            <field name="value"/>
+                            <field name="unit"/>
+                            <field name="text_value"/>
+                            <field name="timestamp"/>
+                        </group>
+                    </group>
+                    <group string="Alerts">
+                        <field name="alert_log_ids" nolabel="1">
+                            <tree>
+                                <field name="name"/>
+                                <field name="rule_id"/>
+                                <field name="severity" widget="badge"/>
+                                <field name="triggered_datetime"/>
+                                <field name="action_taken"/>
+                                <field name="state" widget="badge"/>
+                            </tree>
+                        </field>
+                    </group>
+                    <group string="Raw Payload">
+                        <field name="raw_payload" nolabel="1" readonly="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_iot_reading_tree" model="ir.ui.view">
+        <field name="name">garment.iot.reading.tree</field>
+        <field name="model">garment.iot.reading</field>
+        <field name="arch" type="xml">
+            <tree string="IoT Readings" decoration-info="alert_count &gt; 0">
+                <field name="timestamp"/>
+                <field name="device_id"/>
+                <field name="device_type"/>
+                <field name="reading_type"/>
+                <field name="value"/>
+                <field name="unit"/>
+                <field name="text_value"/>
+                <field name="machine_id"/>
+                <field name="location_id"/>
+                <field name="alert_count"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_iot_reading_search" model="ir.ui.view">
+        <field name="name">garment.iot.reading.search</field>
+        <field name="model">garment.iot.reading</field>
+        <field name="arch" type="xml">
+            <search string="Search IoT Readings">
+                <field name="device_id"/>
+                <field name="machine_id"/>
+                <field name="reading_type"/>
+
+                <!-- FIXED: Removed domain using 'alert_count' because it's a computed field and not searchable unless stored in Python.
+                     If you want to keep this filter, add store=True to alert_count in garment_iot_reading.py -->
+                <!-- <filter string="With Alerts" name="filter_alerts" domain="[('alert_count', '>', 0)]"/> -->
+
+                <filter string="Today" name="filter_today"
+                        domain="[('timestamp', '&gt;=', datetime.datetime.combine(context_today(), datetime.time(0,0,0)))]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Device" name="group_device" context="{'group_by': 'device_id'}"/>
+                    <filter string="Reading Type" name="group_reading_type" context="{'group_by': 'reading_type'}"/>
+                    <filter string="Machine" name="group_machine" context="{'group_by': 'machine_id'}"/>
+                    <filter string="Date" name="group_date" context="{'group_by': 'timestamp:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_iot_reading" model="ir.actions.act_window">
+        <field name="name">IoT Readings</field>
+        <field name="res_model">garment.iot.reading</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No IoT readings ingested yet. Readings normally arrive via
+                POST /api/iot/ingest.</p>
+        </field>
+    </record>
+
+</odoo>

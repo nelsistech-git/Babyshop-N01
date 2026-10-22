@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_report_garment_lc" model="ir.actions.report">
+        <field name="name">LC Summary</field>
+        <field name="model">garment.lc</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">garment_finance.report_garment_lc</field>
+        <field name="report_file">garment_finance.report_garment_lc</field>
+        <field name="binding_model_id" ref="model_garment_lc"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'LC - %s' % (object.lc_number)</field>
+    </record>
+
+    <template id="report_garment_lc">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Letter of Credit <span t-field="o.lc_number"/></h2>
+                        <p class="text-muted">
+                            Buyer: <span t-field="o.buyer_id.name"/> | Amount: <span t-field="o.lc_amount"/>
+                            | Expiry: <span t-field="o.expiry_date"/> | Stage: <span t-field="o.workflow_stage"/>
+                        </p>
+
+                        <h4>Documents</h4>
+                        <table class="table table-sm">
+                            <thead><tr><th>Type</th><th>Submitted</th><th>Date</th></tr></thead>
+                            <tbody>
+                                <tr t-foreach="o.document_ids" t-as="d">
+                                    <td><span t-field="d.document_type"/></td>
+                                    <td><span t-field="d.is_submitted"/></td>
+                                    <td><span t-field="d.submitted_date"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_ie_motion_study_form" model="ir.ui.view">
+        <field name="name">garment.ie.motion.study.form</field>
+        <field name="model">garment.ie.motion.study</field>
+        <field name="arch" type="xml">
+            <form string="Motion Study">
+                <header>
+                    <button name="action_propose" type="object" string="Propose"
+                            class="btn-primary" invisible="status != 'draft'"/>
+                    <button name="action_implement" type="object" string="Implement"
+                            class="btn-primary" invisible="status != 'proposed'"/>
+                    <field name="status" widget="statusbar" statusbar_visible="draft,proposed,implemented"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="study_number"/>
+                        <h1><field name="study_number" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="operation_id"/>
+                            <field name="workstation_id"/>
+                            <field name="responsible_id"/>
+                        </group>
+                        <group>
+                            <field name="walking_distance_before"/>
+                            <field name="walking_distance_after"/>
+                            <field name="hand_movements_before"/>
+                            <field name="hand_movements_after"/>
+                            <field name="time_saving_seconds"/>
+                        </group>
+                    </group>
+                    <group string="Problem">
+                        <field name="problem_description" nolabel="1"/>
+                    </group>
+                    <group string="Solution">
+                        <field name="solution_description" nolabel="1"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_ie_motion_study_tree" model="ir.ui.view">
+        <field name="name">garment.ie.motion.study.tree</field>
+        <field name="model">garment.ie.motion.study</field>
+        <field name="arch" type="xml">
+            <tree string="Motion Studies">
+                <field name="study_number"/>
+                <field name="operation_id"/>
+                <field name="walking_distance_before"/>
+                <field name="walking_distance_after"/>
+                <field name="time_saving_seconds"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_garment_ie_motion_study" model="ir.actions.act_window">
+        <field name="name">Motion Studies</field>
+        <field name="res_model">garment.ie.motion.study</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Start your first motion study.</p>
+        </field>
+    </record>
+
+</odoo>

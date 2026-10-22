@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <!-- Automation Rules (SRS Buyer CRM section 40) -->
+
+    <record id="ir_cron_garment_crm_score_leads_nightly" model="ir.cron">
+        <field name="name">Buyer CRM: Calculate AI Lead Scores Nightly</field>
+        <field name="model_id" ref="model_garment_buyer"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_score_all_active_leads()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active">True</field>
+    </record>
+
+    <record id="ir_cron_garment_crm_flag_inactive_buyers" model="ir.cron">
+        <field name="name">Buyer CRM: Flag Inactive Buyers</field>
+        <field name="model_id" ref="model_garment_buyer"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_flag_inactive_buyers()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active">True</field>
+    </record>
+
+    <record id="ir_cron_garment_crm_nda_expiry" model="ir.cron">
+        <field name="name">Buyer CRM: Notify NDA Expiry</field>
+        <field name="model_id" ref="model_garment_buyer"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_notify_nda_expiry()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active">True</field>
+    </record>
+
+    <record id="ir_cron_garment_crm_document_expiry" model="ir.cron">
+        <field name="name">Buyer CRM: Notify Expiring Buyer Documents</field>
+        <field name="model_id" ref="model_garment_buyer_document"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_notify_expiring_documents()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active">True</field>
+    </record>
+
+    <record id="ir_cron_garment_crm_birthday_greetings" model="ir.cron">
+        <field name="name">Buyer CRM: Contact Birthday / Anniversary Greetings</field>
+        <field name="model_id" ref="model_garment_buyer_contact"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_notify_birthdays()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active">True</field>
+    </record>
+
+    <record id="ir_cron_garment_crm_rfq_due_reminders" model="ir.cron">
+        <field name="name">Buyer CRM: RFQ Due Date Reminders</field>
+        <field name="model_id" ref="model_garment_rfq"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_remind_due_dates()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active">True</field>
+    </record>
+
+    <record id="ir_cron_garment_crm_rfq_escalate_overdue" model="ir.cron">
+        <field name="name">Buyer CRM: Escalate Overdue RFQs</field>
+        <field name="model_id" ref="model_garment_rfq"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_escalate_overdue()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active">True</field>
+    </record>
+
+    <record id="ir_cron_garment_crm_high_value_opportunity" model="ir.cron">
+        <field name="name">Buyer CRM: Notify High-Value Opportunities</field>
+        <field name="model_id" ref="model_garment_opportunity"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_notify_high_value_opportunities()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active">True</field>
+    </record>
+
+    <record id="ir_cron_garment_crm_activity_overdue" model="ir.cron">
+        <field name="name">Buyer CRM: Escalate Overdue Activities</field>
+        <field name="model_id" ref="model_garment_crm_activity"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_mark_overdue_activities()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">hours</field>
+        <field name="active">True</field>
+    </record>
+
+</odoo>

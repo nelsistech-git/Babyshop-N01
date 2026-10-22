@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_bom_approval_tree" model="ir.ui.view">
+        <field name="name">garment.bom.approval.tree</field>
+        <field name="model">garment.bom.approval</field>
+        <field name="arch" type="xml">
+            <tree string="BOM Approvals" editable="bottom" decoration-success="status == 'approved'" decoration-danger="status == 'rejected'">
+                <field name="bom_id"/>
+                <field name="approval_stage"/>
+                <field name="approver_id"/>
+                <field name="status"/>
+                <field name="approval_date"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_garment_bom_approval" model="ir.actions.act_window">
+        <field name="name">BOM Approvals</field>
+        <field name="res_model">garment.bom.approval</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="view_garment_bom_revision_tree" model="ir.ui.view">
+        <field name="name">garment.bom.revision.tree</field>
+        <field name="model">garment.bom.revision</field>
+        <field name="arch" type="xml">
+            <tree string="BOM Revisions">
+                <field name="bom_id"/>
+                <field name="revision_number"/>
+                <field name="old_material"/>
+                <field name="new_material"/>
+                <field name="change_reason_category"/>
+                <field name="change_severity" widget="badge"/>
+                <field name="approval_status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_bom_revision_form" model="ir.ui.view">
+        <field name="name">garment.bom.revision.form</field>
+        <field name="model">garment.bom.revision</field>
+        <field name="arch" type="xml">
+            <form string="BOM Revision">
+                <header>
+                    <field name="approval_status" widget="statusbar"/>
+                    <button name="action_approve" type="object" string="Approve" class="btn-primary"
+                            invisible="approval_status == 'approved'"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="bom_id"/>
+                            <field name="revision_number"/>
+                            <field name="old_material"/>
+                            <field name="new_material"/>
+                            <field name="change_reason_category"/>
+                            <field name="change_severity"/>
+                        </group>
+                        <group>
+                            <field name="changed_by_id"/>
+                            <field name="changed_date"/>
+                            <field name="cost_impact"/>
+                            <field name="effective_date"/>
+                        </group>
+                    </group>
+                    <group string="BOM Approval Matrix — Major Change Sign-off" invisible="change_severity != 'major'">
+                        <field name="technical_manager_approved"/>
+                        <field name="qa_manager_approved"/>
+                        <field name="buyer_approved"/>
+                    </group>
+                    <field name="change_reason" placeholder="Change reason details..."/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_bom_revision" model="ir.actions.act_window">
+        <field name="name">BOM Revisions</field>
+        <field name="res_model">garment.bom.revision</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

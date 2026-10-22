@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_supplier_product_tree" model="ir.ui.view">
+        <field name="name">garment.supplier.product.tree</field>
+        <field name="model">garment.supplier.product</field>
+        <field name="arch" type="xml">
+            <tree string="Supplier Products" editable="bottom">
+                <field name="supplier_id"/>
+                <field name="product_name"/>
+                <field name="product_category"/>
+                <field name="specification"/>
+                <field name="unit_price"/>
+                <field name="moq"/>
+                <field name="lead_time_days"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_supplier_product_form" model="ir.ui.view">
+        <field name="name">garment.supplier.product.form</field>
+        <field name="model">garment.supplier.product</field>
+        <field name="arch" type="xml">
+            <form string="Supplier Product">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_price_history" type="object" class="oe_stat_button" icon="fa-line-chart">
+                            <div class="o_stat_info">
+                                <field name="price_history_count" class="o_stat_value"/>
+                                <span class="o_stat_text">Price History</span>
+                            </div>
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="supplier_id"/>
+                            <field name="product_name"/>
+                            <field name="product_category"/>
+                            <field name="specification"/>
+                            <field name="uom"/>
+                        </group>
+                        <group>
+                            <field name="unit_price"/>
+                            <field name="previous_price" readonly="1"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="effective_date"/>
+                            <field name="validity_date"/>
+                            <field name="lead_time_days"/>
+                            <field name="moq"/>
+                        </group>
+                    </group>
+                    <group string="Fabric Supplier Information" col="3" invisible="product_category != 'fabric'">
+                        <field name="fabric_composition"/>
+                        <field name="gsm"/>
+                        <field name="width"/>
+                        <field name="dyeing_process"/>
+                        <field name="color_fastness_rating"/>
+                        <field name="test_report_ref"/>
+                    </group>
+                    <group string="Accessories Supplier Information" col="2" invisible="product_category != 'accessory'">
+                        <field name="material_type"/>
+                        <field name="size_specification"/>
+                        <field name="color_matching_status"/>
+                        <field name="sample_approval_status"/>
+                    </group>
+                    <button name="action_log_price_history" type="object" string="Log Current Price to History"
+                            class="btn-secondary" icon="fa-history"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_supplier_product" model="ir.actions.act_window">
+        <field name="name">Supplier Products</field>
+        <field name="res_model">garment.supplier.product</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

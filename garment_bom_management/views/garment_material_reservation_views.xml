@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_material_reservation_tree" model="ir.ui.view">
+        <field name="name">garment.material.reservation.tree</field>
+        <field name="model">garment.material.reservation</field>
+        <field name="arch" type="xml">
+            <tree string="Material Reservations" decoration-danger="shortage_qty > 0" decoration-success="state == 'fulfilled'">
+                <field name="bom_id"/>
+                <field name="style_id"/>
+                <field name="order_reference"/>
+                <field name="material_type"/>
+                <field name="material_name"/>
+                <field name="required_qty"/>
+                <field name="reserved_qty"/>
+                <field name="available_qty"/>
+                <field name="shortage_qty"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_material_reservation_form" model="ir.ui.view">
+        <field name="name">garment.material.reservation.form</field>
+        <field name="model">garment.material.reservation</field>
+        <field name="arch" type="xml">
+            <form string="Material Reservation">
+                <header>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,reserved,fulfilled"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="bom_id"/>
+                            <field name="style_id" readonly="1"/>
+                            <field name="order_reference"/>
+                            <field name="material_type"/>
+                            <field name="material_name"/>
+                        </group>
+                        <group>
+                            <field name="fabric_bom_id" invisible="material_type != 'fabric'"/>
+                            <field name="trim_bom_id" invisible="material_type != 'trim'"/>
+                            <field name="packaging_bom_id" invisible="material_type != 'packaging'"/>
+                        </group>
+                    </group>
+                    <group string="Quantities">
+                        <group>
+                            <field name="required_qty"/>
+                            <field name="reserved_qty"/>
+                        </group>
+                        <group>
+                            <field name="available_qty"/>
+                            <field name="shortage_qty" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_material_reservation_search" model="ir.ui.view">
+        <field name="name">garment.material.reservation.search</field>
+        <field name="model">garment.material.reservation</field>
+        <field name="arch" type="xml">
+            <search string="Search Reservations">
+                <field name="bom_id"/>
+                <field name="style_id"/>
+                <field name="order_reference"/>
+                <filter string="Shortage" name="filter_shortage" domain="[('shortage_qty', '&gt;', 0)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Material Type" name="group_material_type" context="{'group_by': 'material_type'}"/>
+                    <filter string="Style" name="group_style" context="{'group_by': 'style_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_material_reservation" model="ir.actions.act_window">
+        <field name="name">Material Reservations</field>
+        <field name="res_model">garment.material.reservation</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Reserve materials against an order.</p>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_iot_alert_rule_form" model="ir.ui.view">
+        <field name="name">garment.iot.alert.rule.form</field>
+        <field name="model">garment.iot.alert.rule</field>
+        <field name="arch" type="xml">
+            <form string="IoT Alert Rule">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="%(action_garment_iot_alert_log)d" type="action" class="oe_stat_button" icon="fa-bell"
+                                context="{'search_default_rule_id': id}">
+                            <field name="alert_count" widget="statinfo" string="Alerts Fired"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="e.g. Sewing Floor Temperature Critical"/></h1>
+                    </div>
+                    <group>
+                        <group string="Scope">
+                            <field name="device_id"/>
+                            <field name="device_type" invisible="device_id != False" required="device_id == False"/>
+                            <field name="reading_type"/>
+                        </group>
+                        <group string="Condition">
+                            <field name="operator"/>
+                            <field name="threshold_value"/>
+                            <field name="severity"/>
+                            <field name="cooldown_minutes"/>
+                        </group>
+                    </group>
+                    <group string="Action">
+                        <field name="action_type"/>
+                        <field name="action_summary" invisible="action_type == 'call_method'"/>
+                        <field name="target_user_id" invisible="action_type != 'create_activity'"/>
+                        <field name="action_model_id" invisible="action_type != 'call_method'"
+                               required="action_type == 'call_method'"/>
+                        <field name="action_method" invisible="action_type != 'call_method'"
+                               required="action_type == 'call_method'"/>
+                    </group>
+                    <field name="active" invisible="1"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_iot_alert_rule_tree" model="ir.ui.view">
+        <field name="name">garment.iot.alert.rule.tree</field>
+        <field name="model">garment.iot.alert.rule</field>
+        <field name="arch" type="xml">
+            <tree string="IoT Alert Rules" decoration-danger="severity == 'critical'" decoration-warning="severity == 'warning'">
+                <field name="name"/>
+                <field name="device_id"/>
+                <field name="device_type"/>
+                <field name="reading_type"/>
+                <field name="operator"/>
+                <field name="threshold_value"/>
+                <field name="severity" widget="badge"/>
+                <field name="action_type"/>
+                <field name="alert_count"/>
+                <field name="active" widget="boolean_toggle"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_iot_alert_rule_search" model="ir.ui.view">
+        <field name="name">garment.iot.alert.rule.search</field>
+        <field name="model">garment.iot.alert.rule</field>
+        <field name="arch" type="xml">
+            <search string="Search IoT Alert Rules">
+                <field name="name"/>
+                <field name="device_id"/>
+                <field name="device_type"/>
+                <field name="reading_type"/>
+                <filter string="Critical" name="filter_critical" domain="[('severity', '=', 'critical')]"/>
+                <filter string="Warning" name="filter_warning" domain="[('severity', '=', 'warning')]"/>
+                <filter string="Inactive" name="filter_inactive" domain="[('active', '=', False)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Device Type" name="group_type" context="{'group_by': 'device_type'}"/>
+                    <filter string="Reading Type" name="group_reading_type" context="{'group_by': 'reading_type'}"/>
+                    <filter string="Severity" name="group_severity" context="{'group_by': 'severity'}"/>
+                    <filter string="Action" name="group_action" context="{'group_by': 'action_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_iot_alert_rule" model="ir.actions.act_window">
+        <field name="name">IoT Alert Rules</field>
+        <field name="res_model">garment.iot.alert.rule</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Define a threshold rule to automatically react to incoming IoT readings.</p>
+        </field>
+    </record>
+
+</odoo>

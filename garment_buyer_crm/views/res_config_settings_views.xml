@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_res_config_settings_garment_ai" model="ir.ui.view">
+        <field name="name">res.config.settings.garment.ai</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app data-string="Smart Garment ERP" string="Smart Garment ERP" data-key="garment_buyer_crm" groups="garment_buyer_crm.group_garment_crm_administrator">
+                    <block title="AI Assist" name="garment_ai_settings">
+                        <setting id="garment_ai_provider_setting" help="Choose the AI provider used for lead scoring and insights across the Smart Complete Garment Software suite. Leave 'Disabled' to use the built-in rule-based scorer.">
+                            <field name="garment_ai_provider"/>
+                            <div class="content-group" invisible="garment_ai_provider == 'none'">
+                                <field name="garment_ai_api_key" password="True"/>
+                                <field name="garment_ai_api_endpoint" invisible="garment_ai_provider not in ['azure_openai', 'custom']"/>
+                                <field name="garment_ai_model"/>
+                            </div>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+</odoo>

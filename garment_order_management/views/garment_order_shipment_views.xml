@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_order_shipment_tree" model="ir.ui.view">
+        <field name="name">garment.order.shipment.tree</field>
+        <field name="model">garment.order.shipment</field>
+        <field name="arch" type="xml">
+            <tree string="Shipments" editable="bottom" decoration-danger="status == 'delayed'"
+                  decoration-success="status == 'shipped'">
+                <field name="order_id"/>
+                <field name="planned_date"/>
+                <field name="actual_shipment_date"/>
+                <field name="shipment_qty" sum="Total"/>
+                <field name="shipped_qty" sum="Shipped"/>
+                <field name="pending_qty"/>
+                <field name="shipment_mode"/>
+                <field name="status"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_order_shipment_form" model="ir.ui.view">
+        <field name="name">garment.order.shipment.form</field>
+        <field name="model">garment.order.shipment</field>
+        <field name="arch" type="xml">
+            <form string="Shipment">
+                <sheet>
+                    <div class="oe_title"><h1><field name="name" readonly="1"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="order_id"/>
+                            <field name="status"/>
+                            <field name="planned_date"/>
+                            <field name="actual_shipment_date"/>
+                        </group>
+                        <group>
+                            <field name="shipment_qty"/>
+                            <field name="shipped_qty"/>
+                            <field name="pending_qty" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Export Details">
+                        <field name="port_of_loading"/>
+                        <field name="port_of_destination"/>
+                        <field name="shipment_mode"/>
+                        <field name="vessel_flight_ref"/>
+                    </group>
+                    <field name="remarks"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_order_shipment" model="ir.actions.act_window">
+        <field name="name">Shipments</field>
+        <field name="res_model">garment.order.shipment</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

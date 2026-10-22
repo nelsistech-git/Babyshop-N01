@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_material_graph" model="ir.ui.view">
+        <field name="name">garment.material.graph</field>
+        <field name="model">garment.material</field>
+        <field name="arch" type="xml">
+            <graph string="Stock Value by Category" type="bar">
+                <field name="category"/>
+                <field name="inventory_value" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_garment_material_pivot" model="ir.ui.view">
+        <field name="name">garment.material.pivot</field>
+        <field name="model">garment.material</field>
+        <field name="arch" type="xml">
+            <pivot string="Inventory Analysis">
+                <field name="category" type="row"/>
+                <field name="stock_status" type="col"/>
+                <field name="on_hand_qty" type="measure"/>
+                <field name="inventory_value" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_garment_warehouse_dashboard" model="ir.actions.act_window">
+        <field name="name">Warehouse Dashboard</field>
+        <field name="res_model">garment.material</field>
+        <field name="view_mode">graph,pivot,tree</field>
+    </record>
+
+    <record id="view_garment_material_aging_graph" model="ir.ui.view">
+        <field name="name">garment.material.aging.graph</field>
+        <field name="model">garment.material</field>
+        <field name="arch" type="xml">
+            <graph string="Stock Aging" type="bar">
+                <field name="aging_bucket"/>
+                <field name="inventory_value" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_garment_material_aging_pivot" model="ir.ui.view">
+        <field name="name">garment.material.aging.pivot</field>
+        <field name="model">garment.material</field>
+        <field name="arch" type="xml">
+            <pivot string="Stock Aging Analysis">
+                <field name="category" type="row"/>
+                <field name="aging_bucket" type="col"/>
+                <field name="on_hand_qty" type="measure"/>
+                <field name="inventory_value" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_garment_warehouse_aging_dashboard" model="ir.actions.act_window">
+        <field name="name">Stock Aging Report</field>
+        <field name="res_model">garment.material</field>
+        <field name="view_mode">graph,pivot,tree</field>
+        <field name="domain">[('stock_age_days', '&gt;', 0)]</field>
+    </record>
+
+    <record id="action_garment_warehouse_aging_dashboard_view_graph" model="ir.actions.act_window.view">
+        <field name="sequence">1</field>
+        <field name="view_mode">graph</field>
+        <field name="view_id" ref="view_garment_material_aging_graph"/>
+        <field name="act_window_id" ref="action_garment_warehouse_aging_dashboard"/>
+    </record>
+
+    <record id="action_garment_warehouse_aging_dashboard_view_pivot" model="ir.actions.act_window.view">
+        <field name="sequence">2</field>
+        <field name="view_mode">pivot</field>
+        <field name="view_id" ref="view_garment_material_aging_pivot"/>
+        <field name="act_window_id" ref="action_garment_warehouse_aging_dashboard"/>
+    </record>
+
+    <record id="view_garment_stock_count_accuracy_pivot" model="ir.ui.view">
+        <field name="name">garment.stock.count.accuracy.pivot</field>
+        <field name="model">garment.stock.count</field>
+        <field name="arch" type="xml">
+            <pivot string="Stock Count Accuracy (Inventory KPI)">
+                <field name="warehouse_id" type="row"/>
+                <field name="count_type" type="col"/>
+                <field name="accuracy_percent" type="measure"/>
+                <field name="total_variance_qty" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_garment_stock_count_dashboard" model="ir.actions.act_window">
+        <field name="name">Stock Count Accuracy</field>
+        <field name="res_model">garment.stock.count</field>
+        <field name="view_mode">pivot,tree</field>
+        <field name="domain">[('state', '=', 'approved')]</field>
+    </record>
+
+</odoo>

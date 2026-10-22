@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_bom_form" model="ir.ui.view">
+        <field name="name">garment.bom.form</field>
+        <field name="model">garment.bom</field>
+        <field name="arch" type="xml">
+            <form string="Bill of Materials">
+                <header>
+                    <field name="status" widget="statusbar"
+                            statusbar_visible="draft,material_review,technical_approval,merchandising_approval,costing_approval,production_approved,active"/>
+                    <button name="action_submit_material_review" type="object" string="Submit for Material Review" class="btn-primary"
+                            invisible="status != 'draft'"/>
+                    <button name="action_submit_technical_approval" type="object" string="Submit for Technical Approval" class="btn-primary"
+                            invisible="status != 'material_review'"/>
+                    <button name="action_submit_merchandising_approval" type="object" string="Submit for Merchandising Approval" class="btn-primary"
+                            invisible="status != 'technical_approval'"/>
+                    <button name="action_submit_costing_approval" type="object" string="Submit for Costing Approval" class="btn-primary"
+                            invisible="status != 'merchandising_approval'"/>
+                    <button name="action_submit_production_approved" type="object" string="Submit for Production Approval" class="btn-primary"
+                            invisible="status != 'costing_approval'"/>
+                    <button name="action_run_ai_analysis" type="object" string="Run AI Analysis" class="btn-secondary" icon="fa-magic"/>
+                    <button name="action_import_from_style" type="object" string="Import From Style" class="btn-secondary"/>
+                    <button name="action_import_from_techpack" type="object" string="Import From Tech Pack" class="btn-secondary"/>
+                    <button name="action_open_compare_wizard" type="object" string="Compare Versions" class="btn-secondary"/>
+                    <button name="action_approve_final" type="object" string="Approve &amp; Lock" class="btn-primary"
+                            invisible="status != 'production_approved'"/>
+                    <button name="action_close" type="object" string="Close" class="btn-secondary"
+                            invisible="status != 'active'"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Locked" bg_color="bg-danger"
+                            invisible="not is_locked"/>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_approvals" type="object" class="oe_stat_button" icon="fa-check-circle">
+                            <div class="o_stat_info"><span class="o_stat_text">Approvals</span></div>
+                        </button>
+                        <button name="action_view_revisions" type="object" class="oe_stat_button" icon="fa-history">
+                            <div class="o_stat_info"><span class="o_stat_text">Revisions</span></div>
+                        </button>
+                        <button name="action_view_reservations" type="object" class="oe_stat_button" icon="fa-cubes">
+                            <div class="o_stat_info"><span class="o_stat_text">Reservations</span></div>
+                        </button>
+                        <button name="action_view_production_orders" type="object" class="oe_stat_button" icon="fa-industry">
+                            <div class="o_stat_info"><span class="o_stat_text">Production Orders</span></div>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="bom_number"/>
+                        <h1><field name="bom_number" readonly="1"/></h1>
+                        <field name="barcode" widget="barcode" placeholder="Barcode"/>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="bom_type"/>
+                            <field name="style_id"/>
+                            <field name="buyer_id" readonly="1"/>
+                            <field name="brand" readonly="1"/>
+                            <field name="season" readonly="1"/>
+                            <field name="style_category_id" readonly="1"/>
+                            <field name="techpack_id"/>
+                        </group>
+                        <group>
+                            <field name="version"/>
+                            <field name="revision_number" readonly="1"/>
+                            <field name="created_by_id" readonly="1"/>
+                            <field name="approved_by_id" readonly="1"/>
+                            <field name="is_locked" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Product Information">
+                        <group>
+                            <field name="style_color_id"/>
+                            <field name="size_set_id"/>
+                            <field name="order_quantity"/>
+                        </group>
+                        <group>
+                            <field name="delivery_date"/>
+                            <field name="factory"/>
+                            <field name="production_unit"/>
+                        </group>
+                    </group>
+                    <group string="Commercial Information"
+                           groups="garment_bom_management.group_bom_costing,garment_bom_management.group_bom_administrator,garment_bom_management.group_bom_top_management">
+                        <group>
+                            <field name="currency_id"/>
+                            <field name="target_cost"/>
+                            <field name="fob_price"/>
+                            <field name="profit_margin"/>
+                        </group>
+                        <group>
+                            <field name="fabric_cost_total" readonly="1"/>
+                            <field name="trim_cost_total" readonly="1"/>
+                            <field name="packaging_cost_total" readonly="1"/>
+                            <field name="processing_cost"/>
+                            <field name="total_material_cost" readonly="1"/>
+                            <field name="cost_per_piece" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Fabric BOM">
+                            <field name="fabric_bom_ids">
+                                <tree editable="bottom">
+                                    <field name="bom_id" invisible="1"/>
+                                    <field name="fabric_code"/>
+                                    <field name="fabric_name"/>
+                                    <field name="fabric_role"/>
+                                    <field name="composition"/>
+                                    <field name="gsm"/>
+                                    <field name="net_consumption"/>
+                                    <field name="total_wastage_pct"/>
+                                    <field name="gross_consumption"/>
+                                    <field name="unit_price"/>
+                                    <field name="required_qty"/>
+                                    <field name="line_cost"/>
+                                    <field name="supplier_id"/>
+                                    <field name="purchase_qty" optional="hide"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Trim BOM">
+                            <field name="trim_bom_ids">
+                                <tree editable="bottom">
+                                    <field name="bom_id" invisible="1"/>
+                                    <field name="trim_type"/>
+                                    <field name="description"/>
+                                    <field name="consumption_per_piece"/>
+                                    <field name="unit_price"/>
+                                    <field name="required_qty"/>
+                                    <field name="line_cost"/>
+                                    <field name="supplier_id"/>
+                                    <field name="purchase_qty" optional="hide"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Packaging BOM">
+                            <field name="packaging_bom_ids">
+                                <tree editable="bottom">
+                                    <field name="bom_id" invisible="1"/>
+                                    <field name="packaging_type"/>
+                                    <field name="description"/>
+                                    <field name="consumption_per_piece"/>
+                                    <field name="unit_price"/>
+                                    <field name="required_qty"/>
+                                    <field name="line_cost"/>
+                                    <field name="supplier_id"/>
+                                    <field name="purchase_qty" optional="hide"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Material Lines">
+                            <div class="oe_inline mb-2">
+                                <button name="action_sync_material_lines" type="object" string="Sync From Fabric/Trim/Packaging" class="btn-secondary"/>
+                                <button name="action_generate_purchase_requirement" type="object" string="Generate Purchase Requirement" class="btn-secondary"/>
+                            </div>
+                            <field name="line_ids">
+                                <tree editable="bottom">
+                                    <field name="bom_id" invisible="1"/>
+                                    <field name="material_category"/>
+                                    <field name="material_code"/>
+                                    <field name="material_name"/>
+                                    <field name="specification"/>
+                                    <field name="uom"/>
+                                    <field name="required_qty"/>
+                                    <field name="issued_qty"/>
+                                    <field name="consumed_qty"/>
+                                    <field name="unit_price"/>
+                                    <field name="line_cost"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Size/Color Consumption">
+                            <field name="consumption_ids">
+                                <tree editable="bottom">
+                                    <field name="bom_id" invisible="1"/>
+                                    <field name="breakdown_type"/>
+                                    <field name="fabric_bom_id"/>
+                                    <field name="trim_bom_id"/>
+                                    <field name="packaging_bom_id"/>
+                                    <field name="size_code"/>
+                                    <field name="color_name"/>
+                                    <field name="artwork_reference"/>
+                                    <field name="size_ratio"/>
+                                    <field name="consumption_value"/>
+                                    <field name="quantity"/>
+                                    <field name="total_requirement"/>
+                                    <field name="consumption_efficiency_pct" optional="hide"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Alternative Materials">
+                            <field name="alternative_ids">
+                                <tree editable="bottom">
+                                    <field name="bom_id" invisible="1"/>
+                                    <field name="main_material"/>
+                                    <field name="alternative_material"/>
+                                    <field name="cost_difference"/>
+                                    <field name="buyer_approval_required"/>
+                                    <field name="buyer_approved"/>
+                                    <field name="approval_status"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Supplier Mapping">
+                            <field name="supplier_ids">
+                                <tree editable="bottom">
+                                    <field name="bom_id" invisible="1"/>
+                                    <field name="material_reference"/>
+                                    <field name="supplier_id"/>
+                                    <field name="supplier_code"/>
+                                    <field name="supplier_type"/>
+                                    <field name="lead_time_days"/>
+                                    <field name="current_price"
+                                           groups="garment_bom_management.group_bom_purchase,garment_bom_management.group_bom_costing,garment_bom_management.group_bom_administrator"/>
+                                    <field name="rank_score"/>
+                                    <field name="approved_status"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Material Reservations">
+                            <field name="reservation_ids">
+                                <tree editable="bottom">
+                                    <field name="bom_id" invisible="1"/>
+                                    <field name="material_type"/>
+                                    <field name="material_name"/>
+                                    <field name="order_reference"/>
+                                    <field name="required_qty"/>
+                                    <field name="reserved_qty"/>
+                                    <field name="available_qty"/>
+                                    <field name="shortage_qty"/>
+                                    <field name="state" widget="badge"/>
+                                </tree>
+                            </field>
+                            <group>
+                                <field name="material_availability_pct" readonly="1"/>
+                            </group>
+                        </page>
+                        <page string="Cost Variance"
+                              groups="garment_bom_management.group_bom_costing,garment_bom_management.group_bom_administrator,garment_bom_management.group_bom_top_management">
+                            <button name="action_compute_cost_variance" type="object" string="Compute Cost Variance" class="btn-secondary mb-2"/>
+                            <group>
+                                <group>
+                                    <field name="cost_per_piece" readonly="1" string="Estimated Cost/Piece"/>
+                                    <field name="actual_material_cost"/>
+                                    <field name="cost_variance" readonly="1"/>
+                                </group>
+                                <group>
+                                    <field name="material_variance"/>
+                                    <field name="consumption_variance"/>
+                                    <field name="price_variance"/>
+                                    <field name="wastage_variance"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="AI Assistant">
+                            <field name="ai_last_run" readonly="1"/>
+                            <group string="BOM Suggestion"><field name="ai_suggested_note" readonly="1" nolabel="1"/></group>
+                            <group string="Consumption Prediction"><field name="ai_consumption_note" readonly="1" nolabel="1"/></group>
+                            <group string="Cost Optimization"><field name="ai_cost_optimization_note" readonly="1" nolabel="1"/></group>
+                            <group string="Risk Detection"><field name="ai_risk_note" readonly="1" nolabel="1"/></group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_bom_tree" model="ir.ui.view">
+        <field name="name">garment.bom.tree</field>
+        <field name="model">garment.bom</field>
+        <field name="arch" type="xml">
+            <tree string="BOMs" decoration-muted="status == 'closed'" decoration-success="status == 'active'">
+                <field name="bom_number"/>
+                <field name="style_id"/>
+                <field name="buyer_id"/>
+                <field name="bom_type"/>
+                <field name="cost_per_piece" groups="garment_bom_management.group_bom_costing,garment_bom_management.group_bom_administrator,garment_bom_management.group_bom_top_management"/>
+                <field name="material_availability_pct" optional="hide"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_bom_kanban" model="ir.ui.view">
+        <field name="name">garment.bom.kanban</field>
+        <field name="model">garment.bom</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="status" class="o_kanban_small_column">
+                <field name="bom_number"/>
+                <field name="buyer_id"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click oe_kanban_card">
+                            <div class="o_kanban_record_top"><strong><field name="bom_number"/></strong></div>
+                            <div><field name="buyer_id"/></div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_garment_bom_search" model="ir.ui.view">
+        <field name="name">garment.bom.search</field>
+        <field name="model">garment.bom</field>
+        <field name="arch" type="xml">
+            <search string="Search BOMs">
+                <field name="bom_number"/>
+                <field name="style_id"/>
+                <field name="buyer_id"/>
+                <filter string="Active" name="filter_active" domain="[('status', '=', 'active')]"/>
+                <filter string="Draft" name="filter_draft" domain="[('status', '=', 'draft')]"/>
+                <filter string="Pending Approval" name="filter_pending"
+                        domain="[('status', 'in', ['material_review', 'technical_approval', 'merchandising_approval', 'costing_approval'])]"/>
+                <filter string="Production Approved" name="filter_production_approved" domain="[('status', '=', 'production_approved')]"/>
+                <filter string="Closed" name="filter_closed" domain="[('status', '=', 'closed')]"/>
+                <separator/>
+                <filter string="Logistical Warning" name="filter_shortage" domain="[('material_availability_pct', '&lt;', 100)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                    <filter string="Buyer" name="group_buyer" context="{'group_by': 'buyer_id'}"/>
+                    <filter string="BOM Type" name="group_type" context="{'group_by': 'bom_type'}"/>
+                    <filter string="Season" name="group_season" context="{'group_by': 'season'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_bom" model="ir.actions.act_window">
+        <field name="name">Bill of Materials</field>
+        <field name="res_model">garment.bom</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first BOM.</p>
+        </field>
+    </record>
+
+</odoo>

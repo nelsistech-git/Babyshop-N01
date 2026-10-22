@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="prompt_template_demand_forecast" model="garment.ai.prompt.template">
+        <field name="name">Demand Forecast Narrative</field>
+        <field name="use_case">demand_forecast</field>
+        <field name="variable_hint">{style_name}, {buyer_name}, {historical_qty}, {periods}, {forecast_qty}</field>
+        <field name="prompt_text">You are a garment export demand-planning analyst. Given style "{style_name}" for
+buyer "{buyer_name}" with a historical total of {historical_qty} units across {periods} period(s), and a
+statistically computed forecast of {forecast_qty} units for the next period, write a two-sentence plain-language
+summary a merchandiser can paste into a buyer-facing planning note. Return plain text only, no markdown.</field>
+        <field name="description">Optional narrative dressing-up of the deterministic demand forecast computed by
+garment.demand.forecast.action_generate_demand_forecast() — the forecast NUMBER itself always comes from the
+heuristic, never from this prompt; this template is only ever used to phrase the explanation if an AI provider
+is configured and enabled.</field>
+    </record>
+
+    <record id="prompt_template_risk_alert" model="garment.ai.prompt.template">
+        <field name="name">Order Risk Alert Summary</field>
+        <field name="use_case">risk_alert</field>
+        <field name="variable_hint">{order_name}, {risk_level}, {risk_reason}</field>
+        <field name="prompt_text">You are a garment production risk analyst. Order "{order_name}" has been scored
+risk level "{risk_level}" for the reason: "{risk_reason}". Write one concise, management-ready recommendation
+(max 2 sentences, plain text, no markdown) on the single most important corrective action to take next.</field>
+        <field name="description">General-purpose template other modules' garment.ai.engine risk-scoring extensions
+may use once they are wired to call garment.ai.engine.call_llm() (see IMPLEMENTATION_NOTES.md).</field>
+    </record>
+
+    <record id="prompt_template_recommendation" model="garment.ai.prompt.template">
+        <field name="name">General Business Recommendation</field>
+        <field name="use_case">recommendation</field>
+        <field name="variable_hint">{topic}, {context_summary}</field>
+        <field name="prompt_text">You are a garment factory management consultant. Topic: "{topic}". Context:
+"{context_summary}". Provide up to 3 short, actionable recommendations as a plain-text numbered list, and one
+expected-impact estimate. No markdown formatting.</field>
+        <field name="description">Generic template for the "AI Recommendation Engine" / "AI Business Consultant
+Assistant" use cases described in the SRS — a starting point for future callers of call_llm().</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <record id="module_category_garment_bom" model="ir.module.category">
+            <field name="name">Smart Garment ERP - BOM Management</field>
+            <field name="sequence">54</field>
+        </record>
+
+        <record id="group_bom_merchandiser" model="res.groups">
+            <field name="name">Merchandiser (Create/Edit Assigned BOM)</field>
+            <field name="category_id" ref="module_category_garment_bom"/>
+        </record>
+
+        <record id="group_bom_technical" model="res.groups">
+            <field name="name">Technical Team (Fabric/Trim/Packaging Review)</field>
+            <field name="category_id" ref="module_category_garment_bom"/>
+        </record>
+
+        <record id="group_bom_costing" model="res.groups">
+            <field name="name">Costing Team (Cost Review &amp; Approval)</field>
+            <field name="category_id" ref="module_category_garment_bom"/>
+        </record>
+
+        <record id="group_bom_purchase" model="res.groups">
+            <field name="name">Purchase Team (Supplier Mapping)</field>
+            <field name="category_id" ref="module_category_garment_bom"/>
+        </record>
+
+        <record id="group_bom_production" model="res.groups">
+            <field name="name">Production Team (Approved BOM View)</field>
+            <field name="category_id" ref="module_category_garment_bom"/>
+        </record>
+
+        <record id="group_bom_administrator" model="res.groups">
+            <field name="name">BOM Administrator (Full Access)</field>
+            <field name="category_id" ref="module_category_garment_bom"/>
+            <field name="implied_ids" eval="[(4, ref('group_bom_merchandiser')),
+                                              (4, ref('group_bom_technical')),
+                                              (4, ref('group_bom_costing')),
+                                              (4, ref('group_bom_purchase'))]"/>
+        </record>
+
+        <record id="group_bom_top_management" model="res.groups">
+            <field name="name">Top Management (Dashboard &amp; Reports)</field>
+            <field name="category_id" ref="module_category_garment_bom"/>
+            <field name="implied_ids" eval="[(4, ref('group_bom_administrator'))]"/>
+        </record>
+
+        <record id="rule_garment_bom_merchandiser_own" model="ir.rule">
+            <field name="name">Merchandiser: Own Created BOMs</field>
+            <field name="model_id" ref="model_garment_bom"/>
+            <field name="domain_force">[('created_by_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_bom_merchandiser'))]"/>
+            <field name="perm_read">1</field>
+            <field name="perm_write">1</field>
+            <field name="perm_create">1</field>
+            <field name="perm_unlink">0</field>
+        </record>
+
+        <record id="rule_garment_bom_full_access" model="ir.rule">
+            <field name="name">Full Access Roles: All BOMs</field>
+            <field name="model_id" ref="model_garment_bom"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_bom_technical')),
+                                        (4, ref('group_bom_costing')),
+                                        (4, ref('group_bom_purchase')),
+                                        (4, ref('group_bom_administrator'))]"/>
+        </record>
+
+        <record id="rule_garment_bom_production_approved_only" model="ir.rule">
+            <field name="name">Production Team: Approved BOMs Only</field>
+            <field name="model_id" ref="model_garment_bom"/>
+            <field name="domain_force">[('status', 'in', ['production_approved', 'active'])]</field>
+            <field name="groups" eval="[(4, ref('group_bom_production'))]"/>
+            <field name="perm_read">1</field>
+            <field name="perm_write">0</field>
+            <field name="perm_create">0</field>
+            <field name="perm_unlink">0</field>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_artwork_tree" model="ir.ui.view">
+        <field name="name">garment.artwork.tree</field>
+        <field name="model">garment.artwork</field>
+        <field name="arch" type="xml">
+            <tree string="Artwork">
+                <field name="artwork_number"/>
+                <field name="techpack_id"/>
+                <field name="artwork_type"/>
+                <field name="placement"/>
+                <field name="approval_status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_artwork_form" model="ir.ui.view">
+        <field name="name">garment.artwork.form</field>
+        <field name="model">garment.artwork</field>
+        <field name="arch" type="xml">
+            <form string="Artwork">
+                <header>
+                    <field name="approval_status" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="artwork_number" readonly="1"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="techpack_id"/>
+                            <field name="style_id" readonly="1"/>
+                            <field name="artwork_type"/>
+                            <field name="placement"/>
+                            <field name="size"/>
+                            <field name="color"/>
+                            <field name="pantone"/>
+                            <field name="technique"/>
+                        </group>
+                        <group>
+                            <field name="file_version"/>
+                            <field name="artwork_file" filename="artwork_filename"/>
+                            <field name="artwork_filename" invisible="1"/>
+                        </group>
+                    </group>
+                    <group string="Print Specification" invisible="artwork_type != 'print'">
+                        <field name="print_type"/>
+                        <field name="print_method"/>
+                        <field name="print_location"/>
+                        <field name="printing_sequence"/>
+                        <field name="print_supplier_id"/>
+                        <field name="testing_requirement"/>
+                    </group>
+                    <group string="Embroidery Specification" invisible="artwork_type != 'embroidery'">
+                        <field name="embroidery_type"/>
+                        <field name="embroidery_thread_color"/>
+                        <field name="embroidery_thread_brand"/>
+                        <field name="stitch_count"/>
+                        <field name="embroidery_machine_type"/>
+                        <field name="backing_requirement"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_artwork" model="ir.actions.act_window">
+        <field name="name">Artwork</field>
+        <field name="res_model">garment.artwork</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_wip_tracking_tree" model="ir.ui.view">
+        <field name="name">garment.wip.tracking.tree</field>
+        <field name="model">garment.wip.tracking</field>
+        <field name="arch" type="xml">
+            <tree string="WIP Tracking" editable="bottom">
+                <field name="production_order_id"/>
+                <field name="department"/>
+                <field name="as_of_date"/>
+                <field name="received_qty"/>
+                <field name="completed_qty"/>
+                <field name="wip_qty" sum="Total WIP"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_wip_tracking_form" model="ir.ui.view">
+        <field name="name">garment.wip.tracking.form</field>
+        <field name="model">garment.wip.tracking</field>
+        <field name="arch" type="xml">
+            <form string="WIP Tracking">
+                <sheet>
+                    <group>
+                        <field name="production_order_id"/>
+                        <field name="department"/>
+                        <field name="as_of_date"/>
+                        <field name="received_qty"/>
+                        <field name="completed_qty"/>
+                        <field name="wip_qty"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_wip_tracking_pivot" model="ir.ui.view">
+        <field name="name">garment.wip.tracking.pivot</field>
+        <field name="model">garment.wip.tracking</field>
+        <field name="arch" type="xml">
+            <pivot string="WIP Analysis">
+                <field name="production_order_id" type="row"/>
+                <field name="department" type="col"/>
+                <field name="wip_qty" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_garment_wip_tracking" model="ir.actions.act_window">
+        <field name="name">WIP Tracking</field>
+        <field name="res_model">garment.wip.tracking</field>
+        <field name="view_mode">tree,form,pivot</field>
+    </record>
+
+</odoo>

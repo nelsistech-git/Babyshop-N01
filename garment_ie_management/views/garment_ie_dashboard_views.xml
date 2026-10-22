@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- IE Dashboard (SRS s.6, s.41-43): Factory Efficiency, Average SMV,
+         Bottleneck Operations, Line Efficiency, Operator Productivity -->
+
+    <record id="view_garment_ie_smv_graph" model="ir.ui.view">
+        <field name="name">garment.ie.smv.graph</field>
+        <field name="model">garment.ie.smv</field>
+        <field name="arch" type="xml">
+            <graph string="Average SMV by Style" type="bar">
+                <field name="style_id"/>
+                <field name="smv" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_garment_ie_smv_dashboard" model="ir.actions.act_window">
+        <field name="name">SMV Dashboard</field>
+        <field name="res_model">garment.ie.smv</field>
+        <field name="view_mode">graph,pivot,tree</field>
+        <field name="context">{'search_default_group_style': 1}</field>
+    </record>
+
+    <record id="view_garment_ie_line_balance_graph" model="ir.ui.view">
+        <field name="name">garment.ie.line.balance.graph</field>
+        <field name="model">garment.ie.line.balance</field>
+        <field name="arch" type="xml">
+            <graph string="Line Efficiency by Line" type="bar">
+                <field name="line_id"/>
+                <field name="projected_efficiency_pct" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_garment_ie_line_balance_dashboard" model="ir.actions.act_window">
+        <field name="name">Line Efficiency Dashboard</field>
+        <field name="res_model">garment.ie.line.balance</field>
+        <field name="view_mode">graph,pivot,tree</field>
+    </record>
+
+    <record id="view_garment_ie_productivity_record_graph" model="ir.ui.view">
+        <field name="name">garment.ie.productivity.record.graph</field>
+        <field name="model">garment.ie.productivity.record</field>
+        <field name="arch" type="xml">
+            <graph string="Operator Efficiency" type="bar">
+                <field name="employee_id"/>
+                <field name="efficiency_pct" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_garment_ie_productivity_record_pivot" model="ir.ui.view">
+        <field name="name">garment.ie.productivity.record.pivot</field>
+        <field name="model">garment.ie.productivity.record</field>
+        <field name="arch" type="xml">
+            <pivot string="Productivity Analysis">
+                <field name="line_id" type="row"/>
+                <field name="date" type="col"/>
+                <field name="efficiency_pct" type="measure"/>
+                <field name="productivity_pct" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_garment_ie_productivity_dashboard" model="ir.actions.act_window">
+        <field name="name">Operator Productivity Dashboard</field>
+        <field name="res_model">garment.ie.productivity.record</field>
+        <field name="view_mode">graph,pivot,tree</field>
+    </record>
+
+    <record id="action_garment_ie_capacity_dashboard" model="ir.actions.act_window">
+        <field name="name">Factory Capacity Dashboard</field>
+        <field name="res_model">garment.ie.capacity.study</field>
+        <field name="view_mode">graph,pivot,tree</field>
+        <field name="context">{'search_default_group_type': 1}</field>
+    </record>
+
+</odoo>

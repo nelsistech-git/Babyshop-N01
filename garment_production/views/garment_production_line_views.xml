@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_production_line_tree" model="ir.ui.view">
+        <field name="name">garment.production.line.tree</field>
+        <field name="model">garment.production.line</field>
+        <field name="arch" type="xml">
+            <tree string="Production Lines" decoration-danger="andon_status == 'red'" decoration-warning="andon_status == 'yellow'">
+                <field name="line_number"/>
+                <field name="department"/>
+                <field name="supervisor_id"/>
+                <field name="operator_count"/>
+                <field name="machine_count"/>
+                <field name="current_style_id"/>
+                <field name="daily_target"/>
+                <field name="status"/>
+                <field name="andon_status"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_production_line_form" model="ir.ui.view">
+        <field name="name">garment.production.line.form</field>
+        <field name="model">garment.production.line</field>
+        <field name="arch" type="xml">
+            <form string="Production Line">
+                <header>
+                    <field name="status" widget="statusbar" statusbar_visible="running,idle,breakdown,maintenance"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_entries" type="object" class="oe_stat_button" icon="fa-list-alt">
+                            <field name="entry_count" widget="statinfo" string="Entries"/>
+                        </button>
+                        <button name="action_view_entries" type="object" class="oe_stat_button" icon="fa-clock-o"
+                                invisible="downtime_count == 0">
+                            <field name="downtime_count" widget="statinfo" string="Downtime"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Andon: Problem" bg_color="bg-danger"
+                            invisible="andon_status != 'red'"/>
+                    <div class="oe_title">
+                        <label for="line_number"/>
+                        <h1><field name="line_number"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="department"/>
+                            <field name="factory"/>
+                            <field name="floor"/>
+                            <field name="supervisor_id"/>
+                            <field name="line_leader_id"/>
+                        </group>
+                        <group>
+                            <field name="operator_count"/>
+                            <field name="machine_count"/>
+                            <field name="working_hours"/>
+                            <field name="capacity_per_day"/>
+                            <field name="efficiency_target_pct"/>
+                            <field name="andon_status"/>
+                        </group>
+                    </group>
+                    <group string="Current Run">
+                        <field name="current_style_id"/>
+                        <field name="current_order_id"/>
+                        <field name="hourly_target"/>
+                        <field name="daily_target"/>
+                    </group>
+                    <notebook>
+                        <page string="Machines">
+                            <field name="machine_ids">
+                                <tree>
+                                    <field name="machine_number"/>
+                                    <field name="machine_type"/>
+                                    <field name="status"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_production_line_search" model="ir.ui.view">
+        <field name="name">garment.production.line.search</field>
+        <field name="model">garment.production.line</field>
+        <field name="arch" type="xml">
+            <search string="Search Production Lines">
+                <field name="line_number"/>
+                <field name="supervisor_id"/>
+                <field name="current_style_id"/>
+                <filter string="Running" name="filter_running" domain="[('status', '=', 'running')]"/>
+                <filter string="Breakdown" name="filter_breakdown" domain="[('status', '=', 'breakdown')]"/>
+                <filter string="Andon: Problem" name="filter_andon_red" domain="[('andon_status', '=', 'red')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Department" name="group_department" context="{'group_by': 'department'}"/>
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                    <filter string="Supervisor" name="group_supervisor" context="{'group_by': 'supervisor_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_production_line" model="ir.actions.act_window">
+        <field name="name">Production Lines</field>
+        <field name="res_model">garment.production.line</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_garment_production_line_search"/>
+    </record>
+
+</odoo>

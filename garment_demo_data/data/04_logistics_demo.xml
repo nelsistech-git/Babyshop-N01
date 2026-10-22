@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Part of Smart Complete Garment Software. Copyright (c) Nelsis Tech (www.nelsistech.com) -->
+<!--
+     Logistics (garment_logistics): 1 freight forwarder + 1 shipping line
+     shared across all three orders, a full sea-freight shipment (with
+     container + Bill of Lading) for order_tee, and lighter planning-stage
+     shipments for order_polo / order_hoodie. garment.shipment is the
+     logistics-side record (distinct from the garment.order.shipment
+     planning lines shipment_tee_1/shipment_polo_1/shipment_hoodie_1 created
+     in 03_order_demo.xml); the model's only link back into the order
+     pipeline is order_confirmation_id (garment.merch.order.confirmation),
+     so each shipment here references the matching order_confirmation_*
+     record from 03_merchandising_demo.xml plus buyer_id/style_id — there is
+     no direct garment.order or garment.order.shipment field on
+     garment.shipment, so the two shipment records coexist independently
+     and are tied together only through the shared buyer/style/order-
+     confirmation chain. Ports reuse the seed garment.port records from
+     garment_logistics/data/garment_logistics_data.xml (port_chittagong)
+     rather than duplicating them. Timeline: Jun-Jul 2026, matching each
+     order's shipment_date (per DEMO_STORY.md).
+-->
+<odoo>
+<data noupdate="1">
+
+    <!-- =================================================================
+         Freight Forwarder + Shipping Line — shared across all 3 shipments
+         ================================================================= -->
+
+    <record id="forwarder_bengal" model="garment.forwarder">
+        <field name="name">Bengal Freight Forwarders Ltd.</field>
+        <field name="contact_person">Imran Kabir</field>
+        <field name="address">Agrabad Commercial Area, Chittagong, Bangladesh</field>
+        <field name="service_type">multimodal</field>
+        <field name="agreement_reference">FWD-AGR-2026-014</field>
+        <field name="agreement_start">2026-01-01</field>
+        <field name="agreement_end">2026-12-31</field>
+        <field name="performance_rating">91.0</field>
+        <field name="damage_rate">0.4</field>
+        <field name="avg_response_time_hours">6.0</field>
+    </record>
+
+    <record id="shipping_line_transglobal" model="garment.shipping.line">
+        <field name="name">TransGlobal Container Lines</field>
+        <field name="contact">Booking Desk, Chittagong Office</field>
+        <field name="vessel_service">Asia-Europe Express (AEX)</field>
+        <field name="origin_port">Chittagong Port, Bangladesh</field>
+        <field name="destination_port">Felixstowe, UK / Hamburg, Germany</field>
+        <field name="transit_time_days">32</field>
+    </record>
+
+    <!-- =================================================================
+         order_tee — full sea-freight shipment: shipment + container + B/L
+         ================================================================= -->
+
+    <record id="shipment_tee_logistics" model="garment.shipment">
+        <field name="buyer_id" ref="buyer_northwind"/>
+        <field name="order_confirmation_id" ref="order_confirmation_tee"/>
+        <field name="style_id" ref="style_tee"/>
+        <field name="invoice_reference">CI-NW-TS-2601-01</field>
+        <field name="quantity">24000</field>
+        <field name="shipment_date">2026-06-10</field>
+        <field name="destination">Felixstowe, UK</field>
+        <field name="mode">sea</field>
+        <field name="status">in_transit</field>
+        <field name="forwarder_id" ref="forwarder_bengal"/>
+        <field name="shipping_line_id" ref="shipping_line_transglobal"/>
+    </record>
+
+    <record id="container_tee_1" model="garment.container">
+        <field name="container_no">TGCU4417250</field>
+        <field name="shipment_id" ref="shipment_tee_logistics"/>
+        <field name="size">40ft</field>
+        <field name="container_type">Dry Van, High Cube</field>
+        <field name="shipping_line_id" ref="shipping_line_transglobal"/>
+        <field name="booking_number">TGL-BKG-2026-3391</field>
+        <field name="seal_no">SL-889214</field>
+        <field name="vessel_name">MV Bengal Voyager</field>
+        <field name="voyage_number">V.2606E</field>
+        <field name="etd">2026-06-12</field>
+        <field name="eta">2026-07-14</field>
+        <field name="port_id" ref="garment_logistics.port_chittagong"/>
+        <field name="current_location">Indian Ocean, en route to Suez Canal</field>
+        <field name="loading_date">2026-06-10</field>
+        <field name="carton_qty">960</field>
+        <field name="weight_kg">7200.0</field>
+        <field name="volume_cbm">58.0</field>
+        <field name="capacity_cbm">67.7</field>
+        <field name="loading_person_id" ref="base.user_admin"/>
+        <field name="status">loaded</field>
+    </record>
+
+    <record id="bl_tee_1" model="garment.bill.lading">
+        <field name="shipment_id" ref="shipment_tee_logistics"/>
+        <field name="vessel_name">MV Bengal Voyager</field>
+        <field name="container_id" ref="container_tee_1"/>
+        <field name="port">Chittagong Port</field>
+        <field name="consignee">Northwind Apparel Sourcing Ltd, Felixstowe, UK</field>
+        <field name="date">2026-06-12</field>
+        <field name="status">issued</field>
+    </record>
+
+    <!-- =================================================================
+         order_polo / order_hoodie — lighter, planning-stage shipments only
+         ================================================================= -->
+
+    <record id="shipment_polo_logistics" model="garment.shipment">
+        <field name="buyer_id" ref="buyer_northwind"/>
+        <field name="order_confirmation_id" ref="order_confirmation_polo"/>
+        <field name="style_id" ref="style_polo"/>
+        <field name="quantity">18000</field>
+        <field name="shipment_date">2026-06-17</field>
+        <field name="destination">Felixstowe, UK</field>
+        <field name="mode">sea</field>
+        <field name="status">planning</field>
+        <field name="forwarder_id" ref="forwarder_bengal"/>
+        <field name="shipping_line_id" ref="shipping_line_transglobal"/>
+    </record>
+
+    <record id="shipment_hoodie_logistics" model="garment.shipment">
+        <field name="buyer_id" ref="buyer_baltichaus"/>
+        <field name="order_confirmation_id" ref="order_confirmation_hoodie"/>
+        <field name="style_id" ref="style_hoodie"/>
+        <field name="quantity">12000</field>
+        <field name="shipment_date">2026-07-13</field>
+        <field name="destination">Hamburg, Germany</field>
+        <field name="mode">sea</field>
+        <field name="status">planning</field>
+        <field name="forwarder_id" ref="forwarder_bengal"/>
+        <field name="shipping_line_id" ref="shipping_line_transglobal"/>
+    </record>
+
+</data>
+</odoo>

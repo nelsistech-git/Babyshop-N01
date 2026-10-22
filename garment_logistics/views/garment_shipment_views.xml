@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_shipment_form" model="ir.ui.view">
+        <field name="name">garment.shipment.form</field>
+        <field name="model">garment.shipment</field>
+        <field name="arch" type="xml">
+            <form string="Shipment">
+                <header>
+                    <field name="status" widget="statusbar"
+                           statusbar_visible="planning,allocation,booking,loading,port,vessel_departed,in_transit,delivered"/>
+                    <button name="action_run_ai_analysis" type="object" string="Run AI Logistics Analysis" class="btn-secondary" icon="fa-magic"/>
+                    <button name="action_confirm_shipment_ready" type="object" string="Confirm Shipment Ready"
+                            class="btn-primary" invisible="status != 'allocation'"/>
+                    <button name="action_generate_container_requirement" type="object"
+                            string="Generate Container Requirement" class="btn-secondary"
+                            invisible="status not in ('booking', 'allocation')"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Closed" bg_color="text-bg-success" invisible="is_closed == False"/>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_containers" type="object" class="oe_stat_button" icon="fa-cube">
+                            <field name="container_count" widget="statinfo" string="Containers"/>
+                        </button>
+                    </div>
+                    <div class="oe_title"><h1><field name="shipment_no" readonly="1"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="buyer_id"/>
+                            <field name="order_confirmation_id"/>
+                            <field name="style_id"/>
+                            <field name="invoice_reference"/>
+                            <field name="quantity"/>
+                        </group>
+                        <group>
+                            <field name="shipment_date"/>
+                            <field name="destination"/>
+                            <field name="mode"/>
+                            <field name="forwarder_id"/>
+                            <field name="shipping_line_id"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="total_freight_cost" readonly="1"/>
+                            <field name="is_closed" readonly="1"/>
+                            <field name="closed_date" readonly="1" invisible="is_closed == False"/>
+                        </group>
+                    </group>
+                    <group string="Air Shipment" invisible="mode != 'air'">
+                        <field name="airline"/>
+                        <field name="awb_number"/>
+                        <field name="flight_number"/>
+                        <field name="air_weight_kg"/>
+                    </group>
+                    <group string="Courier Shipment" invisible="mode != 'courier'">
+                        <field name="courier_company"/>
+                        <field name="courier_tracking_number"/>
+                        <field name="courier_pickup_date"/>
+                    </group>
+                    <notebook>
+                        <page string="Allocation">
+                            <field name="allocation_ids">
+                                <tree editable="bottom">
+                                    <field name="style_id"/>
+                                    <field name="po_reference"/>
+                                    <field name="required_qty"/>
+                                    <field name="allocated_qty"/>
+                                    <field name="carton_qty"/>
+                                    <field name="warehouse_location"/>
+                                    <field name="status"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Containers">
+                            <field name="container_ids">
+                                <tree editable="bottom">
+                                    <field name="container_no"/>
+                                    <field name="size"/>
+                                    <field name="shipping_line_id"/>
+                                    <field name="etd"/>
+                                    <field name="eta"/>
+                                    <field name="utilization_pct"/>
+                                    <field name="status"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Freight Quotes">
+                            <field name="freight_ids">
+                                <tree editable="bottom" decoration-success="is_selected == True">
+                                    <field name="forwarder_id"/>
+                                    <field name="total_cost"/>
+                                    <field name="transit_time_days"/>
+                                    <field name="is_selected"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Bills of Lading">
+                            <field name="bl_ids">
+                                <tree>
+                                    <field name="bl_number"/>
+                                    <field name="vessel_name"/>
+                                    <field name="status"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Documents">
+                            <field name="document_ids">
+                                <!-- FIXED: Added is_expiring_soon with column_invisible="1" so decoration-danger can evaluate it -->
+                                <tree editable="bottom" decoration-danger="is_expiring_soon == True">
+                                    <field name="is_expiring_soon" column_invisible="1"/>
+                                    <field name="document_type"/>
+                                    <field name="file" filename="filename"/>
+                                    <field name="filename" invisible="1"/>
+                                    <field name="approval_status"/>
+                                    <field name="shared_with_buyer"/>
+                                    <field name="expiry_date"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Transport Trips">
+                            <field name="trip_ids">
+                                <tree>
+                                    <field name="trip_number"/>
+                                    <field name="vehicle_id"/>
+                                    <field name="driver_id"/>
+                                    <field name="status"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="AI Logistics Optimization">
+                            <field name="ai_last_run" readonly="1"/>
+                            <group string="Delay Risk">
+                                <field name="ai_delay_risk_note" readonly="1" nolabel="1"/>
+                            </group>
+                            <group string="Freight Cost Prediction">
+                                <field name="ai_freight_prediction_note" readonly="1" nolabel="1"/>
+                            </group>
+                            <group string="Route Optimization">
+                                <field name="ai_route_optimization_note" readonly="1" nolabel="1"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_shipment_tree" model="ir.ui.view">
+        <field name="name">garment.shipment.tree</field>
+        <field name="model">garment.shipment</field>
+        <field name="arch" type="xml">
+            <tree string="Shipments" decoration-success="status == 'delivered'">
+                <field name="shipment_no"/>
+                <field name="buyer_id"/>
+                <field name="destination"/>
+                <field name="mode"/>
+                <field name="shipment_date"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_shipment_kanban" model="ir.ui.view">
+        <field name="name">garment.shipment.kanban</field>
+        <field name="model">garment.shipment</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="status" class="o_kanban_small_column">
+                <field name="shipment_no"/>
+                <field name="buyer_id"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click oe_kanban_card">
+                            <div class="o_kanban_record_top"><strong><field name="shipment_no"/></strong></div>
+                            <div><field name="buyer_id"/></div>
+                            <div class="text-muted"><field name="destination"/></div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_garment_shipment_search" model="ir.ui.view">
+        <field name="name">garment.shipment.search</field>
+        <field name="model">garment.shipment</field>
+        <field name="arch" type="xml">
+            <search string="Search Shipments">
+                <field name="shipment_no"/>
+                <field name="buyer_id"/>
+                <field name="destination"/>
+                <filter string="Open" name="filter_open" domain="[('is_closed', '=', False)]"/>
+                <filter string="Closed" name="filter_closed" domain="[('is_closed', '=', True)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                    <filter string="Buyer" name="group_buyer" context="{'group_by': 'buyer_id'}"/>
+                    <filter string="Mode" name="group_mode" context="{'group_by': 'mode'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_shipment" model="ir.actions.act_window">
+        <field name="name">Shipments</field>
+        <field name="res_model">garment.shipment</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first shipment.</p>
+        </field>
+    </record>
+
+</odoo>

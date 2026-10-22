@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_ai_usage_log_form" model="ir.ui.view">
+        <field name="name">garment.ai.usage.log.form</field>
+        <field name="model">garment.ai.usage.log</field>
+        <field name="arch" type="xml">
+            <form string="AI Usage Log" create="false" edit="false">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_source" type="object" class="oe_stat_button" icon="fa-external-link"
+                                invisible="not res_model">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">View Source</span>
+                            </div>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="provider_config_id"/>
+                            <field name="prompt_template_id"/>
+                            <field name="feature"/>
+                            <field name="status" widget="badge" decoration-danger="status == 'error'"
+                                   decoration-success="status == 'success'"/>
+                        </group>
+                        <group>
+                            <field name="user_id"/>
+                            <field name="request_date"/>
+                            <field name="res_model"/>
+                            <field name="res_name"/>
+                        </group>
+                    </group>
+                    <group string="Metrics">
+                        <group>
+                            <field name="tokens_input"/>
+                            <field name="tokens_output"/>
+                            <field name="tokens_total"/>
+                        </group>
+                        <group>
+                            <field name="estimated_cost"/>
+                            <field name="latency_ms"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <group string="Error" invisible="status != 'error'">
+                        <field name="error_message" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_ai_usage_log_tree" model="ir.ui.view">
+        <field name="name">garment.ai.usage.log.tree</field>
+        <field name="model">garment.ai.usage.log</field>
+        <field name="arch" type="xml">
+            <tree string="AI Usage Log" decoration-danger="status == 'error'" create="false" edit="false">
+                <field name="name"/>
+                <field name="request_date"/>
+                <field name="provider_config_id"/>
+                <field name="feature"/>
+                <field name="res_model"/>
+                <field name="res_name"/>
+                <field name="tokens_total" sum="Total Tokens"/>
+                <field name="estimated_cost" sum="Total Estimated Cost"/>
+                <field name="latency_ms" avg="Avg Latency (ms)"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_ai_usage_log_search" model="ir.ui.view">
+        <field name="name">garment.ai.usage.log.search</field>
+        <field name="model">garment.ai.usage.log</field>
+        <field name="arch" type="xml">
+            <search string="Search AI Usage Log">
+                <field name="name"/>
+                <field name="provider_config_id"/>
+                <field name="feature"/>
+                <filter string="Errors" name="filter_error" domain="[('status', '=', 'error')]"/>
+                <filter string="Success" name="filter_success" domain="[('status', '=', 'success')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Provider" name="group_provider" context="{'group_by': 'provider_config_id'}"/>
+                    <filter string="Feature" name="group_feature" context="{'group_by': 'feature'}"/>
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                    <filter string="Request Date" name="group_date" context="{'group_by': 'request_date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_garment_ai_usage_log_pivot" model="ir.ui.view">
+        <field name="name">garment.ai.usage.log.pivot</field>
+        <field name="model">garment.ai.usage.log</field>
+        <field name="arch" type="xml">
+            <pivot string="AI Usage &amp; Cost">
+                <field name="feature" type="row"/>
+                <field name="request_date" type="col" interval="month"/>
+                <field name="estimated_cost" type="measure"/>
+                <field name="tokens_total" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_garment_ai_usage_log" model="ir.actions.act_window">
+        <field name="name">AI Usage Log</field>
+        <field name="res_model">garment.ai.usage.log</field>
+        <field name="view_mode">tree,pivot,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No AI API calls logged yet.</p>
+            <p>Every external LLM call made through garment.ai.engine.call_llm() is logged here — success or
+                failure — for cost governance.</p>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Part of Smart Complete Garment Software. Copyright (c) Nelsis Tech (www.nelsistech.com) -->
+<!--
+     Commercial Export (garment_commercial_export): HS Code master for the
+     three knit styles, plus one Customs Document and one EXP Form raised
+     against order_tee's shipment (garment.shipment id
+     shipment_tee_logistics, created in 04_logistics_demo.xml — the
+     ACTUAL id there, not a guessed one). Bangladesh RMG knitwear exports
+     to the UK/EU move duty-free under GSP "Everything But Arms" (LDC)
+     preference, hence duty_rate/duty_amount = 0 with an explanatory note.
+     Timeline: submission/EXP alongside the tee shipment's Jun 2026
+     loading/ETD (per DEMO_STORY.md / 04_logistics_demo.xml).
+-->
+<odoo>
+<data noupdate="1">
+
+    <!-- =================================================================
+         HS Codes — one per knit style (T-shirt, polo, hoodie)
+         ================================================================= -->
+
+    <record id="hs_code_tshirt_knit" model="garment.hs.code">
+        <field name="code">6109.10</field>
+        <field name="description">T-shirts, singlets and other vests, knitted or crocheted, of cotton</field>
+        <field name="style_id" ref="style_tee"/>
+        <field name="product_category_id" ref="garment_style_library.style_category_knit"/>
+        <field name="duty_rate">0.0</field>
+        <field name="country_id" ref="base.uk"/>
+        <field name="notes">Bangladesh is an LDC beneficiary under the UK's Developing Countries Trading Scheme (DCTS, successor to GSP/EBA) — knit cotton T-shirts of Bangladeshi origin enter the UK duty-free provided the Certificate of Origin / GSP-equivalent form accompanies the shipment.</field>
+    </record>
+
+    <record id="hs_code_polo_knit" model="garment.hs.code">
+        <field name="code">6105.10</field>
+        <field name="description">Men's or boys' shirts, knitted or crocheted, of cotton (incl. pique polo shirts)</field>
+        <field name="style_id" ref="style_polo"/>
+        <field name="product_category_id" ref="garment_style_library.style_category_knit"/>
+        <field name="duty_rate">0.0</field>
+        <field name="country_id" ref="base.uk"/>
+        <field name="notes">Duty-free entry to the UK under DCTS (LDC) rules of origin, same basis as hs_code_tshirt_knit.</field>
+    </record>
+
+    <record id="hs_code_hoodie_knit" model="garment.hs.code">
+        <field name="code">6110.20</field>
+        <field name="description">Jerseys, pullovers, cardigans and similar articles (incl. fleece zip hoodies), knitted, of cotton</field>
+        <field name="style_id" ref="style_hoodie"/>
+        <field name="product_category_id" ref="garment_style_library.style_category_knit"/>
+        <field name="duty_rate">0.0</field>
+        <field name="country_id" ref="base.de"/>
+        <field name="notes">Bangladesh LDC origin qualifies for duty-free access under the EU's Generalised Scheme of Preferences (GSP) "Everything But Arms" arrangement into Germany.</field>
+    </record>
+
+    <!-- =================================================================
+         Customs Document — Bill of Export for the order_tee shipment
+         ================================================================= -->
+
+    <record id="customs_doc_tee_export" model="garment.customs.document">
+        <field name="document_type">bill_of_export</field>
+        <field name="shipment_id" ref="garment_demo_data.shipment_tee_logistics"/>
+        <field name="hs_code_id" ref="hs_code_tshirt_knit"/>
+        <field name="customs_office">Chittagong Custom House, Bangladesh</field>
+        <field name="declared_value">76800.0</field>
+        <field name="duty_amount">0.0</field>
+        <field name="submission_date">2026-06-08</field>
+        <field name="clearance_date">2026-06-11</field>
+        <field name="status">cleared</field>
+    </record>
+
+    <!-- =================================================================
+         EXP Form — Export Registration Form for the order_tee shipment
+         ================================================================= -->
+
+    <record id="exp_form_tee" model="garment.exp.form">
+        <field name="buyer_id" ref="buyer_northwind"/>
+        <field name="shipment_id" ref="garment_demo_data.shipment_tee_logistics"/>
+        <field name="shipment_date">2026-06-10</field>
+        <field name="export_value">76800.0</field>
+        <field name="workflow_stage">shipment</field>
+        <field name="status">approved</field>
+    </record>
+
+</data>
+</odoo>

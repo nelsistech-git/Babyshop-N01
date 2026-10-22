@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Smart Complete Garment Software
+    Demo Data: Warehouse / Location / Material Master (garment_warehouse)
+
+    Copyright (c) Nelsis Tech (www.nelsistech.com)
+    Developer: Nur Uddin Ahammed
+    License: LGPL-3
+
+    NOTE on supplier linkage: garment.material.supplier_id is a Many2one to
+    res.partner (not garment.supplier) — see garment_warehouse/models/garment_material.py.
+    The res.partner records for Delta Knit / Bright Trims are defined in
+    01_supplier_demo.xml (partner_deltaknit / partner_brighttrim, loaded before
+    this file) and also set as garment.supplier.partner_id there, so the
+    garment.supplier record and these materials' supplier_id point at the same
+    underlying contact.
+-->
+<odoo>
+    <data noupdate="1">
+
+        <!-- ==================================================================
+             Warehouse
+             ================================================================== -->
+        <record id="wh_main" model="garment.warehouse">
+            <field name="name">Nelsis Main Factory Warehouse, Ashulia</field>
+            <field name="code">WH-ASH-01</field>
+            <field name="warehouse_type">raw_material</field>
+            <field name="factory">Ashulia Factory Complex</field>
+            <field name="address">Plot 14-18, Ashulia Industrial Zone, Savar, Dhaka, Bangladesh</field>
+            <field name="capacity">50000</field>
+            <field name="capacity_uom">Sq. Ft.</field>
+        </record>
+
+        <!-- ==================================================================
+             Locations (Zone level, under wh_main)
+             ================================================================== -->
+        <record id="loc_fabric_store" model="garment.location">
+            <field name="warehouse_id" ref="wh_main"/>
+            <field name="zone">Fabric Store</field>
+            <field name="location_type">zone</field>
+            <field name="location_purpose">storage</field>
+            <field name="capacity">20000</field>
+            <field name="capacity_uom">Kg</field>
+        </record>
+
+        <record id="loc_trim_store" model="garment.location">
+            <field name="warehouse_id" ref="wh_main"/>
+            <field name="zone">Trim Store</field>
+            <field name="location_type">zone</field>
+            <field name="location_purpose">storage</field>
+            <field name="capacity">50000</field>
+            <field name="capacity_uom">Cartons</field>
+        </record>
+
+        <record id="loc_cutting_wip" model="garment.location">
+            <field name="warehouse_id" ref="wh_main"/>
+            <field name="zone">Cutting WIP</field>
+            <field name="location_type">zone</field>
+            <field name="location_purpose">staging</field>
+            <field name="capacity">15000</field>
+            <field name="capacity_uom">Pcs</field>
+        </record>
+
+        <record id="loc_fg_store" model="garment.location">
+            <field name="warehouse_id" ref="wh_main"/>
+            <field name="zone">Finished Goods Store</field>
+            <field name="location_type">zone</field>
+            <field name="location_purpose">storage</field>
+            <field name="capacity">40000</field>
+            <field name="capacity_uom">Cartons</field>
+        </record>
+
+        <record id="loc_quality_hold" model="garment.location">
+            <field name="warehouse_id" ref="wh_main"/>
+            <field name="zone">Quality Hold Area</field>
+            <field name="location_type">zone</field>
+            <field name="location_purpose">quality_hold</field>
+            <field name="capacity">3000</field>
+            <field name="capacity_uom">Pcs</field>
+        </record>
+
+        <!-- ==================================================================
+             Materials — 2 fabrics, 2 trims, 2 packaging
+             ================================================================== -->
+        <record id="mat_fabric_jersey" model="garment.material">
+            <field name="name">Single Jersey Cotton 180 GSM</field>
+            <field name="category">fabric</field>
+            <field name="uom">Kg</field>
+            <field name="specification">180 GSM, 100% Cotton, Single Jersey Knit, Greige</field>
+            <field name="supplier_id" ref="partner_deltaknit"/>
+            <field name="default_warehouse_id" ref="wh_main"/>
+            <field name="minimum_stock">500</field>
+            <field name="maximum_stock">5000</field>
+            <field name="reorder_level">800</field>
+            <field name="valuation_method">average_cost</field>
+            <field name="standard_cost">350.0</field>
+            <field name="hazard_category">none</field>
+            <field name="storage_condition">Store rolled and upright in a dry, ventilated area away from direct sunlight</field>
+        </record>
+
+        <record id="mat_fabric_fleece" model="garment.material">
+            <field name="name">Fleece 280 GSM</field>
+            <field name="category">fabric</field>
+            <field name="uom">Kg</field>
+            <field name="specification">280 GSM, Brushed Back Fleece, Cotton-Polyester Blend</field>
+            <field name="supplier_id" ref="partner_deltaknit"/>
+            <field name="default_warehouse_id" ref="wh_main"/>
+            <field name="minimum_stock">300</field>
+            <field name="maximum_stock">3000</field>
+            <field name="reorder_level">500</field>
+            <field name="valuation_method">average_cost</field>
+            <field name="standard_cost">420.0</field>
+            <field name="hazard_category">none</field>
+            <field name="storage_condition">Store rolled and upright in a dry, ventilated area away from direct sunlight</field>
+        </record>
+
+        <record id="mat_trim_label" model="garment.material">
+            <field name="name">Woven Main Label</field>
+            <field name="category">accessories</field>
+            <field name="uom">Pcs</field>
+            <field name="specification">Woven main label, 100% Polyester yarn, buyer logo, 3x5 cm</field>
+            <field name="supplier_id" ref="partner_brighttrim"/>
+            <field name="default_warehouse_id" ref="wh_main"/>
+            <field name="minimum_stock">10000</field>
+            <field name="maximum_stock">100000</field>
+            <field name="reorder_level">20000</field>
+            <field name="valuation_method">average_cost</field>
+            <field name="standard_cost">2.5</field>
+            <field name="color">White/Navy</field>
+            <field name="buyer_approval_status">approved</field>
+        </record>
+
+        <record id="mat_trim_zipper" model="garment.material">
+            <field name="name">YKK Zipper 5mm</field>
+            <field name="category">accessories</field>
+            <field name="uom">Pcs</field>
+            <field name="specification">YKK #5 nylon coil zipper, close-end, 60 cm, auto-lock slider</field>
+            <field name="supplier_id" ref="partner_brighttrim"/>
+            <field name="default_warehouse_id" ref="wh_main"/>
+            <field name="minimum_stock">5000</field>
+            <field name="maximum_stock">50000</field>
+            <field name="reorder_level">8000</field>
+            <field name="valuation_method">average_cost</field>
+            <field name="standard_cost">18.0</field>
+            <field name="color">Black</field>
+            <field name="buyer_approval_status">approved</field>
+        </record>
+
+        <record id="mat_pack_polybag" model="garment.material">
+            <field name="name">Poly Bag 12x16</field>
+            <field name="category">packaging</field>
+            <field name="uom">Pcs</field>
+            <field name="specification">LDPE poly bag, 12x16 inch, printed buyer logo, self-adhesive flap</field>
+            <field name="supplier_id" ref="partner_brighttrim"/>
+            <field name="default_warehouse_id" ref="wh_main"/>
+            <field name="minimum_stock">20000</field>
+            <field name="maximum_stock">200000</field>
+            <field name="reorder_level">40000</field>
+            <field name="valuation_method">average_cost</field>
+            <field name="standard_cost">1.2</field>
+        </record>
+
+        <record id="mat_pack_carton" model="garment.material">
+            <field name="name">Export Carton 20x14x10</field>
+            <field name="category">packaging</field>
+            <field name="uom">Pcs</field>
+            <field name="specification">5-ply export carton, 20x14x10 inch, printed buyer/style markings</field>
+            <field name="supplier_id" ref="partner_brighttrim"/>
+            <field name="default_warehouse_id" ref="wh_main"/>
+            <field name="minimum_stock">2000</field>
+            <field name="maximum_stock">20000</field>
+            <field name="reorder_level">3000</field>
+            <field name="valuation_method">average_cost</field>
+            <field name="standard_cost">45.0</field>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,383 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_buyer_form" model="ir.ui.view">
+        <field name="name">garment.buyer.form</field>
+        <field name="model">garment.buyer</field>
+        <field name="arch" type="xml">
+            <form string="Buyer">
+                <header>
+                    <button name="action_submit_for_approval" type="object" string="Submit for Approval"
+                            class="btn-primary" invisible="approval_status != 'draft'"/>
+                    <button name="action_approval_advance" type="object" string="Advance Approval"
+                            class="btn-primary"
+                            invisible="approval_status in ('draft', 'approved', 'rejected')"/>
+                    <button name="action_reject_approval" type="object" string="Reject"
+                            class="btn-secondary"
+                            invisible="approval_status in ('draft', 'approved', 'rejected')"/>
+                    <field name="approval_status" widget="statusbar"
+                           statusbar_visible="draft,sales_executive,marketing_manager,general_manager,managing_director,approved"/>
+                    <field name="buyer_status" widget="statusbar"
+                           statusbar_visible="new_lead,contacted,interested,rfq_received,negotiation,confirmed,active"/>
+                    <button name="action_run_ai_analysis" type="object" string="Run AI Analysis"
+                            class="btn-secondary" icon="fa-magic"/>
+                </header>
+                <sheet>
+                    <field name="logo" widget="image" class="oe_avatar"/>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_opportunities" type="object" class="oe_stat_button" icon="fa-bullseye">
+                            <field name="opportunity_count" widget="statinfo" string="Opportunities"/>
+                        </button>
+                        <button name="action_view_rfqs" type="object" class="oe_stat_button" icon="fa-file-text-o">
+                            <field name="rfq_count" widget="statinfo" string="RFQs"/>
+                        </button>
+                        <button name="action_view_meetings" type="object" class="oe_stat_button" icon="fa-calendar">
+                            <field name="meeting_count" widget="statinfo" string="Meetings"/>
+                        </button>
+                        <button name="action_view_visits" type="object" class="oe_stat_button" icon="fa-plane">
+                            <field name="visit_count" widget="statinfo" string="Visits"/>
+                        </button>
+                        <button name="action_view_complaints" type="object" class="oe_stat_button" icon="fa-exclamation-triangle">
+                            <field name="complaint_count" widget="statinfo" string="Complaints"/>
+                        </button>
+                        <button name="action_create_related_partner" type="object" class="oe_stat_button" icon="fa-address-book"
+                                invisible="partner_id">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Link Partner</span>
+                            </div>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name" string="Buyer Name"/>
+                        <h1><field name="name" placeholder="e.g. H&amp;M Group"/></h1>
+                        <h3><field name="brand_name" placeholder="Brand Name"/></h3>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="buyer_code" readonly="1"/>
+                            <field name="legal_name"/>
+                            <field name="buyer_category"/>
+                            <field name="buyer_type"/>
+                            <field name="industry"/>
+                            <field name="website" widget="url"/>
+                            <field name="branch"/>
+                            <field name="tag_ids" widget="many2many_tags"/>
+                        </group>
+                        <group>
+                            <field name="lead_source_id"/>
+                            <field name="assigned_merchandiser_id"/>
+                            <field name="marketing_executive_id"/>
+                            <field name="partner_id" readonly="1"/>
+                            <field name="ai_lead_score" widget="progressbar"/>
+                            <field name="ai_score_classification" readonly="1"/>
+                            <field name="ai_last_run"/>
+                            <field name="last_activity_date" readonly="1"/>
+                            <field name="is_dormant" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Contact Information">
+                            <group>
+                                <group>
+                                    <field name="street"/>
+                                    <field name="street2"/>
+                                    <field name="city"/>
+                                    <field name="state_id"/>
+                                    <field name="zip"/>
+                                    <field name="country_id"/>
+                                    <field name="google_map_url" widget="url"/>
+                                    <field name="tz"/>
+                                </group>
+                                <group>
+                                    <field name="phone"/>
+                                    <field name="mobile"/>
+                                    <field name="whatsapp"/>
+                                    <field name="email" widget="email"/>
+                                    <field name="email_secondary" widget="email"/>
+                                    <field name="skype"/>
+                                    <field name="wechat"/>
+                                    <field name="linkedin" widget="url"/>
+                                    <field name="facebook" widget="url"/>
+                                    <field name="instagram" widget="url"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Business Information">
+                            <group>
+                                <group>
+                                    <field name="currency_id"/>
+                                    <field name="annual_purchase_volume"/>
+                                    <field name="annual_revenue"/>
+                                    <field name="employee_count"/>
+                                    <field name="store_count"/>
+                                    <field name="moq"/>
+                                    <field name="preferred_quality_level"/>
+                                </group>
+                                <group>
+                                    <field name="payment_term_id"/>
+                                    <field name="incoterm_id"/>
+                                    <field name="preferred_shipment_method"/>
+                                    <field name="preferred_port"/>
+                                    <field name="preferred_fabric_type"/>
+                                    <field name="preferred_product_category"/>
+                                    <field name="compliance_requirements"/>
+                                </group>
+                            </group>
+                            <group string="Segmentation">
+                                <field name="business_segment"/>
+                                <field name="volume_segment"/>
+                                <field name="profitability_segment"/>
+                            </group>
+                            <group string="Bangladesh Industry References">
+                                <field name="bgmea_reference"/>
+                                <field name="bkmea_reference"/>
+                            </group>
+                        </page>
+                        <page string="Financial">
+                            <group>
+                                <group>
+                                    <field name="credit_limit"/>
+                                    <field name="outstanding_balance"/>
+                                    <field name="credit_days"/>
+                                    <field name="risk_rating"/>
+                                </group>
+                                <group>
+                                    <field name="insurance_provider"/>
+                                    <field name="bank_name"/>
+                                    <field name="swift_code"/>
+                                    <field name="lc_bank"/>
+                                    <field name="currency_exposure"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Compliance">
+                            <group col="4">
+                                <field name="cert_bsci"/>
+                                <field name="cert_sedex"/>
+                                <field name="cert_wrap"/>
+                                <field name="cert_gots"/>
+                                <field name="cert_ocs"/>
+                                <field name="cert_oeko_tex"/>
+                                <field name="cert_higg"/>
+                                <field name="cert_iso"/>
+                                <field name="cert_rcs"/>
+                                <field name="cert_grs"/>
+                                <field name="cert_fsc"/>
+                            </group>
+                            <field name="custom_compliance_note"/>
+                        </page>
+                        <page string="Buying &amp; Communication Preferences">
+                            <group>
+                                <group string="Buying Preferences">
+                                    <field name="preferred_fabric"/>
+                                    <field name="preferred_gsm"/>
+                                    <field name="preferred_color"/>
+                                    <field name="preferred_printing"/>
+                                    <field name="preferred_embroidery"/>
+                                    <field name="preferred_packaging"/>
+                                    <field name="preferred_label"/>
+                                    <field name="preferred_accessories"/>
+                                    <field name="sustainability_preference"/>
+                                    <field name="recycled_material_required"/>
+                                </group>
+                                <group string="Communication Preferences">
+                                    <field name="preferred_language"/>
+                                    <field name="preferred_contact_time"/>
+                                    <field name="preferred_channel"/>
+                                    <field name="email_frequency"/>
+                                    <field name="marketing_consent"/>
+                                    <field name="nda_signed"/>
+                                    <field name="nda_expiry_date" invisible="not nda_signed"/>
+                                    <field name="data_sharing_consent"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Contacts">
+                            <field name="contact_ids">
+                                <tree editable="bottom">
+                                    <field name="name"/>
+                                    <field name="designation"/>
+                                    <field name="department"/>
+                                    <field name="email"/>
+                                    <field name="mobile"/>
+                                    <field name="is_decision_maker"/>
+                                    <field name="is_technical_contact"/>
+                                    <field name="is_finance_contact"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Documents">
+                            <field name="document_ids">
+                                <tree editable="bottom">
+                                    <field name="name"/>
+                                    <field name="document_type"/>
+                                    <field name="attachment" filename="attachment_filename"/>
+                                    <field name="attachment_filename" invisible="1"/>
+                                    <field name="version"/>
+                                    <field name="expiry_date"/>
+                                    <field name="approval_status"/>
+                                    <field name="is_expiring_soon" widget="boolean_toggle"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Communication Log">
+                            <field name="communication_ids">
+                                <tree editable="bottom">
+                                    <field name="date"/>
+                                    <field name="communication_type"/>
+                                    <field name="subject"/>
+                                    <field name="user_id"/>
+                                    <field name="outcome"/>
+                                    <field name="follow_up_date"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Meetings &amp; Visits">
+                            <field name="meeting_ids">
+                                <tree>
+                                    <field name="meeting_number"/>
+                                    <field name="date_start"/>
+                                    <field name="meeting_type"/>
+                                    <field name="state"/>
+                                </tree>
+                            </field>
+                            <field name="visit_ids">
+                                <tree>
+                                    <field name="visit_number"/>
+                                    <field name="visitor_name"/>
+                                    <field name="arrival_date"/>
+                                    <field name="departure_date"/>
+                                    <field name="state"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Complaints">
+                            <field name="complaint_ids">
+                                <tree>
+                                    <field name="complaint_number"/>
+                                    <field name="complaint_date"/>
+                                    <field name="complaint_category"/>
+                                    <field name="state"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Activities">
+                            <field name="activity_schedule_ids">
+                                <tree>
+                                    <field name="activity_number"/>
+                                    <field name="subject"/>
+                                    <field name="activity_type"/>
+                                    <field name="assigned_user_id"/>
+                                    <field name="start_date"/>
+                                    <field name="status"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="AI Insight">
+                            <field name="ai_last_insight" readonly="1" nolabel="1"/>
+                        </page>
+                        <page string="Internal Notes">
+                            <field name="internal_notes" nolabel="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_buyer_tree" model="ir.ui.view">
+        <field name="name">garment.buyer.tree</field>
+        <field name="model">garment.buyer</field>
+        <field name="arch" type="xml">
+            <tree string="Buyers" decoration-muted="buyer_status in ('inactive','blacklisted')">
+                <field name="buyer_code"/>
+                <field name="name"/>
+                <field name="buyer_category"/>
+                <field name="buyer_type"/>
+                <field name="country_id"/>
+                <field name="assigned_merchandiser_id"/>
+                <field name="buyer_status" widget="badge"
+                       decoration-success="buyer_status in ('confirmed','active')"
+                       decoration-danger="buyer_status == 'blacklisted'"/>
+                <field name="ai_lead_score" widget="progressbar"/>
+                <field name="annual_purchase_volume" sum="Total"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_buyer_kanban" model="ir.ui.view">
+        <field name="name">garment.buyer.kanban</field>
+        <field name="model">garment.buyer</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="buyer_status" class="o_kanban_small_column">
+                <field name="name"/>
+                <field name="buyer_type"/>
+                <field name="ai_lead_score"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_global_click oe_kanban_card">
+                            <div class="o_kanban_record_top">
+                                <strong><field name="name"/></strong>
+                            </div>
+                            <div>
+                                <field name="buyer_category"/> · <field name="buyer_type"/>
+                            </div>
+                            <div>
+                                AI Score: <field name="ai_lead_score" widget="progressbar"/>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_garment_buyer_search" model="ir.ui.view">
+        <field name="name">garment.buyer.search</field>
+        <field name="model">garment.buyer</field>
+        <field name="arch" type="xml">
+            <search string="Search Buyers">
+                <field name="name"/>
+                <field name="buyer_code"/>
+                <field name="assigned_merchandiser_id"/>
+                <field name="lead_source_id"/>
+                <field name="country_id"/>
+                <field name="industry"/>
+                <field name="payment_term_id"/>
+                <field name="currency_id"/>
+                <field name="tag_ids"/>
+                <filter string="Active Buyers" name="filter_active" domain="[('buyer_status', '=', 'active')]"/>
+                <filter string="New Leads" name="filter_new_leads" domain="[('buyer_status', '=', 'new_lead')]"/>
+                <filter string="Blacklisted" name="filter_blacklisted" domain="[('buyer_status', '=', 'blacklisted')]"/>
+                <filter string="Inactive (No Activity)" name="filter_dormant" domain="[('is_dormant', '=', True)]"/>
+                <filter string="Pending Approval" name="filter_pending_approval"
+                        domain="[('approval_status', 'not in', ['approved', 'rejected'])]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="group_status" context="{'group_by': 'buyer_status'}"/>
+                    <filter string="Approval Status" name="group_approval" context="{'group_by': 'approval_status'}"/>
+                    <filter string="Category" name="group_category" context="{'group_by': 'buyer_category'}"/>
+                    <filter string="Country" name="group_country" context="{'group_by': 'country_id'}"/>
+                    <filter string="Merchandiser" name="group_merchandiser" context="{'group_by': 'assigned_merchandiser_id'}"/>
+                    <filter string="Lead Source" name="group_lead_source" context="{'group_by': 'lead_source_id'}"/>
+                    <filter string="AI Score Classification" name="group_ai_class" context="{'group_by': 'ai_score_classification'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_buyer" model="ir.actions.act_window">
+        <field name="name">Buyers</field>
+        <field name="res_model">garment.buyer</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="search_view_id" ref="view_garment_buyer_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first buyer.</p>
+        </field>
+    </record>
+
+</odoo>

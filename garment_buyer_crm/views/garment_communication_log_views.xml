@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_communication_tree" model="ir.ui.view">
+        <field name="name">garment.buyer.communication.tree</field>
+        <field name="model">garment.buyer.communication</field>
+        <field name="arch" type="xml">
+            <tree string="Communication Log">
+                <field name="comm_number"/>
+                <field name="date"/>
+                <field name="buyer_id"/>
+                <field name="communication_type"/>
+                <field name="subject"/>
+                <field name="user_id"/>
+                <field name="outcome"/>
+                <field name="follow_up_date"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_communication_form" model="ir.ui.view">
+        <field name="name">garment.buyer.communication.form</field>
+        <field name="model">garment.buyer.communication</field>
+        <field name="arch" type="xml">
+            <form string="Communication">
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="comm_number" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="buyer_id"/>
+                            <field name="buyer_contact_id"/>
+                            <field name="date"/>
+                            <field name="user_id"/>
+                            <field name="communication_type"/>
+                        </group>
+                        <group>
+                            <field name="subject"/>
+                            <field name="outcome"/>
+                            <field name="follow_up_date"/>
+                            <field name="next_action"/>
+                            <field name="related_opportunity_id"/>
+                        </group>
+                    </group>
+                    <field name="summary"/>
+                    <field name="attachment" filename="attachment_filename"/>
+                    <field name="attachment_filename" invisible="1"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_communication" model="ir.actions.act_window">
+        <field name="name">Communication Log</field>
+        <field name="res_model">garment.buyer.communication</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

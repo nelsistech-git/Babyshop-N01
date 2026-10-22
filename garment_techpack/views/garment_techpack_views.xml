@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_techpack_form" model="ir.ui.view">
+        <field name="name">garment.techpack.form</field>
+        <field name="model">garment.techpack</field>
+        <field name="arch" type="xml">
+            <form string="Tech Pack">
+                <field name="style_id" invisible="1"/>
+                <!-- Added missing is_delayed field to satisfy ribbon/widget domain and modifier validation -->
+                <field name="is_delayed" invisible="1"/>
+                <header>
+                    <field name="state" widget="statusbar"
+                            statusbar_visible="registration,technical_review,data_entry,internal_verification,sample_development,buyer_review,approved,production_release"/>
+                    <button name="action_run_ai_analysis" type="object" string="Run AI Analysis" class="btn-secondary" icon="fa-magic"/>
+                    <button name="action_generate_standard_tasks" type="object" string="Generate Standard Tasks" class="btn-secondary"/>
+                    <button name="action_check_production_release" type="object" string="Check &amp; Release to Production"
+                            class="btn-primary" invisible="state != 'approved'"/>
+                    <button name="action_lock" type="object" string="Lock" class="btn-secondary"
+                            invisible="is_locked == True"/>
+                    <button name="action_unlock" type="object" string="Unlock" class="btn-secondary"
+                            invisible="is_locked == False"
+                            groups="garment_techpack.group_techpack_technical_manager"/>
+                    <button name="action_generate_approval_stages" type="object" string="Generate Approval Stages" class="btn-secondary"/>
+                    <button name="action_open_version_compare" type="object" string="Compare Versions" class="btn-secondary"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Locked" bg_color="bg-danger"
+                            invisible="is_locked == False"/>
+                    <widget name="web_ribbon" title="Delayed" bg_color="bg-warning"
+                            invisible="is_delayed == False"/>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_artworks" type="object" class="oe_stat_button" icon="fa-paint-brush">
+                            <field name="artwork_count" widget="statinfo" string="Artwork"/>
+                        </button>
+                        <button name="action_view_versions" type="object" class="oe_stat_button" icon="fa-history">
+                            <field name="version_count" widget="statinfo" string="Versions"/>
+                        </button>
+                        <button name="action_view_changes" type="object" class="oe_stat_button" icon="fa-exchange">
+                            <field name="change_count" widget="statinfo" string="Changes"/>
+                        </button>
+                        <button name="action_view_tasks" type="object" class="oe_stat_button" icon="fa-tasks">
+                            <field name="open_task_count" widget="statinfo" string="Open Tasks"/>
+                        </button>
+                        <button name="action_view_boms" type="object" class="oe_stat_button" icon="fa-list-alt">
+                            <field name="bom_count" widget="statinfo" string="BOMs"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="techpack_number" readonly="1"/>
+                            <field name="version"/>
+                            <field name="style_id"/>
+                            <field name="buyer_id" readonly="1"/>
+                            <field name="brand"/>
+                            <field name="style_category_id" readonly="1"/>
+                            <field name="product_type"/>
+                            <field name="factory"/>
+                            <field name="production_unit"/>
+                        </group>
+                        <group>
+                            <field name="season" readonly="1"/>
+                            <field name="collection" readonly="1"/>
+                            <field name="gender" readonly="1"/>
+                            <field name="age_group" readonly="1"/>
+                            <field name="department"/>
+                            <field name="assigned_merchandiser_id"/>
+                            <field name="technical_owner_id"/>
+                            <field name="is_locked" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Timeline &amp; Deadlines">
+                        <group>
+                            <field name="planned_start_date"/>
+                            <field name="planned_end_date"/>
+                            <field name="delay_days" readonly="1" invisible="is_delayed == False"/>
+                        </group>
+                        <group>
+                            <field name="review_deadline"/>
+                            <field name="buyer_submission_deadline"/>
+                            <field name="approval_deadline"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Product Information">
+                            <group>
+                                <group>
+                                    <field name="product_name"/>
+                                    <field name="fabric_category"/>
+                                    <field name="garment_type"/>
+                                    <field name="construction_method"/>
+                                    <field name="fit_type"/>
+                                </group>
+                                <group>
+                                    <field name="usage_purpose"/>
+                                    <field name="target_market"/>
+                                    <field name="country_id"/>
+                                </group>
+                            </group>
+                            <field name="product_description"/>
+                        </page>
+                        <page string="Technical Specification">
+                            <field name="tech_spec_ids">
+                                <tree editable="bottom">
+                                    <field name="sewing_method"/>
+                                    <field name="stitch_type"/>
+                                    <field name="stitch_density"/>
+                                    <field name="seam_type"/>
+                                    <field name="seam_allowance"/>
+                                    <field name="thread_type"/>
+                                    <field name="spi"/>
+                                    <field name="machine_requirement"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Construction Details">
+                            <field name="construction_detail_ids">
+                                <tree editable="bottom">
+                                    <field name="component"/>
+                                    <field name="construction_notes"/>
+                                    <field name="closure_type"/>
+                                    <field name="closure_size"/>
+                                    <field name="closure_brand"/>
+                                    <field name="closure_color"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Artwork">
+                            <field name="artwork_ids">
+                                <tree editable="bottom">
+                                    <field name="artwork_number"/>
+                                    <field name="artwork_type"/>
+                                    <field name="placement"/>
+                                    <field name="pantone"/>
+                                    <field name="print_method"/>
+                                    <field name="approval_status"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Labels &amp; Packaging">
+                            <separator string="Labels"/>
+                            <field name="label_spec_ids">
+                                <tree editable="bottom">
+                                    <field name="label_type"/>
+                                    <field name="label_code"/>
+                                    <field name="material"/>
+                                    <field name="position"/>
+                                    <field name="approval_status"/>
+                                </tree>
+                            </field>
+                            <separator string="Packaging"/>
+                            <field name="packaging_spec_ids">
+                                <tree editable="bottom">
+                                    <field name="poly_bag_type"/>
+                                    <field name="carton_type"/>
+                                    <field name="folding_method"/>
+                                    <field name="barcode_requirement"/>
+                                    <field name="approval_status"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Measurements">
+                            <field name="measurement_sheet_ids">
+                                <tree editable="bottom">
+                                    <field name="style_id" invisible="1"/>
+                                    <field name="measurement_chart_id"/>
+                                    <field name="size_set_id"/>
+                                    <field name="pattern_id"/>
+                                    <field name="imported_date"/>
+                                    <field name="tolerance_tracked"/>
+                                    <field name="status"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Reviews &amp; Approvals">
+                            <group string="Production Release" invisible="state != 'production_release'">
+                                <field name="production_release_date" readonly="1"/>
+                                <field name="released_by_id" readonly="1"/>
+                            </group>
+                            <separator string="Technical Reviews"/>
+                            <field name="review_ids">
+                                <tree>
+                                    <field name="reviewer_id"/>
+                                    <field name="review_date"/>
+                                    <field name="status"/>
+                                </tree>
+                            </field>
+                            <separator string="Approvals"/>
+                            <field name="approval_ids">
+                                <tree editable="bottom">
+                                    <field name="approval_stage"/>
+                                    <field name="approver_id"/>
+                                    <field name="status"/>
+                                    <field name="signed_date"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Attachments">
+                            <field name="attachment_ids">
+                                <tree editable="bottom">
+                                    <field name="name"/>
+                                    <field name="source"/>
+                                    <field name="file" filename="filename"/>
+                                    <field name="filename" invisible="1"/>
+                                    <field name="ai_extraction_done"/>
+                                    <field name="human_verified"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="AI Assistant">
+                            <field name="ai_last_run" readonly="1"/>
+                            <group>
+                                <field name="ai_missing_fields_note" readonly="1" nolabel="1"/>
+                            </group>
+                            <group>
+                                <field name="ai_validation_note" readonly="1" nolabel="1"/>
+                            </group>
+                            <separator string="Similar Historical Tech Packs"/>
+                            <field name="ai_similar_techpack_ids" readonly="1">
+                                <tree>
+                                    <field name="techpack_number"/>
+                                    <field name="name"/>
+                                    <field name="buyer_id"/>
+                                    <field name="state"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_techpack_tree" model="ir.ui.view">
+        <field name="name">garment.techpack.tree</field>
+        <field name="model">garment.techpack</field>
+        <field name="arch" type="xml">
+            <tree string="Tech Packs" decoration-muted="state == 'archived'" decoration-danger="is_delayed == True">
+                <field name="techpack_number"/>
+                <field name="name"/>
+                <field name="style_id"/>
+                <field name="buyer_id"/>
+                <field name="version"/>
+                <field name="assigned_merchandiser_id"/>
+                <field name="is_delayed" invisible="1"/>
+                <field name="state" widget="badge" decoration-success="state in ('approved','production_release')"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_techpack_kanban" model="ir.ui.view">
+        <field name="name">garment.techpack.kanban</field>
+        <field name="model">garment.techpack</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" class="o_kanban_small_column">
+                <field name="name"/>
+                <field name="buyer_id"/>
+                <field name="style_number"/>
+                <field name="style_image"/>
+                <field name="review_deadline"/>
+                <field name="technical_owner_id"/>
+                <field name="state"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click oe_kanban_card">
+                            <div class="o_kanban_record_top d-flex align-items-center">
+                                <field name="style_image" widget="image" class="o_kanban_image me-2"
+                                       options="{'size': [32, 32]}"/>
+                                <strong><field name="name"/></strong>
+                            </div>
+                            <div><field name="buyer_id"/></div>
+                            <div class="text-muted"><field name="style_number"/></div>
+                            <div class="text-muted">Due: <field name="review_deadline"/></div>
+                            <div><field name="technical_owner_id" widget="many2one_avatar_user"/></div>
+                            <div><field name="state" widget="badge"/></div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_garment_techpack_calendar" model="ir.ui.view">
+        <field name="name">garment.techpack.calendar</field>
+        <field name="model">garment.techpack</field>
+        <field name="arch" type="xml">
+            <calendar string="Tech Pack Deadlines" date_start="review_deadline" color="buyer_id" mode="month">
+                <field name="name"/>
+                <field name="buyer_id"/>
+                <field name="state"/>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="view_garment_techpack_search" model="ir.ui.view">
+        <field name="name">garment.techpack.search</field>
+        <field name="model">garment.techpack</field>
+        <field name="arch" type="xml">
+            <search string="Search Tech Packs">
+                <field name="name"/>
+                <field name="techpack_number"/>
+                <field name="style_id"/>
+                <field name="buyer_id"/>
+                <filter string="My Tech Packs" name="filter_my" domain="[('assigned_merchandiser_id', '=', uid)]"/>
+                <filter string="Approved" name="filter_approved" domain="[('state', '=', 'approved')]"/>
+                <filter string="Buyer Review" name="filter_buyer_review" domain="[('state', '=', 'buyer_review')]"/>
+                <filter string="Production Released" name="filter_production_release" domain="[('state', '=', 'production_release')]"/>
+                <filter string="Delayed" name="filter_delayed" domain="[('is_delayed', '=', True)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="group_status" context="{'group_by': 'state'}"/>
+                    <filter string="Buyer" name="group_buyer" context="{'group_by': 'buyer_id'}"/>
+                    <filter string="Season" name="group_season" context="{'group_by': 'season'}"/>
+                    <filter string="Product Category" name="group_category" context="{'group_by': 'style_category_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_techpack" model="ir.actions.act_window">
+        <field name="name">Tech Packs</field>
+        <field name="res_model">garment.techpack</field>
+        <field name="view_mode">kanban,tree,form,calendar,graph,pivot</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first tech pack.</p>
+        </field>
+    </record>
+
+    <record id="action_garment_techpack_buyer_approval" model="ir.actions.act_window">
+        <field name="name">Buyer Approval</field>
+        <field name="res_model">garment.techpack</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="domain">[('state', '=', 'buyer_review')]</field>
+        <field name="context">{'search_default_filter_buyer_review': 1}</field>
+    </record>
+
+    <record id="action_garment_techpack_production_release" model="ir.actions.act_window">
+        <field name="name">Production Release</field>
+        <field name="res_model">garment.techpack</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('state', '=', 'production_release')]</field>
+        <field name="context">{'search_default_filter_production_release': 1}</field>
+    </record>
+
+</odoo>

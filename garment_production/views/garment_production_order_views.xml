@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_production_order_tree" model="ir.ui.view">
+        <field name="name">garment.production.order.tree</field>
+        <field name="model">garment.production.order</field>
+        <field name="arch" type="xml">
+            <tree string="Production Orders" decoration-danger="progress_stage == 'delayed'" decoration-success="progress_stage == 'completed'">
+                <field name="name"/>
+                <field name="buyer_id"/>
+                <field name="style_id"/>
+                <field name="quantity"/>
+                <field name="production_line_id"/>
+                <field name="deadline"/>
+                <field name="sewing_pct" widget="progressbar"/>
+                <field name="packing_pct" widget="progressbar"/>
+                <field name="priority"/>
+                <field name="progress_stage"/>
+                <field name="status"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_production_order_form" model="ir.ui.view">
+        <field name="name">garment.production.order.form</field>
+        <field name="model">garment.production.order</field>
+        <field name="arch" type="xml">
+            <form string="Production Order">
+                <header>
+                    <field name="status" widget="statusbar"
+                           statusbar_visible="draft,planned,released,material_check,running,completed"/>
+                    <button name="action_release" type="object" string="Release" class="btn-primary"
+                            invisible="status != 'planned'"/>
+                    <button name="action_start" type="object" string="Start Production" class="btn-primary"
+                            invisible="status not in ('released', 'material_check')"/>
+                    <button name="action_hold" type="object" string="Hold" invisible="status != 'running'"/>
+                    <button name="action_complete" type="object" string="Mark Completed" class="btn-primary"
+                            invisible="status != 'running'"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                            invisible="status in ('completed', 'cancelled')"/>
+                    <button name="action_run_ai_forecast" type="object" string="AI Completion Forecast"
+                            class="btn-secondary" icon="fa-magic"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_work_orders" type="object" class="oe_stat_button" icon="fa-tasks">
+                            <field name="work_order_count" widget="statinfo" string="Work Orders"/>
+                        </button>
+                        <button name="action_view_entries" type="object" class="oe_stat_button" icon="fa-list-alt">
+                            <field name="entry_count" widget="statinfo" string="Entries"/>
+                        </button>
+                        <button name="action_view_issues" type="object" class="oe_stat_button" icon="fa-exclamation-triangle"
+                                invisible="issue_count == 0">
+                            <field name="issue_count" widget="statinfo" string="Issues"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="buyer_id"/>
+                            <field name="order_id"/>
+                            <field name="order_confirmation_id"/>
+                            <field name="handover_id"/>
+                            <field name="plan_id"/>
+                            <field name="tna_id"/>
+                        </group>
+                        <group>
+                            <field name="style_id"/>
+                            <field name="bom_id"/>
+                            <field name="routing_id"/>
+                            <field name="production_line_id"/>
+                            <field name="priority"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="quantity"/>
+                            <field name="uom"/>
+                            <field name="start_date"/>
+                            <field name="end_date"/>
+                            <field name="deadline"/>
+                        </group>
+                        <group string="Progress Stage">
+                            <field name="progress_stage"/>
+                        </group>
+                    </group>
+                    <group string="Department Progress">
+                        <group>
+                            <field name="cutting_qty"/>
+                            <field name="cutting_pct" widget="progressbar"/>
+                            <field name="sewing_qty"/>
+                            <field name="sewing_pct" widget="progressbar"/>
+                            <field name="washing_qty"/>
+                            <field name="washing_pct" widget="progressbar"/>
+                        </group>
+                        <group>
+                            <field name="finishing_qty"/>
+                            <field name="finishing_pct" widget="progressbar"/>
+                            <field name="packing_qty"/>
+                            <field name="packing_pct" widget="progressbar"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Work Orders">
+                            <field name="work_order_ids">
+                                <tree editable="bottom">
+                                    <field name="operation_name"/>
+                                    <field name="work_center_id"/>
+                                    <field name="line_id"/>
+                                    <field name="quantity"/>
+                                    <field name="actual_qty"/>
+                                    <field name="status"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Material Issues">
+                            <field name="material_issue_ids">
+                                <tree editable="bottom">
+                                    <field name="material_id"/>
+                                    <field name="department"/>
+                                    <field name="requested_qty"/>
+                                    <field name="approved_qty"/>
+                                    <field name="issued_qty"/>
+                                    <field name="status"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Material Consumption">
+                            <field name="consumption_ids">
+                                <tree editable="bottom">
+                                    <field name="material_id"/>
+                                    <field name="department"/>
+                                    <field name="planned_qty"/>
+                                    <field name="actual_qty"/>
+                                    <field name="variance_qty"/>
+                                    <field name="variance_pct"/>
+                                    <field name="wastage_pct"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Cutting Orders">
+                            <field name="cutting_order_ids">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="color"/>
+                                    <field name="quantity"/>
+                                    <field name="cut_qty"/>
+                                    <field name="status"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Washing / Finishing / Packing">
+                            <field name="washing_order_ids">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="wash_type"/>
+                                    <field name="quantity"/>
+                                    <field name="status"/>
+                                </tree>
+                            </field>
+                            <field name="finishing_order_ids">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="quantity"/>
+                                    <field name="completion_pct" widget="progressbar"/>
+                                    <field name="status"/>
+                                </tree>
+                            </field>
+                            <field name="packing_order_ids">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="quantity"/>
+                                    <field name="packed_qty"/>
+                                    <field name="status"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Issues / Delays">
+                            <field name="issue_ids">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="issue_type"/>
+                                    <field name="andon_status"/>
+                                    <field name="impact_qty"/>
+                                    <field name="status"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Rework">
+                            <field name="rework_ids">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="department"/>
+                                    <field name="quantity"/>
+                                    <field name="reason"/>
+                                    <field name="status"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Cost">
+                            <field name="cost_ids">
+                                <tree>
+                                    <field name="material_cost"/>
+                                    <field name="labor_cost"/>
+                                    <field name="machine_cost"/>
+                                    <field name="overhead_cost"/>
+                                    <field name="total_cost"/>
+                                    <field name="cost_per_piece"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Approvals">
+                            <field name="approval_ids">
+                                <tree editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="approval_step"/>
+                                    <field name="approver_id"/>
+                                    <field name="status"/>
+                                    <field name="signed_date"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="AI Insight">
+                            <group>
+                                <field name="ai_predicted_completion_date"/>
+                                <field name="ai_delay_risk"/>
+                                <field name="ai_insight"/>
+                                <field name="ai_last_run"/>
+                            </group>
+                        </page>
+                        <page string="Notes">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_production_order_search" model="ir.ui.view">
+        <field name="name">garment.production.order.search</field>
+        <field name="model">garment.production.order</field>
+        <field name="arch" type="xml">
+            <search string="Search Production Orders">
+                <field name="name"/>
+                <field name="buyer_id"/>
+                <field name="style_id"/>
+                <field name="production_line_id"/>
+                <filter string="Running" name="filter_running" domain="[('status', '=', 'running')]"/>
+                <filter string="Delayed" name="filter_delayed" domain="[('progress_stage', '=', 'delayed')]"/>
+                <filter string="Completed" name="filter_completed" domain="[('status', '=', 'completed')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Buyer" name="group_buyer" context="{'group_by': 'buyer_id'}"/>
+                    <filter string="Style" name="group_style" context="{'group_by': 'style_id'}"/>
+                    <filter string="Production Line" name="group_line" context="{'group_by': 'production_line_id'}"/>
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                    <filter string="Progress Stage" name="group_progress" context="{'group_by': 'progress_stage'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_production_order" model="ir.actions.act_window">
+        <field name="name">Production Orders</field>
+        <field name="res_model">garment.production.order</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_garment_production_order_search"/>
+    </record>
+
+</odoo>

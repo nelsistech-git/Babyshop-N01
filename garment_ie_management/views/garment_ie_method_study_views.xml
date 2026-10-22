@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_ie_method_study_form" model="ir.ui.view">
+        <field name="name">garment.ie.method.study.form</field>
+        <field name="model">garment.ie.method.study</field>
+        <field name="arch" type="xml">
+            <form string="Method Study">
+                <header>
+                    <button name="action_propose" type="object" string="Propose"
+                            class="btn-primary" invisible="status != 'draft'"/>
+                    <button name="action_approve" type="object" string="Approve"
+                            class="btn-primary" invisible="status != 'proposed'"/>
+                    <button name="action_implement" type="object" string="Implement"
+                            class="btn-primary" invisible="status != 'approved'"/>
+                    <field name="status" widget="statusbar" statusbar_visible="draft,proposed,approved,implemented"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="study_number"/>
+                        <h1><field name="study_number" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="style_id"/>
+                            <field name="operation_id"/>
+                            <field name="study_area"/>
+                        </group>
+                        <group>
+                            <field name="responsible_id"/>
+                            <field name="implemented_date" readonly="1"/>
+                            <field name="time_saving_pct" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Current Method">
+                        <field name="current_method_steps"/>
+                        <field name="current_cycle_time"/>
+                        <field name="current_method_description" nolabel="1"/>
+                    </group>
+                    <group string="Improved Method">
+                        <field name="improved_method_steps"/>
+                        <field name="improved_cycle_time"/>
+                        <field name="improved_method_description" nolabel="1"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_ie_method_study_tree" model="ir.ui.view">
+        <field name="name">garment.ie.method.study.tree</field>
+        <field name="model">garment.ie.method.study</field>
+        <field name="arch" type="xml">
+            <tree string="Method Studies">
+                <field name="study_number"/>
+                <field name="operation_id"/>
+                <field name="study_area"/>
+                <field name="current_method_steps"/>
+                <field name="improved_method_steps"/>
+                <field name="time_saving_pct"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_garment_ie_method_study" model="ir.actions.act_window">
+        <field name="name">Method Studies</field>
+        <field name="res_model">garment.ie.method.study</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Start your first method study.</p>
+        </field>
+    </record>
+
+</odoo>

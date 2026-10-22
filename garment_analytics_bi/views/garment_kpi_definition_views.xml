@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_kpi_definition_form" model="ir.ui.view">
+        <field name="name">garment.kpi.definition.form</field>
+        <field name="model">garment.kpi.definition</field>
+        <field name="arch" type="xml">
+            <form string="KPI Definition">
+                <header>
+                    <button name="action_compute_now" type="object" string="Compute Now" class="btn-primary"
+                            icon="fa-refresh"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_snapshots" type="object" class="oe_stat_button" icon="fa-area-chart">
+                            <field name="snapshot_count" widget="statinfo" string="Snapshots"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="category"/>
+                            <field name="department_id"/>
+                            <field name="responsible_user_id"/>
+                            <field name="frequency"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="target_value"/>
+                            <field name="unit"/>
+                            <field name="higher_is_better"/>
+                            <field name="warning_threshold_pct"/>
+                            <field name="critical_threshold_pct"/>
+                        </group>
+                    </group>
+                    <group string="Latest Snapshot">
+                        <group>
+                            <field name="last_value" readonly="1"/>
+                            <field name="last_status" widget="badge" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="last_snapshot_id" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Data Source (read_group)">
+                        <group>
+                            <field name="source_model"/>
+                            <field name="measure_field"/>
+                            <field name="aggregation"/>
+                        </group>
+                        <group>
+                            <field name="group_by_field"/>
+                            <field name="date_field"/>
+                            <field name="domain_filter"/>
+                        </group>
+                    </group>
+                    <group string="Description">
+                        <field name="description" nolabel="1"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_kpi_definition_tree" model="ir.ui.view">
+        <field name="name">garment.kpi.definition.tree</field>
+        <field name="model">garment.kpi.definition</field>
+        <field name="arch" type="xml">
+            <tree string="KPI Definitions" decoration-danger="last_status == 'critical'"
+                  decoration-warning="last_status == 'warning'" decoration-success="last_status == 'on_target'">
+                <field name="name"/>
+                <field name="category"/>
+                <field name="department_id"/>
+                <field name="source_model"/>
+                <field name="aggregation"/>
+                <field name="frequency"/>
+                <field name="target_value"/>
+                <field name="last_value"/>
+                <field name="unit"/>
+                <field name="last_status" widget="badge"/>
+                <field name="active" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_kpi_definition_search" model="ir.ui.view">
+        <field name="name">garment.kpi.definition.search</field>
+        <field name="model">garment.kpi.definition</field>
+        <field name="arch" type="xml">
+            <search string="Search KPI Definitions">
+                <field name="name"/>
+                <field name="source_model"/>
+                <field name="department_id"/>
+                <filter string="Critical" name="filter_critical" domain="[('last_status', '=', 'critical')]"/>
+                <filter string="Warning" name="filter_warning" domain="[('last_status', '=', 'warning')]"/>
+                <filter string="Archived" name="filter_archived" domain="[('active', '=', False)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Category" name="group_category" context="{'group_by': 'category'}"/>
+                    <filter string="Department" name="group_department" context="{'group_by': 'department_id'}"/>
+                    <filter string="Frequency" name="group_frequency" context="{'group_by': 'frequency'}"/>
+                    <filter string="Status" name="group_status" context="{'group_by': 'last_status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_kpi_definition" model="ir.actions.act_window">
+        <field name="name">KPI Definitions</field>
+        <field name="res_model">garment.kpi.definition</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Define your first KPI.</p>
+            <p>A KPI points at a real model/field already maintained elsewhere in the suite —
+               nothing is duplicated here.</p>
+        </field>
+    </record>
+
+</odoo>

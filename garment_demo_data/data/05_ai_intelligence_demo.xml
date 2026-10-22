@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Part of Smart Complete Garment Software. Copyright (c) Nelsis Tech (www.nelsistech.com) -->
+<!--
+     garment_ai_intelligence demo data.
+
+     provider_openai_demo is a DISABLED placeholder provider configuration —
+     no real API key, is_enabled=False — so installing this module never
+     attempts an outbound call to a real AI provider. The suite's one real,
+     fully-working AI feature (GarmentDemandForecast.action_generate_demand_forecast)
+     does not need this config at all: it is a deterministic heuristic
+     computed straight from garment.order.line history.
+
+     forecast_tee reproduces, as static demo data, what running
+     action_generate_demand_forecast() on style_tee would actually compute
+     from the real order history created in 03_order_demo.xml: order_tee
+     (order_date 2026-03-16) is the ONLY confirmed order against style_tee,
+     with 2 order lines (line_tee_white 14,400 + line_tee_navy 9,600 =
+     24,000 pcs), both falling in calendar month 2026-03. With a single
+     historical period, the 'moving_average' method's forecast for the next
+     period is simply that period's total (24,000), and the confidence
+     heuristic (n=1 historical period) yields 40.0%.
+-->
+<odoo>
+<data noupdate="1">
+
+    <!-- =================================================================
+         AI Provider Configuration — DISABLED placeholder, no real key
+         ================================================================= -->
+
+    <record id="provider_openai_demo" model="garment.ai.provider.config">
+        <field name="name">OpenAI (Not Configured)</field>
+        <field name="sequence">10</field>
+        <field name="provider">openai</field>
+        <field name="model_name">gpt-4o-mini</field>
+        <field name="is_enabled" eval="False"/>
+        <field name="is_default" eval="False"/>
+        <field name="notes">Placeholder configuration shipped with the demo dataset. No API key has been set and
+this configuration is left disabled (Enabled = No) on purpose — the suite's real AI feature (Demand Forecasting)
+runs as a deterministic in-database heuristic and never calls out to an external provider. An administrator who
+wants to route other features (quality prediction, cost optimization, etc.) through a real LLM should duplicate
+this record, add a live API key under the "AI Administrator" security group, and enable it.</field>
+    </record>
+
+    <!-- =================================================================
+         Demand Forecast — style_tee, computed from real order history
+         ================================================================= -->
+
+    <record id="forecast_tee" model="garment.demand.forecast">
+        <field name="style_id" ref="style_tee"/>
+        <field name="buyer_id" ref="buyer_northwind"/>
+        <field name="forecast_date">2026-08-20</field>
+        <field name="period_type">monthly</field>
+        <field name="historical_basis">last_6</field>
+        <field name="method">moving_average</field>
+        <field name="forecast_horizon">3</field>
+        <field name="status">generated</field>
+        <field name="forecast_qty">24000.0</field>
+        <field name="confidence_score">40.0</field>
+        <field name="basis_period_count">1</field>
+        <field name="basis_order_line_count">2</field>
+        <field name="basis_qty_total">24000</field>
+        <field name="basis_order_ids" eval="[(6, 0, [ref('order_tee')])]"/>
+        <field name="last_generated">2026-08-20 09:30:00</field>
+        <field name="explanation">Computed from 2 historical order line(s) across 1 historical monthly period(s)
+for buyer "Northwind Apparel Sourcing Ltd", spanning periods 2026-03 to 2026-03 (total historical qty 24000
+units). Method: simple moving average of the last 1 historical period(s). Forecast = 24000.0. Confidence 40.0%
+reflects the limited amount of historical data (a single confirmed order to date) and would rise as more
+seasons of order history accumulate for this style.</field>
+        <field name="line_ids" eval="[
+            (0, 0, {'sequence': 10, 'period_label': '2026-03', 'period_date': '2026-03-01', 'data_type': 'historical', 'quantity': 24000.0}),
+            (0, 0, {'sequence': 20, 'period_label': '2026-04', 'period_date': '2026-04-01', 'data_type': 'forecast', 'quantity': 24000.0}),
+            (0, 0, {'sequence': 30, 'period_label': '2026-05', 'period_date': '2026-05-01', 'data_type': 'forecast', 'quantity': 24000.0}),
+            (0, 0, {'sequence': 40, 'period_label': '2026-06', 'period_date': '2026-06-01', 'data_type': 'forecast', 'quantity': 24000.0}),
+        ]"/>
+    </record>
+
+    <!-- =================================================================
+         AI Insight / Prediction Log
+         ================================================================= -->
+
+    <record id="insight_risk_alert_tee" model="garment.ai.insight">
+        <field name="insight_type">risk_alert</field>
+        <field name="res_model">garment.order</field>
+        <field name="res_id" eval="ref('order_tee')"/>
+        <field name="confidence">72.0</field>
+        <field name="insight_date">2026-08-20 09:15:00</field>
+        <field name="explanation">order_tee's Time &amp; Action calendar (tna_tee) recorded an 8-day delay on the
+Fabric In-House milestone caused by a Delta Knit yarn shortage; cutting only started 2026-04-14 against an
+original plan date and sewing did not begin until 2026-04-20. The shipment window (2026-06-10) has no float
+remaining after the compressed cutting schedule already absorbed the slippage.</field>
+        <field name="recommendation">Track the tee run on Line 1 daily against the compressed schedule; if
+output efficiency does not keep improving through the ramp-up week, pull additional operators from Line 2 (idle,
+queued for order_hoodie) rather than risk the 2026-06-10 ship date.</field>
+        <field name="source">heuristic</field>
+        <field name="status">new</field>
+    </record>
+
+    <record id="insight_recommendation_tee" model="garment.ai.insight">
+        <field name="insight_type">recommendation</field>
+        <field name="res_model">garment.demand.forecast</field>
+        <field name="res_id" eval="ref('forecast_tee')"/>
+        <field name="confidence">40.0</field>
+        <field name="insight_date">2026-08-20 09:31:00</field>
+        <field name="explanation">Demand forecast forecast_tee projects ~24,000 units/month of ongoing demand for
+Men's Crew Neck T-Shirt (NSG-TS-2601) based on order_tee, the only confirmed order to date. Confidence is
+moderate (40%) since it rests on a single historical period.</field>
+        <field name="recommendation">Projected demand for Men's Crew Neck T-Shirt (NSG-TS-2601) over the next 3
+period(s): ~24000 units/period. Share this projection with Northwind's merchandiser to gauge reorder intent
+before Line 1 frees up post-tee, and revisit the forecast once a second seasonal order lands to raise
+confidence.</field>
+        <field name="source">heuristic</field>
+        <field name="status">new</field>
+    </record>
+
+    <record id="forecast_tee" model="garment.demand.forecast">
+        <field name="ai_insight_id" ref="insight_recommendation_tee"/>
+    </record>
+
+</data>
+</odoo>

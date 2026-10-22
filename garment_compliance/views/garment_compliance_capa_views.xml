@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_compliance_capa_tree" model="ir.ui.view">
+        <field name="name">garment.compliance.capa.tree</field>
+        <field name="model">garment.compliance.capa</field>
+        <field name="arch" type="xml">
+            <tree string="Compliance CAPA">
+                <field name="capa_no"/>
+                <field name="source"/>
+                <field name="issue"/>
+                <field name="department_id"/>
+                <field name="responsible_user_id"/>
+                <field name="due_date"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_compliance_capa_form" model="ir.ui.view">
+        <field name="name">garment.compliance.capa.form</field>
+        <field name="model">garment.compliance.capa</field>
+        <field name="arch" type="xml">
+            <form string="Compliance CAPA">
+                <header>
+                    <button name="action_close" type="object" string="Close" class="btn-primary" invisible="status == 'closed'"/>
+                    <field name="status" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="capa_no" readonly="1"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="source"/>
+                            <field name="finding_id"/>
+                            <field name="audit_id"/>
+                            <field name="incident_id"/>
+                            <field name="department_id"/>
+                        </group>
+                        <group>
+                            <field name="responsible_user_id"/>
+                            <field name="due_date"/>
+                            <field name="implementation_date"/>
+                            <field name="verification_date"/>
+                            <field name="verified_by_id"/>
+                            <field name="verification_result"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="issue"/>
+                        <field name="root_cause_method"/>
+                        <field name="root_cause"/>
+                        <field name="corrective_action"/>
+                        <field name="preventive_action"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_compliance_capa_search" model="ir.ui.view">
+        <field name="name">garment.compliance.capa.search</field>
+        <field name="model">garment.compliance.capa</field>
+        <field name="arch" type="xml">
+            <search string="Search CAPA">
+                <field name="capa_no"/>
+                <field name="issue"/>
+                <field name="department_id"/>
+                <filter string="Open" name="filter_open" domain="[('status', '!=', 'closed')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Source" name="group_source" context="{'group_by': 'source'}"/>
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_compliance_capa" model="ir.actions.act_window">
+        <field name="name">Corrective Actions (CAPA)</field>
+        <field name="res_model">garment.compliance.capa</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

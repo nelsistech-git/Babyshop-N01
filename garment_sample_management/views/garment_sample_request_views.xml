@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_sample_request_tree" model="ir.ui.view">
+        <field name="name">garment.sample.request.tree</field>
+        <field name="model">garment.sample.request</field>
+        <field name="arch" type="xml">
+            <tree string="Sample Requests">
+                <field name="request_number"/>
+                <field name="request_date"/>
+                <field name="buyer_id"/>
+                <field name="style_id"/>
+                <field name="sample_type_id"/>
+                <field name="priority" widget="priority"/>
+                <field name="approval_status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_sample_request_form" model="ir.ui.view">
+        <field name="name">garment.sample.request.form</field>
+        <field name="model">garment.sample.request</field>
+        <field name="arch" type="xml">
+            <form string="Sample Request">
+                <header>
+                    <field name="approval_status" widget="statusbar"/>
+                    <button name="action_approve" type="object" string="Approve" class="btn-primary"
+                            invisible="approval_status == 'approved'"/>
+                    <button name="action_reject" type="object" string="Reject" class="btn-secondary"/>
+                    <button name="action_create_sample" type="object" string="Create Sample" class="btn-primary"
+                            invisible="approval_status != 'approved'"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="request_number" readonly="1"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="request_date"/>
+                            <field name="source"/>
+                            <field name="buyer_id"/>
+                            <field name="style_id"/>
+                            <field name="techpack_id"/>
+                        </group>
+                        <group>
+                            <field name="sample_type_id"/>
+                            <field name="quantity"/>
+                            <field name="required_date"/>
+                            <field name="priority" widget="priority"/>
+                            <field name="requester_id"/>
+                            <field name="sample_id" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_sample_request" model="ir.actions.act_window">
+        <field name="name">Sample Requests</field>
+        <field name="res_model">garment.sample.request</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first sample request.</p>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_hr_recruitment_tree" model="ir.ui.view">
+        <field name="name">garment.hr.recruitment.tree</field>
+        <field name="model">garment.hr.recruitment</field>
+        <field name="arch" type="xml">
+            <tree string="Recruitment Requisitions">
+                <field name="requisition_number"/>
+                <field name="department_id"/>
+                <field name="designation_id"/>
+                <field name="number_of_positions"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_hr_recruitment_form" model="ir.ui.view">
+        <field name="name">garment.hr.recruitment.form</field>
+        <field name="model">garment.hr.recruitment</field>
+        <field name="arch" type="xml">
+            <form string="Recruitment Requisition">
+                <header>
+                    <field name="status" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <div class="oe_stat_button" icon="fa-users">
+                            <div class="o_stat_info">
+                                <field name="candidate_count" class="o_stat_value"/>
+                                <span class="o_stat_text">Candidates</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="oe_title"><h1><field name="requisition_number" readonly="1"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="department_id"/>
+                            <field name="designation_id"/>
+                            <field name="number_of_positions"/>
+                            <field name="reason"/>
+                        </group>
+                        <group>
+                            <field name="request_date"/>
+                            <field name="required_by_date"/>
+                            <field name="requested_by_id"/>
+                        </group>
+                    </group>
+                    <field name="candidate_ids">
+                        <tree>
+                            <field name="name"/>
+                            <field name="mobile"/>
+                            <field name="interview_score"/>
+                            <field name="status"/>
+                        </tree>
+                    </field>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_hr_recruitment" model="ir.actions.act_window">
+        <field name="name">Recruitment Requisitions</field>
+        <field name="res_model">garment.hr.recruitment</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first recruitment requisition.</p>
+        </field>
+    </record>
+
+</odoo>

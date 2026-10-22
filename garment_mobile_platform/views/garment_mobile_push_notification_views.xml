@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_mobile_push_notification_form" model="ir.ui.view">
+        <field name="name">garment.mobile.push.notification.form</field>
+        <field name="model">garment.mobile.push.notification</field>
+        <field name="arch" type="xml">
+            <form string="Push Notification">
+                <header>
+                    <button name="action_send" type="object" string="Send" class="btn-primary"
+                            invisible="state != 'queued'"/>
+                    <button name="action_mark_read" type="object" string="Mark Read"
+                            invisible="state == 'read'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="queued,sent,read"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="title"/>
+                        <h1><field name="title"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="notification_number"/>
+                            <field name="notification_type"/>
+                            <field name="user_id"/>
+                            <field name="device_id"/>
+                        </group>
+                        <group>
+                            <field name="push_provider"/>
+                            <field name="related_model"/>
+                            <field name="related_res_id"/>
+                        </group>
+                    </group>
+                    <group string="Message">
+                        <field name="body" nolabel="1"/>
+                    </group>
+                    <group string="Delivery">
+                        <group>
+                            <field name="scheduled_date"/>
+                            <field name="sent_date"/>
+                            <field name="read_date"/>
+                        </group>
+                        <group>
+                            <field name="error_message" invisible="state != 'failed'"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_mobile_push_notification_tree" model="ir.ui.view">
+        <field name="name">garment.mobile.push.notification.tree</field>
+        <field name="model">garment.mobile.push.notification</field>
+        <field name="arch" type="xml">
+            <tree string="Push Notifications" decoration-danger="state == 'failed'" decoration-muted="state == 'read'">
+                <field name="notification_number"/>
+                <field name="user_id"/>
+                <field name="notification_type"/>
+                <field name="title"/>
+                <field name="scheduled_date"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_mobile_push_notification_search" model="ir.ui.view">
+        <field name="name">garment.mobile.push.notification.search</field>
+        <field name="model">garment.mobile.push.notification</field>
+        <field name="arch" type="xml">
+            <search string="Search Notifications">
+                <field name="notification_number"/>
+                <field name="title"/>
+                <field name="user_id"/>
+                <filter name="filter_queued" string="Queued" domain="[('state', '=', 'queued')]"/>
+                <filter name="filter_failed" string="Failed" domain="[('state', '=', 'failed')]"/>
+                <filter name="filter_unread" string="Unread" domain="[('state', '!=', 'read')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_by_type" string="Type" context="{'group_by': 'notification_type'}"/>
+                    <filter name="group_by_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_by_user" string="User" context="{'group_by': 'user_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_mobile_push_notification" model="ir.actions.act_window">
+        <field name="name">Push Notifications</field>
+        <field name="res_model">garment.mobile.push.notification</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_garment_mobile_push_notification_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No notifications queued yet.</p>
+            <p>Delivery to FCM/APNs is a documented integration stub —
+               see IMPLEMENTATION_NOTES.md.</p>
+        </field>
+    </record>
+
+</odoo>

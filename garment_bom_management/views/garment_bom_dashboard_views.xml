@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_bom_graph" model="ir.ui.view">
+        <field name="name">garment.bom.graph</field>
+        <field name="model">garment.bom</field>
+        <field name="arch" type="xml">
+            <graph string="Cost Per Piece by Buyer" type="bar">
+                <field name="buyer_id"/>
+                <field name="cost_per_piece" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_garment_bom_pivot" model="ir.ui.view">
+        <field name="name">garment.bom.pivot</field>
+        <field name="model">garment.bom</field>
+        <field name="arch" type="xml">
+            <pivot string="BOM Cost Analysis">
+                <field name="buyer_id" type="row"/>
+                <field name="status" type="col"/>
+                <field name="total_material_cost" type="measure"/>
+                <field name="cost_per_piece" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_garment_bom_dashboard" model="ir.actions.act_window">
+        <field name="name">BOM Dashboard</field>
+        <field name="res_model">garment.bom</field>
+        <field name="view_mode">graph,pivot,kanban,tree</field>
+    </record>
+
+    <!-- Material Category Distribution (SRS 28 Material Analysis) -->
+    <record id="view_garment_fabric_bom_graph" model="ir.ui.view">
+        <field name="name">garment.fabric.bom.graph</field>
+        <field name="model">garment.fabric.bom</field>
+        <field name="arch" type="xml">
+            <graph string="Fabric Consumption Trend" type="bar">
+                <field name="fabric_role"/>
+                <field name="required_qty" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_garment_fabric_bom_dashboard" model="ir.actions.act_window">
+        <field name="name">Fabric Consumption Trend</field>
+        <field name="res_model">garment.fabric.bom</field>
+        <field name="view_mode">graph,pivot</field>
+    </record>
+
+    <record id="view_garment_trim_bom_graph" model="ir.ui.view">
+        <field name="name">garment.trim.bom.graph</field>
+        <field name="model">garment.trim.bom</field>
+        <field name="arch" type="xml">
+            <graph string="Trim Usage" type="bar">
+                <field name="trim_type"/>
+                <field name="required_qty" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_garment_trim_bom_dashboard" model="ir.actions.act_window">
+        <field name="name">Trim Usage</field>
+        <field name="res_model">garment.trim.bom</field>
+        <field name="view_mode">graph,pivot</field>
+    </record>
+
+    <!-- Supplier Contribution -->
+    <record id="view_garment_bom_supplier_graph" model="ir.ui.view">
+        <field name="name">garment.bom.supplier.graph</field>
+        <field name="model">garment.bom.supplier</field>
+        <field name="arch" type="xml">
+            <graph string="Supplier Contribution" type="pie">
+                <field name="supplier_id"/>
+                <field name="current_price" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_garment_bom_supplier_dashboard" model="ir.actions.act_window">
+        <field name="name">Supplier Contribution</field>
+        <field name="res_model">garment.bom.supplier</field>
+        <field name="view_mode">graph,pivot</field>
+        <field name="groups_id" eval="[(4, ref('garment_bom_management.group_bom_purchase')),
+                                        (4, ref('garment_bom_management.group_bom_costing')),
+                                        (4, ref('garment_bom_management.group_bom_administrator'))]"/>
+    </record>
+
+    <!-- Material Price Trend -->
+    <record id="view_garment_bom_price_history_graph" model="ir.ui.view">
+        <field name="name">garment.bom.price.history.graph</field>
+        <field name="model">garment.bom.price.history</field>
+        <field name="arch" type="xml">
+            <graph string="Material Price Trend" type="line">
+                <field name="effective_date" type="row" interval="month"/>
+                <field name="current_price" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_garment_bom_price_history_dashboard" model="ir.actions.act_window">
+        <field name="name">Material Price Trend</field>
+        <field name="res_model">garment.bom.price.history</field>
+        <field name="view_mode">graph,pivot</field>
+    </record>
+
+</odoo>

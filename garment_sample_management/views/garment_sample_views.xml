@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_sample_form" model="ir.ui.view">
+        <field name="name">garment.sample.form</field>
+        <field name="model">garment.sample</field>
+        <field name="arch" type="xml">
+            <form string="Sample">
+                <header>
+                    <field name="status" widget="statusbar"
+                           statusbar_visible="request_created,material_planning,pattern_development,cutting,sewing,finishing,internal_qc,submitted,buyer_review,approved,bulk_production"/>
+                    <button name="action_run_ai_analysis" type="object" string="Run AI Analysis" class="btn-secondary" icon="fa-magic"/>
+                    <button name="action_find_similar_samples" type="object" string="Find Similar Samples" class="btn-secondary" icon="fa-search"/>
+                    <button name="action_submit_to_buyer" type="object" string="Submit to Buyer" class="btn-primary"
+                            invisible="status not in ('internal_qc',)"/>
+                    <button name="action_mark_approved" type="object" string="Mark Approved" class="btn-primary"
+                            invisible="status not in ('buyer_review', 'comments_received', 'revision')"/>
+                    <button name="action_mark_commented" type="object" string="Buyer Commented" class="btn-secondary"
+                            invisible="status not in ('buyer_review',)"/>
+                    <button name="action_mark_rejected" type="object" string="Buyer Rejected" class="btn-secondary"
+                            invisible="status not in ('buyer_review', 'comments_received')"/>
+                    <button name="action_transfer_to_bulk_production" type="object" string="Transfer to Bulk Production"
+                            class="btn-primary" invisible="status != 'approved'"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_materials" type="object" class="oe_stat_button" icon="fa-cubes">
+                            <field name="material_count" widget="statinfo" string="Materials"/>
+                        </button>
+                        <button name="action_view_comments" type="object" class="oe_stat_button" icon="fa-comments">
+                            <field name="open_comment_count" widget="statinfo" string="Open Comments"/>
+                        </button>
+                        <button name="action_view_revisions" type="object" class="oe_stat_button" icon="fa-history">
+                            <field name="revision_count" widget="statinfo" string="Revisions"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Locked" bg_color="bg-danger" invisible="not is_locked"/>
+                    <div class="oe_title">
+                        <label for="sample_number"/>
+                        <h1><field name="sample_number" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="style_id" readonly="is_locked"/>
+                            <field name="buyer_id" readonly="is_locked"/>
+                            <field name="brand" readonly="1"/>
+                            <field name="season" readonly="1"/>
+                            <field name="sample_type_id" readonly="is_locked"/>
+                            <field name="style_category_id" readonly="1"/>
+                            <field name="garment_process"/>
+                        </group>
+                        <group>
+                            <field name="techpack_id"/>
+                            <field name="bom_id"/>
+                            <field name="bom_reference" groups="base.group_no_one"/>
+                            <field name="order_reference"/>
+                            <field name="priority" widget="priority"/>
+                            <field name="required_date"/>
+                            <field name="submission_date"/>
+                            <field name="assigned_merchandiser_id"/>
+                            <field name="sample_room_manager_id"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Buyer Approval">
+                            <field name="approval_state" widget="badge"/>
+                            <field name="is_locked" readonly="1"/>
+                            <field name="approval_duration_days"/>
+                        </group>
+                        <group string="Delay Tracking">
+                            <field name="delay_days"/>
+                            <field name="delay_reason" invisible="delay_days == 0"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Pattern Development">
+                            <group>
+                                <group>
+                                    <field name="pattern_id"/>
+                                    <field name="pattern_version"/>
+                                    <field name="pattern_created_date"/>
+                                </group>
+                                <group>
+                                    <field name="pattern_maker_id"/>
+                                    <field name="pattern_approval_status" widget="badge"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Compliance &amp; Buyer Documentation">
+                            <group>
+                                <group>
+                                    <field name="chemical_requirement"/>
+                                    <field name="testing_requirement"/>
+                                </group>
+                                <group>
+                                    <field name="wash_standard"/>
+                                    <field name="shade_approval_status"/>
+                                    <field name="wash_approval_status"/>
+                                    <field name="sealed_sample"/>
+                                    <field name="sealed_sample_reference" invisible="not sealed_sample"/>
+                                </group>
+                            </group>
+                            <field name="buyer_compliance_notes"/>
+                        </page>
+                        <page string="Development Plan">
+                            <field name="activity_line_ids">
+                                <tree editable="bottom">
+                                    <field name="activity_type"/>
+                                    <field name="responsible_person_id"/>
+                                    <field name="sample_room"/>
+                                    <field name="machine"/>
+                                    <field name="start_date"/>
+                                    <field name="end_date"/>
+                                    <field name="progress"/>
+                                    <field name="status"/>
+                                    <field name="cutter_id" optional="hide"/>
+                                    <field name="fabric_used" optional="hide"/>
+                                    <field name="panel_status" optional="hide"/>
+                                    <field name="sewing_start" optional="hide"/>
+                                    <field name="sewing_complete" optional="hide"/>
+                                    <field name="ironing_done" optional="hide"/>
+                                    <field name="trimming_done" optional="hide"/>
+                                    <field name="packing_done" optional="hide"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Material Reservation">
+                            <field name="material_ids">
+                                <tree editable="bottom">
+                                    <field name="material_type"/>
+                                    <field name="description"/>
+                                    <field name="supplier_id"/>
+                                    <field name="required_qty"/>
+                                    <field name="available_qty"/>
+                                    <field name="reserved_qty"/>
+                                    <field name="issued_qty"/>
+                                    <field name="shortage_qty"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Quality Check">
+                            <field name="qc_ids">
+                                <tree>
+                                    <field name="qc_date"/>
+                                    <field name="qc_by_id"/>
+                                    <field name="result"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Cost">
+                            <field name="cost_ids">
+                                <tree>
+                                    <field name="material_cost"/>
+                                    <field name="labor_cost"/>
+                                    <field name="processing_cost"/>
+                                    <field name="total_cost"/>
+                                    <field name="state"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Approvals">
+                            <field name="approval_ids">
+                                <tree editable="bottom">
+                                    <field name="approval_stage"/>
+                                    <field name="approval_type"/>
+                                    <field name="approver_id"/>
+                                    <field name="status"/>
+                                    <field name="approval_date"/>
+                                    <field name="attachment_filename" optional="hide"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Buyer Comments">
+                            <field name="comment_ids">
+                                <tree editable="bottom">
+                                    <field name="comment_date"/>
+                                    <field name="buyer_user_id"/>
+                                    <field name="comment_description"/>
+                                    <field name="responsible_person_id"/>
+                                    <field name="completion_status"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Courier">
+                            <field name="courier_ids">
+                                <tree>
+                                    <field name="courier_number"/>
+                                    <field name="courier_company"/>
+                                    <field name="tracking_number"/>
+                                    <field name="delivery_status"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Images">
+                            <group col="2">
+                                <field name="approved_image" widget="image"/>
+                                <field name="developed_sample_image" widget="image"/>
+                            </group>
+                        </page>
+                        <page string="AI Assistant">
+                            <field name="ai_last_run" readonly="1"/>
+                            <group string="Image Comparison"><field name="ai_image_comparison_note" readonly="1" nolabel="1"/></group>
+                            <group string="Measurement Verification"><field name="ai_measurement_note" readonly="1" nolabel="1"/></group>
+                            <group string="Approval Prediction">
+                                <field name="ai_approval_prediction" widget="progressbar"/>
+                                <field name="ai_prediction_note" readonly="1" nolabel="1"/>
+                            </group>
+                            <group string="Similar Samples"><field name="ai_similarity_note" readonly="1" nolabel="1"/></group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_sample_tree" model="ir.ui.view">
+        <field name="name">garment.sample.tree</field>
+        <field name="model">garment.sample</field>
+        <field name="arch" type="xml">
+            <tree string="Samples" decoration-danger="status == 'rejected'" decoration-success="status in ('approved','bulk_production')">
+                <field name="sample_number"/>
+                <field name="style_id"/>
+                <field name="buyer_id"/>
+                <field name="sample_type_id"/>
+                <field name="priority" widget="priority"/>
+                <field name="required_date"/>
+                <field name="delay_days" optional="hide"/>
+                <field name="approval_state" widget="badge" optional="hide"/>
+                <field name="status" widget="badge"/>
+                <field name="is_locked" optional="hide"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_sample_kanban" model="ir.ui.view">
+        <field name="name">garment.sample.kanban</field>
+        <field name="model">garment.sample</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="status" class="o_kanban_small_column">
+                <field name="sample_number"/>
+                <field name="buyer_id"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click oe_kanban_card">
+                            <div class="o_kanban_record_top"><strong><field name="sample_number"/></strong></div>
+                            <div><field name="buyer_id"/></div>
+                            <field name="priority" widget="priority"/>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_garment_sample_search" model="ir.ui.view">
+        <field name="name">garment.sample.search</field>
+        <field name="model">garment.sample</field>
+        <field name="arch" type="xml">
+            <search string="Search Samples">
+                <field name="sample_number"/>
+                <field name="style_id"/>
+                <field name="buyer_id"/>
+                <field name="sample_type_id"/>
+                <filter string="My Samples" name="filter_my" domain="[('assigned_merchandiser_id', '=', uid)]"/>
+                <filter string="Approved" name="filter_approved" domain="[('status', '=', 'approved')]"/>
+                <filter string="Rejected" name="filter_rejected" domain="[('status', '=', 'rejected')]"/>
+                <filter string="Delayed" name="filter_delayed" domain="[('delay_days', '&gt;', 0)]"/>
+                <filter string="Locked" name="filter_locked" domain="[('is_locked', '=', True)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                    <filter string="Buyer Approval State" name="group_approval_state" context="{'group_by': 'approval_state'}"/>
+                    <filter string="Buyer" name="group_buyer" context="{'group_by': 'buyer_id'}"/>
+                    <filter string="Sample Type" name="group_type" context="{'group_by': 'sample_type_id'}"/>
+                    <filter string="Priority" name="group_priority" context="{'group_by': 'priority'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_garment_sample_calendar" model="ir.ui.view">
+        <field name="name">garment.sample.calendar</field>
+        <field name="model">garment.sample</field>
+        <field name="arch" type="xml">
+            <calendar string="Sample Calendar" date_start="required_date" color="buyer_id" mode="month">
+                <field name="sample_number"/>
+                <field name="buyer_id"/>
+                <field name="status"/>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="action_garment_sample" model="ir.actions.act_window">
+        <field name="name">Samples</field>
+        <field name="res_model">garment.sample</field>
+        <field name="view_mode">kanban,tree,form,calendar</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first sample.</p>
+        </field>
+    </record>
+
+</odoo>

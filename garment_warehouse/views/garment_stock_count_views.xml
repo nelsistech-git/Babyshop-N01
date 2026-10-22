@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_stock_count_tree" model="ir.ui.view">
+        <field name="name">garment.stock.count.tree</field>
+        <field name="model">garment.stock.count</field>
+        <field name="arch" type="xml">
+            <tree string="Stock Counts" decoration-muted="state == 'cancelled'" decoration-success="state == 'approved'">
+                <field name="name"/>
+                <field name="count_type"/>
+                <field name="warehouse_id"/>
+                <field name="location_id"/>
+                <field name="count_date"/>
+                <field name="accuracy_percent" widget="progressbar"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_stock_count_form" model="ir.ui.view">
+        <field name="name">garment.stock.count.form</field>
+        <field name="model">garment.stock.count</field>
+        <field name="arch" type="xml">
+            <form string="Stock Count">
+                <header>
+                    <field name="state" widget="statusbar"/>
+                    <button name="action_start" type="object" string="Start Count" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_submit" type="object" string="Submit for Approval" class="btn-primary"
+                            invisible="state != 'in_progress'"/>
+                    <button name="action_approve" type="object" string="Approve &amp; Post Adjustments" class="btn-primary"
+                            groups="garment_warehouse.group_warehouse_manager"
+                            invisible="state != 'submitted'"/>
+                    <button name="action_cancel" type="object" string="Cancel" class="btn-secondary"
+                            invisible="state in ('approved', 'cancelled')"/>
+                    <button name="action_reset_draft" type="object" string="Reset to Draft" class="btn-secondary"
+                            invisible="state not in ('in_progress', 'cancelled')"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name" readonly="1"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="count_type"/>
+                            <field name="warehouse_id"/>
+                            <field name="location_id"/>
+                            <field name="count_date"/>
+                        </group>
+                        <group>
+                            <field name="responsible_id"/>
+                            <field name="approved_by_id" readonly="1" invisible="not approved_by_id"/>
+                            <field name="accuracy_percent" readonly="1" widget="progressbar"/>
+                            <field name="variance_line_count" readonly="1"/>
+                            <field name="total_variance_qty" readonly="1"/>
+                        </group>
+                    </group>
+                    <field name="line_ids" readonly="state in ('approved', 'cancelled')">
+                        <tree editable="bottom">
+                            <field name="material_id"/>
+                            <field name="location_id"/>
+                            <field name="abc_classification"/>
+                            <field name="system_qty" readonly="1"/>
+                            <field name="counted_qty"/>
+                            <field name="variance_qty"/>
+                            <field name="variance_value"/>
+                            <field name="notes"/>
+                        </tree>
+                    </field>
+                    <field name="notes" placeholder="Notes..."/>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_stock_count_search" model="ir.ui.view">
+        <field name="name">garment.stock.count.search</field>
+        <field name="model">garment.stock.count</field>
+        <field name="arch" type="xml">
+            <search string="Search Stock Counts">
+                <field name="name"/>
+                <field name="warehouse_id"/>
+                <filter string="Open" name="filter_open" domain="[('state', 'in', ('draft','in_progress','submitted'))]"/>
+                <filter string="Approved" name="filter_approved" domain="[('state', '=', 'approved')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Warehouse" name="group_warehouse" context="{'group_by': 'warehouse_id'}"/>
+                    <filter string="Count Type" name="group_type" context="{'group_by': 'count_type'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_stock_count" model="ir.actions.act_window">
+        <field name="name">Stock Counts</field>
+        <field name="res_model">garment.stock.count</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_garment_stock_count_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Start your first cycle count.</p>
+        </field>
+    </record>
+
+</odoo>

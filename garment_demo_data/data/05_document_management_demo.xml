@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Part of Smart Complete Garment Software. Copyright (c) Nelsis Tech (www.nelsistech.com) -->
+<!--
+     Document Management demo data (garment_document_management) — SRS sections 7-19, 29-31, 36-38.
+
+     garment.document is a generic, cross-module register: any business record from any
+     other module can be listed into it through the generic res_model_id/res_id pair
+     without this module depending on the module that owns the record. In XML data we
+     resolve res_model_id via the standard Odoo-generated `model_<model_name>` external id
+     that every model automatically gets in the module that defines it (e.g. garment.style
+     -> garment_style_library.model_garment_style), and res_id via `eval="ref('xxx')"` to
+     get that record's real database id.
+
+     Note: garment_document_management already ships its own document category taxonomy
+     (see data/garment_document_category_data.xml — cat_commercial, cat_production_style,
+     cat_production_techpack, cat_compliance_certificates, ...). The 2 categories below are
+     additional, demo-specific top-level folders (no `code` set, so no clash with that
+     taxonomy's unique codes) requested for this dataset.
+-->
+<odoo>
+<data noupdate="1">
+
+    <!-- =================================================================
+         Document categories (garment.document.category)
+         ================================================================= -->
+
+    <record id="doc_cat_style_documents" model="garment.document.category">
+        <field name="name">Style Documents</field>
+        <field name="department">production</field>
+        <field name="document_type">technical</field>
+        <field name="sequence">50</field>
+        <field name="description">Tech packs, construction details and other style-level technical documents
+kept in the central document register for cross-module search and approval routing.</field>
+    </record>
+
+    <record id="doc_cat_compliance_certificates" model="garment.document.category">
+        <field name="name">Compliance Certificates</field>
+        <field name="department">compliance</field>
+        <field name="document_type">certificate</field>
+        <field name="sequence">51</field>
+        <field name="description">Supplier and factory compliance certificates (OEKO-TEX, BSCI, Sedex, WRAP ...)
+tracked centrally for expiry / renewal reminders.</field>
+    </record>
+
+    <!-- =================================================================
+         Document tags (garment.document.tag)
+         ================================================================= -->
+
+    <record id="doc_tag_techpack" model="garment.document.tag">
+        <field name="name">Tech Pack</field>
+        <field name="color">4</field>
+    </record>
+
+    <record id="doc_tag_certificate" model="garment.document.tag">
+        <field name="name">Certificate</field>
+        <field name="color">3</field>
+    </record>
+
+    <record id="doc_tag_purchase_order" model="garment.document.tag">
+        <field name="name">Purchase Order</field>
+        <field name="color">2</field>
+    </record>
+
+    <record id="doc_tag_compliance" model="garment.document.tag">
+        <field name="name">Compliance</field>
+        <field name="color">1</field>
+    </record>
+
+    <!-- =================================================================
+         Documents (garment.document) — generic register linked via
+         res_model_id / res_id to real records from other modules.
+         ================================================================= -->
+
+    <!-- 1. Tee tech pack PDF, linked to the garment.techpack of style_tee -->
+    <record id="doc_techpack_tee_pdf" model="garment.document">
+        <field name="name">NSG-TS-2601 Men's Crew Neck T-Shirt — Tech Pack v1.0</field>
+        <field name="category_id" ref="doc_cat_style_documents"/>
+        <field name="department">production</field>
+        <field name="document_type">technical</field>
+        <field name="tag_ids" eval="[(6, 0, [ref('doc_tag_techpack')])]"/>
+        <field name="keywords">NSG-TS-2601 tee techpack construction measurement</field>
+        <field name="res_model_id" ref="garment_techpack.model_garment_techpack"/>
+        <field name="res_id" eval="ref('techpack_tee')"/>
+        <field name="file_name">NSG-TS-2601_TechPack_v1.0.pdf</field>
+        <field name="version">1.0</field>
+        <field name="security_level">internal</field>
+        <field name="status">active</field>
+        <field name="issue_date">2026-01-20</field>
+        <field name="notes">Master tech pack PDF exported from the Tech Pack module for buyer (Northwind)
+review and factory pattern/sewing reference.</field>
+    </record>
+
+    <!-- 2. Compliance certificate scan, linked to supplier Delta Knit Fabrics -->
+    <record id="doc_compliance_cert_deltaknit" model="garment.document">
+        <field name="name">Delta Knit Fabrics Ltd — OEKO-TEX Standard 100 Certificate</field>
+        <field name="category_id" ref="doc_cat_compliance_certificates"/>
+        <field name="department">compliance</field>
+        <field name="document_type">certificate</field>
+        <field name="tag_ids" eval="[(6, 0, [ref('doc_tag_certificate'), ref('doc_tag_compliance')])]"/>
+        <field name="keywords">OEKO-TEX Delta Knit fabric compliance certificate</field>
+        <field name="res_model_id" ref="garment_supplier.model_garment_supplier"/>
+        <field name="res_id" eval="ref('supplier_deltaknit')"/>
+        <field name="file_name">DeltaKnit_OEKOTEX_STD100_Certificate_2026.pdf</field>
+        <field name="version">1.0</field>
+        <field name="security_level">confidential</field>
+        <field name="status">active</field>
+        <field name="issue_date">2026-02-01</field>
+        <field name="expiry_date">2027-01-31</field>
+        <field name="renewal_reminder_days">45</field>
+        <field name="notes">Scanned OEKO-TEX Standard 100 certificate submitted by Delta Knit Fabrics Ltd
+(fabric mill, Narayanganj) as part of supplier compliance approval for the tee/polo fabric supply.</field>
+    </record>
+
+    <!-- 3. Purchase order copy, linked to the fabric PO for the tee style -->
+    <record id="doc_po_copy_fabric_tee" model="garment.document">
+        <field name="name">Purchase Order Copy — Fabric PO for NSG-TS-2601 (Tee)</field>
+        <field name="department">commercial</field>
+        <field name="document_type">contract</field>
+        <field name="tag_ids" eval="[(6, 0, [ref('doc_tag_purchase_order')])]"/>
+        <field name="keywords">purchase order fabric tee Delta Knit</field>
+        <field name="res_model_id" ref="garment_purchase.model_garment_purchase_order"/>
+        <field name="res_id" eval="ref('purchase_order_fabric_tee')"/>
+        <field name="file_name">PO_Fabric_Tee_DeltaKnit_2026.pdf</field>
+        <field name="version">1.0</field>
+        <field name="security_level">internal</field>
+        <field name="status">active</field>
+        <field name="issue_date">2026-03-10</field>
+        <field name="notes">Signed copy of the fabric purchase order raised against Delta Knit Fabrics Ltd
+for the Men's Crew Neck T-Shirt (NSG-TS-2601) BOM, kept centrally for commercial audit.</field>
+    </record>
+
+</data>
+</odoo>

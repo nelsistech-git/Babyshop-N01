@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<data noupdate="1">
+
+    <!-- ================================================================ -->
+    <!-- Contact partners (res.partner) — also used by garment_warehouse's -->
+    <!-- garment.material.supplier_id (Many2one res.partner) so the        -->
+    <!-- garment.supplier record and the material master point at the     -->
+    <!-- same underlying company contact.                                 -->
+    <!-- ================================================================ -->
+
+    <record id="partner_deltaknit" model="res.partner">
+        <field name="name">Delta Knit Fabrics Ltd</field>
+        <field name="is_company">1</field>
+        <field name="supplier_rank">1</field>
+        <field name="street">BSCIC Industrial Area</field>
+        <field name="city">Narayanganj</field>
+        <field name="country_id" ref="base.bd"/>
+        <field name="email">sales@deltaknitfabrics.example.com</field>
+        <field name="phone">+880 1711-223344</field>
+    </record>
+
+    <record id="partner_brighttrim" model="res.partner">
+        <field name="name">Bright Trims &amp; Accessories</field>
+        <field name="is_company">1</field>
+        <field name="supplier_rank">1</field>
+        <field name="street">Konabari Industrial Area</field>
+        <field name="city">Gazipur</field>
+        <field name="country_id" ref="base.bd"/>
+        <field name="email">sales@brighttrims.example.com</field>
+        <field name="phone">+880 1811-556677</field>
+    </record>
+
+    <!-- ================================================================ -->
+    <!-- Supplier categories (garment.supplier.category)                  -->
+    <!-- ================================================================ -->
+
+    <record id="supplier_category_fabric" model="garment.supplier.category">
+        <field name="name">Fabric Mill</field>
+        <field name="sequence">10</field>
+        <field name="group">material</field>
+        <field name="sub_type">fabric</field>
+    </record>
+
+    <record id="supplier_category_trim" model="garment.supplier.category">
+        <field name="name">Trims &amp; Packaging</field>
+        <field name="sequence">20</field>
+        <field name="group">material</field>
+        <field name="sub_type">trim</field>
+    </record>
+
+    <!-- ================================================================ -->
+    <!-- Suppliers (garment.supplier)                                     -->
+    <!-- ================================================================ -->
+
+    <record id="supplier_deltaknit" model="garment.supplier">
+        <field name="name">Delta Knit Fabrics Ltd</field>
+        <field name="partner_id" ref="partner_deltaknit"/>
+        <field name="supplier_type">material</field>
+        <field name="category_id" ref="supplier_category_fabric"/>
+        <field name="registration_source">internal</field>
+        <field name="classification">strategic</field>
+        <field name="country_id" ref="base.bd"/>
+        <field name="address">Plot 45, BSCIC Industrial Area, Narayanganj</field>
+        <field name="contact_person">Mostafizur Rahman</field>
+        <field name="email">sales@deltaknitfabrics.example.bd</field>
+        <field name="phone">+880 2-7690123</field>
+        <field name="website">https://www.deltaknitfabrics.example</field>
+        <field name="tax_id">BIN-004512378-0104</field>
+        <field name="registration_number">RJSC-C-98765</field>
+        <field name="year_established">2004</field>
+        <field name="factory_location">Narayanganj, Bangladesh</field>
+        <field name="production_capacity">40 tons/day knit fabric</field>
+        <field name="employee_count">650</field>
+        <field name="monthly_capacity">1,200,000 kg/month</field>
+        <field name="export_experience">18 years, EU/UK/US knit exporters</field>
+        <field name="major_customers">Northwind Apparel Sourcing, BalticHaus Fashion, other EU buying houses</field>
+        <field name="status">active</field>
+        <field name="compliance_status">compliant</field>
+        <field name="cert_bsci">True</field>
+        <field name="cert_oeko_tex">True</field>
+        <field name="cert_iso">True</field>
+    </record>
+
+    <record id="supplier_brighttrim" model="garment.supplier">
+        <field name="name">Bright Trims &amp; Accessories</field>
+        <field name="partner_id" ref="partner_brighttrim"/>
+        <field name="supplier_type">material</field>
+        <field name="category_id" ref="supplier_category_trim"/>
+        <field name="registration_source">internal</field>
+        <field name="classification">approved</field>
+        <field name="country_id" ref="base.bd"/>
+        <field name="address">Plot 12, Konabari BSCIC, Gazipur</field>
+        <field name="contact_person">Shahida Yeasmin</field>
+        <field name="email">info@brighttrims.example.bd</field>
+        <field name="phone">+880 2-9251456</field>
+        <field name="website">https://www.brighttrims.example</field>
+        <field name="tax_id">BIN-006678211-0107</field>
+        <field name="registration_number">RJSC-C-56421</field>
+        <field name="year_established">2010</field>
+        <field name="factory_location">Gazipur, Bangladesh</field>
+        <field name="production_capacity">2,000,000 pcs/month trims &amp; packaging</field>
+        <field name="employee_count">210</field>
+        <field name="monthly_capacity">2,000,000 pcs/month</field>
+        <field name="export_experience">12 years, RMG trims/packaging for EU buying houses</field>
+        <field name="major_customers">Northwind Apparel Sourcing, BalticHaus Fashion</field>
+        <field name="status">active</field>
+        <field name="compliance_status">compliant</field>
+        <field name="cert_bsci">True</field>
+        <field name="cert_sedex">True</field>
+    </record>
+
+    <!-- ================================================================ -->
+    <!-- Supplier product catalog (garment.supplier.product)              -->
+    <!-- ================================================================ -->
+
+    <record id="supplier_product_deltaknit_singlejersey" model="garment.supplier.product">
+        <field name="supplier_id" ref="supplier_deltaknit"/>
+        <field name="sequence">10</field>
+        <field name="product_name">100% Cotton Single Jersey 180 GSM</field>
+        <field name="product_category">fabric</field>
+        <field name="specification">30s combed cotton, single jersey knit</field>
+        <field name="uom">KG</field>
+        <field name="unit_price">4.85</field>
+        <field name="effective_date">2026-01-05</field>
+        <field name="validity_date">2026-12-31</field>
+        <field name="lead_time_days">21</field>
+        <field name="moq">500</field>
+        <field name="fabric_composition">100% Cotton</field>
+        <field name="gsm">180</field>
+        <field name="width">60 inch tubular</field>
+        <field name="dyeing_process">piece_dyed</field>
+        <field name="color_fastness_rating">Grade 4-5</field>
+        <field name="test_report_ref">DK-TR-2026-0114</field>
+    </record>
+
+    <record id="supplier_product_deltaknit_pique" model="garment.supplier.product">
+        <field name="supplier_id" ref="supplier_deltaknit"/>
+        <field name="sequence">20</field>
+        <field name="product_name">100% Cotton Pique 220 GSM</field>
+        <field name="product_category">fabric</field>
+        <field name="specification">20s combed cotton pique knit for polo</field>
+        <field name="uom">KG</field>
+        <field name="unit_price">5.30</field>
+        <field name="effective_date">2026-01-05</field>
+        <field name="validity_date">2026-12-31</field>
+        <field name="lead_time_days">25</field>
+        <field name="moq">400</field>
+        <field name="fabric_composition">100% Cotton</field>
+        <field name="gsm">220</field>
+        <field name="width">58 inch tubular</field>
+        <field name="dyeing_process">yarn_dyed</field>
+        <field name="color_fastness_rating">Grade 4</field>
+        <field name="test_report_ref">DK-TR-2026-0122</field>
+    </record>
+
+    <record id="supplier_product_brighttrim_wovenlabel" model="garment.supplier.product">
+        <field name="supplier_id" ref="supplier_brighttrim"/>
+        <field name="sequence">10</field>
+        <field name="product_name">Woven Main Label</field>
+        <field name="product_category">accessory</field>
+        <field name="specification">Damask woven main label, 4-color, folded</field>
+        <field name="uom">PCS</field>
+        <field name="unit_price">0.018</field>
+        <field name="effective_date">2026-01-10</field>
+        <field name="validity_date">2026-12-31</field>
+        <field name="lead_time_days">10</field>
+        <field name="moq">10000</field>
+        <field name="material_type">Woven Polyester</field>
+        <field name="size_specification">3cm x 5cm folded</field>
+        <field name="color_matching_status">matched</field>
+        <field name="sample_approval_status">approved</field>
+    </record>
+
+    <record id="supplier_product_brighttrim_polybag" model="garment.supplier.product">
+        <field name="supplier_id" ref="supplier_brighttrim"/>
+        <field name="sequence">20</field>
+        <field name="product_name">Printed LDPE Poly Bag</field>
+        <field name="product_category">other</field>
+        <field name="specification">Printed poly bag with self-adhesive strip, buyer logo</field>
+        <field name="uom">PCS</field>
+        <field name="unit_price">0.012</field>
+        <field name="effective_date">2026-01-10</field>
+        <field name="validity_date">2026-12-31</field>
+        <field name="lead_time_days">7</field>
+        <field name="moq">20000</field>
+        <field name="material_type">LDPE Poly</field>
+        <field name="size_specification">30cm x 40cm</field>
+        <field name="color_matching_status">matched</field>
+        <field name="sample_approval_status">approved</field>
+    </record>
+
+    <!-- ================================================================ -->
+    <!-- Supplier performance ratings (garment.supplier.rating)           -->
+    <!-- ================================================================ -->
+
+    <record id="supplier_rating_deltaknit_2026q1" model="garment.supplier.rating">
+        <field name="supplier_id" ref="supplier_deltaknit"/>
+        <field name="rating_date">2026-03-15</field>
+        <field name="rejection_rate_pct">1.8</field>
+        <field name="defect_rate_pct">2.1</field>
+        <field name="quality_score">92.0</field>
+        <field name="on_time_delivery_pct">95.0</field>
+        <field name="avg_delay_days">1.2</field>
+        <field name="lead_time_accuracy_pct">93.0</field>
+        <field name="price_stability_score">88.0</field>
+        <field name="cost_competitiveness_score">84.0</field>
+        <field name="compliance_score">90.0</field>
+        <field name="notes">Consistent GSM/shade accuracy on single jersey and pique deliveries for Q1 2026; on-time for both order_tee and order_polo bulk fabric.</field>
+    </record>
+
+    <record id="supplier_rating_brighttrim_2026q1" model="garment.supplier.rating">
+        <field name="supplier_id" ref="supplier_brighttrim"/>
+        <field name="rating_date">2026-03-15</field>
+        <field name="rejection_rate_pct">0.9</field>
+        <field name="defect_rate_pct">1.1</field>
+        <field name="quality_score">95.0</field>
+        <field name="on_time_delivery_pct">97.0</field>
+        <field name="avg_delay_days">0.5</field>
+        <field name="lead_time_accuracy_pct">96.0</field>
+        <field name="price_stability_score">90.0</field>
+        <field name="cost_competitiveness_score">87.0</field>
+        <field name="compliance_score">92.0</field>
+        <field name="notes">Reliable short lead-time trims/packaging supplier; label color matching approved first submission for all three styles.</field>
+    </record>
+
+</data>
+</odoo>

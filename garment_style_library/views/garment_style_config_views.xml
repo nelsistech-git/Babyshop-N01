@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Document Types (SRS section 14 + section 35 Configuration) -->
+    <record id="view_garment_style_document_type_tree" model="ir.ui.view">
+        <field name="name">garment.style.document.type.tree</field>
+        <field name="model">garment.style.document.type</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="category"/>
+                <field name="allowed_extensions"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_garment_style_document_type" model="ir.actions.act_window">
+        <field name="name">Document Types</field>
+        <field name="res_model">garment.style.document.type</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Document Tags -->
+    <record id="view_garment_style_document_tag_tree" model="ir.ui.view">
+        <field name="name">garment.style.document.tag.tree</field>
+        <field name="model">garment.style.document.tag</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name="name"/>
+                <field name="color" widget="color_picker"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_garment_style_document_tag" model="ir.actions.act_window">
+        <field name="name">Document Tags</field>
+        <field name="res_model">garment.style.document.tag</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Measurement Points (SRS section 17 + section 35 Configuration) -->
+    <record id="view_garment_measurement_point_tree" model="ir.ui.view">
+        <field name="name">garment.measurement.point.tree</field>
+        <field name="model">garment.measurement.point</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="point_code"/>
+                <field name="name"/>
+                <field name="product_category_id"/>
+                <field name="default_measurement_method"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_measurement_point_form" model="ir.ui.view">
+        <field name="name">garment.measurement.point.form</field>
+        <field name="model">garment.measurement.point</field>
+        <field name="arch" type="xml">
+            <form string="Measurement Point">
+                <sheet>
+                    <field name="illustration_reference" widget="image" class="oe_avatar"/>
+                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="point_code"/>
+                            <field name="product_category_id"/>
+                            <field name="sequence"/>
+                        </group>
+                        <group>
+                            <field name="default_measurement_method"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_measurement_point" model="ir.actions.act_window">
+        <field name="name">Measurement Points</field>
+        <field name="res_model">garment.measurement.point</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Approval Rules (SRS section 22 + section 25 + section 35 Configuration) -->
+    <record id="view_garment_style_approval_rule_tree" model="ir.ui.view">
+        <field name="name">garment.style.approval.rule.tree</field>
+        <field name="model">garment.style.approval.rule</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="style_category_id"/>
+                <field name="approval_step"/>
+                <field name="responsible_department"/>
+                <field name="is_mandatory"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_garment_style_approval_rule" model="ir.actions.act_window">
+        <field name="name">Approval Rules</field>
+        <field name="res_model">garment.style.approval.rule</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Define which approval steps are mandatory per Product Category.</p>
+            <p>Leave Product Category blank to apply a rule to every category. New styles automatically
+               get their approval steps generated from these rules.</p>
+        </field>
+    </record>
+
+</odoo>

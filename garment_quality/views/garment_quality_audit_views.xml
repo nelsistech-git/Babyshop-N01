@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_quality_audit_form" model="ir.ui.view">
+        <field name="name">garment.quality.audit.form</field>
+        <field name="model">garment.quality.audit</field>
+        <field name="arch" type="xml">
+            <form string="Quality Audit">
+                <header>
+                    <field name="status" widget="statusbar" statusbar_visible="planned,in_progress,completed,closed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_findings" type="object" class="oe_stat_button" icon="fa-search">
+                            <field name="finding_count" widget="statinfo" string="Findings"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="audit_no"/>
+                        <h1><field name="audit_no" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="audit_type"/>
+                            <field name="buyer_id"/>
+                            <field name="style_id"/>
+                            <field name="supplier_id"/>
+                            <field name="production_order_id"/>
+                        </group>
+                        <group>
+                            <field name="audit_date"/>
+                            <field name="auditor_id"/>
+                            <field name="score"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Findings">
+                            <field name="finding_ids">
+                                <tree editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="finding"/>
+                                    <field name="severity"/>
+                                    <field name="corrective_action"/>
+                                    <field name="status"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="CAPA">
+                            <field name="capa_ids">
+                                <tree>
+                                    <field name="capa_no"/>
+                                    <field name="problem_description"/>
+                                    <field name="responsible_id"/>
+                                    <field name="status"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_quality_audit_tree" model="ir.ui.view">
+        <field name="name">garment.quality.audit.tree</field>
+        <field name="model">garment.quality.audit</field>
+        <field name="arch" type="xml">
+            <tree string="Quality Audits">
+                <field name="audit_no"/>
+                <field name="audit_type"/>
+                <field name="audit_date"/>
+                <field name="buyer_id"/>
+                <field name="auditor_id"/>
+                <field name="score"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_quality_audit_search" model="ir.ui.view">
+        <field name="name">garment.quality.audit.search</field>
+        <field name="model">garment.quality.audit</field>
+        <field name="arch" type="xml">
+            <search string="Search Audits">
+                <field name="audit_no"/>
+                <field name="buyer_id"/>
+                <field name="supplier_id"/>
+                <group expand="0" string="Group By">
+                    <filter string="Audit Type" name="group_type" context="{'group_by': 'audit_type'}"/>
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_quality_audit" model="ir.actions.act_window">
+        <field name="name">Quality Audits</field>
+        <field name="res_model">garment.quality.audit</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Plan your first quality audit.</p>
+        </field>
+    </record>
+
+</odoo>

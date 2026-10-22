@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_material_consumption_tree" model="ir.ui.view">
+        <field name="name">garment.material.consumption.tree</field>
+        <field name="model">garment.material.consumption</field>
+        <field name="arch" type="xml">
+            <tree string="Consumption Breakdown" editable="bottom">
+                <field name="bom_id"/>
+                <field name="breakdown_type"/>
+                <field name="size_code"/>
+                <field name="color_name"/>
+                <field name="consumption_value"/>
+                <field name="total_requirement"/>
+                <field name="actual_consumption"/>
+                <field name="consumption_efficiency_pct"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_material_consumption_form" model="ir.ui.view">
+        <field name="name">garment.material.consumption.form</field>
+        <field name="model">garment.material.consumption</field>
+        <field name="arch" type="xml">
+            <form string="Material Consumption">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="bom_id"/>
+                            <field name="breakdown_type"/>
+                            <field name="size_code" invisible="breakdown_type != 'size'"/>
+                            <field name="color_name" invisible="breakdown_type != 'color'"/>
+                            <field name="fabric_bom_id"/>
+                            <field name="trim_bom_id"/>
+                            <field name="packaging_bom_id"/>
+                            <field name="artwork_reference"/>
+                        </group>
+                        <group>
+                            <field name="size_ratio"/>
+                            <field name="consumption_value"/>
+                            <field name="quantity"/>
+                            <field name="total_requirement" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Consumption Monitoring">
+                        <group>
+                            <field name="issued_qty"/>
+                            <field name="actual_consumption"/>
+                        </group>
+                        <group>
+                            <field name="returned_qty"/>
+                            <field name="wastage_qty"/>
+                            <field name="consumption_efficiency_pct" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_material_consumption" model="ir.actions.act_window">
+        <field name="name">Consumption Breakdown</field>
+        <field name="res_model">garment.material.consumption</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

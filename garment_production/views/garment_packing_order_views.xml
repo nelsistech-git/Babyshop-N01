@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_packing_order_tree" model="ir.ui.view">
+        <field name="name">garment.packing.order.tree</field>
+        <field name="model">garment.packing.order</field>
+        <field name="arch" type="xml">
+            <tree string="Packing Orders">
+                <field name="name"/>
+                <field name="production_order_id"/>
+                <field name="style_id"/>
+                <field name="quantity"/>
+                <field name="packed_qty"/>
+                <field name="destination"/>
+                <field name="shipment_date"/>
+                <field name="status"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_packing_order_form" model="ir.ui.view">
+        <field name="name">garment.packing.order.form</field>
+        <field name="model">garment.packing.order</field>
+        <field name="arch" type="xml">
+            <form string="Packing Order">
+                <header>
+                    <field name="status" widget="statusbar"
+                           statusbar_visible="draft,folding,poly_packing,carton_packing,labeled,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_cartons" type="object" class="oe_stat_button" icon="fa-archive"
+                                invisible="carton_count == 0">
+                            <field name="carton_count" widget="statinfo" string="Cartons"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="production_order_id"/>
+                            <field name="buyer_id"/>
+                            <field name="style_id"/>
+                            <field name="carton_size"/>
+                        </group>
+                        <group>
+                            <field name="quantity"/>
+                            <field name="packed_qty"/>
+                            <field name="destination"/>
+                            <field name="warehouse_id"/>
+                            <field name="shipment_date"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Cartons">
+                            <field name="carton_ids">
+                                <tree editable="bottom">
+                                    <field name="name"/>
+                                    <field name="size_ratio"/>
+                                    <field name="color"/>
+                                    <field name="quantity"/>
+                                    <field name="weight"/>
+                                    <field name="destination"/>
+                                    <field name="barcode"/>
+                                    <field name="status"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_packing_order" model="ir.actions.act_window">
+        <field name="name">Packing Orders</field>
+        <field name="res_model">garment.packing.order</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

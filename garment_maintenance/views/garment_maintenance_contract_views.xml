@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_maintenance_contract_form" model="ir.ui.view">
+        <field name="name">garment.maintenance.contract.form</field>
+        <field name="model">garment.maintenance.contract</field>
+        <field name="arch" type="xml">
+            <form string="AMC / Service Contract">
+                <header>
+                    <button name="action_terminate" type="object" string="Terminate" class="btn-danger"
+                            invisible="status == 'terminated'"/>
+                    <field name="status" widget="statusbar" statusbar_visible="active,terminated"/>
+                </header>
+                <sheet>
+                    <!-- FIXED: Added hidden fields so the 'invisible' modifiers can evaluate them -->
+                    <field name="is_expiring_soon" invisible="1"/>
+                    <field name="is_expired" invisible="1"/>
+
+                    <widget name="web_ribbon" title="Expiring Soon" bg_color="text-bg-warning"
+                            invisible="is_expiring_soon == False or status == 'terminated'"/>
+                    <widget name="web_ribbon" title="Expired" bg_color="text-bg-danger"
+                            invisible="is_expired == False or status == 'terminated'"/>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="%(action_garment_maintenance_workorder)d" type="action" class="oe_stat_button" icon="fa-wrench"
+                                context="{'search_default_filter_open': 0}" invisible="workorder_count == 0">
+                            <field name="workorder_count" widget="statinfo" string="Work Orders"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="vendor_id"/>
+                            <field name="equipment_type"/>
+                            <field name="machine_id" invisible="equipment_type != 'machine'"/>
+                            <field name="asset_id" invisible="equipment_type != 'asset'"/>
+                        </group>
+                        <group>
+                            <field name="service_frequency"/>
+                            <field name="start_date"/>
+                            <field name="end_date"/>
+                            <field name="cost"/>
+                            <field name="currency_id" groups="base.group_multi_currency"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="coverage"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_maintenance_contract_tree" model="ir.ui.view">
+        <field name="name">garment.maintenance.contract.tree</field>
+        <field name="model">garment.maintenance.contract</field>
+        <field name="arch" type="xml">
+            <tree string="AMC / Service Contracts" decoration-danger="is_expired == True" decoration-warning="is_expiring_soon == True">
+                <field name="name"/>
+                <field name="vendor_id"/>
+                <field name="machine_id"/>
+                <field name="asset_id"/>
+                <field name="service_frequency"/>
+                <field name="end_date"/>
+                <field name="cost" sum="Total Cost"/>
+                <field name="status" widget="badge"/>
+                <field name="is_expired" invisible="1"/>
+                <field name="is_expiring_soon" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_maintenance_contract_search" model="ir.ui.view">
+        <field name="name">garment.maintenance.contract.search</field>
+        <field name="model">garment.maintenance.contract</field>
+        <field name="arch" type="xml">
+            <search string="Search Contracts">
+                <field name="name"/>
+                <field name="vendor_id"/>
+                <filter string="Active" name="filter_active" domain="[('status', '=', 'active')]"/>
+                <filter string="Expiring Soon" name="filter_expiring" domain="[('is_expiring_soon', '=', True)]"/>
+                <filter string="Expired" name="filter_expired" domain="[('is_expired', '=', True)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Vendor" name="group_vendor" context="{'group_by': 'vendor_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_maintenance_contract" model="ir.actions.act_window">
+        <field name="name">AMC / Service Contracts</field>
+        <field name="res_model">garment.maintenance.contract</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first AMC / service contract.</p>
+        </field>
+    </record>
+
+</odoo>

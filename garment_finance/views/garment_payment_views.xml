@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_payment_tree" model="ir.ui.view">
+        <field name="name">garment.payment.tree</field>
+        <field name="model">garment.payment</field>
+        <field name="arch" type="xml">
+            <tree string="Vendor Payments" decoration-danger="payment_status == 'overdue'" decoration-success="payment_status == 'paid'">
+                <field name="supplier_id"/>
+                <field name="invoice_reference"/>
+                <field name="amount"/>
+                <field name="paid_amount"/>
+                <field name="outstanding_amount"/>
+                <field name="due_date"/>
+                <field name="payment_status" widget="badge"/>
+                <field name="approval_status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_payment_form" model="ir.ui.view">
+        <field name="name">garment.payment.form</field>
+        <field name="model">garment.payment</field>
+        <field name="arch" type="xml">
+            <form string="Vendor Payment">
+                <header>
+                    <button name="action_submit_for_verification" type="object" string="Submit for Verification"
+                            class="btn-primary" invisible="approval_status != 'draft'"/>
+                    <button name="action_verify" type="object" string="Verify" class="btn-primary"
+                            invisible="approval_status != 'pending_verification'"/>
+                    <button name="action_approve" type="object" string="Approve" class="btn-primary"
+                            invisible="approval_status != 'pending_approval'"/>
+                    <button name="action_reject" type="object" string="Reject" class="btn-secondary"
+                            invisible="approval_status in ('draft', 'approved', 'rejected')"/>
+                    <button name="action_reset_to_draft" type="object" string="Reset to Draft"
+                            invisible="approval_status == 'draft'"/>
+                    <field name="approval_status" widget="statusbar"
+                           statusbar_visible="draft,pending_verification,pending_approval,approved"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="supplier_id"/>
+                            <field name="invoice_reference"/>
+                            <field name="invoice_date"/>
+                            <field name="due_date"/>
+                        </group>
+                        <group>
+                            <field name="currency_id"/>
+                            <field name="amount"/>
+                            <field name="paid_amount"/>
+                            <field name="outstanding_amount" readonly="1"/>
+                            <field name="payment_status" widget="badge" readonly="1"/>
+                            <field name="account_payment_id"/>
+                        </group>
+                    </group>
+                    <group string="Approval Matrix">
+                        <group>
+                            <field name="required_approver_group_id" readonly="1"/>
+                            <field name="verified_by_id" readonly="1"/>
+                            <field name="verified_date" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="approved_by_id" readonly="1"/>
+                            <field name="approval_date" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_payment" model="ir.actions.act_window">
+        <field name="name">Vendor Payments</field>
+        <field name="res_model">garment.payment</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Track your first vendor payment.</p>
+        </field>
+    </record>
+</odoo>

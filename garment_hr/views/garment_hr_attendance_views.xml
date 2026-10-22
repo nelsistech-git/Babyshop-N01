@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_hr_attendance_tree" model="ir.ui.view">
+        <field name="name">garment.hr.attendance.tree</field>
+        <field name="model">garment.hr.attendance</field>
+        <field name="arch" type="xml">
+            <tree string="Attendance" editable="bottom" decoration-danger="status == 'absent'" decoration-warning="status == 'late'">
+                <field name="employee_id"/>
+                <field name="attendance_date"/>
+                <field name="source"/>
+                <field name="shift_id"/>
+                <field name="check_in"/>
+                <field name="check_out"/>
+                <field name="is_holiday"/>
+                <field name="is_weekly_off"/>
+                <field name="working_hours"/>
+                <field name="late_minutes"/>
+                <field name="overtime_hours"/>
+                <field name="status"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_hr_attendance_form" model="ir.ui.view">
+        <field name="name">garment.hr.attendance.form</field>
+        <field name="model">garment.hr.attendance</field>
+        <field name="arch" type="xml">
+            <form string="Attendance">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="employee_id"/>
+                            <field name="attendance_date"/>
+                            <field name="source"/>
+                            <field name="shift_id"/>
+                        </group>
+                        <group>
+                            <field name="check_in"/>
+                            <field name="check_out"/>
+                            <field name="scheduled_start"/>
+                            <field name="scheduled_end"/>
+                            <field name="grace_period_minutes"/>
+                            <field name="is_holiday"/>
+                            <field name="is_weekly_off"/>
+                        </group>
+                    </group>
+                    <group col="4">
+                        <field name="working_hours" readonly="1"/>
+                        <field name="late_minutes" readonly="1"/>
+                        <field name="early_leave_minutes" readonly="1"/>
+                        <field name="overtime_hours" readonly="1"/>
+                        <field name="status" readonly="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_hr_attendance_search" model="ir.ui.view">
+        <field name="name">garment.hr.attendance.search</field>
+        <field name="model">garment.hr.attendance</field>
+        <field name="arch" type="xml">
+            <search string="Search Attendance">
+                <field name="employee_id"/>
+                <field name="attendance_date"/>
+                <filter string="Present" name="filter_present" domain="[('status', '=', 'present')]"/>
+                <filter string="Absent" name="filter_absent" domain="[('status', '=', 'absent')]"/>
+                <filter string="Late" name="filter_late" domain="[('status', '=', 'late')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Employee" name="group_employee" context="{'group_by': 'employee_id'}"/>
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                    <filter string="Date" name="group_date" context="{'group_by': 'attendance_date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_hr_attendance" model="ir.actions.act_window">
+        <field name="name">Attendance</field>
+        <field name="res_model">garment.hr.attendance</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Record your first attendance entry.</p>
+        </field>
+    </record>
+</odoo>

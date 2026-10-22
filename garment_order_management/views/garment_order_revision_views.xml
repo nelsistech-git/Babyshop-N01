@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_order_revision_tree" model="ir.ui.view">
+        <field name="name">garment.order.revision.tree</field>
+        <field name="model">garment.order.revision</field>
+        <field name="arch" type="xml">
+            <tree string="Order Revisions" decoration-success="status == 'approved'"
+                  decoration-danger="status == 'rejected'">
+                <field name="order_id"/>
+                <field name="revision_number"/>
+                <field name="revision_type"/>
+                <field name="field_changed"/>
+                <field name="old_value"/>
+                <field name="new_value"/>
+                <field name="requested_by_id"/>
+                <field name="approved_by_id"/>
+                <field name="status"/>
+                <field name="date"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_order_revision_form" model="ir.ui.view">
+        <field name="name">garment.order.revision.form</field>
+        <field name="model">garment.order.revision</field>
+        <field name="arch" type="xml">
+            <form string="Order Revision">
+                <header>
+                    <button name="action_submit" type="object" string="Submit" class="btn-primary"
+                            invisible="status != 'draft'"/>
+                    <button name="action_approve" type="object" string="Approve" class="btn-primary"
+                            invisible="status != 'submitted'"
+                            groups="garment_order_management.group_order_manager,garment_order_management.group_order_department_manager"/>
+                    <button name="action_reject" type="object" string="Reject" class="btn-secondary"
+                            invisible="status != 'submitted'"
+                            groups="garment_order_management.group_order_manager,garment_order_management.group_order_department_manager"/>
+                    <field name="status" widget="statusbar" statusbar_visible="draft,submitted,approved"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="order_id"/>
+                            <field name="revision_number"/>
+                            <field name="revision_type"/>
+                            <field name="date"/>
+                        </group>
+                        <group>
+                            <field name="field_changed"/>
+                            <field name="old_value"/>
+                            <field name="new_value"/>
+                            <field name="requested_by_id"/>
+                            <field name="approved_by_id" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Reason">
+                        <field name="reason" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_order_revision" model="ir.actions.act_window">
+        <field name="name">Order Revisions</field>
+        <field name="res_model">garment.order.revision</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

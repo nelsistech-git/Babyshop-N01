@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_hr_employee_form_maintenance_inherit" model="ir.ui.view">
+        <field name="name">garment.hr.employee.form.maintenance.inherit</field>
+        <field name="model">garment.hr.employee</field>
+        <field name="inherit_id" ref="garment_hr.view_garment_hr_employee_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/field[@name='photo']" position="before">
+                <div class="oe_button_box" name="maintenance_button_box">
+                    <button name="action_view_maintenance_workorders" type="object" class="oe_stat_button" icon="fa-wrench"
+                            invisible="is_maintenance_technician == False">
+                        <field name="maintenance_workorder_count" widget="statinfo" string="Work Orders"/>
+                    </button>
+                </div>
+            </xpath>
+            <xpath expr="//field[@name='machine_operated']" position="after">
+                <field name="is_maintenance_technician"/>
+                <field name="maintenance_specialization" invisible="is_maintenance_technician == False"/>
+                <field name="maintenance_certification" invisible="is_maintenance_technician == False"/>
+                <field name="maintenance_experience_years" invisible="is_maintenance_technician == False"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_garment_hr_employee_search_maintenance_inherit" model="ir.ui.view">
+        <field name="name">garment.hr.employee.search.maintenance.inherit</field>
+        <field name="model">garment.hr.employee</field>
+        <field name="inherit_id" ref="garment_hr.view_garment_hr_employee_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <filter string="Maintenance Technicians" name="filter_maintenance_technician"
+                        domain="[('is_maintenance_technician', '=', True)]"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

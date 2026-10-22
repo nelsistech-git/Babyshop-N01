@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_kpi_snapshot_form" model="ir.ui.view">
+        <field name="name">garment.kpi.snapshot.form</field>
+        <field name="model">garment.kpi.snapshot</field>
+        <field name="arch" type="xml">
+            <form string="KPI Snapshot">
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="kpi_id" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="period_date" readonly="1"/>
+                            <field name="period_type" readonly="1"/>
+                            <field name="date_from" readonly="1"/>
+                            <field name="date_to" readonly="1"/>
+                            <field name="group_label" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="computed_value" readonly="1"/>
+                            <field name="target_value" readonly="1"/>
+                            <field name="variance" readonly="1"/>
+                            <field name="variance_pct" readonly="1"/>
+                            <field name="status" widget="badge" readonly="1"/>
+                            <field name="record_count" readonly="1"/>
+                            <field name="computation_datetime" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_kpi_snapshot_tree" model="ir.ui.view">
+        <field name="name">garment.kpi.snapshot.tree</field>
+        <field name="model">garment.kpi.snapshot</field>
+        <field name="arch" type="xml">
+            <tree string="KPI Snapshots" decoration-danger="status == 'critical'"
+                  decoration-warning="status == 'warning'" decoration-success="status == 'on_target'">
+                <field name="kpi_id"/>
+                <field name="period_date"/>
+                <field name="period_type"/>
+                <field name="group_label"/>
+                <field name="computed_value"/>
+                <field name="unit"/>
+                <field name="target_value"/>
+                <field name="variance_pct"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_kpi_snapshot_graph" model="ir.ui.view">
+        <field name="name">garment.kpi.snapshot.graph</field>
+        <field name="model">garment.kpi.snapshot</field>
+        <field name="arch" type="xml">
+            <graph string="KPI Trend" type="line">
+                <field name="period_date" type="row" interval="day"/>
+                <field name="computed_value" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_garment_kpi_snapshot_pivot" model="ir.ui.view">
+        <field name="name">garment.kpi.snapshot.pivot</field>
+        <field name="model">garment.kpi.snapshot</field>
+        <field name="arch" type="xml">
+            <pivot string="KPI Analysis">
+                <field name="kpi_id" type="row"/>
+                <field name="period_date" type="col" interval="month"/>
+                <field name="computed_value" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_garment_kpi_snapshot_search" model="ir.ui.view">
+        <field name="name">garment.kpi.snapshot.search</field>
+        <field name="model">garment.kpi.snapshot</field>
+        <field name="arch" type="xml">
+            <search string="Search KPI Snapshots">
+                <field name="kpi_id"/>
+                <field name="group_label"/>
+                <filter string="Critical" name="filter_critical" domain="[('status', '=', 'critical')]"/>
+                <filter string="Warning" name="filter_warning" domain="[('status', '=', 'warning')]"/>
+                <filter string="This Month" name="filter_this_month"
+                        domain="[('period_date', '&gt;=', (context_today() - relativedelta(day=1)).strftime('%Y-%m-%d'))]"/>
+                <group expand="0" string="Group By">
+                    <filter string="KPI" name="group_kpi" context="{'group_by': 'kpi_id'}"/>
+                    <filter string="Category" name="group_category" context="{'group_by': 'category'}"/>
+                    <filter string="Period" name="group_period" context="{'group_by': 'period_date'}"/>
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_kpi_snapshot" model="ir.actions.act_window">
+        <field name="name">KPI Snapshots</field>
+        <field name="res_model">garment.kpi.snapshot</field>
+        <field name="view_mode">tree,graph,pivot,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No KPI snapshots yet.</p>
+            <p>Snapshots are generated automatically by the daily scheduled action, or on demand
+               with the "Compute Now" button on a KPI Definition.</p>
+        </field>
+    </record>
+
+</odoo>

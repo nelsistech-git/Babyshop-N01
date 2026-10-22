@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_report_garment_order_confirmation" model="ir.actions.report">
+        <field name="name">Order Confirmation Sheet</field>
+        <field name="model">garment.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">garment_order_management.report_garment_order_confirmation</field>
+        <field name="report_file">garment_order_management.report_garment_order_confirmation</field>
+        <field name="binding_model_id" ref="model_garment_order"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'Order Confirmation - %s' % (object.name)</field>
+    </record>
+
+    <template id="report_garment_order_confirmation">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Order Confirmation Sheet <span t-field="o.name"/></h2>
+                        <p class="text-muted">
+                            Buyer PO: <span t-field="o.buyer_po_number"/> | Order Date: <span t-field="o.order_date"/>
+                            | Delivery Date: <span t-field="o.delivery_date"/> | Shipment Date: <span t-field="o.shipment_date"/>
+                        </p>
+
+                        <h4>Buyer Information</h4>
+                        <table class="table table-sm">
+                            <tr><td>Buyer</td><td><span t-field="o.buyer_id.name"/></td>
+                                <td>Brand</td><td><span t-field="o.brand"/></td></tr>
+                            <tr><td>Buying House</td><td><span t-field="o.buying_house"/></td>
+                                <td>Season / Collection</td>
+                                <td><span t-field="o.season"/> / <span t-field="o.collection"/></td></tr>
+                            <tr><td>Factory</td><td><span t-field="o.factory"/></td>
+                                <td>Merchandiser</td><td><span t-field="o.merchandiser_id.name"/></td></tr>
+                        </table>
+
+                        <h4>Style Details &amp; Quantity</h4>
+                        <table class="table table-sm">
+                            <thead>
+                                <tr><th>Style</th><th>Color</th><th>Size Range</th><th>Quantity</th>
+                                    <th>Unit Price</th><th>Total Value</th><th>Delivery Date</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="o.line_ids" t-as="l">
+                                    <td><span t-field="l.style_id.style_name"/></td>
+                                    <td><span t-field="l.color"/></td>
+                                    <td><span t-field="l.size_range"/></td>
+                                    <td><span t-field="l.quantity"/></td>
+                                    <td><span t-field="l.unit_price"/></td>
+                                    <td><span t-field="l.total_value"/></td>
+                                    <td><span t-field="l.delivery_date"/></td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="3"><strong>Total</strong></td>
+                                    <td><strong><span t-field="o.quantity"/></strong></td>
+                                    <td/>
+                                    <td><strong><span t-field="o.order_value"/></strong></td>
+                                    <td/>
+                                </tr>
+                            </tfoot>
+                        </table>
+
+                        <p>
+                            Incoterm: <span t-field="o.shipment_term"/> | Payment Terms:
+                            <span t-field="o.payment_term_id.name"/> | Port of Loading:
+                            <span t-field="o.port_of_loading"/> | Port of Destination:
+                            <span t-field="o.port_of_destination"/>
+                        </p>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

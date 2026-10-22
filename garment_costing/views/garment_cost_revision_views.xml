@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_cost_revision_tree" model="ir.ui.view">
+        <field name="name">garment.cost.revision.tree</field>
+        <field name="model">garment.cost.revision</field>
+        <field name="arch" type="xml">
+            <tree string="Cost Revisions">
+                <field name="costing_id"/>
+                <field name="version_number"/>
+                <field name="change_reason"/>
+                <field name="previous_fob_price"/>
+                <field name="new_fob_price"/>
+                <field name="approval_status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_cost_revision_form" model="ir.ui.view">
+        <field name="name">garment.cost.revision.form</field>
+        <field name="model">garment.cost.revision</field>
+        <field name="arch" type="xml">
+            <form string="Cost Revision">
+                <header>
+                    <field name="approval_status" widget="statusbar"/>
+                    <button name="action_approve" type="object" string="Approve" class="btn-primary"
+                            invisible="approval_status == 'approved'"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="costing_id"/>
+                            <field name="version_number"/>
+                            <field name="previous_version_id"/>
+                            <field name="change_reason"/>
+                        </group>
+                        <group>
+                            <field name="changed_by_id"/>
+                            <field name="change_date"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="previous_fob_price"/>
+                            <field name="new_fob_price"/>
+                        </group>
+                    </group>
+                    <field name="change_notes"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_cost_revision" model="ir.actions.act_window">
+        <field name="name">Cost Revisions</field>
+        <field name="res_model">garment.cost.revision</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

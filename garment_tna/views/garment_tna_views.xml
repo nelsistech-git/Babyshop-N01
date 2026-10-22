@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_tna_form" model="ir.ui.view">
+        <field name="name">garment.tna.form</field>
+        <field name="model">garment.tna</field>
+        <field name="arch" type="xml">
+            <form string="TNA">
+                <header>
+                    <field name="status" widget="statusbar"
+                           statusbar_visible="draft,generated,department_review,active,monitoring,completed,closed"/>
+                    <button name="action_run_ai_analysis" type="object" string="Run AI Analysis" class="btn-secondary" icon="fa-magic"/>
+                    <button name="action_generate_from_template" type="object" string="Generate From Template" class="btn-primary"
+                            invisible="status != 'draft'"/>
+                    <button name="action_submit_for_review" type="object" string="Submit for Department Review" class="btn-primary"
+                            invisible="status not in ('draft', 'generated')"/>
+                    <button name="action_activate" type="object" string="Activate" class="btn-primary"
+                            invisible="status != 'department_review'"/>
+                    <button name="action_start_monitoring" type="object" string="Start Monitoring" class="btn-primary"
+                            invisible="status != 'active'"/>
+                    <button name="action_complete" type="object" string="Mark Completed" class="btn-primary"
+                            invisible="status != 'monitoring'"/>
+                    <button name="action_close" type="object" string="Close TNA" class="btn-primary"
+                            invisible="status != 'completed'"/>
+                    <button name="action_create_revision" type="object" string="Create Revision"
+                            invisible="status not in ('active', 'monitoring', 'completed', 'closed')"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_activities" type="object" class="oe_stat_button" icon="fa-tasks">
+                            <field name="activity_count" widget="statinfo" string="Activities"/>
+                        </button>
+                        <button name="action_view_delays" type="object" class="oe_stat_button" icon="fa-clock-o">
+                            <field name="delay_count" widget="statinfo" string="Delays"/>
+                        </button>
+                        <button name="action_view_revisions" type="object" class="oe_stat_button" icon="fa-history">
+                            <field name="revision_count" widget="statinfo" string="Revisions"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="tna_number" readonly="1"/>
+                            <field name="buyer_id"/>
+                            <field name="buying_house"/>
+                            <field name="style_id"/>
+                            <field name="order_number"/>
+                            <field name="purchase_order"/>
+                            <field name="order_confirmation_id"/>
+                        </group>
+                        <group>
+                            <field name="season" readonly="1"/>
+                            <field name="product_category_id" readonly="1"/>
+                            <field name="order_quantity"/>
+                            <field name="factory"/>
+                            <field name="production_unit"/>
+                            <field name="shipment_date"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="merchandiser_id"/>
+                            <field name="owner_id"/>
+                            <field name="template_id"/>
+                        </group>
+                        <group>
+                            <field name="progress" widget="progressbar"/>
+                            <field name="risk_level" widget="badge"
+                                   decoration-danger="risk_level in ('high','critical')"
+                                   decoration-warning="risk_level == 'medium'"/>
+                            <field name="risk_score" widget="progressbar"/>
+                            <field name="main_risk_issue"/>
+                            <field name="critical_activity_count"/>
+                        </group>
+                    </group>
+                    <group string="Integration">
+                        <group>
+                            <field name="techpack_id"/>
+                            <field name="bom_id"/>
+                            <field name="costing_id"/>
+                        </group>
+                        <group>
+                            <field name="currency_id"/>
+                            <field name="buyer_country_id"/>
+                            <field name="destination"/>
+                            <field name="port"/>
+                            <field name="vessel"/>
+                            <field name="forwarder"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Activities">
+                            <!-- FIXED: Changed from 'activity_ids' to 'tna_activity_ids' -->
+                            <field name="tna_activity_ids">
+                                <tree editable="bottom" decoration-danger="status == 'delayed'" decoration-success="status == 'completed'"
+                                      decoration-warning="is_critical_path == True">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="activity_name"/>
+                                    <field name="category"/>
+                                    <field name="responsible_person_id"/>
+                                    <field name="planned_start_date"/>
+                                    <field name="planned_end_date"/>
+                                    <field name="actual_end_date"/>
+                                    <field name="progress_pct"/>
+                                    <field name="is_milestone"/>
+                                    <field name="is_critical_path"/>
+                                    <field name="status"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Milestones">
+                            <field name="milestone_ids">
+                                <tree editable="bottom" decoration-danger="risk_level in ('high','critical')">
+                                    <field name="milestone_name"/>
+                                    <field name="due_date"/>
+                                    <field name="responsible_person_id"/>
+                                    <field name="status"/>
+                                    <field name="risk_level"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Delays">
+                            <field name="delay_ids">
+                                <tree editable="bottom" decoration-danger="severity in ('high','critical')">
+                                    <field name="activity_id"/>
+                                    <field name="planned_date"/>
+                                    <field name="actual_date"/>
+                                    <field name="delay_days"/>
+                                    <field name="severity"/>
+                                    <field name="delay_reason"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Risks">
+                            <field name="risk_ids">
+                                <tree editable="bottom" decoration-danger="risk_level in ('high','critical')">
+                                    <field name="risk_type"/>
+                                    <field name="probability_pct"/>
+                                    <field name="impact"/>
+                                    <field name="risk_level"/>
+                                    <field name="status"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Department Approvals">
+                            <field name="approval_ids">
+                                <tree editable="bottom">
+                                    <field name="department"/>
+                                    <field name="approver_id"/>
+                                    <field name="status"/>
+                                    <field name="approval_date"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Notifications">
+                            <field name="notification_ids">
+                                <tree>
+                                    <field name="escalation_level"/>
+                                    <field name="channel"/>
+                                    <field name="recipient_id"/>
+                                    <field name="subject"/>
+                                    <field name="status"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Revisions">
+                            <field name="revision_ids">
+                                <tree decoration-success="state == 'approved'" decoration-danger="state == 'rejected'">
+                                    <field name="revision_number"/>
+                                    <field name="previous_shipment_date"/>
+                                    <field name="new_shipment_date"/>
+                                    <field name="change_reason"/>
+                                    <field name="requested_by_id"/>
+                                    <field name="approved_by_id"/>
+                                    <field name="state"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="AI Assistant">
+                            <group>
+                                <field name="ai_last_run" readonly="1"/>
+                                <field name="ai_shipment_probability_pct" readonly="1"/>
+                                <field name="ai_expected_delay_days" readonly="1"/>
+                            </group>
+                            <group string="Shipment Risk"><field name="ai_shipment_risk_note" readonly="1" nolabel="1"/></group>
+                            <group string="Schedule Suggestion"><field name="ai_schedule_suggestion_note" readonly="1" nolabel="1"/></group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <!-- KEPT AS IS: This is the standard Odoo chatter activity widget, it MUST remain 'activity_ids' -->
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_tna_tree" model="ir.ui.view">
+        <field name="name">garment.tna.tree</field>
+        <field name="model">garment.tna</field>
+        <field name="arch" type="xml">
+            <tree string="TNAs" decoration-danger="risk_level in ('high','critical')" decoration-warning="risk_level == 'medium'">
+                <field name="tna_number"/>
+                <field name="style_id"/>
+                <field name="buyer_id"/>
+                <field name="shipment_date"/>
+                <field name="progress" widget="progressbar"/>
+                <field name="risk_level" widget="badge"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_tna_kanban" model="ir.ui.view">
+        <field name="name">garment.tna.kanban</field>
+        <field name="model">garment.tna</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="status" class="o_kanban_small_column">
+                <field name="tna_number"/>
+                <field name="buyer_id"/>
+                <field name="risk_level"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click oe_kanban_card">
+                            <div class="o_kanban_record_top"><strong><field name="tna_number"/></strong></div>
+                            <div><field name="buyer_id"/></div>
+                            <div><field name="shipment_date"/></div>
+                            <field name="risk_level" widget="badge"/>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_garment_tna_search" model="ir.ui.view">
+        <field name="name">garment.tna.search</field>
+        <field name="model">garment.tna</field>
+        <field name="arch" type="xml">
+            <search string="Search TNAs">
+                <field name="tna_number"/>
+                <field name="style_id"/>
+                <field name="buyer_id"/>
+                <filter string="My TNAs" name="filter_my" domain="['|', ('owner_id', '=', uid), ('merchandiser_id', '=', uid)]"/>
+                <filter string="High/Critical Risk" name="filter_risk" domain="[('risk_level', 'in', ('high','critical'))]"/>
+                <filter string="On-Time" name="filter_on_time" domain="[('risk_level', '=', 'normal'), ('status', 'not in', ('completed', 'closed'))]"/>
+                <filter string="Delayed" name="filter_delayed" domain="[('delay_ids', '!=', False), ('status', 'not in', ('completed', 'closed'))]"/>
+                <filter string="Critical Orders" name="filter_critical" domain="[('risk_level', '=', 'critical')]"/>
+                <filter string="Upcoming Shipments (30 Days)" name="filter_upcoming"
+                        domain="[('shipment_date', '&gt;=', context_today().strftime('%Y-%m-%d')),
+                                 ('shipment_date', '&lt;=', (context_today() + relativedelta(days=30)).strftime('%Y-%m-%d'))]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                    <filter string="Buyer" name="group_buyer" context="{'group_by': 'buyer_id'}"/>
+                    <filter string="Risk Level" name="group_risk" context="{'group_by': 'risk_level'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_tna" model="ir.actions.act_window">
+        <field name="name">TNA</field>
+        <field name="res_model">garment.tna</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first TNA.</p>
+        </field>
+    </record>
+
+</odoo>

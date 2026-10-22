@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_lc_form" model="ir.ui.view">
+        <field name="name">garment.lc.form</field>
+        <field name="model">garment.lc</field>
+        <field name="arch" type="xml">
+            <form string="Letter of Credit">
+                <header>
+                    <field name="workflow_stage" widget="statusbar"
+                           statusbar_visible="buyer_order,lc_received,lc_verification,bank_approval,material_procurement,production,shipment,export_documents,payment_received"/>
+                    <button name="action_run_ai_analysis" type="object" string="Run AI Risk Analysis" class="btn-secondary" icon="fa-magic"/>
+                    <button name="action_next_stage" type="object" string="Move to Next Stage" class="btn-primary"
+                            invisible="workflow_stage == 'payment_received'"/>
+                    <button name="action_record_amendment" type="object" string="Record Amendment" class="btn-secondary"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <div class="oe_stat_button" icon="fa-file-text-o">
+                            <div class="o_stat_info">
+                                <field name="document_count" class="o_stat_value"/>
+                                <span class="o_stat_text">Documents</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="oe_title"><h1><field name="lc_number"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="buyer_id"/>
+                            <field name="order_confirmation_id"/>
+                            <field name="bank_id"/>
+                            <field name="status" widget="badge"/>
+                        </group>
+                        <group>
+                            <field name="currency_id"/>
+                            <field name="lc_amount"/>
+                            <field name="issue_date"/>
+                            <field name="expiry_date"/>
+                            <field name="shipment_deadline"/>
+                            <field name="payment_terms"/>
+                            <field name="amendment_count" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Documents">
+                            <field name="document_ids">
+                                <tree editable="bottom">
+                                    <field name="document_type"/>
+                                    <field name="file" filename="filename"/>
+                                    <field name="filename" invisible="1"/>
+                                    <field name="is_submitted"/>
+                                    <field name="submitted_date"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="AI Risk Analysis">
+                            <field name="ai_last_run" readonly="1"/>
+                            <field name="ai_realization_risk_note" readonly="1" nolabel="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_lc_tree" model="ir.ui.view">
+        <field name="name">garment.lc.tree</field>
+        <field name="model">garment.lc</field>
+        <field name="arch" type="xml">
+            <tree string="Letters of Credit" decoration-danger="status == 'expired'" decoration-success="status == 'utilized'">
+                <field name="lc_number"/>
+                <field name="buyer_id"/>
+                <field name="lc_amount"/>
+                <field name="expiry_date"/>
+                <field name="workflow_stage" widget="badge"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_lc_search" model="ir.ui.view">
+        <field name="name">garment.lc.search</field>
+        <field name="model">garment.lc</field>
+        <field name="arch" type="xml">
+            <search string="Search LCs">
+                <field name="lc_number"/>
+                <field name="buyer_id"/>
+                <filter string="Active" name="filter_active" domain="[('status', '=', 'active')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Workflow Stage" name="group_stage" context="{'group_by': 'workflow_stage'}"/>
+                    <filter string="Buyer" name="group_buyer" context="{'group_by': 'buyer_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_lc" model="ir.actions.act_window">
+        <field name="name">Letters of Credit</field>
+        <field name="res_model">garment.lc</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first LC.</p>
+        </field>
+    </record>
+
+</odoo>

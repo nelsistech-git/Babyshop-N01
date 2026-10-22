@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_production_cost_tree" model="ir.ui.view">
+        <field name="name">garment.production.cost.tree</field>
+        <field name="model">garment.production.cost</field>
+        <field name="arch" type="xml">
+            <tree string="Production Cost" editable="bottom">
+                <field name="production_order_id"/>
+                <field name="material_cost"/>
+                <field name="labor_cost"/>
+                <field name="machine_cost"/>
+                <field name="washing_cost"/>
+                <field name="finishing_cost"/>
+                <field name="overhead_cost"/>
+                <field name="total_cost" sum="Total"/>
+                <field name="cost_per_piece"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_production_cost_form" model="ir.ui.view">
+        <field name="name">garment.production.cost.form</field>
+        <field name="model">garment.production.cost</field>
+        <field name="arch" type="xml">
+            <form string="Production Cost">
+                <sheet>
+                    <group>
+                        <field name="production_order_id"/>
+                        <field name="currency_id" groups="base.group_multi_currency"/>
+                    </group>
+                    <group string="Cost Components">
+                        <group>
+                            <field name="material_cost"/>
+                            <field name="labor_cost"/>
+                            <field name="machine_cost"/>
+                            <field name="washing_cost"/>
+                        </group>
+                        <group>
+                            <field name="finishing_cost"/>
+                            <field name="electricity_cost"/>
+                            <field name="maintenance_cost"/>
+                            <field name="overhead_cost"/>
+                        </group>
+                    </group>
+                    <group string="Result">
+                        <field name="total_cost"/>
+                        <field name="cost_per_piece"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_production_cost" model="ir.actions.act_window">
+        <field name="name">Production Cost</field>
+        <field name="res_model">garment.production.cost</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

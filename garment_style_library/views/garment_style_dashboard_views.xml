@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_style_graph" model="ir.ui.view">
+        <field name="name">garment.style.graph</field>
+        <field name="model">garment.style</field>
+        <field name="arch" type="xml">
+            <graph string="Styles by Category" type="bar">
+                <field name="style_category_id"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_garment_style_pivot" model="ir.ui.view">
+        <field name="name">garment.style.pivot</field>
+        <field name="model">garment.style</field>
+        <field name="arch" type="xml">
+            <pivot string="Style Analysis">
+                <field name="buyer_id" type="row"/>
+                <field name="status" type="col"/>
+                <field name="id" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_garment_style_dashboard" model="ir.actions.act_window">
+        <field name="name">Style Library Dashboard</field>
+        <field name="res_model">garment.style</field>
+        <field name="view_mode">graph,pivot,kanban,tree</field>
+    </record>
+
+    <!-- Development KPIs (SRS section 15) -->
+    <record id="view_garment_style_dev_request_graph" model="ir.ui.view">
+        <field name="name">garment.style.development.request.graph</field>
+        <field name="model">garment.style.development.request</field>
+        <field name="arch" type="xml">
+            <graph string="Development Requests by Status" type="bar">
+                <field name="state"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_garment_style_dev_request_dashboard" model="ir.actions.act_window">
+        <field name="name">Development Requests Pipeline</field>
+        <field name="res_model">garment.style.development.request</field>
+        <field name="view_mode">graph,pivot,tree</field>
+    </record>
+
+    <!-- Colorway Distribution (SRS sections 15 &amp; 29) -->
+    <record id="view_garment_style_color_graph" model="ir.ui.view">
+        <field name="name">garment.style.color.graph</field>
+        <field name="model">garment.style.color</field>
+        <field name="arch" type="xml">
+            <graph string="Colorway Distribution" type="pie">
+                <field name="status"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_garment_style_color_dashboard" model="ir.actions.act_window">
+        <field name="name">Colorway Distribution</field>
+        <field name="res_model">garment.style.color</field>
+        <field name="view_mode">graph,pivot,tree</field>
+    </record>
+
+    <!-- Reports (SRS section 31) — simple filtered list/pivot reports built
+         on the existing models; PDF prints (Style Spec Sheet, Approval Sheet,
+         Pattern Report) are available from the Print menu on their forms. -->
+    <record id="action_garment_style_register" model="ir.actions.act_window">
+        <field name="name">Style Register</field>
+        <field name="res_model">garment.style</field>
+        <field name="view_mode">tree,form,pivot</field>
+    </record>
+
+    <record id="action_garment_style_missing_assets_report" model="ir.actions.act_window">
+        <field name="name">Missing Technical Data Report</field>
+        <field name="res_model">garment.style</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('has_missing_assets', '=', True)]</field>
+    </record>
+
+    <record id="action_garment_style_approval_pending_report" model="ir.actions.act_window">
+        <field name="name">Approval Pending Report</field>
+        <field name="res_model">garment.style.approval</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('status', '=', 'pending')]</field>
+    </record>
+
+</odoo>

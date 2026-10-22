@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_stock_transfer_wizard_form" model="ir.ui.view">
+        <field name="name">garment.stock.transfer.wizard.form</field>
+        <field name="model">garment.stock.transfer.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Stock Transfer">
+                <group>
+                    <field name="material_id"/>
+                    <field name="quantity"/>
+                    <field name="responsible_id"/>
+                </group>
+                <group>
+                    <group string="From">
+                        <field name="source_warehouse_id"/>
+                        <field name="source_location_id"/>
+                    </group>
+                    <group string="To">
+                        <field name="destination_warehouse_id"/>
+                        <field name="destination_location_id"/>
+                    </group>
+                </group>
+                <field name="remarks"/>
+                <footer>
+                    <button name="action_transfer" type="object" string="Transfer" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_stock_transfer_wizard" model="ir.actions.act_window">
+        <field name="name">New Stock Transfer</field>
+        <field name="res_model">garment.stock.transfer.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_garment_stock_transfer_wizard_form"/>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

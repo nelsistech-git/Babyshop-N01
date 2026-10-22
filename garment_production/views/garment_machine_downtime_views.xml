@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_machine_downtime_tree" model="ir.ui.view">
+        <field name="name">garment.machine.downtime.tree</field>
+        <field name="model">garment.machine.downtime</field>
+        <field name="arch" type="xml">
+            <tree string="Machine Downtime" decoration-danger="status == 'open'">
+                <field name="line_id"/>
+                <field name="machine_id"/>
+                <field name="start_datetime"/>
+                <field name="end_datetime"/>
+                <field name="duration_minutes"/>
+                <field name="reason"/>
+                <field name="production_loss_qty"/>
+                <field name="status"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_machine_downtime_form" model="ir.ui.view">
+        <field name="name">garment.machine.downtime.form</field>
+        <field name="model">garment.machine.downtime</field>
+        <field name="arch" type="xml">
+            <form string="Machine Downtime">
+                <header>
+                    <field name="status" widget="statusbar" statusbar_visible="open,resolved"/>
+                    <button name="action_resolve" type="object" string="Resolve" class="btn-primary"
+                            invisible="status == 'resolved'"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="machine_id"/>
+                            <field name="line_id"/>
+                            <field name="work_center_id"/>
+                            <field name="production_order_id"/>
+                        </group>
+                        <group>
+                            <field name="start_datetime"/>
+                            <field name="end_datetime"/>
+                            <field name="duration_minutes"/>
+                            <field name="reason"/>
+                            <field name="production_loss_qty"/>
+                            <field name="reported_by_id"/>
+                        </group>
+                    </group>
+                    <field name="action_taken"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_machine_downtime_search" model="ir.ui.view">
+        <field name="name">garment.machine.downtime.search</field>
+        <field name="model">garment.machine.downtime</field>
+        <field name="arch" type="xml">
+            <search string="Search Downtime">
+                <field name="line_id"/>
+                <field name="machine_id"/>
+                <field name="reason"/>
+                <filter string="Open" name="filter_open" domain="[('status', '=', 'open')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Reason" name="group_reason" context="{'group_by': 'reason'}"/>
+                    <filter string="Line" name="group_line" context="{'group_by': 'line_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_machine_downtime" model="ir.actions.act_window">
+        <field name="name">Machine Downtime</field>
+        <field name="res_model">garment.machine.downtime</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_garment_machine_downtime_search"/>
+    </record>
+
+</odoo>

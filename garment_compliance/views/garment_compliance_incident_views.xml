@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_compliance_incident_tree" model="ir.ui.view">
+        <field name="name">garment.compliance.incident.tree</field>
+        <field name="model">garment.compliance.incident</field>
+        <field name="arch" type="xml">
+            <tree string="Safety Incidents" decoration-danger="severity == 'critical'">
+                <field name="incident_no"/>
+                <field name="incident_type"/>
+                <field name="incident_date"/>
+                <field name="department_id"/>
+                <field name="employee_id"/>
+                <field name="severity" widget="badge"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_compliance_incident_form" model="ir.ui.view">
+        <field name="name">garment.compliance.incident.form</field>
+        <field name="model">garment.compliance.incident</field>
+        <field name="arch" type="xml">
+            <form string="Safety Incident">
+                <header>
+                    <button name="action_close" type="object" string="Close" class="btn-primary" invisible="status == 'closed'"/>
+                    <field name="status" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="%(action_garment_compliance_capa)d" type="action" class="oe_stat_button" icon="fa-wrench"
+                                context="{'default_incident_id': id}">
+                            <field name="capa_count" widget="statinfo" string="CAPA"/>
+                        </button>
+                    </div>
+                    <div class="oe_title"><h1><field name="incident_no" readonly="1"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="incident_type"/>
+                            <field name="incident_date"/>
+                            <field name="severity"/>
+                        </group>
+                        <group>
+                            <field name="department_id"/>
+                            <field name="employee_id"/>
+                            <field name="location_id"/>
+                            <field name="reported_by_id"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="description"/>
+                        <field name="investigation_findings"/>
+                        <field name="root_cause"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_compliance_incident" model="ir.actions.act_window">
+        <field name="name">Safety Incidents</field>
+        <field name="res_model">garment.compliance.incident</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

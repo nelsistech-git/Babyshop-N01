@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_ie_capacity_study_form" model="ir.ui.view">
+        <field name="name">garment.ie.capacity.study.form</field>
+        <field name="model">garment.ie.capacity.study</field>
+        <field name="arch" type="xml">
+            <form string="Capacity Study">
+                <header>
+                    <button name="action_confirm" type="object" string="Confirm"
+                            class="btn-primary" invisible="status != 'draft'"/>
+                    <field name="status" widget="statusbar" statusbar_visible="draft,confirmed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="study_number"/>
+                        <h1><field name="study_number" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="study_type"/>
+                            <field name="style_id"/>
+                            <field name="production_order_id"/>
+                            <field name="date"/>
+                        </group>
+                        <group>
+                            <field name="available_lines"/>
+                            <field name="operators_per_line"/>
+                            <field name="working_hours"/>
+                            <field name="smv"/>
+                            <field name="efficiency_pct"/>
+                        </group>
+                    </group>
+                    <group string="Capacity">
+                        <group>
+                            <field name="daily_capacity_per_line" readonly="1"/>
+                            <field name="total_daily_capacity" readonly="1"/>
+                            <field name="monthly_capacity" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="booked_qty"/>
+                            <field name="available_capacity" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Order / Production Simulation">
+                        <group>
+                            <field name="order_qty"/>
+                            <field name="target_delivery_days"/>
+                        </group>
+                        <group>
+                            <field name="required_lines" readonly="1"/>
+                            <field name="estimated_completion_days" readonly="1"/>
+                            <field name="risk_level" widget="badge"
+                                   decoration-success="risk_level == 'low'"
+                                   decoration-warning="risk_level == 'medium'"
+                                   decoration-danger="risk_level == 'high'"/>
+                        </group>
+                    </group>
+                    <group string="Notes">
+                        <field name="notes" nolabel="1"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_ie_capacity_study_tree" model="ir.ui.view">
+        <field name="name">garment.ie.capacity.study.tree</field>
+        <field name="model">garment.ie.capacity.study</field>
+        <field name="arch" type="xml">
+            <tree string="Capacity Studies" decoration-danger="risk_level == 'high'" decoration-warning="risk_level == 'medium'">
+                <field name="study_number"/>
+                <field name="study_type"/>
+                <field name="style_id"/>
+                <field name="date"/>
+                <field name="order_qty"/>
+                <field name="required_lines"/>
+                <field name="estimated_completion_days"/>
+                <field name="risk_level"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_ie_capacity_study_search" model="ir.ui.view">
+        <field name="name">garment.ie.capacity.study.search</field>
+        <field name="model">garment.ie.capacity.study</field>
+        <field name="arch" type="xml">
+            <search string="Search Capacity Studies">
+                <field name="study_number"/>
+                <field name="style_id"/>
+                <group expand="0" string="Group By">
+                    <filter string="Study Type" name="group_type" context="{'group_by': 'study_type'}"/>
+                    <filter string="Risk Level" name="group_risk" context="{'group_by': 'risk_level'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_ie_capacity_study" model="ir.actions.act_window">
+        <field name="name">Capacity Studies</field>
+        <field name="res_model">garment.ie.capacity.study</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Run your first capacity / production simulation study.</p>
+        </field>
+    </record>
+
+</odoo>

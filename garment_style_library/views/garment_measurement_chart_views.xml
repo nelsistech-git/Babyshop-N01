@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_measurement_chart_tree" model="ir.ui.view">
+        <field name="name">garment.measurement.chart.tree</field>
+        <field name="model">garment.measurement.chart</field>
+        <field name="arch" type="xml">
+            <tree string="Measurement Charts">
+                <field name="chart_number"/>
+                <field name="style_id"/>
+                <field name="buyer_id"/>
+                <field name="version"/>
+                <field name="unit"/>
+                <field name="status"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_measurement_chart_form" model="ir.ui.view">
+        <field name="name">garment.measurement.chart.form</field>
+        <field name="model">garment.measurement.chart</field>
+        <field name="arch" type="xml">
+            <form string="Measurement Chart">
+                <header>
+                    <field name="status" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="chart_number" readonly="1"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="style_id"/>
+                            <field name="buyer_id" readonly="1"/>
+                            <field name="version"/>
+                        </group>
+                        <group>
+                            <field name="product_type"/>
+                            <field name="unit"/>
+                            <field name="revision"/>
+                            <field name="grade_rule_id"/>
+                        </group>
+                    </group>
+                    <field name="line_ids">
+                        <tree editable="bottom">
+                            <field name="sequence" widget="handle"/>
+                            <field name="measurement_point_id"/>
+                            <field name="point_code"/>
+                            <field name="description"/>
+                            <field name="base_size_value"/>
+                            <field name="grade_rule_value"/>
+                            <field name="tolerance_plus"/>
+                            <field name="tolerance_minus"/>
+                            <field name="measurement_method"/>
+                        </tree>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_measurement_chart" model="ir.actions.act_window">
+        <field name="name">Measurement Charts</field>
+        <field name="res_model">garment.measurement.chart</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

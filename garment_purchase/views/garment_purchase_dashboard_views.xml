@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_purchase_order_graph" model="ir.ui.view">
+        <field name="name">garment.purchase.order.graph</field>
+        <field name="model">garment.purchase.order</field>
+        <field name="arch" type="xml">
+            <graph string="Purchase Value by Supplier" type="bar">
+                <field name="supplier_id"/>
+                <field name="total_value" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_garment_purchase_order_pivot" model="ir.ui.view">
+        <field name="name">garment.purchase.order.pivot</field>
+        <field name="model">garment.purchase.order</field>
+        <field name="arch" type="xml">
+            <pivot string="Purchase Analysis">
+                <field name="supplier_id" type="row"/>
+                <field name="status" type="col"/>
+                <field name="total_value" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_garment_purchase_dashboard" model="ir.actions.act_window">
+        <field name="name">Purchase Dashboard</field>
+        <field name="res_model">garment.purchase.order</field>
+        <field name="view_mode">graph,pivot,tree</field>
+    </record>
+
+    <!-- Purchase Reports (SRS section 38) -->
+
+    <record id="view_garment_purchase_register_tree" model="ir.ui.view">
+        <field name="name">garment.purchase.order.line.register.tree</field>
+        <field name="model">garment.purchase.order.line</field>
+        <field name="arch" type="xml">
+            <tree string="Purchase Register" create="0" edit="0">
+                <field name="order_id"/>
+                <field name="supplier_id"/>
+                <field name="material_name"/>
+                <field name="quantity"/>
+                <field name="uom"/>
+                <field name="unit_price"/>
+                <field name="line_total"/>
+                <field name="order_date"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_garment_purchase_register" model="ir.actions.act_window">
+        <field name="name">Purchase Register</field>
+        <field name="res_model">garment.purchase.order.line</field>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="view_garment_purchase_register_tree"/>
+        <field name="context">{'search_default_group_supplier': 1}</field>
+    </record>
+
+    <record id="view_garment_purchase_register_search" model="ir.ui.view">
+        <field name="name">garment.purchase.order.line.register.search</field>
+        <field name="model">garment.purchase.order.line</field>
+        <field name="arch" type="xml">
+            <search string="Search Purchase Register">
+                <field name="material_name"/>
+                <field name="supplier_id"/>
+                <group expand="0" string="Group By">
+                    <filter string="Supplier" name="group_supplier" context="{'group_by': 'supplier_id'}"/>
+                    <filter string="Material" name="group_material" context="{'group_by': 'material_name'}"/>
+                    <filter string="Category" name="group_category" context="{'group_by': 'material_category'}"/>
+                    <filter string="Order Date" name="group_date" context="{'group_by': 'order_date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_garment_purchase_supplier_spend_pivot" model="ir.ui.view">
+        <field name="name">garment.purchase.order.supplier.spend.pivot</field>
+        <field name="model">garment.purchase.order</field>
+        <field name="arch" type="xml">
+            <pivot string="Supplier Spend Report">
+                <field name="supplier_id" type="row"/>
+                <field name="purchase_type" type="col"/>
+                <field name="total_value" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_garment_purchase_supplier_spend" model="ir.actions.act_window">
+        <field name="name">Supplier Spend Report</field>
+        <field name="res_model">garment.purchase.order</field>
+        <field name="view_mode">pivot,graph</field>
+        <field name="view_id" ref="view_garment_purchase_supplier_spend_pivot"/>
+    </record>
+
+    <record id="view_garment_purchase_cost_trend_pivot" model="ir.ui.view">
+        <field name="name">garment.purchase.order.line.cost.trend.pivot</field>
+        <field name="model">garment.purchase.order.line</field>
+        <field name="arch" type="xml">
+            <pivot string="Material Cost Trend Report">
+                <field name="material_name" type="row"/>
+                <field name="order_date" interval="month" type="col"/>
+                <field name="unit_price" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_garment_purchase_cost_trend" model="ir.actions.act_window">
+        <field name="name">Material Cost Trend Report</field>
+        <field name="res_model">garment.purchase.order.line</field>
+        <field name="view_mode">pivot,graph</field>
+        <field name="view_id" ref="view_garment_purchase_cost_trend_pivot"/>
+    </record>
+
+    <!-- Material Shortage Alert list (SRS section 11) -->
+    <record id="view_garment_purchase_shortage_tree" model="ir.ui.view">
+        <field name="name">garment.purchase.request.line.shortage.tree</field>
+        <field name="model">garment.purchase.request.line</field>
+        <field name="arch" type="xml">
+            <tree string="Material Shortage Alerts" create="0" decoration-danger="is_shortage">
+                <field name="requisition_id"/>
+                <field name="material_category"/>
+                <field name="material_name"/>
+                <field name="required_qty"/>
+                <field name="available_stock"/>
+                <field name="incoming_stock"/>
+                <field name="shortage_qty"/>
+                <field name="supplier_id"/>
+                <field name="is_shortage" column_invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_garment_purchase_shortage" model="ir.actions.act_window">
+        <field name="name">Material Shortage Alerts</field>
+        <field name="res_model">garment.purchase.request.line</field>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="view_garment_purchase_shortage_tree"/>
+        <field name="domain">[('is_shortage', '=', True)]</field>
+    </record>
+
+</odoo>

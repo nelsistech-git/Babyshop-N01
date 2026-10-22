@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <!-- ================= Production KPIs (SRS 21-22 - Production KPI) ================= -->
+
+    <record id="kpi_def_daily_output" model="garment.kpi.definition">
+        <field name="name">Daily Production Output</field>
+        <field name="category">production</field>
+        <field name="source_model">garment.production.entry</field>
+        <field name="measure_field">output_qty</field>
+        <field name="aggregation">sum</field>
+        <field name="date_field">date</field>
+        <field name="frequency">daily</field>
+        <field name="target_value">500000</field>
+        <field name="unit">PCS</field>
+        <field name="higher_is_better">True</field>
+    </record>
+
+    <record id="kpi_def_line_efficiency" model="garment.kpi.definition">
+        <field name="name">Average Line Efficiency</field>
+        <field name="category">production</field>
+        <field name="source_model">garment.production.entry</field>
+        <field name="measure_field">efficiency_pct</field>
+        <field name="aggregation">avg</field>
+        <field name="date_field">date</field>
+        <field name="frequency">daily</field>
+        <field name="target_value">95</field>
+        <field name="unit">%</field>
+        <field name="higher_is_better">True</field>
+    </record>
+
+    <record id="kpi_def_oee" model="garment.kpi.definition">
+        <field name="name">Average OEE</field>
+        <field name="category">production</field>
+        <field name="source_model">garment.production.oee</field>
+        <field name="measure_field">oee_pct</field>
+        <field name="aggregation">avg</field>
+        <field name="date_field">date</field>
+        <field name="frequency">daily</field>
+        <field name="target_value">85</field>
+        <field name="unit">%</field>
+        <field name="higher_is_better">True</field>
+    </record>
+
+    <!-- ================= Quality KPIs (SRS 21-22 - Quality KPI) ================= -->
+
+    <record id="kpi_def_quality_score" model="garment.kpi.definition">
+        <field name="name">Quality Pass Score</field>
+        <field name="category">quality</field>
+        <field name="source_model">garment.quality.inspection</field>
+        <field name="measure_field">quality_score</field>
+        <field name="aggregation">avg</field>
+        <field name="date_field">inspection_date</field>
+        <field name="frequency">daily</field>
+        <field name="target_value">98</field>
+        <field name="unit">%</field>
+        <field name="higher_is_better">True</field>
+    </record>
+
+    <record id="kpi_def_inspected_qty" model="garment.kpi.definition">
+        <field name="name">Total Inspected Quantity</field>
+        <field name="category">quality</field>
+        <field name="source_model">garment.quality.inspection</field>
+        <field name="measure_field">quantity</field>
+        <field name="aggregation">sum</field>
+        <field name="date_field">inspection_date</field>
+        <field name="frequency">daily</field>
+        <field name="target_value">0</field>
+        <field name="unit">PCS</field>
+        <field name="higher_is_better">True</field>
+        <field name="description">Monitoring KPI (no fixed target) — tracks daily inspection volume.</field>
+    </record>
+
+    <!-- ================= Sales / Order KPIs (SRS 6-8 - Business Overview) ================= -->
+
+    <record id="kpi_def_active_orders" model="garment.kpi.definition">
+        <field name="name">Active Order Count</field>
+        <field name="category">sales</field>
+        <field name="source_model">garment.order</field>
+        <field name="measure_field">id</field>
+        <field name="aggregation">count</field>
+        <field name="domain_filter">[('state', 'not in', ['draft', 'cancelled', 'closed'])]</field>
+        <field name="frequency">daily</field>
+        <field name="target_value">100</field>
+        <field name="unit">Orders</field>
+        <field name="higher_is_better">True</field>
+    </record>
+
+    <record id="kpi_def_confirmed_order_value" model="garment.kpi.definition">
+        <field name="name">Confirmed Order Value (Monthly)</field>
+        <field name="category">sales</field>
+        <field name="source_model">garment.order</field>
+        <field name="measure_field">order_value</field>
+        <field name="aggregation">sum</field>
+        <field name="date_field">order_date</field>
+        <field name="domain_filter">[('state', '!=', 'cancelled')]</field>
+        <field name="frequency">monthly</field>
+        <field name="target_value">0</field>
+        <field name="unit">BDT</field>
+        <field name="higher_is_better">True</field>
+        <field name="description">Monitoring KPI (no fixed target) — tracks monthly confirmed order value.</field>
+    </record>
+
+    <!-- ================= Finance KPIs (SRS 15, 21-22) ================= -->
+
+    <record id="kpi_def_outstanding_receivable" model="garment.kpi.definition">
+        <field name="name">Outstanding Receivable</field>
+        <field name="category">finance</field>
+        <field name="source_model">garment.receivable</field>
+        <field name="measure_field">outstanding_amount</field>
+        <field name="aggregation">sum</field>
+        <field name="frequency">daily</field>
+        <field name="target_value">0</field>
+        <field name="unit">BDT</field>
+        <field name="higher_is_better">False</field>
+        <field name="description">Point-in-time monitoring KPI (no date_field — always the current outstanding balance).</field>
+    </record>
+
+    <record id="kpi_def_approved_expense" model="garment.kpi.definition">
+        <field name="name">Approved Expense Total (Monthly)</field>
+        <field name="category">finance</field>
+        <field name="source_model">garment.expense</field>
+        <field name="measure_field">amount</field>
+        <field name="aggregation">sum</field>
+        <field name="date_field">expense_date</field>
+        <field name="domain_filter">[('status', '=', 'approved')]</field>
+        <field name="frequency">monthly</field>
+        <field name="target_value">0</field>
+        <field name="unit">BDT</field>
+        <field name="higher_is_better">False</field>
+        <field name="description">Monitoring KPI (no fixed target) — tracks approved monthly expense.</field>
+    </record>
+
+    <record id="kpi_def_avg_fob_price" model="garment.kpi.definition">
+        <field name="name">Average FOB Price (Monthly)</field>
+        <field name="category">finance</field>
+        <field name="source_model">garment.costing</field>
+        <field name="measure_field">fob_price</field>
+        <field name="aggregation">avg</field>
+        <field name="date_field">costing_date</field>
+        <field name="frequency">monthly</field>
+        <field name="target_value">0</field>
+        <field name="unit">BDT</field>
+        <field name="higher_is_better">True</field>
+        <field name="description">Monitoring KPI (no fixed target) — tracks average approved FOB price.</field>
+    </record>
+
+    <!-- ================= HR KPIs (SRS 19, 21-22 - HR KPI) ================= -->
+
+    <record id="kpi_def_attendance_present" model="garment.kpi.definition">
+        <field name="name">Attendance Present Count</field>
+        <field name="category">hr</field>
+        <field name="source_model">garment.hr.attendance</field>
+        <field name="measure_field">id</field>
+        <field name="aggregation">count</field>
+        <field name="date_field">attendance_date</field>
+        <field name="domain_filter">[('status', 'in', ['present', 'late'])]</field>
+        <field name="frequency">daily</field>
+        <field name="target_value">0</field>
+        <field name="unit">Employees</field>
+        <field name="higher_is_better">True</field>
+        <field name="description">Monitoring KPI (no fixed target) — daily present/late headcount.</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_report_garment_bom" model="ir.actions.report">
+        <field name="name">BOM Cost Sheet</field>
+        <field name="model">garment.bom</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">garment_bom_management.report_garment_bom</field>
+        <field name="report_file">garment_bom_management.report_garment_bom</field>
+        <field name="binding_model_id" ref="model_garment_bom"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'BOM - %s' % (object.bom_number)</field>
+    </record>
+
+    <template id="report_garment_bom">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Bill of Materials <span t-field="o.bom_number"/></h2>
+                        <p class="text-muted">
+                            Style: <span t-field="o.style_id.style_name"/> | Buyer: <span t-field="o.buyer_id.name"/>
+                            | Order Qty: <span t-field="o.order_quantity"/> | Status: <span t-field="o.status"/>
+                        </p>
+
+                        <h4>Fabric BOM</h4>
+                        <table class="table table-sm">
+                            <thead><tr><th>Role</th><th>Composition</th><th>Gross Consumption</th><th>Unit Price</th><th>Line Cost</th></tr></thead>
+                            <tbody>
+                                <tr t-foreach="o.fabric_bom_ids" t-as="f">
+                                    <td><span t-field="f.fabric_role"/></td>
+                                    <td><span t-field="f.composition"/></td>
+                                    <td><span t-field="f.gross_consumption"/></td>
+                                    <td><span t-field="f.unit_price"/></td>
+                                    <td><span t-field="f.line_cost"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4>Trim BOM</h4>
+                        <table class="table table-sm">
+                            <thead><tr><th>Type</th><th>Description</th><th>Required Qty</th><th>Line Cost</th></tr></thead>
+                            <tbody>
+                                <tr t-foreach="o.trim_bom_ids" t-as="t">
+                                    <td><span t-field="t.trim_type"/></td>
+                                    <td><span t-field="t.description"/></td>
+                                    <td><span t-field="t.required_qty"/></td>
+                                    <td><span t-field="t.line_cost"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4>Packaging BOM</h4>
+                        <table class="table table-sm">
+                            <thead><tr><th>Type</th><th>Description</th><th>Required Qty</th><th>Line Cost</th></tr></thead>
+                            <tbody>
+                                <tr t-foreach="o.packaging_bom_ids" t-as="p">
+                                    <td><span t-field="p.packaging_type"/></td>
+                                    <td><span t-field="p.description"/></td>
+                                    <td><span t-field="p.required_qty"/></td>
+                                    <td><span t-field="p.line_cost"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4>Cost Summary</h4>
+                        <table class="table table-sm">
+                            <tr><td>Fabric Cost</td><td><span t-field="o.fabric_cost_total"/></td></tr>
+                            <tr><td>Trim Cost</td><td><span t-field="o.trim_cost_total"/></td></tr>
+                            <tr><td>Packaging Cost</td><td><span t-field="o.packaging_cost_total"/></td></tr>
+                            <tr><td>Processing Cost</td><td><span t-field="o.processing_cost"/></td></tr>
+                            <tr><td><strong>Total Material Cost</strong></td><td><strong><span t-field="o.total_material_cost"/></strong></td></tr>
+                            <tr><td><strong>Cost Per Piece</strong></td><td><strong><span t-field="o.cost_per_piece"/></strong></td></tr>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!-- Fabric Requirement Report / Sheet (SRS 29-30) -->
+    <record id="action_report_garment_fabric_requirement" model="ir.actions.report">
+        <field name="name">Fabric Requirement Sheet</field>
+        <field name="model">garment.bom</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">garment_bom_management.report_garment_fabric_requirement</field>
+        <field name="report_file">garment_bom_management.report_garment_fabric_requirement</field>
+        <field name="binding_model_id" ref="model_garment_bom"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'Fabric Requirement - %s' % (object.bom_number)</field>
+    </record>
+
+    <template id="report_garment_fabric_requirement">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Fabric Requirement Sheet <span t-field="o.bom_number"/></h2>
+                        <p class="text-muted">Style: <span t-field="o.style_id.style_name"/> | Delivery: <span t-field="o.delivery_date"/></p>
+                        <table class="table table-sm">
+                            <thead><tr><th>Fabric</th><th>Color</th><th>Specification (GSM/Width)</th><th>Quantity</th><th>UoM</th><th>Delivery Date</th></tr></thead>
+                            <tbody>
+                                <tr t-foreach="o.fabric_bom_ids" t-as="f">
+                                    <td><span t-field="f.fabric_name"/></td>
+                                    <td><span t-field="f.color"/></td>
+                                    <td>GSM <span t-field="f.gsm"/> / Width <span t-field="f.width"/></td>
+                                    <td><span t-field="f.required_qty"/></td>
+                                    <td><span t-field="f.uom"/></td>
+                                    <td><span t-field="o.delivery_date"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!-- Trim Requirement Report / Sheet (SRS 29-30) -->
+    <record id="action_report_garment_trim_requirement" model="ir.actions.report">
+        <field name="name">Trim Requirement Sheet</field>
+        <field name="model">garment.bom</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">garment_bom_management.report_garment_trim_requirement</field>
+        <field name="report_file">garment_bom_management.report_garment_trim_requirement</field>
+        <field name="binding_model_id" ref="model_garment_bom"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'Trim Requirement - %s' % (object.bom_number)</field>
+    </record>
+
+    <template id="report_garment_trim_requirement">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Trim Requirement Sheet <span t-field="o.bom_number"/></h2>
+                        <p class="text-muted">Style: <span t-field="o.style_id.style_name"/></p>
+                        <table class="table table-sm">
+                            <thead><tr><th>Accessory</th><th>Description</th><th>Quantity</th><th>UoM</th><th>Supplier</th></tr></thead>
+                            <tbody>
+                                <tr t-foreach="o.trim_bom_ids" t-as="t">
+                                    <td><span t-field="t.trim_type"/></td>
+                                    <td><span t-field="t.description"/></td>
+                                    <td><span t-field="t.required_qty"/></td>
+                                    <td><span t-field="t.uom"/></td>
+                                    <td><span t-field="t.supplier_id"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!-- Material Shortage Report (SRS 29) -->
+    <record id="action_report_garment_material_shortage" model="ir.actions.report">
+        <field name="name">Material Shortage Report</field>
+        <field name="model">garment.bom</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">garment_bom_management.report_garment_material_shortage</field>
+        <field name="report_file">garment_bom_management.report_garment_material_shortage</field>
+        <field name="binding_model_id" ref="model_garment_bom"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'Material Shortage - %s' % (object.bom_number)</field>
+    </record>
+
+    <template id="report_garment_material_shortage">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Material Shortage Report <span t-field="o.bom_number"/></h2>
+                        <table class="table table-sm">
+                            <thead><tr><th>Material</th><th>Required Quantity</th><th>Available Stock</th><th>Shortage</th></tr></thead>
+                            <tbody>
+                                <tr t-foreach="o.reservation_ids" t-as="r">
+                                    <td><span t-field="r.material_name"/></td>
+                                    <td><span t-field="r.required_qty"/></td>
+                                    <td><span t-field="r.available_qty"/></td>
+                                    <td><span t-field="r.shortage_qty"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

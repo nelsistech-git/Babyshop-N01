@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_budget_tree" model="ir.ui.view">
+        <field name="name">garment.budget.tree</field>
+        <field name="model">garment.budget</field>
+        <field name="arch" type="xml">
+            <tree string="Budgets" decoration-danger="utilization_pct &gt;= 100" decoration-warning="utilization_pct &gt;= 85">
+                <field name="name"/>
+                <field name="cost_center_id"/>
+                <field name="budget_type"/>
+                <field name="budgeted_amount"/>
+                <field name="actual_amount"/>
+                <field name="utilization_pct"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_budget_form" model="ir.ui.view">
+        <field name="name">garment.budget.form</field>
+        <field name="model">garment.budget</field>
+        <field name="arch" type="xml">
+            <form string="Budget">
+                <header>
+                    <field name="status" widget="statusbar"/>
+                    <button name="action_next_stage" type="object" string="Move to Next Stage" class="btn-primary"
+                            invisible="status == 'closed'"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="budget_type"/>
+                            <field name="cost_center_id"/>
+                            <field name="period_start"/>
+                            <field name="period_end"/>
+                        </group>
+                        <group>
+                            <field name="currency_id"/>
+                            <field name="budgeted_amount"/>
+                            <field name="actual_amount" readonly="1"/>
+                            <field name="remaining_amount" readonly="1"/>
+                            <field name="utilization_pct" widget="progressbar" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Variance Analysis">
+                        <group>
+                            <field name="variance_amount" readonly="1"/>
+                            <field name="variance_pct" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="variance_reason" nolabel="1" placeholder="e.g. Higher Fabric Cost"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_budget" model="ir.actions.act_window">
+        <field name="name">Budgets</field>
+        <field name="res_model">garment.budget</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first budget.</p>
+        </field>
+    </record>
+</odoo>

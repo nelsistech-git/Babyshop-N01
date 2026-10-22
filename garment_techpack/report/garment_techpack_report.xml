@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_report_garment_techpack" model="ir.actions.report">
+        <field name="name">Complete Tech Pack</field>
+        <field name="model">garment.techpack</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">garment_techpack.report_garment_techpack</field>
+        <field name="report_file">garment_techpack.report_garment_techpack</field>
+        <field name="binding_model_id" ref="model_garment_techpack"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'Tech Pack - %s' % (object.name)</field>
+    </record>
+
+    <template id="report_garment_techpack">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2><span t-field="o.name"/></h2>
+                        <p class="text-muted">
+                            Tech Pack No: <span t-field="o.techpack_number"/> | Version: <span t-field="o.version"/>
+                            | Style: <span t-field="o.style_id.style_name"/> | Buyer: <span t-field="o.buyer_id.name"/>
+                        </p>
+
+                        <h4>Product Information</h4>
+                        <table class="table table-sm">
+                            <tr><td>Product Name</td><td><span t-field="o.product_name"/></td></tr>
+                            <tr><td>Garment Type</td><td><span t-field="o.garment_type"/></td></tr>
+                            <tr><td>Construction Method</td><td><span t-field="o.construction_method"/></td></tr>
+                            <tr><td>Fit Type</td><td><span t-field="o.fit_type"/></td></tr>
+                        </table>
+
+                        <h4>Technical Specification</h4>
+                        <table class="table table-sm">
+                            <thead><tr><th>Sewing Method</th><th>Stitch Type</th><th>Seam Type</th><th>SPI</th></tr></thead>
+                            <tbody>
+                                <tr t-foreach="o.tech_spec_ids" t-as="ts">
+                                    <td><span t-field="ts.sewing_method"/></td>
+                                    <td><span t-field="ts.stitch_type"/></td>
+                                    <td><span t-field="ts.seam_type"/></td>
+                                    <td><span t-field="ts.spi"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4>Artwork Summary</h4>
+                        <table class="table table-sm">
+                            <thead><tr><th>Number</th><th>Type</th><th>Placement</th><th>Status</th></tr></thead>
+                            <tbody>
+                                <tr t-foreach="o.artwork_ids" t-as="art">
+                                    <td><span t-field="art.artwork_number"/></td>
+                                    <td><span t-field="art.artwork_type"/></td>
+                                    <td><span t-field="art.placement"/></td>
+                                    <td><span t-field="art.approval_status"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4>Label Details</h4>
+                        <table class="table table-sm">
+                            <thead><tr><th>Type</th><th>Material</th><th>Position</th></tr></thead>
+                            <tbody>
+                                <tr t-foreach="o.label_spec_ids" t-as="lbl">
+                                    <td><span t-field="lbl.label_type"/></td>
+                                    <td><span t-field="lbl.material"/></td>
+                                    <td><span t-field="lbl.position"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4>Packaging Details</h4>
+                        <table class="table table-sm">
+                            <tr t-foreach="o.packaging_spec_ids" t-as="pkg">
+                                <td>Poly Bag: <span t-field="pkg.poly_bag_type"/></td>
+                                <td>Carton: <span t-field="pkg.carton_type"/></td>
+                                <td>Folding: <span t-field="pkg.folding_method"/></td>
+                            </tr>
+                        </table>
+
+                        <h4>Approval History</h4>
+                        <table class="table table-sm">
+                            <thead><tr><th>Stage</th><th>Approver</th><th>Status</th><th>Date</th></tr></thead>
+                            <tbody>
+                                <tr t-foreach="o.approval_ids" t-as="ap">
+                                    <td><span t-field="ap.approval_stage"/></td>
+                                    <td><span t-field="ap.approver_id.name"/></td>
+                                    <td><span t-field="ap.status"/></td>
+                                    <td><span t-field="ap.signed_date"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!-- ================================================================
+         Production Specification Sheet (SRS section 29)
+         Sewing Instructions, Measurement Details, Quality Points, Packing Instructions
+         ================================================================ -->
+    <record id="action_report_garment_techpack_production_spec" model="ir.actions.report">
+        <field name="name">Production Specification Sheet</field>
+        <field name="model">garment.techpack</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">garment_techpack.report_garment_techpack_production_spec</field>
+        <field name="report_file">garment_techpack.report_garment_techpack_production_spec</field>
+        <field name="binding_model_id" ref="model_garment_techpack"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'Production Spec - %s' % (object.name)</field>
+    </record>
+
+    <template id="report_garment_techpack_production_spec">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Production Specification Sheet</h2>
+                        <p class="text-muted">
+                            <span t-field="o.name"/> | Style: <span t-field="o.style_id.style_name"/>
+                            | Version: <span t-field="o.version"/> | Factory: <span t-field="o.factory"/>
+                        </p>
+
+                        <h4>Sewing Instructions</h4>
+                        <table class="table table-sm">
+                            <thead><tr><th>Sewing Method</th><th>Stitch Type</th><th>SPI</th><th>Seam Type</th><th>Machine</th></tr></thead>
+                            <tbody>
+                                <tr t-foreach="o.tech_spec_ids" t-as="ts">
+                                    <td><span t-field="ts.sewing_method"/></td>
+                                    <td><span t-field="ts.stitch_type"/></td>
+                                    <td><span t-field="ts.spi"/></td>
+                                    <td><span t-field="ts.seam_type"/></td>
+                                    <td><span t-field="ts.machine_requirement"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4>Measurement Details</h4>
+                        <table class="table table-sm">
+                            <thead><tr><th>Measurement Chart</th><th>Size Set</th><th>Tolerance Tracked</th><th>Status</th></tr></thead>
+                            <tbody>
+                                <tr t-foreach="o.measurement_sheet_ids" t-as="ms">
+                                    <td><span t-field="ms.measurement_chart_id.chart_number"/></td>
+                                    <td><span t-field="ms.size_set_id.name"/></td>
+                                    <td><span t-field="ms.tolerance_tracked"/></td>
+                                    <td><span t-field="ms.status"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4>Quality Points</h4>
+                        <ul>
+                            <li t-foreach="o.review_ids" t-as="rv">
+                                Reviewed by <span t-field="rv.reviewer_id.name"/> on <span t-field="rv.review_date"/>:
+                                Fabric composition <span t-field="rv.chk_fabric_composition_verified"/>,
+                                GSM <span t-field="rv.chk_gsm_verified"/>,
+                                Shrinkage <span t-field="rv.chk_shrinkage_verified"/>,
+                                Tolerance defined <span t-field="rv.chk_tolerance_defined"/>
+                            </li>
+                        </ul>
+
+                        <h4>Packing Instructions</h4>
+                        <table class="table table-sm">
+                            <tr t-foreach="o.packaging_spec_ids" t-as="pkg">
+                                <td>Poly Bag: <span t-field="pkg.poly_bag_type"/> (<span t-field="pkg.poly_bag_size"/>)</td>
+                                <td>Carton: <span t-field="pkg.carton_type"/> - <span t-field="pkg.carton_dimension"/></td>
+                                <td>Folding: <span t-field="pkg.folding_method"/></td>
+                                <td>Barcode Required: <span t-field="pkg.barcode_requirement"/></td>
+                            </tr>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!-- ================================================================
+         Buyer Approval Document (SRS section 29)
+         Version, Changes, Approval Signature
+         ================================================================ -->
+    <record id="action_report_garment_techpack_buyer_approval" model="ir.actions.report">
+        <field name="name">Buyer Approval Document</field>
+        <field name="model">garment.techpack</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">garment_techpack.report_garment_techpack_buyer_approval</field>
+        <field name="report_file">garment_techpack.report_garment_techpack_buyer_approval</field>
+        <field name="binding_model_id" ref="model_garment_techpack"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'Buyer Approval - %s' % (object.name)</field>
+    </record>
+
+    <template id="report_garment_techpack_buyer_approval">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Buyer Approval Document</h2>
+                        <p class="text-muted">
+                            <span t-field="o.name"/> | Buyer: <span t-field="o.buyer_id.name"/>
+                            | Version: <span t-field="o.version"/>
+                        </p>
+
+                        <h4>Changes</h4>
+                        <table class="table table-sm">
+                            <thead><tr><th>Version</th><th>Type</th><th>Change Reason</th><th>Date</th></tr></thead>
+                            <tbody>
+                                <tr t-foreach="o.version_ids" t-as="v">
+                                    <td><span t-field="v.version_number"/></td>
+                                    <td><span t-field="v.revision_type"/></td>
+                                    <td><span t-field="v.change_reason"/></td>
+                                    <td><span t-field="v.revision_date"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4>Approval Signature</h4>
+                        <table class="table table-sm">
+                            <thead><tr><th>Signer</th><th>Designation</th><th>Signed Date</th><th>Document Version</th></tr></thead>
+                            <tbody>
+                                <tr t-foreach="o.approval_ids.filtered(lambda a: a.approval_stage in ('buyer_review', 'buyer_approved'))" t-as="ap">
+                                    <td><span t-field="ap.signer_name"/></td>
+                                    <td><span t-field="ap.designation"/></td>
+                                    <td><span t-field="ap.signed_date"/></td>
+                                    <td><span t-field="ap.document_version"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!-- ================================================================
+         Production Release Certificate (SRS section 23)
+         Style Information, Version, Approved Documents, Approval History,
+         Release Date, Released By
+         ================================================================ -->
+    <record id="action_report_garment_techpack_release_certificate" model="ir.actions.report">
+        <field name="name">Production Release Certificate</field>
+        <field name="model">garment.techpack</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">garment_techpack.report_garment_techpack_release_certificate</field>
+        <field name="report_file">garment_techpack.report_garment_techpack_release_certificate</field>
+        <field name="binding_model_id" ref="model_garment_techpack"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'Production Release Certificate - %s' % (object.name)</field>
+    </record>
+
+    <template id="report_garment_techpack_release_certificate">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Production Release Certificate</h2>
+                        <h4>Style Information</h4>
+                        <table class="table table-sm">
+                            <tr><td>Style</td><td><span t-field="o.style_id.style_name"/></td></tr>
+                            <tr><td>Style Number</td><td><span t-field="o.style_number"/></td></tr>
+                            <tr><td>Buyer</td><td><span t-field="o.buyer_id.name"/></td></tr>
+                            <tr><td>Version</td><td><span t-field="o.version"/></td></tr>
+                            <tr><td>Factory</td><td><span t-field="o.factory"/></td></tr>
+                        </table>
+
+                        <h4>Approved Documents</h4>
+                        <table class="table table-sm">
+                            <tr><td>Measurement</td><td>
+                                <span t-if="o.measurement_sheet_ids.filtered(lambda m: m.status == 'approved')">Approved</span>
+                                <span t-else="">Pending</span>
+                            </td></tr>
+                            <tr><td>Artwork</td><td>
+                                <span t-if="not o.artwork_ids or all(a.approval_status == 'approved' for a in o.artwork_ids)">Approved</span>
+                                <span t-else="">Pending</span>
+                            </td></tr>
+                            <tr><td>Packaging</td><td>
+                                <span t-if="not o.packaging_spec_ids or all(p.approval_status == 'approved' for p in o.packaging_spec_ids)">Approved</span>
+                                <span t-else="">Pending</span>
+                            </td></tr>
+                        </table>
+
+                        <h4>Approval History</h4>
+                        <table class="table table-sm">
+                            <thead><tr><th>Stage</th><th>Approver</th><th>Status</th><th>Date</th></tr></thead>
+                            <tbody>
+                                <tr t-foreach="o.approval_ids" t-as="ap">
+                                    <td><span t-field="ap.approval_stage"/></td>
+                                    <td><span t-field="ap.approver_id.name"/></td>
+                                    <td><span t-field="ap.status"/></td>
+                                    <td><span t-field="ap.signed_date"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4>Release</h4>
+                        <table class="table table-sm">
+                            <tr><td>Release Date</td><td><span t-field="o.production_release_date"/></td></tr>
+                            <tr><td>Released By</td><td><span t-field="o.released_by_id.name"/></td></tr>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

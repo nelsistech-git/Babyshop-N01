@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_bom_supplier_tree" model="ir.ui.view">
+        <field name="name">garment.bom.supplier.tree</field>
+        <field name="model">garment.bom.supplier</field>
+        <field name="arch" type="xml">
+            <tree string="Supplier Mapping" editable="bottom">
+                <field name="bom_id"/>
+                <field name="material_reference"/>
+                <field name="supplier_id"/>
+                <field name="supplier_code"/>
+                <field name="supplier_type"/>
+                <field name="current_price"
+                       groups="garment_bom_management.group_bom_purchase,garment_bom_management.group_bom_costing,garment_bom_management.group_bom_administrator"/>
+                <field name="rank_score"/>
+                <field name="approved_status"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_bom_supplier_form" model="ir.ui.view">
+        <field name="name">garment.bom.supplier.form</field>
+        <field name="model">garment.bom.supplier</field>
+        <field name="arch" type="xml">
+            <form string="Supplier Mapping">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_price_history" type="object" class="oe_stat_button" icon="fa-line-chart">
+                            <div class="o_stat_info"><span class="o_stat_text">Price History</span></div>
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="bom_id"/>
+                            <field name="material_reference"/>
+                            <field name="supplier_id"/>
+                            <field name="supplier_code"/>
+                            <field name="supplier_type"/>
+                            <field name="country_id"/>
+                            <field name="contact_person"/>
+                        </group>
+                        <group>
+                            <field name="lead_time_days"/>
+                            <field name="moq"/>
+                            <field name="payment_term_id"/>
+                            <field name="approved_status"/>
+                        </group>
+                    </group>
+                    <group string="Pricing"
+                           groups="garment_bom_management.group_bom_purchase,garment_bom_management.group_bom_costing,garment_bom_management.group_bom_administrator">
+                        <field name="previous_price"/>
+                        <field name="current_price"/>
+                    </group>
+                    <group string="Supplier Ranking">
+                        <group>
+                            <field name="quality_rating"/>
+                            <field name="delivery_rating"/>
+                        </group>
+                        <group>
+                            <field name="compliance_score"/>
+                            <field name="previous_issues_count"/>
+                            <field name="rank_score" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_bom_supplier" model="ir.actions.act_window">
+        <field name="name">Supplier Mapping</field>
+        <field name="res_model">garment.bom.supplier</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

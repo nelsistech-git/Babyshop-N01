@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_rfid_tag_tree" model="ir.ui.view">
+        <field name="name">garment.rfid.tag.tree</field>
+        <field name="model">garment.rfid.tag</field>
+        <field name="arch" type="xml">
+            <tree string="RFID Tags" editable="bottom" decoration-danger="gate_event == 'unauthorized'">
+                <field name="tag_id"/>
+                <field name="material_id"/>
+                <field name="fabric_roll_id"/>
+                <field name="status"/>
+                <field name="gate_event"/>
+                <field name="movement_authorized"/>
+                <field name="last_scan_datetime"/>
+                <field name="last_scan_location_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_rfid_tag_form" model="ir.ui.view">
+        <field name="name">garment.rfid.tag.form</field>
+        <field name="model">garment.rfid.tag</field>
+        <field name="arch" type="xml">
+            <form string="RFID Tag">
+                <header>
+                    <button name="action_record_gate_entry" type="object" string="Record Gate Entry" class="btn-secondary"/>
+                    <button name="action_record_gate_exit" type="object" string="Record Gate Exit" class="btn-secondary"/>
+                    <button name="action_flag_unauthorized" type="object" string="Flag Unauthorized Movement" class="btn-danger"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="tag_id"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="material_id"/>
+                            <field name="fabric_roll_id"/>
+                            <field name="status"/>
+                            <field name="assigned_date" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="gate_event" readonly="1"/>
+                            <field name="movement_authorized" readonly="1"/>
+                            <field name="last_scan_datetime" readonly="1"/>
+                            <field name="last_scan_location_id"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_rfid_tag_search" model="ir.ui.view">
+        <field name="name">garment.rfid.tag.search</field>
+        <field name="model">garment.rfid.tag</field>
+        <field name="arch" type="xml">
+            <search string="Search RFID Tags">
+                <field name="tag_id"/>
+                <field name="material_id"/>
+                <field name="fabric_roll_id"/>
+                <filter string="Unauthorized Movement" name="filter_unauthorized" domain="[('gate_event', '=', 'unauthorized')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_rfid_tag" model="ir.actions.act_window">
+        <field name="name">RFID Tags</field>
+        <field name="res_model">garment.rfid.tag</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_garment_rfid_tag_search"/>
+    </record>
+</odoo>

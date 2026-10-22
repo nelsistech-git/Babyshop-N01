@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_report_garment_tna" model="ir.actions.report">
+        <field name="name">TNA Report</field>
+        <field name="model">garment.tna</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">garment_tna.report_garment_tna</field>
+        <field name="report_file">garment_tna.report_garment_tna</field>
+        <field name="binding_model_id" ref="model_garment_tna"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'TNA - %s' % (object.tna_number)</field>
+    </record>
+
+    <template id="report_garment_tna">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>TNA <span t-field="o.tna_number"/></h2>
+                        <p class="text-muted">
+                            Style: <span t-field="o.style_id.style_name"/> | Buyer: <span t-field="o.buyer_id.name"/>
+                            | Shipment Date: <span t-field="o.shipment_date"/> | Risk: <span t-field="o.risk_level"/>
+                        </p>
+
+                        <h4>Activities</h4>
+                        <table class="table table-sm">
+                            <thead><tr><th>Activity</th><th>Category</th><th>Planned End</th><th>Status</th><th>Progress</th></tr></thead>
+                            <tbody>
+                                <tr t-foreach="o.activity_ids" t-as="a">
+                                    <td><span t-field="a.activity_name"/></td>
+                                    <td><span t-field="a.category"/></td>
+                                    <td><span t-field="a.planned_end_date"/></td>
+                                    <td><span t-field="a.status"/></td>
+                                    <td><span t-field="a.progress_pct"/>%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4>Delays</h4>
+                        <table class="table table-sm">
+                            <thead><tr><th>Activity</th><th>Delay Days</th><th>Severity</th><th>Reason</th></tr></thead>
+                            <tbody>
+                                <tr t-foreach="o.delay_ids" t-as="d">
+                                    <td><span t-field="d.activity_id.activity_name"/></td>
+                                    <td><span t-field="d.delay_days"/></td>
+                                    <td><span t-field="d.severity"/></td>
+                                    <td><span t-field="d.delay_reason"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!-- Order Progress Report (SRS section 30): Buyer, Order, Style,
+         Completion %, Delay Status — across the selected TNAs. -->
+    <record id="action_report_garment_tna_progress" model="ir.actions.report">
+        <field name="name">Order Progress Report</field>
+        <field name="model">garment.tna</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">garment_tna.report_garment_tna_progress</field>
+        <field name="report_file">garment_tna.report_garment_tna_progress</field>
+        <field name="binding_model_id" ref="model_garment_tna"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'Order Progress Report'</field>
+    </record>
+
+    <template id="report_garment_tna_progress">
+        <t t-call="web.html_container">
+            <t t-call="web.internal_layout">
+                <div class="page">
+                    <h2>Order Progress Report</h2>
+                    <table class="table table-sm table-bordered">
+                        <thead>
+                            <tr>
+                                <th>TNA Number</th><th>Buyer</th><th>Order</th><th>Style</th>
+                                <th>Completion %</th><th>Delay Status</th><th>Shipment Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="docs" t-as="o">
+                                <td><span t-field="o.tna_number"/></td>
+                                <td><span t-field="o.buyer_id.name"/></td>
+                                <td><span t-field="o.order_number"/></td>
+                                <td><span t-field="o.style_id.style_name"/></td>
+                                <td><span t-field="o.progress"/>%</td>
+                                <td>
+                                    <t t-if="o.delay_count">
+                                        <span t-esc="o.delay_count"/> delay(s)
+                                    </t>
+                                    <t t-else="">On Time</t>
+                                </td>
+                                <td><span t-field="o.shipment_date"/></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <!-- Shipment Risk Report (SRS section 30): High Risk Orders, Delay
+         Reasons, Recovery Plan (AI Schedule Suggestion). -->
+    <record id="action_report_garment_tna_risk" model="ir.actions.report">
+        <field name="name">Shipment Risk Report</field>
+        <field name="model">garment.tna</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">garment_tna.report_garment_tna_risk</field>
+        <field name="report_file">garment_tna.report_garment_tna_risk</field>
+        <field name="binding_model_id" ref="model_garment_tna"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'Shipment Risk Report'</field>
+    </record>
+
+    <template id="report_garment_tna_risk">
+        <t t-call="web.html_container">
+            <t t-call="web.internal_layout">
+                <div class="page">
+                    <h2>Shipment Risk Report — High Risk Orders</h2>
+                    <table class="table table-sm table-bordered">
+                        <thead>
+                            <tr>
+                                <th>TNA Number</th><th>Buyer</th><th>Style</th><th>Risk Level</th>
+                                <th>Risk Score</th><th>Main Issue</th><th>Recovery Plan</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="docs.filtered(lambda t: t.risk_level in ('high', 'critical'))" t-as="o">
+                                <td><span t-field="o.tna_number"/></td>
+                                <td><span t-field="o.buyer_id.name"/></td>
+                                <td><span t-field="o.style_id.style_name"/></td>
+                                <td><span t-field="o.risk_level"/></td>
+                                <td><span t-field="o.risk_score"/>%</td>
+                                <td><span t-field="o.main_risk_issue"/></td>
+                                <td><span t-field="o.ai_schedule_suggestion_note"/></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
+        </t>
+    </template>
+
+</odoo>

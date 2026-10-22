@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_plm_project_form" model="ir.ui.view">
+        <field name="name">garment.plm.project.form</field>
+        <field name="model">garment.plm.project</field>
+        <field name="arch" type="xml">
+            <form string="PLM Project">
+                <header>
+                    <button name="action_advance_stage" type="object" string="Advance Stage"
+                            class="btn-primary" invisible="state in ('completed', 'cancelled')"/>
+                    <button name="action_generate_stage_gates" type="object" string="Generate Stage Gates"
+                            class="btn-secondary" invisible="stage_gate_ids"/>
+                    <button name="action_run_ai_insight" type="object" string="AI Risk Insight"
+                            class="btn-secondary" icon="fa-magic"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,in_progress,completed"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Delayed" bg_color="bg-danger" invisible="not is_delayed"/>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_techpacks" type="object" class="oe_stat_button" icon="fa-file-text-o">
+                            <field name="techpack_count" widget="statinfo" string="Tech Packs"/>
+                        </button>
+                        <button name="action_view_boms" type="object" class="oe_stat_button" icon="fa-list-alt">
+                            <field name="bom_count" widget="statinfo" string="BOMs"/>
+                        </button>
+                        <button name="action_view_samples" type="object" class="oe_stat_button" icon="fa-flask">
+                            <field name="sample_count" widget="statinfo" string="Samples"/>
+                        </button>
+                        <button name="action_view_costings" type="object" class="oe_stat_button" icon="fa-calculator">
+                            <field name="costing_count" widget="statinfo" string="Costings"/>
+                        </button>
+                        <button name="action_view_ecrs" type="object" class="oe_stat_button" icon="fa-exchange">
+                            <field name="ecr_count" widget="statinfo" string="ECRs"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="plm_number" readonly="1"/>
+                            <field name="style_id"/>
+                            <field name="buyer_id" readonly="1"/>
+                            <field name="style_category_id" readonly="1"/>
+                            <field name="season" readonly="1"/>
+                            <field name="request_source"/>
+                            <field name="development_request_id"/>
+                            <field name="priority"/>
+                        </group>
+                        <group>
+                            <field name="current_stage"/>
+                            <field name="progress" widget="progressbar"/>
+                            <field name="is_delayed" readonly="1"/>
+                            <field name="delayed_stage_count" readonly="1"/>
+                            <field name="pending_gate_approval_count" readonly="1"/>
+                            <field name="target_launch_date"/>
+                            <field name="actual_launch_date" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Cross-Module Links">
+                            <group>
+                                <group string="Style Development">
+                                    <field name="style_status" readonly="1"/>
+                                    <field name="techpack_id"/>
+                                    <field name="techpack_status" readonly="1"/>
+                                </group>
+                                <group string="Sourcing / Sampling / Costing">
+                                    <field name="bom_id"/>
+                                    <field name="bom_status" readonly="1"/>
+                                    <field name="sample_id"/>
+                                    <field name="sample_status" readonly="1"/>
+                                    <field name="costing_id"/>
+                                    <field name="costing_status" readonly="1"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Stage Gates">
+                            <field name="stage_gate_ids">
+                                <tree editable="bottom" decoration-danger="is_delayed == True"
+                                      decoration-success="status == 'completed'">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="stage"/>
+                                    <field name="team_role"/>
+                                    <field name="responsible_id"/>
+                                    <field name="planned_start_date"/>
+                                    <field name="planned_end_date"/>
+                                    <field name="actual_start_date"/>
+                                    <field name="actual_end_date"/>
+                                    <field name="sla_days"/>
+                                    <field name="delay_days"/>
+                                    <field name="is_delayed" invisible="1"/>
+                                    <field name="all_approved"/>
+                                    <field name="status"/>
+                                    <button name="action_start" type="object" string="Start" icon="fa-play"
+                                            invisible="status != 'pending'"/>
+                                    <button name="action_complete" type="object" string="Complete" icon="fa-check"
+                                            invisible="status not in ('in_progress', 'delayed')"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Team">
+                            <field name="team_ids">
+                                <tree editable="bottom">
+                                    <field name="role"/>
+                                    <field name="employee_id"/>
+                                    <field name="user_id"/>
+                                    <field name="is_lead"/>
+                                    <field name="date_assigned"/>
+                                    <field name="notes"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Tasks">
+                            <field name="task_ids">
+                                <!-- FIXED: Added project_id with column_invisible="1" so the domain can evaluate it -->
+                                <tree editable="bottom" decoration-danger="status == 'delayed'"
+                                      decoration-muted="status in ('completed', 'cancelled')">
+                                    <field name="project_id" column_invisible="1"/>
+                                    <field name="name"/>
+                                    <field name="task_type"/>
+                                    <field name="stage_gate_id"/>
+                                    <field name="assigned_to_id"/>
+                                    <field name="due_date"/>
+                                    <field name="priority"/>
+                                    <field name="status"/>
+                                    <button name="action_complete" type="object" string="Complete" icon="fa-check"
+                                            invisible="status in ('completed', 'cancelled')"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Notifications">
+                            <field name="notification_ids">
+                                <tree>
+                                    <field name="notification_type"/>
+                                    <field name="subject"/>
+                                    <field name="recipient_id"/>
+                                    <field name="status"/>
+                                    <field name="sent_date"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="AI Insight">
+                            <group>
+                                <field name="ai_risk_level" readonly="1"/>
+                                <field name="ai_last_run" readonly="1"/>
+                            </group>
+                            <field name="ai_last_insight" readonly="1"/>
+                        </page>
+                        <page string="Notes">
+                            <field name="description"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_plm_project_tree" model="ir.ui.view">
+        <field name="name">garment.plm.project.tree</field>
+        <field name="model">garment.plm.project</field>
+        <field name="arch" type="xml">
+            <tree string="PLM Projects" decoration-danger="is_delayed == True"
+                  decoration-success="state == 'completed'">
+                <field name="plm_number"/>
+                <field name="style_id"/>
+                <field name="buyer_id"/>
+                <field name="current_stage"/>
+                <field name="progress" widget="progressbar"/>
+                <field name="target_launch_date"/>
+                <field name="is_delayed" invisible="1"/>
+                <field name="pending_gate_approval_count"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_plm_project_kanban" model="ir.ui.view">
+        <field name="name">garment.plm.project.kanban</field>
+        <field name="model">garment.plm.project</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="current_stage" class="o_kanban_small_column">
+                <field name="name"/>
+                <field name="style_id"/>
+                <field name="progress"/>
+                <field name="is_delayed"/>
+                <field name="state"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_card oe_kanban_global_click #{record.is_delayed.raw_value ? 'oe_kanban_color_2' : ''}">
+                            <div class="oe_kanban_content">
+                                <strong><field name="plm_number"/></strong>
+                                <div><field name="style_id"/></div>
+                                <div><field name="buyer_id"/></div>
+                                <div>Progress: <field name="progress" widget="progressbar"/></div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_garment_plm_project_search" model="ir.ui.view">
+        <field name="name">garment.plm.project.search</field>
+        <field name="model">garment.plm.project</field>
+        <field name="arch" type="xml">
+            <search string="Search PLM Projects">
+                <field name="plm_number"/>
+                <field name="style_id"/>
+                <field name="buyer_id"/>
+                <field name="current_stage"/>
+                <filter string="Delayed" name="filter_delayed" domain="[('is_delayed', '=', True)]"/>
+                <filter string="Pending Gate Approval" name="filter_pending_approval"
+                        domain="[('pending_gate_approval_count', '>', 0)]"/>
+                <filter string="In Progress" name="filter_in_progress" domain="[('state', '=', 'in_progress')]"/>
+                <filter string="Production Ready" name="filter_completed" domain="[('state', '=', 'completed')]"/>
+                <separator/>
+                <filter string="My PLM Projects" name="filter_my"
+                        domain="[('team_ids.user_id', '=', uid)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Current Stage" name="groupby_stage" context="{'group_by': 'current_stage'}"/>
+                    <filter string="Status" name="groupby_state" context="{'group_by': 'state'}"/>
+                    <filter string="Buyer" name="groupby_buyer" context="{'group_by': 'buyer_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_plm_project" model="ir.actions.act_window">
+        <field name="name">PLM Projects</field>
+        <field name="res_model">garment.plm.project</field>
+        <field name="view_mode">tree,kanban,form</field>
+        <field name="search_view_id" ref="view_garment_plm_project_search"/>
+        <field name="context">{'search_default_filter_in_progress': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smart_action">Create a new PLM Project to start tracking a style's
+                Concept -&gt; Design -&gt; Sourcing -&gt; Sampling -&gt; Costing -&gt; Approval -&gt;
+                Production Handover journey.</p>
+        </field>
+    </record>
+
+</odoo>

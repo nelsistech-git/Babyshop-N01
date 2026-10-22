@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_stock_move_tree" model="ir.ui.view">
+        <field name="name">garment.stock.move.tree</field>
+        <field name="model">garment.stock.move</field>
+        <field name="arch" type="xml">
+            <tree string="Stock Moves" decoration-muted="state == 'cancelled'" decoration-info="state == 'draft'">
+                <field name="move_number"/>
+                <field name="material_id"/>
+                <field name="warehouse_id"/>
+                <field name="location_id"/>
+                <field name="move_type"/>
+                <field name="quantity"/>
+                <field name="move_date"/>
+                <field name="reference"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_stock_move_form" model="ir.ui.view">
+        <field name="name">garment.stock.move.form</field>
+        <field name="model">garment.stock.move</field>
+        <field name="arch" type="xml">
+            <form string="Stock Move">
+                <header>
+                    <field name="state" widget="statusbar"/>
+                    <button name="action_approve_movement" type="object" string="Approve" class="btn-primary"
+                            groups="garment_warehouse.group_warehouse_manager"
+                            invisible="state != 'draft' or move_type not in ('adjustment_in','adjustment_out','return','transfer_in','transfer_out')"/>
+                    <button name="action_cancel" type="object" string="Cancel" class="btn-secondary"
+                            invisible="state != 'done'"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="material_id"/>
+                            <field name="warehouse_id"/>
+                            <field name="location_id"/>
+                            <field name="move_type"/>
+                            <field name="quantity"/>
+                            <field name="move_date"/>
+                        </group>
+                        <group>
+                            <field name="issue_department" invisible="move_type != 'issue'"/>
+                            <field name="order_reference"/>
+                            <field name="bom_id"/>
+                            <field name="return_condition" invisible="move_type != 'return'"/>
+                            <field name="destination_warehouse_id"
+                                   invisible="move_type not in ('transfer_in','transfer_out')"/>
+                            <field name="destination_location_id"
+                                   invisible="move_type != 'transfer_out'"/>
+                            <field name="adjustment_reason"
+                                   invisible="move_type not in ('adjustment_in','adjustment_out','return')"/>
+                            <field name="fabric_roll_id"/>
+                            <field name="reference"/>
+                            <field name="approved_by_id" readonly="1" invisible="not approved_by_id"/>
+                        </group>
+                    </group>
+                    <field name="remarks"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_stock_move_search" model="ir.ui.view">
+        <field name="name">garment.stock.move.search</field>
+        <field name="model">garment.stock.move</field>
+        <field name="arch" type="xml">
+            <search string="Search Stock Moves">
+                <field name="move_number"/>
+                <field name="material_id"/>
+                <field name="warehouse_id"/>
+                <field name="reference"/>
+                <filter string="Pending Approval" name="filter_pending_approval" domain="[('state', '=', 'draft')]"/>
+                <filter string="Done" name="filter_done" domain="[('state', '=', 'done')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Move Type" name="group_move_type" context="{'group_by': 'move_type'}"/>
+                    <filter string="Warehouse" name="group_warehouse" context="{'group_by': 'warehouse_id'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_stock_move" model="ir.actions.act_window">
+        <field name="name">Stock Moves</field>
+        <field name="res_model">garment.stock.move</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_garment_stock_move_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first stock movement.</p>
+        </field>
+    </record>
+
+</odoo>

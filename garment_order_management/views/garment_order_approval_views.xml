@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_order_approval_tree" model="ir.ui.view">
+        <field name="name">garment.order.approval.tree</field>
+        <field name="model">garment.order.approval</field>
+        <field name="arch" type="xml">
+            <tree string="Approval Stages" editable="bottom" decoration-success="status == 'approved'"
+                  decoration-danger="status == 'rejected'">
+                <field name="order_id"/>
+                <field name="stage"/>
+                <field name="approver_id"/>
+                <field name="status"/>
+                <field name="date"/>
+                <field name="remarks"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_order_approval_form" model="ir.ui.view">
+        <field name="name">garment.order.approval.form</field>
+        <field name="model">garment.order.approval</field>
+        <field name="arch" type="xml">
+            <form string="Order Approval Stage">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="order_id"/>
+                            <field name="stage"/>
+                            <field name="status"/>
+                        </group>
+                        <group>
+                            <field name="approver_id"/>
+                            <field name="date"/>
+                        </group>
+                    </group>
+                    <field name="remarks"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_order_approval" model="ir.actions.act_window">
+        <field name="name">Approval Stages</field>
+        <field name="res_model">garment.order.approval</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

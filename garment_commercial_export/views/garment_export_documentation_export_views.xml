@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_export_documentation_form_export_inherit" model="ir.ui.view">
+        <field name="name">garment.export.documentation.form.export.inherit</field>
+        <field name="model">garment.export.documentation</field>
+        <field name="inherit_id" ref="garment_finance.view_garment_export_documentation_form"/>
+        <field name="arch" type="xml">
+            <field name="status" position="after">
+                <button name="action_sync_totals_from_lines" type="object" string="Sync Totals From Lines"
+                        class="btn-secondary" icon="fa-refresh"/>
+                <button name="action_run_ai_verification" type="object" string="Run AI Document Verification"
+                        class="btn-secondary" icon="fa-magic"/>
+            </field>
+            <field name="lc_id" position="after">
+                <field name="po_number"/>
+                <field name="hs_code_id"/>
+            </field>
+            <field name="file" position="after">
+                <field name="buyer_document_shared"/>
+            </field>
+            <xpath expr="//sheet/group" position="after">
+                <notebook>
+                    <page string="Invoice Lines" invisible="document_type != 'export_invoice'">
+                        <field name="line_ids">
+                            <tree editable="bottom">
+                                <field name="style_id"/>
+                                <field name="color"/>
+                                <field name="size"/>
+                                <field name="quantity"/>
+                                <field name="unit_price"/>
+                                <field name="amount" readonly="1"/>
+                            </tree>
+                        </field>
+                    </page>
+                    <page string="Packing Cartons" invisible="document_type != 'packing_list'">
+                        <field name="carton_ids">
+                            <tree editable="bottom">
+                                <field name="carton_no"/>
+                                <field name="style_id"/>
+                                <field name="color"/>
+                                <field name="size"/>
+                                <field name="quantity"/>
+                                <field name="net_weight"/>
+                                <field name="gross_weight"/>
+                                <field name="measurement"/>
+                            </tree>
+                        </field>
+                    </page>
+                    <page string="AI Verification">
+                        <field name="ai_last_run" readonly="1"/>
+                        <field name="ai_verification_note" readonly="1" nolabel="1"/>
+                    </page>
+                </notebook>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_garment_export_documentation_tree_export_inherit" model="ir.ui.view">
+        <field name="name">garment.export.documentation.tree.export.inherit</field>
+        <field name="model">garment.export.documentation</field>
+        <field name="inherit_id" ref="garment_finance.view_garment_export_documentation_tree"/>
+        <field name="arch" type="xml">
+            <field name="document_date" position="before">
+                <field name="hs_code_id" optional="hide"/>
+                <field name="total_value" optional="show"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>

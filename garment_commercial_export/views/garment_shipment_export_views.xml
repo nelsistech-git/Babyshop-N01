@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_shipment_form_export_inherit" model="ir.ui.view">
+        <field name="name">garment.shipment.form.export.inherit</field>
+        <field name="model">garment.shipment</field>
+        <field name="inherit_id" ref="garment_logistics.view_garment_shipment_form"/>
+        <field name="arch" type="xml">
+            <field name="total_freight_cost" position="after">
+                <field name="commercial_readiness" widget="badge"
+                       decoration-success="commercial_readiness == 'ready'"
+                       decoration-danger="commercial_readiness == 'not_ready'"/>
+            </field>
+
+            <!-- FIXED: Replaced <page string="..."> selector with <xpath expr="//notebook"> to comply with Odoo 17 -->
+            <xpath expr="//notebook" position="inside">
+                <page string="Commercial &amp; Customs" name="commercial_customs">
+                    <group>
+                        <field name="commercial_readiness_note" readonly="1" nolabel="1"/>
+                    </group>
+                    <separator string="Export Documentation"/>
+                    <field name="export_documentation_ids">
+                        <tree>
+                            <field name="document_number"/>
+                            <field name="document_type"/>
+                            <field name="document_date"/>
+                            <field name="total_value"/>
+                            <field name="status"/>
+                        </tree>
+                    </field>
+                    <separator string="EXP Forms"/>
+                    <field name="exp_form_ids">
+                        <tree>
+                            <field name="exp_number"/>
+                            <field name="export_value"/>
+                            <field name="workflow_stage"/>
+                            <field name="status"/>
+                        </tree>
+                    </field>
+                    <separator string="Customs Documents"/>
+                    <field name="customs_document_ids">
+                        <tree>
+                            <field name="document_number"/>
+                            <field name="document_type"/>
+                            <field name="declared_value"/>
+                            <field name="status"/>
+                        </tree>
+                    </field>
+                    <separator string="Export Incentives"/>
+                    <field name="export_incentive_ids">
+                        <tree>
+                            <field name="claim_number"/>
+                            <field name="incentive_type"/>
+                            <field name="claim_amount"/>
+                            <field name="approval_status"/>
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_garment_shipment_tree_export_inherit" model="ir.ui.view">
+        <field name="name">garment.shipment.tree.export.inherit</field>
+        <field name="model">garment.shipment</field>
+        <field name="inherit_id" ref="garment_logistics.view_garment_shipment_tree"/>
+        <field name="arch" type="xml">
+            <field name="status" position="before">
+                <field name="commercial_readiness" widget="badge" optional="show"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>

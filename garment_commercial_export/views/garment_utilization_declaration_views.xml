@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_utilization_declaration_form" model="ir.ui.view">
+        <field name="name">garment.utilization.declaration.form</field>
+        <field name="model">garment.utilization.declaration</field>
+        <field name="arch" type="xml">
+            <form string="Utilization Declaration (UD)">
+                <header>
+                    <field name="status" widget="statusbar" statusbar_visible="draft,submitted,accepted"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="ud_number" readonly="1"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="import_permission_id"/>
+                            <field name="imported_quantity" readonly="1"/>
+                            <field name="consumed_qty"/>
+                            <field name="remaining_quantity" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="production_reference"/>
+                            <field name="export_documentation_id"/>
+                            <field name="shipment_id"/>
+                            <field name="declaration_date"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_utilization_declaration_tree" model="ir.ui.view">
+        <field name="name">garment.utilization.declaration.tree</field>
+        <field name="model">garment.utilization.declaration</field>
+        <field name="arch" type="xml">
+            <tree string="Utilization Declarations">
+                <field name="ud_number"/>
+                <field name="import_permission_id"/>
+                <field name="consumed_qty"/>
+                <field name="remaining_quantity"/>
+                <field name="shipment_id"/>
+                <field name="declaration_date"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_garment_utilization_declaration" model="ir.actions.act_window">
+        <field name="name">Utilization Declarations (UD)</field>
+        <field name="res_model">garment.utilization.declaration</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first Utilization Declaration.</p>
+        </field>
+    </record>
+
+</odoo>

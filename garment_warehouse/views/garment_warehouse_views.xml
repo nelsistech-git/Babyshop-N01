@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_warehouse_tree" model="ir.ui.view">
+        <field name="name">garment.warehouse.tree</field>
+        <field name="model">garment.warehouse</field>
+        <field name="arch" type="xml">
+            <tree string="Warehouses">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="warehouse_type"/>
+                <field name="factory"/>
+                <field name="manager_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_warehouse_form" model="ir.ui.view">
+        <field name="name">garment.warehouse.form</field>
+        <field name="model">garment.warehouse</field>
+        <field name="arch" type="xml">
+            <form string="Warehouse">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_locations" type="object" class="oe_stat_button" icon="fa-map-marker">
+                            <field name="location_count" widget="statinfo" string="Locations"/>
+                        </button>
+                        <button name="action_view_pending_grns" type="object" class="oe_stat_button" icon="fa-truck">
+                            <field name="pending_grn_count" widget="statinfo" string="Pending GRNs"/>
+                        </button>
+                        <button name="action_view_low_stock_materials" type="object" class="oe_stat_button" icon="fa-exclamation-triangle">
+                            <field name="low_stock_count" widget="statinfo" string="Low/Out of Stock"/>
+                        </button>
+                    </div>
+                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="warehouse_type"/>
+                            <field name="factory"/>
+                            <field name="address"/>
+                        </group>
+                        <group>
+                            <field name="manager_id"/>
+                            <field name="capacity"/>
+                            <field name="capacity_uom"/>
+                            <field name="space_utilization_percent" readonly="1" widget="progressbar"/>
+                        </group>
+                    </group>
+                    <field name="location_ids">
+                        <tree editable="bottom">
+                            <field name="zone"/>
+                            <field name="rack"/>
+                            <field name="shelf"/>
+                            <field name="bin"/>
+                            <field name="location_code"/>
+                            <field name="capacity"/>
+                        </tree>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_warehouse" model="ir.actions.act_window">
+        <field name="name">Warehouses</field>
+        <field name="res_model">garment.warehouse</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_cutting_bundle_tree" model="ir.ui.view">
+        <field name="name">garment.cutting.bundle.tree</field>
+        <field name="model">garment.cutting.bundle</field>
+        <field name="arch" type="xml">
+            <tree string="Cutting Bundles">
+                <field name="name"/>
+                <field name="cutting_order_id"/>
+                <field name="style_id"/>
+                <field name="size"/>
+                <field name="color"/>
+                <field name="quantity"/>
+                <field name="current_line_id"/>
+                <field name="current_operation"/>
+                <field name="status"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_cutting_bundle_form" model="ir.ui.view">
+        <field name="name">garment.cutting.bundle.form</field>
+        <field name="model">garment.cutting.bundle</field>
+        <field name="arch" type="xml">
+            <form string="Cutting Bundle">
+                <header>
+                    <field name="status" widget="statusbar"
+                           statusbar_visible="cutting,numbering,bundling,sewing,finishing,packing,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="cutting_order_id"/>
+                            <field name="style_id"/>
+                            <field name="size"/>
+                            <field name="color"/>
+                            <field name="quantity"/>
+                        </group>
+                        <group>
+                            <field name="barcode"/>
+                            <field name="rfid_tag_id"/>
+                            <field name="destination_line_id"/>
+                            <field name="current_line_id"/>
+                            <field name="current_operation"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_cutting_bundle_search" model="ir.ui.view">
+        <field name="name">garment.cutting.bundle.search</field>
+        <field name="model">garment.cutting.bundle</field>
+        <field name="arch" type="xml">
+            <search string="Search Bundles">
+                <field name="name"/>
+                <field name="barcode"/>
+                <field name="style_id"/>
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                    <filter string="Current Line" name="group_line" context="{'group_by': 'current_line_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_cutting_bundle" model="ir.actions.act_window">
+        <field name="name">Cutting Bundles</field>
+        <field name="res_model">garment.cutting.bundle</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_garment_cutting_bundle_search"/>
+    </record>
+
+</odoo>

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_document_retention_policy_tree" model="ir.ui.view">
+        <field name="name">garment.document.retention.policy.tree</field>
+        <field name="model">garment.document.retention.policy</field>
+        <field name="arch" type="xml">
+            <tree string="Retention Policies">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="category_id"/>
+                <field name="department"/>
+                <field name="document_type"/>
+                <field name="is_permanent"/>
+                <field name="retention_years"/>
+                <field name="action_on_expiry"/>
+                <field name="document_count"/>
+                <field name="active" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_document_retention_policy_form" model="ir.ui.view">
+        <field name="name">garment.document.retention.policy.form</field>
+        <field name="model">garment.document.retention.policy</field>
+        <field name="arch" type="xml">
+            <form string="Retention Policy">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_documents" type="object" class="oe_stat_button" icon="fa-file-text-o">
+                            <field name="document_count" widget="statinfo" string="Documents"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="sequence"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="category_id"/>
+                            <field name="department"/>
+                            <field name="document_type"/>
+                        </group>
+                    </group>
+                    <group string="Retention Rule (SRS section 50)">
+                        <group>
+                            <field name="is_permanent"/>
+                            <field name="retention_years" invisible="is_permanent == True"/>
+                        </group>
+                        <group>
+                            <field name="notice_days"/>
+                            <field name="action_on_expiry"/>
+                        </group>
+                    </group>
+                    <group string="Description">
+                        <field name="description" nolabel="1"/>
+                    </group>
+                    <button name="action_apply_to_matching_documents" type="object"
+                            string="Apply To Matching Documents Without A Policy" class="btn-secondary"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_document_retention_policy_search" model="ir.ui.view">
+        <field name="name">garment.document.retention.policy.search</field>
+        <field name="model">garment.document.retention.policy</field>
+        <field name="arch" type="xml">
+            <search string="Search Retention Policies">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="category_id"/>
+                <filter string="Permanent" name="permanent" domain="[('is_permanent', '=', True)]"/>
+                <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Department" name="group_department" context="{'group_by': 'department'}"/>
+                    <filter string="Action On Expiry" name="group_action" context="{'group_by': 'action_on_expiry'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_document_retention_policy" model="ir.actions.act_window">
+        <field name="name">Retention Policies</field>
+        <field name="res_model">garment.document.retention.policy</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first document retention policy.</p>
+        </field>
+    </record>
+
+</odoo>

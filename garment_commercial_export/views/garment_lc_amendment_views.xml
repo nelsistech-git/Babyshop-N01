@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_lc_amendment_tree" model="ir.ui.view">
+        <field name="name">garment.lc.amendment.tree</field>
+        <field name="model">garment.lc.amendment</field>
+        <field name="arch" type="xml">
+            <tree string="LC Amendments" decoration-success="status == 'approved'" decoration-danger="status == 'rejected'">
+                <field name="lc_id"/>
+                <field name="amendment_number"/>
+                <field name="amendment_date"/>
+                <field name="change_summary"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_lc_amendment_form" model="ir.ui.view">
+        <field name="name">garment.lc.amendment.form</field>
+        <field name="model">garment.lc.amendment</field>
+        <field name="arch" type="xml">
+            <form string="LC Amendment">
+                <header>
+                    <field name="status" widget="statusbar" statusbar_visible="draft,submitted,approved"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="lc_id"/>
+                            <field name="amendment_number"/>
+                            <field name="amendment_date"/>
+                            <field name="change_summary"/>
+                        </group>
+                        <group>
+                            <field name="old_value"/>
+                            <field name="new_value"/>
+                            <field name="approval_date"/>
+                        </group>
+                    </group>
+                    <group string="Reason">
+                        <field name="reason" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_lc_amendment" model="ir.actions.act_window">
+        <field name="name">LC Amendments</field>
+        <field name="res_model">garment.lc.amendment</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Record your first LC amendment.</p>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_dashboard_tile_kanban" model="ir.ui.view">
+        <field name="name">garment.dashboard.tile.kanban</field>
+        <field name="model">garment.dashboard.tile</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_dashboard" create="true" default_group_by="board_id">
+                <field name="name"/>
+                <field name="current_value"/>
+                <field name="target_value"/>
+                <field name="unit"/>
+                <field name="status"/>
+                <field name="icon"/>
+                <field name="as_of"/>
+                <field name="board_id"/>
+                <field name="size"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click o_kanban_card p-3">
+                            <div class="d-flex align-items-center mb-2">
+                                <i t-attf-class="fa fa-fw fa-lg mr-2 #{record.icon.raw_value or 'fa-bar-chart'}"/>
+                                <strong><field name="name"/></strong>
+                            </div>
+                            <div t-attf-class="display-4 #{record.status.raw_value == 'critical' and 'text-danger' or (record.status.raw_value == 'warning' and 'text-warning' or 'text-success')}">
+                                <field name="current_value" widget="float" options="{'digits': [16, 1]}"/>
+                                <span class="h5 text-muted"> <field name="unit"/></span>
+                            </div>
+                            <div class="text-muted" t-if="record.target_value.raw_value">
+                                Target: <field name="target_value"/> <field name="unit"/>
+                            </div>
+                            <div class="text-muted small">
+                                <field name="as_of"/>
+                            </div>
+                            <span t-attf-class="badge #{record.status.raw_value == 'critical' and 'badge-danger' or (record.status.raw_value == 'warning' and 'badge-warning' or 'badge-success')}">
+                                <field name="status"/>
+                            </span>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_garment_dashboard_tile_tree" model="ir.ui.view">
+        <field name="name">garment.dashboard.tile.tree</field>
+        <field name="model">garment.dashboard.tile</field>
+        <field name="arch" type="xml">
+            <tree string="Dashboard Tiles" decoration-danger="status == 'critical'"
+                  decoration-warning="status == 'warning'" decoration-success="status == 'on_target'">
+                <field name="sequence" widget="handle"/>
+                <field name="board_id"/>
+                <field name="name"/>
+                <field name="tile_type"/>
+                <field name="kpi_id"/>
+                <field name="current_value"/>
+                <field name="unit"/>
+                <field name="target_value"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_dashboard_tile_form" model="ir.ui.view">
+        <field name="name">garment.dashboard.tile.form</field>
+        <field name="model">garment.dashboard.tile</field>
+        <field name="arch" type="xml">
+            <form string="Dashboard Tile">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="board_id"/>
+                            <field name="name"/>
+                            <field name="tile_type"/>
+                            <field name="icon"/>
+                            <field name="color"/>
+                            <field name="size"/>
+                            <field name="sequence"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="current_value" readonly="1"/>
+                            <field name="target_value" readonly="1"/>
+                            <field name="unit" readonly="1"/>
+                            <field name="status" widget="badge" readonly="1"/>
+                            <field name="as_of" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Linked KPI" invisible="tile_type != 'kpi'">
+                        <field name="kpi_id" nolabel="1"/>
+                    </group>
+                    <group string="Custom Measure" invisible="tile_type != 'custom'">
+                        <group>
+                            <field name="source_model"/>
+                            <field name="measure_field"/>
+                            <field name="aggregation"/>
+                            <field name="date_field"/>
+                            <field name="date_range"/>
+                            <field name="domain_filter"/>
+                        </group>
+                        <group>
+                            <field name="custom_target_value"/>
+                            <field name="custom_unit"/>
+                            <field name="higher_is_better"/>
+                            <field name="warning_threshold_pct"/>
+                            <field name="critical_threshold_pct"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_dashboard_tile_search" model="ir.ui.view">
+        <field name="name">garment.dashboard.tile.search</field>
+        <field name="model">garment.dashboard.tile</field>
+        <field name="arch" type="xml">
+            <search string="Search Dashboard Tiles">
+                <field name="name"/>
+                <field name="board_id"/>
+                <field name="kpi_id"/>
+                <group expand="0" string="Group By">
+                    <filter string="Dashboard" name="group_board" context="{'group_by': 'board_id'}"/>
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_dashboard_tile" model="ir.actions.act_window">
+        <field name="name">Dashboard Tiles</field>
+        <field name="res_model">garment.dashboard.tile</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No dashboard tiles yet.</p>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_barcode_tree" model="ir.ui.view">
+        <field name="name">garment.barcode.tree</field>
+        <field name="model">garment.barcode</field>
+        <field name="arch" type="xml">
+            <tree string="Barcodes" editable="bottom">
+                <field name="barcode_value"/>
+                <field name="usage_type"/>
+                <field name="barcode_type"/>
+                <field name="material_id"/>
+                <field name="fabric_roll_id"/>
+                <field name="location_id"/>
+                <field name="printed"/>
+                <field name="last_scanned_date"/>
+                <field name="last_scanned_location_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_barcode_form" model="ir.ui.view">
+        <field name="name">garment.barcode.form</field>
+        <field name="model">garment.barcode</field>
+        <field name="arch" type="xml">
+            <form string="Barcode">
+                <header>
+                    <button name="action_mark_printed" type="object" string="Mark Printed" class="btn-secondary"
+                            invisible="printed"/>
+                    <button name="action_scan" type="object" string="Scan" class="btn-primary"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="barcode_value"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="usage_type"/>
+                            <field name="barcode_type"/>
+                            <field name="material_id" invisible="usage_type != 'material'"/>
+                            <field name="fabric_roll_id" invisible="usage_type != 'roll'"/>
+                            <field name="location_id" invisible="usage_type != 'location'"/>
+                            <field name="printed"/>
+                            <field name="generated_date" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="last_scanned_date" readonly="1"/>
+                            <field name="last_scanned_by_id" readonly="1"/>
+                            <field name="last_scanned_location_id"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_barcode_search" model="ir.ui.view">
+        <field name="name">garment.barcode.search</field>
+        <field name="model">garment.barcode</field>
+        <field name="arch" type="xml">
+            <search string="Search Barcodes">
+                <field name="barcode_value"/>
+                <field name="material_id"/>
+                <field name="fabric_roll_id"/>
+                <filter string="Not Printed" name="filter_not_printed" domain="[('printed', '=', False)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Barcode Use" name="group_usage" context="{'group_by': 'usage_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_barcode" model="ir.actions.act_window">
+        <field name="name">Barcodes</field>
+        <field name="res_model">garment.barcode</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_garment_barcode_search"/>
+    </record>
+</odoo>

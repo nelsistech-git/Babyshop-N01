@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_grade_rule_tree" model="ir.ui.view">
+        <field name="name">garment.grade.rule.tree</field>
+        <field name="model">garment.grade.rule</field>
+        <field name="arch" type="xml">
+            <tree string="Grade Rules">
+                <field name="rule_code"/>
+                <field name="name"/>
+                <field name="buyer_id"/>
+                <field name="style_category_id"/>
+                <field name="size_set_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_grade_rule_form" model="ir.ui.view">
+        <field name="name">garment.grade.rule.form</field>
+        <field name="model">garment.grade.rule</field>
+        <field name="arch" type="xml">
+            <form string="Grade Rule">
+                <header>
+                    <button name="action_preview_grading" type="object" string="Preview Grading" class="btn-secondary"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="rule_code"/>
+                            <field name="buyer_id"/>
+                            <field name="style_category_id"/>
+                        </group>
+                        <group>
+                            <field name="size_set_id"/>
+                            <field name="unit"/>
+                        </group>
+                    </group>
+                    <field name="line_ids">
+                        <tree editable="bottom">
+                            <field name="sequence" widget="handle"/>
+                            <field name="measurement_point"/>
+                            <field name="base_size_value"/>
+                            <field name="increment_value"/>
+                            <field name="decrement_value"/>
+                        </tree>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_grade_rule" model="ir.actions.act_window">
+        <field name="name">Grade Rules</field>
+        <field name="res_model">garment.grade.rule</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

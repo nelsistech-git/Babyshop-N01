@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <record id="module_category_garment_iot_platform" model="ir.module.category">
+            <field name="name">Smart Garment ERP - Smart Factory &amp; IoT Platform</field>
+            <field name="sequence">80</field>
+        </record>
+
+        <record id="group_iot_viewer" model="res.groups">
+            <field name="name">Viewer (Dashboards &amp; Alerts, Read Only)</field>
+            <field name="category_id" ref="module_category_garment_iot_platform"/>
+        </record>
+
+        <record id="group_iot_technician" model="res.groups">
+            <field name="name">Technician (Gateway &amp; Device Registration)</field>
+            <field name="category_id" ref="module_category_garment_iot_platform"/>
+            <field name="implied_ids" eval="[(4, ref('group_iot_viewer'))]"/>
+        </record>
+
+        <record id="group_iot_analyst" model="res.groups">
+            <field name="name">IoT Analyst (Alert Rule Configuration)</field>
+            <field name="category_id" ref="module_category_garment_iot_platform"/>
+            <field name="implied_ids" eval="[(4, ref('group_iot_viewer'))]"/>
+        </record>
+
+        <record id="group_iot_manager" model="res.groups">
+            <field name="name">Manager (Full Access + Configuration)</field>
+            <field name="category_id" ref="module_category_garment_iot_platform"/>
+            <field name="implied_ids" eval="[(4, ref('group_iot_technician')), (4, ref('group_iot_analyst'))]"/>
+        </record>
+
+    </data>
+</odoo>

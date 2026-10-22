@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_ie_operation_form" model="ir.ui.view">
+        <field name="name">garment.ie.operation.form</field>
+        <field name="model">garment.ie.operation</field>
+        <field name="arch" type="xml">
+            <form string="IE Operation">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_recommended_operators" type="object"
+                                class="oe_stat_button" icon="fa-users">
+                            <field name="operator_skill_count" widget="statinfo" string="Skilled Operators"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="e.g. Sleeve Attach"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="operation_code"/>
+                            <field name="department"/>
+                            <field name="sequence"/>
+                        </group>
+                        <group>
+                            <field name="machine_type"/>
+                            <field name="skill_required"/>
+                            <field name="standard_smv"/>
+                        </group>
+                    </group>
+                    <group string="Notes">
+                        <field name="notes" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_ie_operation_tree" model="ir.ui.view">
+        <field name="name">garment.ie.operation.tree</field>
+        <field name="model">garment.ie.operation</field>
+        <field name="arch" type="xml">
+            <tree string="IE Operations">
+                <field name="operation_code"/>
+                <field name="name"/>
+                <field name="department"/>
+                <field name="machine_type"/>
+                <field name="skill_required"/>
+                <field name="standard_smv" sum="Total SMV"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_ie_operation_search" model="ir.ui.view">
+        <field name="name">garment.ie.operation.search</field>
+        <field name="model">garment.ie.operation</field>
+        <field name="arch" type="xml">
+            <search string="Search IE Operations">
+                <field name="operation_code"/>
+                <field name="name"/>
+                <field name="department"/>
+                <group expand="0" string="Group By">
+                    <filter string="Department" name="group_department" context="{'group_by': 'department'}"/>
+                    <filter string="Machine Type" name="group_machine" context="{'group_by': 'machine_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_ie_operation" model="ir.actions.act_window">
+        <field name="name">Operation Master</field>
+        <field name="res_model">garment.ie.operation</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first IE operation.</p>
+        </field>
+    </record>
+
+</odoo>

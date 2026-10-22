@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <record id="module_category_garment_costing" model="ir.module.category">
+            <field name="name">Smart Garment ERP - Costing</field>
+            <field name="sequence">56</field>
+        </record>
+
+        <record id="group_costing_merchandiser" model="res.groups">
+            <field name="name">Merchandiser (Level 1 Approval)</field>
+            <field name="category_id" ref="module_category_garment_costing"/>
+        </record>
+
+        <record id="group_costing_team" model="res.groups">
+            <field name="name">Costing Team (Level 2 Approval, Create/Edit)</field>
+            <field name="category_id" ref="module_category_garment_costing"/>
+        </record>
+
+        <record id="group_costing_finance" model="res.groups">
+            <field name="name">Finance (Level 3 Approval)</field>
+            <field name="category_id" ref="module_category_garment_costing"/>
+        </record>
+
+        <record id="group_costing_manager" model="res.groups">
+            <field name="name">Costing Manager (Level 4 Approval, Full Access, Unlock)</field>
+            <field name="category_id" ref="module_category_garment_costing"/>
+            <field name="implied_ids" eval="[(4, ref('group_costing_merchandiser')),
+                                              (4, ref('group_costing_team')),
+                                              (4, ref('group_costing_finance'))]"/>
+        </record>
+
+        <record id="group_costing_top_management" model="res.groups">
+            <field name="name">Top Management (MD - Unlock, Dashboard &amp; Reports)</field>
+            <field name="category_id" ref="module_category_garment_costing"/>
+            <field name="implied_ids" eval="[(4, ref('group_costing_manager'))]"/>
+        </record>
+
+        <record id="rule_garment_costing_team_full" model="ir.rule">
+            <field name="name">Costing Team and above: All Costings</field>
+            <field name="model_id" ref="model_garment_costing"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_costing_team')),
+                                        (4, ref('group_costing_finance')),
+                                        (4, ref('group_costing_manager'))]"/>
+        </record>
+
+        <record id="rule_garment_costing_merchandiser_readonly" model="ir.rule">
+            <field name="name">Merchandiser: Read Access to All Costings</field>
+            <field name="model_id" ref="model_garment_costing"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_costing_merchandiser'))]"/>
+            <field name="perm_read">1</field>
+            <field name="perm_write">0</field>
+            <field name="perm_create">0</field>
+            <field name="perm_unlink">0</field>
+        </record>
+
+    </data>
+</odoo>

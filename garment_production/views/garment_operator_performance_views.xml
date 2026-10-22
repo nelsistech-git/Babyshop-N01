@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_operator_performance_tree" model="ir.ui.view">
+        <field name="name">garment.operator.performance.tree</field>
+        <field name="model">garment.operator.performance</field>
+        <field name="arch" type="xml">
+            <tree string="Operator Performance" decoration-danger="performance_score &lt; 70" decoration-success="performance_score &gt;= 95">
+                <field name="date"/>
+                <field name="employee_id"/>
+                <field name="operation_name"/>
+                <field name="line_id"/>
+                <field name="target_qty"/>
+                <field name="actual_qty"/>
+                <field name="efficiency_pct"/>
+                <field name="quality_score"/>
+                <field name="attendance_score"/>
+                <field name="performance_score"/>
+                <field name="incentive_amount"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_operator_performance_form" model="ir.ui.view">
+        <field name="name">garment.operator.performance.form</field>
+        <field name="model">garment.operator.performance</field>
+        <field name="arch" type="xml">
+            <form string="Operator Performance">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="employee_id"/>
+                            <field name="operation_name"/>
+                            <field name="line_id"/>
+                            <field name="production_order_id"/>
+                            <field name="date"/>
+                            <field name="skill_level"/>
+                        </group>
+                        <group>
+                            <field name="target_qty"/>
+                            <field name="actual_qty"/>
+                            <field name="efficiency_pct"/>
+                            <field name="quality_score"/>
+                            <field name="attendance_score"/>
+                            <field name="performance_score"/>
+                            <field name="incentive_amount"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_operator_performance_pivot" model="ir.ui.view">
+        <field name="name">garment.operator.performance.pivot</field>
+        <field name="model">garment.operator.performance</field>
+        <field name="arch" type="xml">
+            <pivot string="Operator Performance Analysis">
+                <field name="employee_id" type="row"/>
+                <field name="date" type="col"/>
+                <field name="performance_score" type="measure"/>
+                <field name="actual_qty" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_garment_operator_performance" model="ir.actions.act_window">
+        <field name="name">Operator Performance</field>
+        <field name="res_model">garment.operator.performance</field>
+        <field name="view_mode">tree,form,pivot</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_ie_skill_matrix_form" model="ir.ui.view">
+        <field name="name">garment.ie.skill.matrix.form</field>
+        <field name="model">garment.ie.skill.matrix</field>
+        <field name="arch" type="xml">
+            <form string="Operator Skill Matrix">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="employee_id"/>
+                        <h1><field name="employee_id"/></h1>
+                    </div>
+                    <group>
+                        <field name="skill_count" readonly="1"/>
+                        <field name="expert_count" readonly="1"/>
+                    </group>
+                    <notebook>
+                        <page string="Operation Skills">
+                            <field name="line_ids">
+                                <tree editable="bottom">
+                                    <field name="operation_id"/>
+                                    <field name="skill_level"/>
+                                    <field name="efficiency_pct"/>
+                                    <field name="training_status"/>
+                                    <field name="certified_date"/>
+                                    <field name="last_assessed_date"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_ie_skill_matrix_tree" model="ir.ui.view">
+        <field name="name">garment.ie.skill.matrix.tree</field>
+        <field name="model">garment.ie.skill.matrix</field>
+        <field name="arch" type="xml">
+            <tree string="Operator Skill Matrix">
+                <field name="employee_id"/>
+                <field name="skill_count"/>
+                <field name="expert_count"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_garment_ie_skill_matrix" model="ir.actions.act_window">
+        <field name="name">Operator Skill Matrix</field>
+        <field name="res_model">garment.ie.skill.matrix</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first operator skill matrix profile.</p>
+        </field>
+    </record>
+
+    <!-- Flat line list, used by the "Recommended Operators" smart button on garment.ie.operation -->
+    <record id="view_garment_ie_skill_matrix_line_tree" model="ir.ui.view">
+        <field name="name">garment.ie.skill.matrix.line.tree</field>
+        <field name="model">garment.ie.skill.matrix.line</field>
+        <field name="arch" type="xml">
+            <tree string="Operator Skills" default_order="efficiency_pct desc" create="0">
+                <field name="employee_id"/>
+                <field name="operation_id"/>
+                <field name="skill_level"/>
+                <field name="efficiency_pct"/>
+                <field name="training_status"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_garment_ie_skill_matrix_line" model="ir.actions.act_window">
+        <field name="name">Recommended Operators</field>
+        <field name="res_model">garment.ie.skill.matrix.line</field>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="view_garment_ie_skill_matrix_line_tree"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No operator has a recorded skill on this operation yet.</p>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <record id="module_category_garment_mobile" model="ir.module.category">
+            <field name="name">Smart Garment ERP - Mobile Platform</field>
+            <field name="sequence">27</field>
+        </record>
+
+        <record id="group_mobile_user" model="res.groups">
+            <field name="name">Mobile User (Own Devices &amp; Notifications)</field>
+            <field name="category_id" ref="module_category_garment_mobile"/>
+        </record>
+
+        <record id="group_mobile_admin" model="res.groups">
+            <field name="name">IT Administrator (Device &amp; Session Management)</field>
+            <field name="category_id" ref="module_category_garment_mobile"/>
+            <field name="implied_ids" eval="[(4, ref('group_mobile_user'))]"/>
+        </record>
+
+        <record id="group_mobile_manager" model="res.groups">
+            <field name="name">Mobile Platform Manager (Full Access)</field>
+            <field name="category_id" ref="module_category_garment_mobile"/>
+            <field name="implied_ids" eval="[(4, ref('group_mobile_admin'))]"/>
+        </record>
+
+    </data>
+</odoo>

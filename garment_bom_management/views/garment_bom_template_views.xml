@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_bom_template_tree" model="ir.ui.view">
+        <field name="name">garment.bom.template.tree</field>
+        <field name="model">garment.bom.template</field>
+        <field name="arch" type="xml">
+            <tree string="BOM Templates">
+                <field name="name"/>
+                <field name="style_category_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_bom_template_form" model="ir.ui.view">
+        <field name="name">garment.bom.template.form</field>
+        <field name="model">garment.bom.template</field>
+        <field name="arch" type="xml">
+            <form string="BOM Template">
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <field name="style_category_id"/>
+                    </group>
+                    <group string="Description"><field name="description" nolabel="1"/></group>
+                    <notebook>
+                        <page string="Default Materials">
+                            <field name="line_ids">
+                                <tree editable="bottom">
+                                    <field name="material_category"/>
+                                    <field name="material_name"/>
+                                    <field name="default_qty"/>
+                                    <field name="uom"/>
+                                    <field name="notes"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Rules">
+                            <group string="Consumption Rules"><field name="consumption_rules" nolabel="1"/></group>
+                            <group string="Supplier Rules"><field name="supplier_rules" nolabel="1"/></group>
+                            <group string="Packaging Rules"><field name="packaging_rules" nolabel="1"/></group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_bom_template" model="ir.actions.act_window">
+        <field name="name">BOM Templates</field>
+        <field name="res_model">garment.bom.template</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create a reusable BOM template (e.g. Knit T-Shirt, Polo Shirt, Hoodie).</p>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_supplier_audit_tree" model="ir.ui.view">
+        <field name="name">garment.supplier.audit.tree</field>
+        <field name="model">garment.supplier.audit</field>
+        <field name="arch" type="xml">
+            <tree string="Supplier Audits">
+                <field name="audit_number"/>
+                <field name="supplier_id"/>
+                <field name="audit_type"/>
+                <field name="audit_date"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_supplier_audit_form" model="ir.ui.view">
+        <field name="name">garment.supplier.audit.form</field>
+        <field name="model">garment.supplier.audit</field>
+        <field name="arch" type="xml">
+            <form string="Supplier Audit">
+                <header>
+                    <field name="status" widget="statusbar"/>
+                    <button name="action_next_stage" type="object" string="Move to Next Stage" class="btn-primary"
+                            invisible="status == 'closed'"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="audit_number" readonly="1"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="supplier_id"/>
+                            <field name="audit_type"/>
+                            <field name="audit_date"/>
+                            <field name="auditor_id"/>
+                        </group>
+                    </group>
+                    <group string="Factory Checklist" col="3">
+                        <field name="chk_production_capacity"/>
+                        <field name="chk_machine_condition"/>
+                        <field name="chk_safety_system"/>
+                    </group>
+                    <group string="Quality Checklist" col="3">
+                        <field name="chk_qc_process"/>
+                        <field name="chk_testing_facility"/>
+                        <field name="chk_documentation"/>
+                    </group>
+                    <group string="Compliance Checklist" col="3">
+                        <field name="chk_worker_safety"/>
+                        <field name="chk_environment"/>
+                        <field name="chk_certifications"/>
+                    </group>
+                    <field name="findings"/>
+                    <field name="capa_ids">
+                        <tree editable="bottom">
+                            <field name="issue"/>
+                            <field name="responsible_person_id"/>
+                            <field name="due_date"/>
+                            <field name="completion_status"/>
+                        </tree>
+                    </field>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_supplier_audit" model="ir.actions.act_window">
+        <field name="name">Supplier Audits</field>
+        <field name="res_model">garment.supplier.audit</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

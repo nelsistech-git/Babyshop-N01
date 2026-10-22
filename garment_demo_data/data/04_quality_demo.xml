@@ -1,0 +1,462 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Smart Complete Garment Software
+    Demo Data: Quality Management System (garment_quality)
+
+    Copyright (c) Nelsis Tech (www.nelsistech.com)
+    License: LGPL-3
+
+    NOTE on production-order linkage: per garment_quality/IMPLEMENTATION_NOTES.md,
+    garment.quality.inspection.production_order_id, garment.aql.inspection.
+    production_order_id and garment.quality.defect.production_order_id are all
+    plain Char soft-reference fields (NOT Many2one) — the module was authored
+    before garment_production exposed a stable Production Order model, and was
+    deliberately kept as free text. Per the task's instruction, each is filled
+    with "<xml id sibling agent uses in 04_production_demo.xml> / <readable
+    production order number>" so a human reader can trace it even though the
+    field itself is not a hard link: prod_order_tee / PROD-TS-2601-01,
+    prod_order_polo / PROD-PL-2602-01, prod_order_hoodie / PROD-HD-2603-01.
+
+    NOTE on inspector/responsible-person linkage: every "who did this" field in
+    this module (inspector_id, repair_person_id, responsible_user_id,
+    responsible_id, verified_by_id) is Many2one('res.users'), not
+    garment.hr.employee — see the model sources under garment_quality/models/.
+    No res.users demo record exists for emp_qc_inspector (Shirin Sultana) or
+    any other HR employee (same situation already noted in 02_sample_demo.xml /
+    03_merchandising_demo.xml), so per house convention these fields point at
+    base.user_admin, and the actual human is named in remarks/notes text
+    instead so the story still reads correctly.
+
+    NOTE on incoming fabric GRN linkage: garment.quality.inspection.grn_id is a
+    Many2one to garment.grn (garment_warehouse), a different model from
+    garment.purchase.delivery (used for GRN-2026-TS-001 in 03_purchase_demo.xml
+    for the same physical receipt) — no garment.grn record exists anywhere in
+    this dataset (that model/batch was never populated), so grn_id/grn_line_id
+    are left empty here rather than guessing a non-existent ref; the receipt is
+    instead traced via material_id/supplier_id plus a remarks-text reference to
+    purchase_order_fabric_tee / purchase_delivery_fabric_tee (GRN-2026-TS-001).
+
+    Story: incoming fabric inspection for style_tee's Delta Knit fabric receipt,
+    three Sewing Inline QC inspections on Line 1 during style_tee production
+    (one clean, two catching a recurring open-seam defect that is repaired via
+    Rework each time and ultimately raises a CAPA for the systemic root cause),
+    one AQL Final Inspection per order (order_tee's is the fullest, with a
+    handful of touched-up defects still within AQL 2.5/4.0 limits; order_polo
+    and order_hoodie get a single lighter, clean AQL pass each). Timeline:
+    fabric inspection May 2026, sewing inline QC Apr-May 2026 production, AQL
+    finals Jun-Jul 2026 ahead of each order's shipment window.
+-->
+<odoo>
+<data noupdate="1">
+
+    <!-- =================================================================
+         Quality Standard — Northwind knit programs (style_tee / style_polo)
+         ================================================================= -->
+
+    <record id="std_northwind_knit" model="garment.quality.standard">
+        <field name="name">Northwind Knit Basics — Buyer Quality Standard</field>
+        <field name="buyer_id" ref="buyer_northwind"/>
+        <field name="standard_type">buyer</field>
+        <field name="aql_level">2.5</field>
+        <field name="inspection_level">g2</field>
+        <field name="inspection_method">4_point</field>
+        <field name="measurement_tolerance">±0.5 inch (chest/length), ±0.25 inch (sleeve/collar)</field>
+        <field name="defect_limit_critical">0</field>
+        <field name="defect_limit_major">10</field>
+        <field name="defect_limit_minor">14</field>
+        <field name="packaging_rules">1 dozen per inner poly, 6 dozen per export master carton, size/color
+assortment sticker per buyer packing list.</field>
+        <field name="notes">Applies to all Northwind Core Basics knit styles (style_tee, style_polo). AQL 2.5
+major / 4.0 minor, General Inspection Level II, 4-point fabric inspection system.</field>
+        <field name="state">active</field>
+    </record>
+
+    <!-- =================================================================
+         Incoming Fabric Inspection — style_tee's Delta Knit fabric receipt
+         ================================================================= -->
+
+    <record id="inspection_fabric_incoming_tee" model="garment.quality.inspection">
+        <field name="inspection_type">fabric</field>
+        <field name="inspection_source">purchase_receipt</field>
+        <field name="material_id" ref="mat_fabric_jersey"/>
+        <field name="supplier_id" ref="supplier_deltaknit"/>
+        <field name="roll_number">DK-JS180-R-0114/0142</field>
+        <field name="fabric_type">Single Jersey Cotton 180 GSM, Greige</field>
+        <field name="total_meter">4120.0</field>
+        <field name="style_id" ref="style_tee"/>
+        <field name="buyer_id" ref="buyer_northwind"/>
+        <field name="checkpoint_id" ref="garment_quality.checkpoint_incoming_material"/>
+        <field name="standard_id" ref="std_northwind_knit"/>
+        <field name="inspector_id" ref="base.user_admin"/>
+        <field name="inspection_date">2026-05-14 10:15:00</field>
+        <field name="inspection_method">4_point</field>
+        <field name="four_point_defect_points">8</field>
+        <field name="quantity">3600</field>
+        <field name="state">approved</field>
+        <field name="disposition">pass</field>
+        <field name="remarks">Partial receipt against purchase_order_fabric_tee / GRN-2026-TS-001
+(purchase_delivery_fabric_tee): 3,600 kg of the 5,100 kg ordered from Delta Knit Fabrics Ltd, Optic White and
+Navy lots. 4-point system: 8 points per 100 sq. yd average across the lot — well within the Northwind 2.5/4.0
+standard (std_northwind_knit). GSM, shade and shrinkage lab results all passed per purchase_delivery_fabric_tee.
+Inspected by Shirin Sultana, QC Inspector (emp_qc_inspector). Released to Fabric Store / Cutting.</field>
+    </record>
+
+    <!-- =================================================================
+         Sewing Inline QC — style_tee, Sewing Line 1, three inspections
+         ================================================================= -->
+
+    <!-- Inline #1 — clean pass, early production -->
+    <record id="inspection_sewing_tee_1" model="garment.quality.inspection">
+        <field name="inspection_type">sewing_inline</field>
+        <field name="inspection_source">production_order</field>
+        <field name="style_id" ref="style_tee"/>
+        <field name="buyer_id" ref="buyer_northwind"/>
+        <field name="production_order_id">prod_order_tee / PROD-TS-2601-01</field>
+        <field name="sewing_line">Sewing Line 1</field>
+        <field name="operation">Shoulder Join / Collar Attach</field>
+        <field name="checkpoint_id" ref="garment_quality.checkpoint_sewing_inline"/>
+        <field name="standard_id" ref="std_northwind_knit"/>
+        <field name="inspector_id" ref="base.user_admin"/>
+        <field name="inspection_date">2026-04-06 11:00:00</field>
+        <field name="inspection_method">visual</field>
+        <field name="quantity">500</field>
+        <field name="state">approved</field>
+        <field name="disposition">pass</field>
+        <field name="measurement_line_ids" eval="[
+            (0, 0, {'sequence': 10, 'measurement_point': 'Chest (1&quot; below armhole)', 'size': 'M',
+                     'spec_value': 20.0, 'tolerance': 0.5, 'actual_value': 20.2}),
+            (0, 0, {'sequence': 20, 'measurement_point': 'Body Length (HPS)', 'size': 'M',
+                     'spec_value': 28.0, 'tolerance': 0.5, 'actual_value': 27.8}),
+        ]"/>
+        <field name="remarks">First inline check on Line 1 after style_tee style changeover — clean start,
+stitch quality and measurements within tolerance. Inspected by Shirin Sultana, QC Inspector.</field>
+    </record>
+
+    <!-- Inline #2 — open-seam defect found, closed via Rework -->
+    <record id="inspection_sewing_tee_2" model="garment.quality.inspection">
+        <field name="inspection_type">sewing_inline</field>
+        <field name="inspection_source">production_order</field>
+        <field name="style_id" ref="style_tee"/>
+        <field name="buyer_id" ref="buyer_northwind"/>
+        <field name="production_order_id">prod_order_tee / PROD-TS-2601-01</field>
+        <field name="sewing_line">Sewing Line 1</field>
+        <field name="operation">Side Seam</field>
+        <field name="checkpoint_id" ref="garment_quality.checkpoint_sewing_inline"/>
+        <field name="standard_id" ref="std_northwind_knit"/>
+        <field name="inspector_id" ref="base.user_admin"/>
+        <field name="inspection_date">2026-04-20 14:15:00</field>
+        <field name="inspection_method">percentage</field>
+        <field name="quantity">480</field>
+        <field name="state">approved</field>
+        <field name="disposition">conditional</field>
+        <field name="checklist_line_ids" eval="[
+            (0, 0, {'sequence': 10, 'check_item': 'Stitch Quality', 'result': 'fail',
+                     'remark': 'Open seam on left side-seam — see defect_open_seam_tee_1'}),
+            (0, 0, {'sequence': 20, 'check_item': 'Measurement', 'result': 'pass'}),
+            (0, 0, {'sequence': 30, 'check_item': 'Operation Accuracy', 'result': 'pass'}),
+        ]"/>
+        <field name="remarks">3 pcs held for open seam on the left side-seam (bundle SL1-B-0142) — see
+defect_open_seam_tee_1. Repaired same shift via garment.quality.rework and re-inspected pass; bundle released
+conditional on the repair. Inspected by Shirin Sultana, QC Inspector.</field>
+    </record>
+
+    <record id="defect_open_seam_tee_1" model="garment.quality.defect">
+        <field name="name">Open Seam</field>
+        <field name="defect_code_id" ref="garment_quality.defect_code_open_seam"/>
+        <field name="department">sewing</field>
+        <field name="inspection_id" ref="inspection_sewing_tee_2"/>
+        <field name="style_id" ref="style_tee"/>
+        <field name="production_order_id">prod_order_tee / PROD-TS-2601-01</field>
+        <field name="sewing_line">Sewing Line 1</field>
+        <field name="location">Side seam, left panel</field>
+        <field name="quantity">3</field>
+        <field name="corrective_action">Re-stitch open seam with reinforced 3-thread overlock; verify tension
+setting on machine SN-14 before resuming.</field>
+        <field name="status">closed</field>
+    </record>
+
+    <record id="rework_open_seam_tee_1" model="garment.quality.rework">
+        <field name="defect_id" ref="defect_open_seam_tee_1"/>
+        <field name="inspection_id" ref="inspection_sewing_tee_2"/>
+        <field name="defect_code_id" ref="garment_quality.defect_code_open_seam"/>
+        <field name="style_id" ref="style_tee"/>
+        <field name="garment_ref">Bundle SL1-B-0142</field>
+        <field name="quantity">3</field>
+        <field name="repair_person_id" ref="base.user_admin"/>
+        <field name="repair_start">2026-04-20 14:30:00</field>
+        <field name="repair_end">2026-04-20 16:10:00</field>
+        <field name="status">approved</field>
+        <field name="reinspection_result">pass</field>
+        <field name="notes">Repaired by Rahima Khatun (Sewing Line 1 operator), same shift. Re-inspected by
+Shirin Sultana, QC Inspector, and passed — bundle released to the next operation.</field>
+    </record>
+
+    <!-- Inline #3 — recurring open-seam defect + a minor defect, feeds CAPA -->
+    <record id="inspection_sewing_tee_3" model="garment.quality.inspection">
+        <field name="inspection_type">sewing_inline</field>
+        <field name="inspection_source">production_order</field>
+        <field name="style_id" ref="style_tee"/>
+        <field name="buyer_id" ref="buyer_northwind"/>
+        <field name="production_order_id">prod_order_tee / PROD-TS-2601-01</field>
+        <field name="sewing_line">Sewing Line 1</field>
+        <field name="operation">Side Seam</field>
+        <field name="checkpoint_id" ref="garment_quality.checkpoint_sewing_inline"/>
+        <field name="standard_id" ref="std_northwind_knit"/>
+        <field name="inspector_id" ref="base.user_admin"/>
+        <field name="inspection_date">2026-05-04 10:45:00</field>
+        <field name="inspection_method">percentage</field>
+        <field name="quantity">520</field>
+        <field name="state">approved</field>
+        <field name="disposition">conditional</field>
+        <field name="checklist_line_ids" eval="[
+            (0, 0, {'sequence': 10, 'check_item': 'Stitch Quality', 'result': 'fail',
+                     'remark': 'Open seam recurring, plus a skipped-stitch on the sleeve hem — see '
+                               'defect_open_seam_tee_2 / defect_skipped_stitch_tee_1'}),
+            (0, 0, {'sequence': 20, 'check_item': 'Measurement', 'result': 'pass'}),
+            (0, 0, {'sequence': 30, 'check_item': 'Operation Accuracy', 'result': 'pass'}),
+        ]"/>
+        <field name="remarks">Open seam recurring on the same side-seam operation (bundle SL1-B-0219), plus a
+minor skipped-stitch on the sleeve hem — see defect_open_seam_tee_2 / defect_skipped_stitch_tee_1. Two
+open-seam incidents on Line 1 in a two-week window; escalated to CAPA capa_recurring_open_seam_tee for root
+cause. Inspected by Shirin Sultana, QC Inspector.</field>
+    </record>
+
+    <record id="defect_open_seam_tee_2" model="garment.quality.defect">
+        <field name="name">Open Seam</field>
+        <field name="defect_code_id" ref="garment_quality.defect_code_open_seam"/>
+        <field name="department">sewing</field>
+        <field name="inspection_id" ref="inspection_sewing_tee_3"/>
+        <field name="style_id" ref="style_tee"/>
+        <field name="production_order_id">prod_order_tee / PROD-TS-2601-01</field>
+        <field name="sewing_line">Sewing Line 1</field>
+        <field name="location">Side seam, left panel</field>
+        <field name="quantity">4</field>
+        <field name="corrective_action">Re-stitch and reinforce; flagged as a recurring defect on Line 1 — CAPA
+raised for systemic root cause (see capa_recurring_open_seam_tee).</field>
+        <field name="status">closed</field>
+    </record>
+
+    <record id="defect_skipped_stitch_tee_1" model="garment.quality.defect">
+        <field name="name">Skipped Stitch</field>
+        <field name="defect_code_id" ref="garment_quality.defect_code_skipped_stitch"/>
+        <field name="department">sewing</field>
+        <field name="inspection_id" ref="inspection_sewing_tee_3"/>
+        <field name="style_id" ref="style_tee"/>
+        <field name="production_order_id">prod_order_tee / PROD-TS-2601-01</field>
+        <field name="sewing_line">Sewing Line 1</field>
+        <field name="location">Sleeve hem</field>
+        <field name="quantity">2</field>
+        <field name="corrective_action">Re-stitch hem; adjust needle-thread tension on the hemming machine.</field>
+        <field name="status">closed</field>
+    </record>
+
+    <record id="rework_open_seam_tee_2" model="garment.quality.rework">
+        <field name="defect_id" ref="defect_open_seam_tee_2"/>
+        <field name="inspection_id" ref="inspection_sewing_tee_3"/>
+        <field name="defect_code_id" ref="garment_quality.defect_code_open_seam"/>
+        <field name="style_id" ref="style_tee"/>
+        <field name="garment_ref">Bundle SL1-B-0219</field>
+        <field name="quantity">4</field>
+        <field name="repair_person_id" ref="base.user_admin"/>
+        <field name="repair_start">2026-05-04 11:00:00</field>
+        <field name="repair_end">2026-05-04 12:40:00</field>
+        <field name="status">approved</field>
+        <field name="reinspection_result">pass</field>
+        <field name="notes">Repaired by Salma Aktar (Sewing Line 1 operator), same shift. Re-inspected by Shirin
+Sultana, QC Inspector, and passed. Unit-level repair closed; the recurring pattern itself is tracked separately
+under capa_recurring_open_seam_tee.</field>
+    </record>
+
+    <!-- =================================================================
+         CAPA — recurring open-seam defect on Sewing Line 1 (style_tee)
+         ================================================================= -->
+
+    <record id="capa_recurring_open_seam_tee" model="garment.quality.capa">
+        <field name="source">defect</field>
+        <field name="defect_id" ref="defect_open_seam_tee_2"/>
+        <field name="style_id" ref="style_tee"/>
+        <field name="department">sewing</field>
+        <field name="problem_description">Two separate Sewing Inline QC inspections on Sewing Line 1 in a
+two-week window (20-Apr and 04-May 2026) found open-seam defects on the same side-seam operation — 7 pcs total
+across inspection_sewing_tee_2 and inspection_sewing_tee_3 — pointing to a systemic cause rather than isolated
+operator error.</field>
+        <field name="root_cause_method">5why</field>
+        <field name="root_cause">Overlock machine SN-14's thread tension was drifting out of spec after the
+April preventive-maintenance cycle, and the shift-start checklist did not include a tension re-check, so the
+drift went undetected until QC caught it inline.</field>
+        <field name="corrective_action">Re-calibrated tension on machine SN-14; re-trained the Line 1 side-seam
+operators on the shift-start tension check; re-inspected all side-seam bundles from the two affected shifts.</field>
+        <field name="preventive_action">Added a tension-check step to the Line 1 &amp; 2 daily start-of-shift
+checklist; increased the overlock machine tension-calibration frequency in the preventive maintenance plan.</field>
+        <field name="responsible_id" ref="base.user_admin"/>
+        <field name="target_date">2026-05-20</field>
+        <field name="verification_date">2026-05-22</field>
+        <field name="verified_by_id" ref="base.user_admin"/>
+        <field name="verification_result">effective</field>
+        <field name="status">closed</field>
+    </record>
+
+    <!-- Second pass: back-fill the capa_id links now that the CAPA record
+         above exists (defect_open_seam_tee_2.capa_id / inspection_sewing_tee_3
+         .capa_id would otherwise be forward references to a not-yet-created
+         record — same two-pass pattern used in 01_hr_demo.xml). -->
+    <record id="defect_open_seam_tee_2" model="garment.quality.defect">
+        <field name="capa_id" ref="capa_recurring_open_seam_tee"/>
+    </record>
+    <record id="inspection_sewing_tee_3" model="garment.quality.inspection">
+        <field name="capa_id" ref="capa_recurring_open_seam_tee"/>
+    </record>
+
+    <!-- =================================================================
+         AQL / Final Inspection — order_tee (Northwind, 24,000 pcs) — passed
+         ================================================================= -->
+
+    <record id="aql_final_tee" model="garment.aql.inspection">
+        <field name="inspection_type">final</field>
+        <field name="inspection_scope">sampling</field>
+        <field name="buyer_id" ref="buyer_northwind"/>
+        <field name="style_id" ref="style_tee"/>
+        <field name="order_reference">order_tee / ORD-NSG-TS-2601 (NW-PO-2026-1101)</field>
+        <field name="production_order_id">prod_order_tee / PROD-TS-2601-01</field>
+        <field name="supplier_id" ref="supplier_deltaknit"/>
+        <field name="inspector_id" ref="base.user_admin"/>
+        <field name="inspection_date">2026-06-05 09:30:00</field>
+        <field name="lot_size">24000</field>
+        <field name="sample_size">200</field>
+        <field name="inspection_level">g2</field>
+        <field name="aql_critical">0.0</field>
+        <field name="aql_major">2.5</field>
+        <field name="aql_minor">4.0</field>
+        <field name="accept_number_major">10</field>
+        <field name="reject_number_major">11</field>
+        <field name="accept_number_minor">14</field>
+        <field name="reject_number_minor">15</field>
+        <field name="critical_defect_qty">0</field>
+        <field name="carton_qty">1000</field>
+        <field name="packing_ok" eval="True"/>
+        <field name="documentation_ok" eval="True"/>
+        <field name="state">released</field>
+        <field name="buyer_approval_status">approved</field>
+        <field name="buyer_comments">Approved for shipment — defect counts well within AQL 2.5 (major) / 4.0
+(minor) limits on a 200-pc sample. Good to load for the 10-Jun sailing.</field>
+        <field name="shipment_release" eval="True"/>
+    </record>
+
+    <record id="defect_aql_tee_open_seam" model="garment.quality.defect">
+        <field name="name">Open Seam</field>
+        <field name="defect_code_id" ref="garment_quality.defect_code_open_seam"/>
+        <field name="department">quality</field>
+        <field name="aql_inspection_id" ref="aql_final_tee"/>
+        <field name="style_id" ref="style_tee"/>
+        <field name="location">Side seam</field>
+        <field name="quantity">1</field>
+        <field name="corrective_action">Touched up on the finishing table before carton packing.</field>
+        <field name="status">corrected</field>
+    </record>
+
+    <record id="defect_aql_tee_broken_stitch" model="garment.quality.defect">
+        <field name="name">Broken Stitch</field>
+        <field name="defect_code_id" ref="garment_quality.defect_code_broken_stitch"/>
+        <field name="department">quality</field>
+        <field name="aql_inspection_id" ref="aql_final_tee"/>
+        <field name="style_id" ref="style_tee"/>
+        <field name="location">Hem</field>
+        <field name="quantity">1</field>
+        <field name="corrective_action">Re-stitched on the finishing table before carton packing.</field>
+        <field name="status">corrected</field>
+    </record>
+
+    <record id="defect_aql_tee_loose_thread" model="garment.quality.defect">
+        <field name="name">Loose Thread</field>
+        <field name="defect_code_id" ref="garment_quality.defect_code_loose_thread"/>
+        <field name="department">quality</field>
+        <field name="aql_inspection_id" ref="aql_final_tee"/>
+        <field name="style_id" ref="style_tee"/>
+        <field name="location">Underarm</field>
+        <field name="quantity">2</field>
+        <field name="corrective_action">Trimmed at finishing.</field>
+        <field name="status">corrected</field>
+    </record>
+
+    <record id="defect_aql_tee_puckering" model="garment.quality.defect">
+        <field name="name">Puckering</field>
+        <field name="defect_code_id" ref="garment_quality.defect_code_puckering"/>
+        <field name="department">quality</field>
+        <field name="aql_inspection_id" ref="aql_final_tee"/>
+        <field name="style_id" ref="style_tee"/>
+        <field name="location">Collar rib</field>
+        <field name="quantity">1</field>
+        <field name="corrective_action">Within buyer tolerance — logged for trend monitoring only.</field>
+        <field name="status">closed</field>
+    </record>
+
+    <!-- =================================================================
+         AQL / Final Inspection — order_polo (Northwind, 18,000 pcs) — clean pass
+         ================================================================= -->
+
+    <record id="aql_final_polo" model="garment.aql.inspection">
+        <field name="inspection_type">final</field>
+        <field name="inspection_scope">sampling</field>
+        <field name="buyer_id" ref="buyer_northwind"/>
+        <field name="style_id" ref="style_polo"/>
+        <field name="order_reference">order_polo / ORD-NSG-PL-2602 (NW-PO-2026-1102)</field>
+        <field name="production_order_id">prod_order_polo / PROD-PL-2602-01</field>
+        <field name="inspector_id" ref="base.user_admin"/>
+        <field name="inspection_date">2026-06-12 09:30:00</field>
+        <field name="lot_size">18000</field>
+        <field name="sample_size">125</field>
+        <field name="inspection_level">g2</field>
+        <field name="aql_critical">0.0</field>
+        <field name="aql_major">2.5</field>
+        <field name="aql_minor">4.0</field>
+        <field name="accept_number_major">7</field>
+        <field name="reject_number_major">8</field>
+        <field name="accept_number_minor">10</field>
+        <field name="reject_number_minor">11</field>
+        <field name="critical_defect_qty">0</field>
+        <field name="carton_qty">750</field>
+        <field name="packing_ok" eval="True"/>
+        <field name="documentation_ok" eval="True"/>
+        <field name="state">released</field>
+        <field name="buyer_approval_status">approved</field>
+        <field name="buyer_comments">Clean pass, no defects on the 125-pc sample. Approved for the 17-Jun
+sailing.</field>
+        <field name="shipment_release" eval="True"/>
+    </record>
+
+    <!-- =================================================================
+         AQL / Final Inspection — order_hoodie (BalticHaus, 12,000 pcs) — clean pass
+         ================================================================= -->
+
+    <record id="aql_final_hoodie" model="garment.aql.inspection">
+        <field name="inspection_type">final</field>
+        <field name="inspection_scope">sampling</field>
+        <field name="buyer_id" ref="buyer_baltichaus"/>
+        <field name="style_id" ref="style_hoodie"/>
+        <field name="order_reference">order_hoodie / ORD-NSG-HD-2603 (BH-PO-2026-2201)</field>
+        <field name="production_order_id">prod_order_hoodie / PROD-HD-2603-01</field>
+        <field name="inspector_id" ref="base.user_admin"/>
+        <field name="inspection_date">2026-07-08 09:30:00</field>
+        <field name="lot_size">12000</field>
+        <field name="sample_size">80</field>
+        <field name="inspection_level">g2</field>
+        <field name="aql_critical">0.0</field>
+        <field name="aql_major">2.5</field>
+        <field name="aql_minor">4.0</field>
+        <field name="accept_number_major">5</field>
+        <field name="reject_number_major">6</field>
+        <field name="accept_number_minor">7</field>
+        <field name="reject_number_minor">8</field>
+        <field name="critical_defect_qty">0</field>
+        <field name="carton_qty">500</field>
+        <field name="packing_ok" eval="True"/>
+        <field name="documentation_ok" eval="True"/>
+        <field name="state">released</field>
+        <field name="buyer_approval_status">approved</field>
+        <field name="buyer_comments">Clean pass, no defects on the 80-pc sample. Approved for the 13-Jul
+sailing.</field>
+        <field name="shipment_release" eval="True"/>
+    </record>
+
+</data>
+</odoo>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_shipment_document_tree" model="ir.ui.view">
+        <field name="name">garment.shipment.document.tree</field>
+        <field name="model">garment.shipment.document</field>
+        <field name="arch" type="xml">
+            <!-- FIXED: Added is_expiring_soon with column_invisible="1" so decoration-danger can evaluate it -->
+            <tree string="Shipment Documents" decoration-danger="is_expiring_soon == True">
+                <field name="is_expiring_soon" column_invisible="1"/>
+                <field name="shipment_id"/>
+                <field name="document_type"/>
+                <field name="approval_status"/>
+                <field name="shared_with_buyer"/>
+                <field name="expiry_date"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_garment_shipment_document" model="ir.actions.act_window">
+        <field name="name">Shipment Documents</field>
+        <field name="res_model">garment.shipment.document</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

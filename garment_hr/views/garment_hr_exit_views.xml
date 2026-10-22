@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_hr_exit_tree" model="ir.ui.view">
+        <field name="name">garment.hr.exit.tree</field>
+        <field name="model">garment.hr.exit</field>
+        <field name="arch" type="xml">
+            <tree string="Employee Exits" decoration-success="status == 'archived'">
+                <field name="exit_number"/>
+                <field name="employee_id"/>
+                <field name="exit_type"/>
+                <field name="last_working_date"/>
+                <field name="final_settlement_amount"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_hr_exit_form" model="ir.ui.view">
+        <field name="name">garment.hr.exit.form</field>
+        <field name="model">garment.hr.exit</field>
+        <field name="arch" type="xml">
+            <form string="Employee Exit / Clearance">
+                <header>
+                    <field name="status" widget="statusbar"/>
+                    <button name="action_start_notice" type="object" string="Start Notice Period" class="btn-primary"
+                            invisible="status != 'draft'"/>
+                    <button name="action_start_clearance" type="object" string="Start Clearance" class="btn-primary"
+                            invisible="status != 'notice'"/>
+                    <button name="action_settle" type="object" string="Settle" class="btn-primary"
+                            invisible="status != 'clearance' or not all_clearance_done"/>
+                    <button name="action_archive_employee" type="object" string="Archive Employee" class="btn-secondary"
+                            invisible="status != 'settled'"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="exit_number" readonly="1"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="employee_id"/>
+                            <field name="exit_type"/>
+                            <field name="notice_date"/>
+                            <field name="last_working_date"/>
+                        </group>
+                        <group>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="last_basic_salary"/>
+                            <field name="years_of_service" readonly="1"/>
+                            <field name="gratuity_days_per_year"/>
+                            <field name="gratuity_amount" readonly="1"/>
+                        </group>
+                    </group>
+                    <field name="reason"/>
+                    <group string="Clearance (SRS section 51: HR / Finance / Inventory / IT / Administration)" col="5">
+                        <field name="hr_clearance"/>
+                        <field name="finance_clearance"/>
+                        <field name="inventory_clearance"/>
+                        <field name="it_clearance"/>
+                        <field name="admin_clearance"/>
+                    </group>
+                    <field name="all_clearance_done" readonly="1" invisible="1"/>
+                    <group string="Final Settlement">
+                        <field name="outstanding_dues"/>
+                        <field name="loan_deduction"/>
+                        <field name="final_settlement_amount" readonly="1" class="oe_subtotal_footer_separator"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_hr_exit" model="ir.actions.act_window">
+        <field name="name">Employee Exits</field>
+        <field name="res_model">garment.hr.exit</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Start your first employee exit process.</p>
+        </field>
+    </record>
+
+</odoo>

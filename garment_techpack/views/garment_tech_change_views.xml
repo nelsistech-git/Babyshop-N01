@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_tech_change_tree" model="ir.ui.view">
+        <field name="name">garment.tech.change.tree</field>
+        <field name="model">garment.tech.change</field>
+        <field name="arch" type="xml">
+            <tree string="Change Requests">
+                <field name="change_number"/>
+                <field name="techpack_id"/>
+                <field name="revision_type"/>
+                <field name="impact_level"/>
+                <field name="revision_deadline"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_tech_change_form" model="ir.ui.view">
+        <field name="name">garment.tech.change.form</field>
+        <field name="model">garment.tech.change</field>
+        <field name="arch" type="xml">
+            <form string="Tech Change Request">
+                <header>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="requested,technical_review,impact_analysis,department_review,approved,released"/>
+                    <button name="action_next_stage" type="object" string="Move to Next Stage" class="btn-primary"
+                            invisible="state == 'released'"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="change_number" readonly="1"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="techpack_id"/>
+                            <field name="requested_by_id"/>
+                            <field name="request_date"/>
+                            <field name="buyer_reference"/>
+                        </group>
+                        <group>
+                            <field name="revision_type"/>
+                            <field name="impact_level"/>
+                            <field name="revision_deadline"/>
+                        </group>
+                    </group>
+                    <field name="change_reason"/>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_tech_change" model="ir.actions.act_window">
+        <field name="name">Change Requests</field>
+        <field name="res_model">garment.tech.change</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

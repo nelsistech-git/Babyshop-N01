@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_production_machine_tree" model="ir.ui.view">
+        <field name="name">garment.production.machine.tree</field>
+        <field name="model">garment.production.machine</field>
+        <field name="arch" type="xml">
+            <tree string="Machines" decoration-danger="status == 'breakdown'" decoration-muted="status == 'offline'">
+                <field name="machine_number"/>
+                <field name="machine_type"/>
+                <field name="work_center_id"/>
+                <field name="line_id"/>
+                <field name="brand"/>
+                <field name="status"/>
+                <field name="ai_maintenance_risk"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_production_machine_form" model="ir.ui.view">
+        <field name="name">garment.production.machine.form</field>
+        <field name="model">garment.production.machine</field>
+        <field name="arch" type="xml">
+            <form string="Machine">
+                <header>
+                    <field name="status" widget="statusbar" statusbar_visible="running,idle,breakdown,maintenance,offline"/>
+                    <button name="action_run_ai_maintenance_prediction" type="object"
+                            string="Predict Maintenance (AI)" class="btn-secondary" icon="fa-magic"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_downtime" type="object" class="oe_stat_button" icon="fa-clock-o"
+                                invisible="downtime_count == 0">
+                            <field name="downtime_count" widget="statinfo" string="Downtime"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="machine_number"/>
+                        <h1><field name="machine_number"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="machine_type"/>
+                            <field name="brand"/>
+                            <field name="model_reference"/>
+                            <field name="work_center_id"/>
+                            <field name="line_id"/>
+                            <field name="location"/>
+                            <field name="purchase_date"/>
+                        </group>
+                        <group>
+                            <field name="iot_enabled"/>
+                            <field name="running_hours_total"/>
+                            <field name="idle_hours_total"/>
+                            <field name="breakdown_hours_total"/>
+                            <field name="last_output_count"/>
+                            <field name="last_speed"/>
+                            <field name="last_vibration"/>
+                            <field name="last_energy_consumption"/>
+                            <field name="last_data_sync"/>
+                        </group>
+                    </group>
+                    <group string="AI Predictive Maintenance">
+                        <field name="ai_maintenance_risk"/>
+                        <field name="ai_maintenance_note" nolabel="1" colspan="2"/>
+                        <field name="ai_last_run"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_production_machine" model="ir.actions.act_window">
+        <field name="name">Machines</field>
+        <field name="res_model">garment.production.machine</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

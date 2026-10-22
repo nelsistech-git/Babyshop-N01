@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_plm_stage_gate_tree" model="ir.ui.view">
+        <field name="name">garment.plm.stage.gate.tree</field>
+        <field name="model">garment.plm.stage.gate</field>
+        <field name="arch" type="xml">
+            <!-- FIXED: Added is_delayed with column_invisible="1" so decoration-danger can evaluate it -->
+            <tree string="Stage Gates" decoration-danger="is_delayed == True" decoration-success="status == 'completed'">
+                <field name="is_delayed" column_invisible="1"/>
+                <field name="project_id"/>
+                <field name="style_id"/>
+                <field name="stage"/>
+                <field name="team_role"/>
+                <field name="responsible_id"/>
+                <field name="planned_end_date"/>
+                <field name="actual_end_date"/>
+                <field name="delay_days"/>
+                <field name="status"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_plm_stage_gate_form" model="ir.ui.view">
+        <field name="name">garment.plm.stage.gate.form</field>
+        <field name="model">garment.plm.stage.gate</field>
+        <field name="arch" type="xml">
+            <form string="PLM Stage Gate">
+                <header>
+                    <button name="action_start" type="object" string="Start" class="btn-primary"
+                            invisible="status != 'pending'"/>
+                    <button name="action_complete" type="object" string="Complete" class="btn-primary"
+                            invisible="status not in ('in_progress', 'delayed')"/>
+                    <field name="status" widget="statusbar" statusbar_visible="pending,in_progress,completed"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="project_id"/>
+                            <field name="style_id" readonly="1"/>
+                            <field name="stage"/>
+                            <field name="team_role"/>
+                            <field name="responsible_id"/>
+                        </group>
+                        <group>
+                            <field name="planned_start_date"/>
+                            <field name="planned_end_date"/>
+                            <field name="actual_start_date"/>
+                            <field name="actual_end_date"/>
+                            <field name="sla_days"/>
+                            <field name="delay_days" readonly="1"/>
+                            <field name="is_delayed" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Gate Sign-Offs">
+                            <field name="gate_approval_ids">
+                                <tree editable="bottom">
+                                    <field name="approval_level"/>
+                                    <field name="approver_id"/>
+                                    <field name="status"/>
+                                    <field name="approval_date"/>
+                                    <field name="comments"/>
+                                    <button name="action_approve" type="object" string="Approve" icon="fa-check"
+                                            invisible="status != 'pending'"/>
+                                    <button name="action_reject" type="object" string="Reject" icon="fa-times"
+                                            invisible="status != 'pending'"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Notes">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_plm_stage_gate_search" model="ir.ui.view">
+        <field name="name">garment.plm.stage.gate.search</field>
+        <field name="model">garment.plm.stage.gate</field>
+        <field name="arch" type="xml">
+            <search string="Search Stage Gates">
+                <field name="project_id"/>
+                <field name="style_id"/>
+                <field name="stage"/>
+                <field name="responsible_id"/>
+                <filter string="Delayed" name="filter_delayed" domain="[('is_delayed', '=', True)]"/>
+                <filter string="In Progress" name="filter_in_progress" domain="[('status', '=', 'in_progress')]"/>
+                <filter string="Completed" name="filter_completed" domain="[('status', '=', 'completed')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Stage" name="groupby_stage" context="{'group_by': 'stage'}"/>
+                    <filter string="Status" name="groupby_status" context="{'group_by': 'status'}"/>
+                    <filter string="Responsible" name="groupby_responsible" context="{'group_by': 'responsible_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_plm_stage_gate" model="ir.actions.act_window">
+        <field name="name">Stage Gates</field>
+        <field name="res_model">garment.plm.stage.gate</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_garment_plm_stage_gate_search"/>
+    </record>
+
+    <record id="action_garment_plm_gate_approval" model="ir.actions.act_window">
+        <field name="name">Gate Sign-Offs</field>
+        <field name="res_model">garment.plm.gate.approval</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[]</field>
+        <field name="context">{'search_default_pending': 1}</field>
+    </record>
+
+    <record id="view_garment_plm_gate_approval_tree" model="ir.ui.view">
+        <field name="name">garment.plm.gate.approval.tree</field>
+        <field name="model">garment.plm.gate.approval</field>
+        <field name="arch" type="xml">
+            <tree string="Gate Sign-Offs" decoration-warning="status == 'pending'" decoration-success="status == 'approved'"
+                  decoration-danger="status == 'rejected'">
+                <field name="project_id"/>
+                <field name="stage"/>
+                <field name="approval_level"/>
+                <field name="approver_id"/>
+                <field name="status"/>
+                <field name="approval_date"/>
+                <button name="action_approve" type="object" string="Approve" icon="fa-check"
+                        invisible="status != 'pending'"/>
+                <button name="action_reject" type="object" string="Reject" icon="fa-times"
+                        invisible="status != 'pending'"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_plm_gate_approval_form" model="ir.ui.view">
+        <field name="name">garment.plm.gate.approval.form</field>
+        <field name="model">garment.plm.gate.approval</field>
+        <field name="arch" type="xml">
+            <form string="PLM Gate Sign-Off">
+                <header>
+                    <button name="action_approve" type="object" string="Approve" class="btn-primary"
+                            invisible="status != 'pending'"/>
+                    <button name="action_reject" type="object" string="Reject" class="btn-secondary"
+                            invisible="status != 'pending'"/>
+                    <field name="status" widget="statusbar" statusbar_visible="pending,approved,rejected"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="gate_id"/>
+                            <field name="project_id" readonly="1"/>
+                            <field name="stage" readonly="1"/>
+                            <field name="approval_level"/>
+                        </group>
+                        <group>
+                            <field name="approver_id"/>
+                            <field name="approval_date" readonly="1"/>
+                        </group>
+                    </group>
+                    <field name="comments" placeholder="Comments..."/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_plm_gate_approval_search" model="ir.ui.view">
+        <field name="name">garment.plm.gate.approval.search</field>
+        <field name="model">garment.plm.gate.approval</field>
+        <field name="arch" type="xml">
+            <search string="Search Gate Sign-Offs">
+                <field name="project_id"/>
+                <field name="approval_level"/>
+                <field name="approver_id"/>
+                <filter string="Pending" name="pending" domain="[('status', '=', 'pending')]"/>
+                <filter string="Approved" name="approved" domain="[('status', '=', 'approved')]"/>
+                <filter string="Rejected" name="rejected" domain="[('status', '=', 'rejected')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Approval Level" name="groupby_level" context="{'group_by': 'approval_level'}"/>
+                    <filter string="Status" name="groupby_status" context="{'group_by': 'status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+</odoo>

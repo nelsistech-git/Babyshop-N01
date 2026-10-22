@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_hr_employee_graph" model="ir.ui.view">
+        <field name="name">garment.hr.employee.graph</field>
+        <field name="model">garment.hr.employee</field>
+        <field name="arch" type="xml">
+            <graph string="Headcount by Department" type="bar">
+                <field name="department_id"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_garment_hr_employee_pivot" model="ir.ui.view">
+        <field name="name">garment.hr.employee.pivot</field>
+        <field name="model">garment.hr.employee</field>
+        <field name="arch" type="xml">
+            <pivot string="Workforce Analysis">
+                <field name="department_id" type="row"/>
+                <field name="status" type="col"/>
+                <field name="id" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_garment_hr_dashboard" model="ir.actions.act_window">
+        <field name="name">HR Dashboard</field>
+        <field name="res_model">garment.hr.employee</field>
+        <field name="view_mode">graph,pivot,kanban,tree</field>
+    </record>
+
+</odoo>

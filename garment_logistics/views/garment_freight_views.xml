@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_freight_tree" model="ir.ui.view">
+        <field name="name">garment.freight.tree</field>
+        <field name="model">garment.freight</field>
+        <field name="arch" type="xml">
+            <tree string="Freight Quotes" editable="bottom" decoration-success="is_selected == True">
+                <field name="shipment_id"/>
+                <field name="forwarder_id"/>
+                <field name="ocean_freight"/>
+                <field name="port_charges"/>
+                <field name="total_cost"/>
+                <field name="transit_time_days"/>
+                <field name="is_selected"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_freight_form" model="ir.ui.view">
+        <field name="name">garment.freight.form</field>
+        <field name="model">garment.freight</field>
+        <field name="arch" type="xml">
+            <form string="Freight Cost">
+                <header>
+                    <button name="action_select_quote" type="object" string="Select This Quote" class="btn-primary"
+                            invisible="is_selected == True"/>
+                </header>
+                <sheet>
+                    <!-- FIXED: Added is_selected with invisible="1" so the 'invisible' modifier can evaluate it -->
+                    <field name="is_selected" invisible="1"/>
+
+                    <group>
+                        <field name="shipment_id"/>
+                        <field name="forwarder_id"/>
+                        <field name="currency_id" invisible="1"/>
+                    </group>
+                    <group col="3">
+                        <field name="ocean_freight"/>
+                        <field name="local_transport"/>
+                        <field name="port_charges"/>
+                        <field name="documentation_charge"/>
+                        <field name="handling_charge"/>
+                        <field name="insurance"/>
+                    </group>
+                    <group>
+                        <field name="total_cost" readonly="1"/>
+                        <field name="transit_time_days"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_freight_search" model="ir.ui.view">
+        <field name="name">garment.freight.search</field>
+        <field name="model">garment.freight</field>
+        <field name="arch" type="xml">
+            <search string="Search Freight Costs">
+                <field name="shipment_id"/>
+                <field name="forwarder_id"/>
+                <field name="buyer_id"/>
+                <field name="destination"/>
+                <group expand="0" string="Group By">
+                    <filter string="Buyer" name="group_buyer" context="{'group_by': 'buyer_id'}"/>
+                    <filter string="Destination (Country)" name="group_destination" context="{'group_by': 'destination'}"/>
+                    <filter string="Forwarder (Carrier)" name="group_forwarder" context="{'group_by': 'forwarder_id'}"/>
+                    <filter string="Shipment Date" name="group_date" context="{'group_by': 'shipment_date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_garment_freight_graph" model="ir.ui.view">
+        <field name="name">garment.freight.graph</field>
+        <field name="model">garment.freight</field>
+        <field name="arch" type="xml">
+            <graph string="Freight Cost Dashboard" type="bar">
+                <field name="shipment_date" interval="month"/>
+                <field name="total_cost" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_garment_freight_pivot" model="ir.ui.view">
+        <field name="name">garment.freight.pivot</field>
+        <field name="model">garment.freight</field>
+        <field name="arch" type="xml">
+            <pivot string="Freight Cost Analysis">
+                <field name="buyer_id" type="row"/>
+                <field name="destination" type="row"/>
+                <field name="forwarder_id" type="col"/>
+                <field name="total_cost" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_garment_freight" model="ir.actions.act_window">
+        <field name="name">Freight Quotes</field>
+        <field name="res_model">garment.freight</field>
+        <field name="view_mode">tree,form,graph,pivot</field>
+    </record>
+
+    <record id="action_garment_freight_dashboard" model="ir.actions.act_window">
+        <field name="name">Freight Cost Dashboard</field>
+        <field name="res_model">garment.freight</field>
+        <field name="view_mode">graph,pivot,tree</field>
+    </record>
+</odoo>

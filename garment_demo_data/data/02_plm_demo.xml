@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Part of Smart Complete Garment Software. Copyright (c) Nelsis Tech (www.nelsistech.com) -->
+<!--
+     PLM Projects (garment.plm.project) — garment_plm.
+     One project per style, tracking the 7-stage journey:
+     Concept -> Design -> Sourcing -> Sampling -> Costing -> Approval -> Production Handover.
+
+     style_tee   : fully complete (all 7 gates Completed, project Production Ready)
+     style_polo  : in progress, currently at the Costing gate
+     style_hoodie: just started, only Concept + Design gates done, currently at Sourcing
+
+     Cross-module refs (techpack_*/bom_*/sample_*/costing_*) are written by sibling
+     batches into 02_techpack_demo.xml / 02_bom_demo.xml / 02_sample_demo.xml /
+     02_costing_demo.xml, all loaded before this file per the manifest's data list.
+-->
+<odoo>
+<data noupdate="1">
+
+    <!-- =================================================================
+         PLM Project — Men's Crew Neck T-Shirt (style_tee) — COMPLETE
+         ================================================================= -->
+
+    <record id="plm_tee" model="garment.plm.project">
+        <field name="plm_number">PLM-2026-0001</field>
+        <field name="style_id" ref="style_tee"/>
+        <field name="request_source">merchandising</field>
+        <field name="priority">1</field>
+        <field name="target_launch_date">2026-04-01</field>
+        <field name="actual_launch_date">2026-03-28</field>
+        <field name="techpack_id" ref="techpack_tee"/>
+        <field name="bom_id" ref="bom_tee"/>
+        <field name="sample_id" ref="sample_tee_fit"/>
+        <field name="costing_id" ref="costing_tee"/>
+        <field name="current_stage">production_handover</field>
+        <field name="state">completed</field>
+        <field name="description">Core basics tee for Northwind SS26 — full stage-gate journey closed out on schedule; handed over to Production on 28 Mar 2026.</field>
+        <field name="team_ids" eval="[
+            (0,0,{'role':'merchandiser','employee_id': ref('emp_merchandiser'),'is_lead': True,
+                  'date_assigned':'2026-01-05','notes':'Primary buyer contact for Northwind account'}),
+            (0,0,{'role':'pattern_maker','employee_id': ref('emp_pattern_master'),'is_lead': False,
+                  'date_assigned':'2026-01-13','notes':'Base pattern and grading'}),
+        ]"/>
+        <field name="stage_gate_ids" eval="[
+            (0,0,{'sequence':10,'stage':'concept','team_role':'merchandiser','status':'completed',
+                  'planned_start_date':'2026-01-05','planned_end_date':'2026-01-12',
+                  'actual_start_date':'2026-01-05','actual_end_date':'2026-01-11','sla_days':7,
+                  'notes':'Concept approved from Northwind core-basics brief.'}),
+            (0,0,{'sequence':20,'stage':'design','team_role':'designer','status':'completed',
+                  'planned_start_date':'2026-01-13','planned_end_date':'2026-01-26',
+                  'actual_start_date':'2026-01-13','actual_end_date':'2026-01-24','sla_days':14,
+                  'notes':'Tech pack v1 and base pattern signed off.',
+                  'gate_approval_ids':[
+                      (0,0,{'sequence':10,'approval_level':'designer','status':'approved',
+                            'approval_date':'2026-01-23 10:00:00','comments':'Pattern and construction approved.'}),
+                      (0,0,{'sequence':20,'approval_level':'merchandising','status':'approved',
+                            'approval_date':'2026-01-24 09:30:00','comments':'Ready to release to sourcing.'}),
+                  ]}),
+            (0,0,{'sequence':30,'stage':'sourcing','team_role':'merchandiser','status':'completed',
+                  'planned_start_date':'2026-01-27','planned_end_date':'2026-02-09',
+                  'actual_start_date':'2026-01-27','actual_end_date':'2026-02-07','sla_days':14,
+                  'notes':'Fabric and trims sourced from Delta Knit / Bright Trims.'}),
+            (0,0,{'sequence':40,'stage':'sampling','team_role':'sample_coordinator','status':'completed',
+                  'planned_start_date':'2026-02-10','planned_end_date':'2026-03-02',
+                  'actual_start_date':'2026-02-10','actual_end_date':'2026-02-27','sla_days':21,
+                  'notes':'Proto, fit and PP samples all approved by buyer.',
+                  'gate_approval_ids':[
+                      (0,0,{'sequence':10,'approval_level':'technical','status':'approved',
+                            'approval_date':'2026-02-26 11:00:00','comments':'PP sample matches approved measurement chart.'}),
+                      (0,0,{'sequence':20,'approval_level':'quality','status':'approved',
+                            'approval_date':'2026-02-27 14:00:00','comments':'No AQL concerns on PP sample.'}),
+                  ]}),
+            (0,0,{'sequence':50,'stage':'costing','team_role':'merchandiser','status':'completed',
+                  'planned_start_date':'2026-03-03','planned_end_date':'2026-03-12',
+                  'actual_start_date':'2026-03-03','actual_end_date':'2026-03-10','sla_days':9,
+                  'notes':'FOB price finalized and accepted by Northwind.'}),
+            (0,0,{'sequence':60,'stage':'approval','team_role':'quality_team','status':'completed',
+                  'planned_start_date':'2026-03-13','planned_end_date':'2026-03-20',
+                  'actual_start_date':'2026-03-13','actual_end_date':'2026-03-19','sla_days':7,
+                  'notes':'Buyer final approval received for bulk production.',
+                  'gate_approval_ids':[
+                      (0,0,{'sequence':10,'approval_level':'buyer','status':'approved',
+                            'approval_date':'2026-03-18 16:00:00','comments':'Northwind sign-off received via email.'}),
+                      (0,0,{'sequence':20,'approval_level':'production','status':'approved',
+                            'approval_date':'2026-03-19 09:00:00','comments':'Capacity confirmed on Sewing Line 1.'}),
+                  ]}),
+            (0,0,{'sequence':70,'stage':'production_handover','team_role':'production_team','status':'completed',
+                  'planned_start_date':'2026-03-21','planned_end_date':'2026-03-28',
+                  'actual_start_date':'2026-03-21','actual_end_date':'2026-03-28','sla_days':7,
+                  'notes':'Handed over to Sewing Line 1 with approved tech pack and BOM.'}),
+        ]"/>
+    </record>
+
+    <!-- =================================================================
+         PLM Project — Classic Pique Polo (style_polo) — IN PROGRESS (Costing)
+         ================================================================= -->
+
+    <record id="plm_polo" model="garment.plm.project">
+        <field name="plm_number">PLM-2026-0002</field>
+        <field name="style_id" ref="style_polo"/>
+        <field name="request_source">merchandising</field>
+        <field name="priority">1</field>
+        <field name="target_launch_date">2026-04-15</field>
+        <field name="techpack_id" ref="techpack_polo"/>
+        <field name="bom_id" ref="bom_polo"/>
+        <field name="sample_id" ref="sample_polo_pp"/>
+        <field name="costing_id" ref="costing_polo"/>
+        <field name="current_stage">costing</field>
+        <field name="state">in_progress</field>
+        <field name="description">Core basics polo for Northwind SS26 — sampling closed out, FOB costing sheet currently being finalized with buyer.</field>
+        <field name="team_ids" eval="[
+            (0,0,{'role':'merchandiser','employee_id': ref('emp_merchandiser'),'is_lead': True,
+                  'date_assigned':'2026-01-10','notes':'Primary buyer contact for Northwind account'}),
+            (0,0,{'role':'ie_engineer','employee_id': ref('emp_ie_officer'),'is_lead': False,
+                  'date_assigned':'2026-02-15','notes':'SMV input for costing sheet'}),
+        ]"/>
+        <field name="stage_gate_ids" eval="[
+            (0,0,{'sequence':10,'stage':'concept','team_role':'merchandiser','status':'completed',
+                  'planned_start_date':'2026-01-10','planned_end_date':'2026-01-17',
+                  'actual_start_date':'2026-01-10','actual_end_date':'2026-01-16','sla_days':7,
+                  'notes':'Concept approved from Northwind core-basics brief.'}),
+            (0,0,{'sequence':20,'stage':'design','team_role':'designer','status':'completed',
+                  'planned_start_date':'2026-01-18','planned_end_date':'2026-01-31',
+                  'actual_start_date':'2026-01-18','actual_end_date':'2026-01-29','sla_days':14,
+                  'notes':'Tech pack v1 and base pattern signed off.',
+                  'gate_approval_ids':[
+                      (0,0,{'sequence':10,'approval_level':'designer','status':'approved',
+                            'approval_date':'2026-01-28 10:00:00','comments':'Placket and collar construction approved.'}),
+                      (0,0,{'sequence':20,'approval_level':'merchandising','status':'approved',
+                            'approval_date':'2026-01-29 09:30:00','comments':'Ready to release to sourcing.'}),
+                  ]}),
+            (0,0,{'sequence':30,'stage':'sourcing','team_role':'merchandiser','status':'completed',
+                  'planned_start_date':'2026-02-01','planned_end_date':'2026-02-14',
+                  'actual_start_date':'2026-02-01','actual_end_date':'2026-02-13','sla_days':14,
+                  'notes':'Pique fabric and buttons sourced from Delta Knit / Bright Trims.'}),
+            (0,0,{'sequence':40,'stage':'sampling','team_role':'sample_coordinator','status':'completed',
+                  'planned_start_date':'2026-02-15','planned_end_date':'2026-03-07',
+                  'actual_start_date':'2026-02-15','actual_end_date':'2026-03-05','sla_days':21,
+                  'notes':'Proto, fit and PP samples all approved by buyer.',
+                  'gate_approval_ids':[
+                      (0,0,{'sequence':10,'approval_level':'technical','status':'approved',
+                            'approval_date':'2026-03-04 11:00:00','comments':'PP sample matches approved measurement chart.'}),
+                  ]}),
+            (0,0,{'sequence':50,'stage':'costing','team_role':'merchandiser','status':'in_progress',
+                  'planned_start_date':'2026-03-08','planned_end_date':'2026-03-17',
+                  'actual_start_date':'2026-03-08','sla_days':9,
+                  'notes':'FOB costing sheet under review, awaiting buyer price acceptance.'}),
+            (0,0,{'sequence':60,'stage':'approval','team_role':'quality_team','status':'pending',
+                  'planned_start_date':'2026-03-18','planned_end_date':'2026-03-25','sla_days':7}),
+            (0,0,{'sequence':70,'stage':'production_handover','team_role':'production_team','status':'pending',
+                  'planned_start_date':'2026-03-26','planned_end_date':'2026-04-02','sla_days':7}),
+        ]"/>
+    </record>
+
+    <!-- =================================================================
+         PLM Project — Fleece Zip Hoodie (style_hoodie) — JUST STARTED (Sourcing)
+         ================================================================= -->
+
+    <record id="plm_hoodie" model="garment.plm.project">
+        <field name="plm_number">PLM-2026-0003</field>
+        <field name="style_id" ref="style_hoodie"/>
+        <field name="request_source">buyer_inquiry</field>
+        <field name="priority">1</field>
+        <field name="target_launch_date">2026-06-01</field>
+        <field name="techpack_id" ref="techpack_hoodie"/>
+        <field name="bom_id" ref="bom_hoodie"/>
+        <field name="sample_id" ref="sample_hoodie_pp"/>
+        <field name="costing_id" ref="costing_hoodie"/>
+        <field name="current_stage">sourcing</field>
+        <field name="state">in_progress</field>
+        <field name="description">Fleece zip hoodie for BalticHaus AW26 — concept and design signed off; fabric and trim sourcing now underway.</field>
+        <field name="team_ids" eval="[
+            (0,0,{'role':'merchandiser','employee_id': ref('emp_merchandiser'),'is_lead': True,
+                  'date_assigned':'2026-02-01','notes':'Primary buyer contact for BalticHaus account'}),
+            (0,0,{'role':'pattern_maker','employee_id': ref('emp_pattern_master'),'is_lead': False,
+                  'date_assigned':'2026-02-09','notes':'Hood and pocket pattern development'}),
+        ]"/>
+        <field name="stage_gate_ids" eval="[
+            (0,0,{'sequence':10,'stage':'concept','team_role':'merchandiser','status':'completed',
+                  'planned_start_date':'2026-02-01','planned_end_date':'2026-02-08',
+                  'actual_start_date':'2026-02-01','actual_end_date':'2026-02-07','sla_days':7,
+                  'notes':'Concept approved from BalticHaus AW26 sustainability-led brief.'}),
+            (0,0,{'sequence':20,'stage':'design','team_role':'designer','status':'completed',
+                  'planned_start_date':'2026-02-09','planned_end_date':'2026-02-22',
+                  'actual_start_date':'2026-02-09','actual_end_date':'2026-02-20','sla_days':14,
+                  'notes':'Tech pack v1 and hood/pocket pattern signed off.',
+                  'gate_approval_ids':[
+                      (0,0,{'sequence':10,'approval_level':'designer','status':'approved',
+                            'approval_date':'2026-02-19 10:00:00','comments':'Hood construction and pocket placement approved.'}),
+                      (0,0,{'sequence':20,'approval_level':'merchandising','status':'approved',
+                            'approval_date':'2026-02-20 09:30:00','comments':'Ready to release to sourcing.'}),
+                  ]}),
+            (0,0,{'sequence':30,'stage':'sourcing','team_role':'merchandiser','status':'in_progress',
+                  'planned_start_date':'2026-02-23','planned_end_date':'2026-03-08',
+                  'actual_start_date':'2026-02-23','sla_days':14,
+                  'notes':'Sourcing brushed fleece fabric and YKK zippers; FSC carton sourcing in parallel.'}),
+            (0,0,{'sequence':40,'stage':'sampling','team_role':'sample_coordinator','status':'pending',
+                  'planned_start_date':'2026-03-09','planned_end_date':'2026-03-29','sla_days':21}),
+            (0,0,{'sequence':50,'stage':'costing','team_role':'merchandiser','status':'pending',
+                  'planned_start_date':'2026-03-30','planned_end_date':'2026-04-08','sla_days':9}),
+            (0,0,{'sequence':60,'stage':'approval','team_role':'quality_team','status':'pending',
+                  'planned_start_date':'2026-04-09','planned_end_date':'2026-04-16','sla_days':7}),
+            (0,0,{'sequence':70,'stage':'production_handover','team_role':'production_team','status':'pending',
+                  'planned_start_date':'2026-04-17','planned_end_date':'2026-04-24','sla_days':7}),
+        ]"/>
+    </record>
+
+</data>
+</odoo>

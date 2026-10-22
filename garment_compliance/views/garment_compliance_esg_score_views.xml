@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_compliance_esg_score_tree" model="ir.ui.view">
+        <field name="name">garment.compliance.esg.score.tree</field>
+        <field name="model">garment.compliance.esg.score</field>
+        <field name="arch" type="xml">
+            <tree string="ESG Scores">
+                <field name="name"/>
+                <field name="period_date"/>
+                <field name="buyer_id"/>
+                <field name="environmental_score" widget="percentage"/>
+                <field name="social_score" widget="percentage"/>
+                <field name="governance_score" widget="percentage"/>
+                <field name="overall_score" widget="percentage"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_compliance_esg_score_form" model="ir.ui.view">
+        <field name="name">garment.compliance.esg.score.form</field>
+        <field name="model">garment.compliance.esg.score</field>
+        <field name="arch" type="xml">
+            <form string="ESG Score">
+                <sheet>
+                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="period_date"/>
+                            <field name="buyer_id"/>
+                        </group>
+                        <group>
+                            <field name="overall_score" readonly="1" widget="percentage"/>
+                        </group>
+                    </group>
+                    <group string="ESG Weighting (Environmental 40% / Social 40% / Governance 20%)">
+                        <field name="environmental_score" widget="percentage"/>
+                        <field name="social_score" widget="percentage"/>
+                        <field name="governance_score" widget="percentage"/>
+                    </group>
+                    <group string="Sustainability KPIs">
+                        <field name="carbon_reduction_percentage"/>
+                        <field name="water_saving_percentage"/>
+                        <field name="waste_recycling_percentage"/>
+                    </group>
+                    <field name="notes"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_compliance_esg_score" model="ir.actions.act_window">
+        <field name="name">ESG Scores</field>
+        <field name="res_model">garment.compliance.esg.score</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

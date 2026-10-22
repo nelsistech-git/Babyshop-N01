@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Smart Complete Garment Software
+    Demo Data: Costing Sheets (garment_costing)
+
+    Copyright (c) Nelsis Tech (www.nelsistech.com)
+    License: LGPL-3
+
+    NOTE on Material Cost / BOM linkage: garment.costing.bom_id is
+    intentionally left UNSET here. Per garment_costing/models/garment_costing.py
+    _compute_material_cost(), rec.fabric_cost / trim_cost / packaging_cost
+    are copied straight from bom_id.fabric_cost_total / trim_cost_total /
+    packaging_cost_total on garment.bom — and per
+    garment_bom_management/models/garment_fabric_bom.py _compute_consumption(),
+    those BOM totals are WHOLE-ORDER costs (required_qty = gross_consumption
+    * bom_id.order_quantity, so line_cost / *_cost_total scale with the
+    24,000/18,000/12,000-pc order quantities). garment.costing's own
+    fob_price formula (_compute_totals) treats material_cost as a PER-PIECE
+    figure alongside cm_cost/overhead_cost/additional_cost_total, so linking
+    bom_id here would add an order-total fabric cost into a per-piece FOB
+    price and blow it up to an unrealistic figure. Until that mismatch is
+    reconciled, this costing sheet's per-piece base cost is built entirely
+    from the CM (Cost of Making) operation lines + factory overhead +
+    additional costs, which are genuinely per-piece fields on garment.costing
+    / garment.cm.cost — giving a realistic FOB price. Material sourcing
+    detail for these styles lives in bom_tee / bom_polo / bom_hoodie
+    (02_bom_demo.xml).
+-->
+<odoo>
+<data noupdate="1">
+
+    <!-- =================================================================
+         Costing — style_tee (Men's Crew Neck T-Shirt, Northwind, 24,000 pcs)
+         Target ~$3.20/pc FOB, 10% margin.
+         ================================================================= -->
+
+    <record id="costing_tee" model="garment.costing">
+        <field name="costing_number">CST-NSG-TS-2601-01</field>
+        <field name="costing_type">final</field>
+        <field name="style_id" ref="style_tee"/>
+        <field name="sample_id" ref="sample_tee_fit"/>
+        <field name="order_quantity">24000</field>
+        <field name="currency_id" ref="base.USD"/>
+        <field name="costing_date">2026-03-05</field>
+        <field name="validity_period">2026-06-05</field>
+        <field name="status">approved</field>
+        <field name="is_locked" eval="True"/>
+
+        <field name="incoterm">fob</field>
+
+        <!-- Manufacturing Cost (CM) — Cost of Making, per piece -->
+        <field name="cm_cost_ids" eval="[(0, 0, {
+            'sequence': 10,
+            'calculation_mode': 'components',
+            'operation_line_ids': [
+                (0, 0, {'sequence': 10, 'operation': 'cutting', 'description': 'Fabric cutting and bundling',
+                        'line_cost': 0.18}),
+                (0, 0, {'sequence': 20, 'operation': 'sewing', 'description': 'Sewing line (crew neck rib attach, '
+                        'set-in sleeve, overlock/flatlock)', 'line_cost': 1.20}),
+                (0, 0, {'sequence': 30, 'operation': 'finishing', 'description': 'Trimming, ironing, folding',
+                        'line_cost': 0.15}),
+                (0, 0, {'sequence': 40, 'operation': 'packing', 'description': 'Poly bag and carton packing',
+                        'line_cost': 0.12}),
+            ],
+        })]"/>
+
+        <!-- Factory Overhead &amp; Additional Costs, per piece -->
+        <field name="overhead_cost">0.50</field>
+        <field name="testing_cost">0.06</field>
+        <field name="inspection_cost">0.05</field>
+        <field name="sample_cost">0.04</field>
+        <field name="development_cost">0.03</field>
+        <field name="freight_cost">0.42</field>
+        <field name="commission_cost">0.11</field>
+        <field name="bank_charge_cost">0.05</field>
+
+        <!-- Profit &amp; FOB -->
+        <field name="profit_margin_type">percentage</field>
+        <field name="profit_margin_pct">10.0</field>
+    </record>
+
+    <!-- Buyer Price Negotiation (SRS section 19) — Northwind pushed back on
+         the first submitted price; factory countered and settled at $3.20. -->
+    <record id="negotiation_tee_round1" model="garment.cost.negotiation">
+        <field name="costing_id" ref="costing_tee"/>
+        <field name="sequence">10</field>
+        <field name="negotiation_date">2026-03-10</field>
+        <field name="submitted_price">3.40</field>
+        <field name="buyer_target_price">3.00</field>
+        <field name="negotiated_price">3.20</field>
+        <field name="final_price">3.20</field>
+        <field name="negotiation_notes">Northwind (Emma Whitfield) queried the initial submission of $3.40/pc
+against their SS26 target FOB of $5.00 for the combined tee+polo program and countered at $3.00/pc, citing the
+24,000-pc volume and a 3-season repeat commitment. Costing team held CM and overhead firm, trimmed the freight
+and commission allowance, and re-submitted at $3.20/pc. Buyer accepted $3.20/pc as final for order_tee; approved
+by Merchandising.</field>
+        <field name="approval_status">approved</field>
+        <field name="approved_by_id" ref="base.user_admin"/>
+    </record>
+
+    <!-- =================================================================
+         Costing — style_polo (Classic Pique Polo, Northwind, 18,000 pcs)
+         Target ~$4.10/pc FOB, 10% margin.
+         ================================================================= -->
+
+    <record id="costing_polo" model="garment.costing">
+        <field name="costing_number">CST-NSG-PL-2602-01</field>
+        <field name="costing_type">final</field>
+        <field name="style_id" ref="style_polo"/>
+        <field name="sample_id" ref="sample_polo_pp"/>
+        <field name="order_quantity">18000</field>
+        <field name="currency_id" ref="base.USD"/>
+        <field name="costing_date">2026-03-06</field>
+        <field name="validity_period">2026-06-06</field>
+        <field name="status">approved</field>
+        <field name="is_locked" eval="True"/>
+
+        <field name="incoterm">fob</field>
+
+        <!-- Manufacturing Cost (CM) — Cost of Making, per piece -->
+        <field name="cm_cost_ids" eval="[(0, 0, {
+            'sequence': 10,
+            'calculation_mode': 'components',
+            'operation_line_ids': [
+                (0, 0, {'sequence': 10, 'operation': 'cutting', 'description': 'Fabric cutting and bundling',
+                        'line_cost': 0.20}),
+                (0, 0, {'sequence': 20, 'operation': 'sewing', 'description': 'Sewing line (collar/placket attach, '
+                        'button sewing, set-in sleeve with rib cuff)', 'line_cost': 1.55}),
+                (0, 0, {'sequence': 30, 'operation': 'embroidery', 'description': 'Left chest embroidery, 3000 '
+                        'stitches', 'line_cost': 0.20}),
+                (0, 0, {'sequence': 40, 'operation': 'finishing', 'description': 'Trimming, ironing, folding',
+                        'line_cost': 0.20}),
+                (0, 0, {'sequence': 50, 'operation': 'packing', 'description': 'Poly bag and carton packing',
+                        'line_cost': 0.15}),
+            ],
+        })]"/>
+
+        <!-- Factory Overhead &amp; Additional Costs, per piece -->
+        <field name="overhead_cost">0.60</field>
+        <field name="testing_cost">0.07</field>
+        <field name="inspection_cost">0.06</field>
+        <field name="sample_cost">0.05</field>
+        <field name="development_cost">0.04</field>
+        <field name="freight_cost">0.62</field>
+        <field name="commission_cost">0.13</field>
+        <field name="bank_charge_cost">0.06</field>
+
+        <!-- Profit &amp; FOB -->
+        <field name="profit_margin_type">percentage</field>
+        <field name="profit_margin_pct">10.0</field>
+    </record>
+
+    <!-- =================================================================
+         Costing — style_hoodie (Fleece Zip Hoodie, BalticHaus, 12,000 pcs)
+         Target ~$8.50/pc FOB, 12% margin (premium fleece program, first
+         Bangladesh order for this buyer).
+         ================================================================= -->
+
+    <record id="costing_hoodie" model="garment.costing">
+        <field name="costing_number">CST-NSG-HD-2603-01</field>
+        <field name="costing_type">final</field>
+        <field name="style_id" ref="style_hoodie"/>
+        <field name="sample_id" ref="sample_hoodie_pp"/>
+        <field name="order_quantity">12000</field>
+        <field name="currency_id" ref="base.USD"/>
+        <field name="costing_date">2026-03-13</field>
+        <field name="validity_period">2026-07-13</field>
+        <field name="status">approved</field>
+        <field name="is_locked" eval="True"/>
+
+        <field name="incoterm">fob</field>
+
+        <!-- Manufacturing Cost (CM) — Cost of Making, per piece -->
+        <field name="cm_cost_ids" eval="[(0, 0, {
+            'sequence': 10,
+            'calculation_mode': 'components',
+            'operation_line_ids': [
+                (0, 0, {'sequence': 10, 'operation': 'cutting', 'description': 'Fleece panel cutting and bundling '
+                        '(9-piece pattern)', 'line_cost': 0.45}),
+                (0, 0, {'sequence': 20, 'operation': 'sewing', 'description': 'Sewing line (hood 3-panel '
+                        'construction, YKK zip attach, kangaroo pocket, rib waistband/cuffs)', 'line_cost': 2.80}),
+                (0, 0, {'sequence': 30, 'operation': 'embroidery', 'description': 'Left chest embroidered '
+                        'wordmark', 'line_cost': 0.40}),
+                (0, 0, {'sequence': 40, 'operation': 'packing', 'description': 'Recycled poly bag and FSC carton '
+                        'packing', 'line_cost': 0.25}),
+            ],
+        })]"/>
+
+        <!-- Factory Overhead &amp; Additional Costs, per piece -->
+        <field name="overhead_cost">1.10</field>
+        <field name="testing_cost">0.15</field>
+        <field name="inspection_cost">0.12</field>
+        <field name="sample_cost">0.10</field>
+        <field name="development_cost">0.08</field>
+        <field name="freight_cost">1.74</field>
+        <field name="commission_cost">0.28</field>
+        <field name="bank_charge_cost">0.12</field>
+
+        <!-- Profit &amp; FOB -->
+        <field name="profit_margin_type">percentage</field>
+        <field name="profit_margin_pct">12.0</field>
+    </record>
+
+</data>
+</odoo>

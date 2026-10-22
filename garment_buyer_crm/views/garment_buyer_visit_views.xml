@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_buyer_visit_tree" model="ir.ui.view">
+        <field name="name">garment.buyer.visit.tree</field>
+        <field name="model">garment.buyer.visit</field>
+        <field name="arch" type="xml">
+            <tree string="Buyer Visits">
+                <field name="visit_number"/>
+                <field name="buyer_id"/>
+                <field name="visitor_name"/>
+                <field name="arrival_date"/>
+                <field name="departure_date"/>
+                <field name="checklist_progress" widget="progressbar"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_buyer_visit_calendar" model="ir.ui.view">
+        <field name="name">garment.buyer.visit.calendar</field>
+        <field name="model">garment.buyer.visit</field>
+        <field name="arch" type="xml">
+            <calendar string="Factory Visits" date_start="arrival_date" date_stop="departure_date" color="buyer_id">
+                <field name="buyer_id"/>
+                <field name="visitor_name"/>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="view_garment_buyer_visit_form" model="ir.ui.view">
+        <field name="name">garment.buyer.visit.form</field>
+        <field name="model">garment.buyer.visit</field>
+        <field name="arch" type="xml">
+            <form string="Buyer Visit">
+                <header>
+                    <button name="action_confirm" type="object" string="Confirm" class="btn-primary"
+                            invisible="state != 'planned'"/>
+                    <button name="action_start" type="object" string="Start Visit" class="btn-primary"
+                            invisible="state != 'confirmed'"/>
+                    <button name="action_complete" type="object" string="Complete" class="btn-primary"
+                            invisible="state != 'in_progress'"/>
+                    <button name="action_cancel" type="object" string="Cancel" class="btn-secondary"
+                            invisible="state in ('completed','cancelled')"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="planned,confirmed,in_progress,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="visit_number" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="buyer_id"/>
+                            <field name="visitor_name"/>
+                            <field name="visitor_company"/>
+                            <field name="passport_number"/>
+                            <field name="nationality_id"/>
+                            <field name="host_user_id"/>
+                        </group>
+                        <group>
+                            <field name="arrival_date"/>
+                            <field name="departure_date"/>
+                            <field name="hotel_info"/>
+                            <field name="airport_pickup"/>
+                            <field name="driver_name" invisible="not airport_pickup"/>
+                            <field name="vehicle" invisible="not airport_pickup"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Visit Planning">
+                            <group>
+                                <field name="meeting_schedule"/>
+                                <field name="factory_tour"/>
+                                <field name="audit_schedule"/>
+                                <field name="lunch_dinner_arrangement"/>
+                            </group>
+                        </page>
+                        <page string="Checklist">
+                            <field name="checklist_progress" widget="progressbar"/>
+                            <group col="2">
+                                <field name="checklist_visitor_pass"/>
+                                <field name="checklist_nda_signed"/>
+                                <field name="checklist_safety_briefing"/>
+                                <field name="checklist_ppe_issued"/>
+                                <field name="checklist_meeting_room_reserved"/>
+                                <field name="checklist_presentation_ready"/>
+                                <field name="checklist_product_samples_ready"/>
+                                <field name="checklist_factory_cleanliness"/>
+                                <field name="checklist_audit_documents_ready"/>
+                            </group>
+                        </page>
+                        <page string="Outcome">
+                            <group>
+                                <field name="visit_outcome"/>
+                                <field name="feedback"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_buyer_visit_search" model="ir.ui.view">
+        <field name="name">garment.buyer.visit.search</field>
+        <field name="model">garment.buyer.visit</field>
+        <field name="arch" type="xml">
+            <search string="Search Buyer Visits">
+                <field name="visit_number"/>
+                <field name="buyer_id"/>
+                <field name="visitor_name"/>
+                <group expand="0" string="Group By">
+                    <filter string="Buyer" name="group_buyer" context="{'group_by': 'buyer_id'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_buyer_visit" model="ir.actions.act_window">
+        <field name="name">Factory Visits</field>
+        <field name="res_model">garment.buyer.visit</field>
+        <field name="view_mode">calendar,tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Plan your first buyer factory visit.</p>
+        </field>
+    </record>
+
+</odoo>

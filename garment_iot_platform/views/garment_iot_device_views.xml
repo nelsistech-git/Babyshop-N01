@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_iot_device_form" model="ir.ui.view">
+        <field name="name">garment.iot.device.form</field>
+        <field name="model">garment.iot.device</field>
+        <field name="arch" type="xml">
+            <form string="IoT Device">
+                <header>
+                    <button name="action_mark_online" type="object" string="Mark Online"
+                            class="btn-primary" invisible="connection_status == 'online'"/>
+                    <button name="action_mark_offline" type="object" string="Mark Offline"
+                            invisible="connection_status == 'offline'"/>
+                    <field name="connection_status" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Error" bg_color="text-bg-danger" invisible="connection_status != 'error'"/>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_readings" type="object" class="oe_stat_button" icon="fa-line-chart">
+                            <field name="reading_count" widget="statinfo" string="Readings"/>
+                        </button>
+                        <button name="action_view_alert_rules" type="object" class="oe_stat_button" icon="fa-bell">
+                            <field name="alert_rule_count" widget="statinfo" string="Alert Rules"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="e.g. IoT Sensor-001"/></h1>
+                        <h3><field name="device_code" readonly="1"/></h3>
+                    </div>
+                    <group>
+                        <group string="Device">
+                            <field name="device_type"/>
+                            <field name="manufacturer"/>
+                            <field name="model_reference"/>
+                            <field name="serial_number"/>
+                        </group>
+                        <group string="Network">
+                            <field name="gateway_id"/>
+                            <field name="ip_address"/>
+                            <field name="mac_address"/>
+                            <field name="default_unit"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Placement">
+                            <field name="machine_id" invisible="device_type != 'machine_sensor'"/>
+                            <field name="location_id"/>
+                            <field name="location_note"/>
+                            <field name="installed_date"/>
+                        </group>
+                        <group string="Status">
+                            <field name="last_communication" readonly="1"/>
+                            <field name="last_reading_value" readonly="1"/>
+                            <field name="last_reading_unit" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="API Access">
+                        <field name="api_key" readonly="1" password="True"/>
+                    </group>
+                    <notebook>
+                        <page string="Recent Readings">
+                            <field name="reading_ids" limit="20">
+                                <tree default_order="timestamp desc">
+                                    <field name="timestamp"/>
+                                    <field name="reading_type"/>
+                                    <field name="value"/>
+                                    <field name="unit"/>
+                                    <field name="text_value"/>
+                                    <field name="alert_count"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Alert Rules (Device-Specific)">
+                            <field name="alert_rule_ids">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="reading_type"/>
+                                    <field name="operator"/>
+                                    <field name="threshold_value"/>
+                                    <field name="severity" widget="badge"/>
+                                    <field name="action_type"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_iot_device_tree" model="ir.ui.view">
+        <field name="name">garment.iot.device.tree</field>
+        <field name="model">garment.iot.device</field>
+        <field name="arch" type="xml">
+            <tree string="IoT Devices" decoration-success="connection_status == 'online'"
+                  decoration-muted="connection_status == 'offline'" decoration-danger="connection_status == 'error'">
+                <field name="device_code"/>
+                <field name="name"/>
+                <field name="device_type"/>
+                <field name="gateway_id"/>
+                <field name="machine_id"/>
+                <field name="location_id"/>
+                <field name="connection_status" widget="badge"/>
+                <field name="last_communication"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_iot_device_search" model="ir.ui.view">
+        <field name="name">garment.iot.device.search</field>
+        <field name="model">garment.iot.device</field>
+        <field name="arch" type="xml">
+            <search string="Search IoT Devices">
+                <field name="name"/>
+                <field name="device_code"/>
+                <field name="gateway_id"/>
+                <field name="machine_id"/>
+                <field name="location_id"/>
+                <filter string="Online" name="filter_online" domain="[('connection_status', '=', 'online')]"/>
+                <filter string="Offline" name="filter_offline" domain="[('connection_status', '=', 'offline')]"/>
+                <filter string="Error" name="filter_error" domain="[('connection_status', '=', 'error')]"/>
+                <filter string="Linked To A Machine" name="filter_machine_linked" domain="[('machine_id', '!=', False)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Device Type" name="group_type" context="{'group_by': 'device_type'}"/>
+                    <filter string="Gateway" name="group_gateway" context="{'group_by': 'gateway_id'}"/>
+                    <filter string="Status" name="group_status" context="{'group_by': 'connection_status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_iot_device" model="ir.actions.act_window">
+        <field name="name">IoT Devices</field>
+        <field name="res_model">garment.iot.device</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Register the factory's first IoT sensor/device.</p>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_sample_room_capacity_tree" model="ir.ui.view">
+        <field name="name">garment.sample.room.capacity.tree</field>
+        <field name="model">garment.sample.room.capacity</field>
+        <field name="arch" type="xml">
+            <tree string="Sample Room Capacity" editable="bottom">
+                <field name="sample_room"/>
+                <field name="date"/>
+                <field name="resource_type"/>
+                <field name="resource_count"/>
+                <field name="available_hours"/>
+                <field name="efficiency"/>
+                <field name="daily_capacity" sum="Total Daily Capacity"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_sample_room_capacity_form" model="ir.ui.view">
+        <field name="name">garment.sample.room.capacity.form</field>
+        <field name="model">garment.sample.room.capacity</field>
+        <field name="arch" type="xml">
+            <form string="Sample Room Capacity Plan">
+                <sheet>
+                    <div class="oe_title"><h1><field name="name" readonly="1"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="sample_room"/>
+                            <field name="date"/>
+                            <field name="resource_type"/>
+                        </group>
+                        <group>
+                            <field name="resource_count"/>
+                            <field name="available_hours"/>
+                            <field name="efficiency"/>
+                            <field name="daily_capacity" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_sample_room_capacity_pivot" model="ir.ui.view">
+        <field name="name">garment.sample.room.capacity.pivot</field>
+        <field name="model">garment.sample.room.capacity</field>
+        <field name="arch" type="xml">
+            <pivot string="Sample Room Capacity">
+                <field name="sample_room" type="row"/>
+                <field name="resource_type" type="col"/>
+                <field name="daily_capacity" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_garment_sample_room_capacity_search" model="ir.ui.view">
+        <field name="name">garment.sample.room.capacity.search</field>
+        <field name="model">garment.sample.room.capacity</field>
+        <field name="arch" type="xml">
+            <search string="Search Capacity Plans">
+                <field name="sample_room"/>
+                <group expand="0" string="Group By">
+                    <filter string="Sample Room" name="group_room" context="{'group_by': 'sample_room'}"/>
+                    <filter string="Resource Type" name="group_resource" context="{'group_by': 'resource_type'}"/>
+                    <filter string="Date" name="group_date" context="{'group_by': 'date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_sample_room_capacity" model="ir.actions.act_window">
+        <field name="name">Sample Room Capacity Planning</field>
+        <field name="res_model">garment.sample.room.capacity</field>
+        <field name="view_mode">tree,form,pivot</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Plan sample room resources and daily capacity.</p>
+        </field>
+    </record>
+</odoo>

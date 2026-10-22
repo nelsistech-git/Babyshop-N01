@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_ie_improvement_form" model="ir.ui.view">
+        <field name="name">garment.ie.improvement.form</field>
+        <field name="model">garment.ie.improvement</field>
+        <field name="arch" type="xml">
+            <form string="IE Improvement Project">
+                <header>
+                    <button name="action_start_analysis" type="object" string="Start Analysis"
+                            class="btn-primary" invisible="state != 'identified'"/>
+                    <button name="action_plan" type="object" string="Create Plan"
+                            class="btn-primary" invisible="state != 'analysis'"/>
+                    <button name="action_implement" type="object" string="Implement"
+                            class="btn-primary" invisible="state != 'planned'"/>
+                    <button name="action_measure" type="object" string="Measure Result"
+                            class="btn-primary" invisible="state != 'implemented'"/>
+                    <button name="action_approve" type="object" string="Approve"
+                            class="btn-primary" groups="garment_ie_management.group_ie_manager"
+                            invisible="state != 'measured'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="identified,analysis,planned,implemented,measured,approved"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="title"/>
+                        <h1><field name="title"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="improvement_number" readonly="1"/>
+                            <field name="improvement_type"/>
+                            <field name="line_id"/>
+                            <field name="style_id"/>
+                            <field name="operation_id"/>
+                        </group>
+                        <group>
+                            <field name="responsible_id"/>
+                            <field name="target_date"/>
+                            <field name="implemented_date" readonly="1"/>
+                            <field name="method_study_id"/>
+                            <field name="motion_study_id"/>
+                            <field name="line_balance_id"/>
+                        </group>
+                    </group>
+                    <group string="Problem &amp; Root Cause">
+                        <field name="problem_description" nolabel="1" placeholder="Problem..."/>
+                        <field name="root_cause" nolabel="1" placeholder="Root Cause..."/>
+                    </group>
+                    <group string="Action &amp; Benefit">
+                        <field name="improvement_action" nolabel="1" placeholder="Improvement Action..."/>
+                        <field name="expected_benefit" nolabel="1" placeholder="Expected Benefit..."/>
+                        <field name="actual_result" nolabel="1" placeholder="Actual Result..."/>
+                    </group>
+                    <group string="Before / After">
+                        <group>
+                            <field name="output_before"/>
+                            <field name="operators_before"/>
+                        </group>
+                        <group>
+                            <field name="output_after"/>
+                            <field name="operators_after"/>
+                            <field name="improvement_pct" readonly="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="cost_saving_amount"/>
+                        <field name="currency_id" invisible="1"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_ie_improvement_tree" model="ir.ui.view">
+        <field name="name">garment.ie.improvement.tree</field>
+        <field name="model">garment.ie.improvement</field>
+        <field name="arch" type="xml">
+            <tree string="IE Improvement Projects">
+                <field name="improvement_number"/>
+                <field name="title"/>
+                <field name="improvement_type"/>
+                <field name="line_id"/>
+                <field name="improvement_pct"/>
+                <field name="cost_saving_amount"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_ie_improvement_search" model="ir.ui.view">
+        <field name="name">garment.ie.improvement.search</field>
+        <field name="model">garment.ie.improvement</field>
+        <field name="arch" type="xml">
+            <search string="Search Improvement Projects">
+                <field name="title"/>
+                <field name="improvement_number"/>
+                <field name="line_id"/>
+                <group expand="0" string="Group By">
+                    <filter string="Type" name="group_type" context="{'group_by': 'improvement_type'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_ie_improvement" model="ir.actions.act_window">
+        <field name="name">IE Improvement Projects</field>
+        <field name="res_model">garment.ie.improvement</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Log your first improvement project.</p>
+        </field>
+    </record>
+
+</odoo>

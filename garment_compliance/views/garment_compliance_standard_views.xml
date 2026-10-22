@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_compliance_standard_tree" model="ir.ui.view">
+        <field name="name">garment.compliance.standard.tree</field>
+        <field name="model">garment.compliance.standard</field>
+        <field name="arch" type="xml">
+            <tree string="Compliance Standards">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="category"/>
+                <field name="standard_authority"/>
+                <field name="requirement_count"/>
+                <field name="certificate_count"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_compliance_standard_form" model="ir.ui.view">
+        <field name="name">garment.compliance.standard.form</field>
+        <field name="model">garment.compliance.standard</field>
+        <field name="arch" type="xml">
+            <form string="Compliance Standard">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="%(action_garment_compliance_requirement)d" type="action" class="oe_stat_button" icon="fa-list-alt"
+                                context="{'default_standard_id': id}">
+                            <field name="requirement_count" widget="statinfo" string="Requirements"/>
+                        </button>
+                        <button name="%(action_garment_compliance_certificate)d" type="action" class="oe_stat_button" icon="fa-certificate"
+                                context="{'default_standard_id': id}">
+                            <field name="certificate_count" widget="statinfo" string="Certificates"/>
+                        </button>
+                        <button name="%(action_garment_compliance_audit)d" type="action" class="oe_stat_button" icon="fa-search"
+                                context="{'default_standard_id': id}">
+                            <field name="audit_count" widget="statinfo" string="Audits"/>
+                        </button>
+                    </div>
+                    <div class="oe_title"><h1><field name="name" placeholder="e.g. BSCI"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="category"/>
+                        </group>
+                        <group>
+                            <field name="standard_authority"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <field name="description"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_compliance_standard_search" model="ir.ui.view">
+        <field name="name">garment.compliance.standard.search</field>
+        <field name="model">garment.compliance.standard</field>
+        <field name="arch" type="xml">
+            <search string="Search Compliance Standards">
+                <field name="name"/>
+                <field name="standard_authority"/>
+                <filter string="Buyer Compliance" name="filter_buyer" domain="[('category', '=', 'buyer')]"/>
+                <filter string="Social Compliance" name="filter_social" domain="[('category', '=', 'social')]"/>
+                <filter string="Environmental" name="filter_environmental" domain="[('category', '=', 'environmental')]"/>
+                <filter string="Government" name="filter_government" domain="[('category', '=', 'government')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Category" name="group_category" context="{'group_by': 'category'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_compliance_standard" model="ir.actions.act_window">
+        <field name="name">Compliance Standards</field>
+        <field name="res_model">garment.compliance.standard</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

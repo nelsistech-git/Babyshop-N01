@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_production_issue_tree" model="ir.ui.view">
+        <field name="name">garment.production.issue.tree</field>
+        <field name="model">garment.production.issue</field>
+        <field name="arch" type="xml">
+            <tree string="Production Issues / Delays" decoration-danger="andon_status == 'red'" decoration-warning="andon_status == 'yellow'">
+                <field name="name"/>
+                <field name="production_order_id"/>
+                <field name="line_id"/>
+                <field name="issue_type"/>
+                <field name="andon_status"/>
+                <field name="impact_qty"/>
+                <field name="delay_days"/>
+                <field name="status"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_production_issue_form" model="ir.ui.view">
+        <field name="name">garment.production.issue.form</field>
+        <field name="model">garment.production.issue</field>
+        <field name="arch" type="xml">
+            <form string="Production Issue / Delay">
+                <header>
+                    <field name="status" widget="statusbar" statusbar_visible="open,in_progress,resolved"/>
+                    <button name="action_start_progress" type="object" string="Start Progress" class="btn-primary"
+                            invisible="status != 'open'"/>
+                    <button name="action_resolve" type="object" string="Resolve" class="btn-primary"
+                            invisible="status == 'resolved'"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="production_order_id"/>
+                            <field name="line_id"/>
+                            <field name="machine_id"/>
+                            <field name="issue_type"/>
+                            <field name="andon_status"/>
+                        </group>
+                        <group>
+                            <field name="reported_date"/>
+                            <field name="reported_by_id"/>
+                            <field name="impact_qty"/>
+                            <field name="delay_days"/>
+                            <field name="expected_date"/>
+                            <field name="actual_date"/>
+                        </group>
+                    </group>
+                    <field name="description"/>
+                    <group string="Resolution">
+                        <field name="resolution"/>
+                        <field name="resolved_by_id"/>
+                        <field name="resolved_date"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_production_issue_search" model="ir.ui.view">
+        <field name="name">garment.production.issue.search</field>
+        <field name="model">garment.production.issue</field>
+        <field name="arch" type="xml">
+            <search string="Search Issues">
+                <field name="name"/>
+                <field name="production_order_id"/>
+                <field name="line_id"/>
+                <filter string="Open" name="filter_open" domain="[('status', '!=', 'resolved')]"/>
+                <filter string="Andon Red" name="filter_red" domain="[('andon_status', '=', 'red')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Issue Type" name="group_type" context="{'group_by': 'issue_type'}"/>
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_production_issue" model="ir.actions.act_window">
+        <field name="name">Production Issues / Andon</field>
+        <field name="res_model">garment.production.issue</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_garment_production_issue_search"/>
+    </record>
+
+</odoo>

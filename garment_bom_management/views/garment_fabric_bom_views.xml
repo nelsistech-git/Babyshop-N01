@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_fabric_bom_tree" model="ir.ui.view">
+        <field name="name">garment.fabric.bom.tree</field>
+        <field name="model">garment.fabric.bom</field>
+        <field name="arch" type="xml">
+            <tree string="Fabric BOM">
+                <field name="bom_id"/>
+                <field name="fabric_code"/>
+                <field name="fabric_name"/>
+                <field name="fabric_role"/>
+                <field name="composition"/>
+                <field name="gsm"/>
+                <field name="gross_consumption"/>
+                <field name="line_cost"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_fabric_bom_form" model="ir.ui.view">
+        <field name="name">garment.fabric.bom.form</field>
+        <field name="model">garment.fabric.bom</field>
+        <field name="arch" type="xml">
+            <form string="Fabric BOM Line">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="bom_id"/>
+                            <field name="fabric_code"/>
+                            <field name="fabric_name"/>
+                            <field name="fabric_role"/>
+                            <field name="composition"/>
+                            <field name="gsm"/>
+                            <field name="width"/>
+                            <field name="construction"/>
+                            <field name="knit_woven"/>
+                            <field name="color"/>
+                            <field name="pantone"/>
+                            <field name="finish"/>
+                        </group>
+                        <group>
+                            <field name="supplier_id"/>
+                            <field name="mill"/>
+                            <field name="country_of_origin_id"/>
+                            <field name="uom"/>
+                            <field name="unit_price"/>
+                        </group>
+                    </group>
+                    <group string="Consumption &amp; Wastage">
+                        <group>
+                            <field name="net_consumption"/>
+                            <field name="cutting_wastage_pct"/>
+                            <field name="shrinkage_wastage_pct"/>
+                            <field name="marker_wastage_pct"/>
+                            <field name="process_wastage_pct"/>
+                            <field name="shade_wastage_pct"/>
+                            <field name="quality_wastage_pct"/>
+                        </group>
+                        <group>
+                            <field name="total_wastage_pct" readonly="1"/>
+                            <field name="gross_consumption" readonly="1"/>
+                            <field name="required_qty" readonly="1"/>
+                            <field name="line_cost" readonly="1"/>
+                            <field name="wastage_approved_by_id"/>
+                            <field name="wastage_reason"/>
+                        </group>
+                    </group>
+                    <group string="Bangladesh Industry Data">
+                        <group>
+                            <field name="yarn_count"/>
+                            <field name="dye_lot"/>
+                            <field name="shade_band"/>
+                        </group>
+                        <group>
+                            <field name="marker_efficiency_pct"/>
+                            <field name="wash_loss_pct"/>
+                        </group>
+                    </group>
+                    <group string="Buyer Requirements">
+                        <group>
+                            <field name="buyer_material_code"/>
+                            <field name="buyer_description"/>
+                            <field name="is_approved_mill"/>
+                        </group>
+                        <group>
+                            <field name="is_restricted"/>
+                            <field name="restriction_reason" invisible="not is_restricted"/>
+                        </group>
+                    </group>
+                    <group string="Compliance">
+                        <group>
+                            <field name="compliance_gots"/>
+                            <field name="compliance_grs"/>
+                            <field name="compliance_oekotex"/>
+                            <field name="compliance_rcs"/>
+                        </group>
+                        <group>
+                            <field name="compliance_higg_score"/>
+                            <field name="compliance_chemical_status"/>
+                        </group>
+                    </group>
+                    <group string="Purchase Requirement">
+                        <group>
+                            <field name="available_stock"/>
+                            <field name="reserved_stock"/>
+                        </group>
+                        <group>
+                            <field name="incoming_stock"/>
+                            <field name="safety_stock"/>
+                            <field name="purchase_qty" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_fabric_bom" model="ir.actions.act_window">
+        <field name="name">Fabric BOM</field>
+        <field name="res_model">garment.fabric.bom</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

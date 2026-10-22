@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_quality_checkpoint_form" model="ir.ui.view">
+        <field name="name">garment.quality.checkpoint.form</field>
+        <field name="model">garment.quality.checkpoint</field>
+        <field name="arch" type="xml">
+            <form string="Quality Checkpoint">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="stage"/>
+                            <field name="style_id"/>
+                        </group>
+                        <group>
+                            <field name="standard_id"/>
+                            <field name="sequence"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Checklist Items">
+                            <field name="line_ids">
+                                <tree editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="check_item"/>
+                                    <field name="is_mandatory"/>
+                                    <field name="instructions"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Notes">
+                            <field name="notes" nolabel="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_quality_checkpoint_tree" model="ir.ui.view">
+        <field name="name">garment.quality.checkpoint.tree</field>
+        <field name="model">garment.quality.checkpoint</field>
+        <field name="arch" type="xml">
+            <tree string="Quality Checkpoints">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="stage"/>
+                <field name="style_id"/>
+                <field name="line_count"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_quality_checkpoint_search" model="ir.ui.view">
+        <field name="name">garment.quality.checkpoint.search</field>
+        <field name="model">garment.quality.checkpoint</field>
+        <field name="arch" type="xml">
+            <search string="Search Checkpoints">
+                <field name="name"/>
+                <field name="style_id"/>
+                <group expand="0" string="Group By">
+                    <filter string="Stage" name="group_stage" context="{'group_by': 'stage'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_quality_checkpoint" model="ir.actions.act_window">
+        <field name="name">Quality Checkpoints</field>
+        <field name="res_model">garment.quality.checkpoint</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first quality checkpoint template.</p>
+        </field>
+    </record>
+
+</odoo>

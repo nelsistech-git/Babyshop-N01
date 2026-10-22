@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_dashboard_board_form" model="ir.ui.view">
+        <field name="name">garment.dashboard.board.form</field>
+        <field name="model">garment.dashboard.board</field>
+        <field name="arch" type="xml">
+            <form string="Dashboard Board">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_add_tile" type="object" class="oe_stat_button" icon="fa-plus-square">
+                            <field name="tile_count" widget="statinfo" string="Tiles"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="category"/>
+                            <field name="owner_id"/>
+                            <field name="is_default"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="sequence"/>
+                            <field name="visible_group_ids" widget="many2many_tags"/>
+                        </group>
+                    </group>
+                    <group string="Description">
+                        <field name="description" nolabel="1"/>
+                    </group>
+                    <notebook>
+                        <page string="Tiles">
+                            <p class="text-muted">
+                                Use the "Dashboard" menu for the visual tile view of this board.
+                                This list is for configuring which tiles belong to it.
+                            </p>
+                            <field name="tile_ids">
+                                <tree editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="tile_type"/>
+                                    <field name="kpi_id" invisible="tile_type != 'kpi'"/>
+                                    <field name="source_model" invisible="tile_type != 'custom'"/>
+                                    <field name="measure_field" invisible="tile_type != 'custom'"/>
+                                    <field name="aggregation" invisible="tile_type != 'custom'"/>
+                                    <field name="date_range" invisible="tile_type != 'custom'"/>
+                                    <field name="icon"/>
+                                    <field name="color"/>
+                                    <field name="size"/>
+                                    <field name="current_value" readonly="1"/>
+                                    <field name="unit" readonly="1"/>
+                                    <field name="status" widget="badge" readonly="1"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_dashboard_board_tree" model="ir.ui.view">
+        <field name="name">garment.dashboard.board.tree</field>
+        <field name="model">garment.dashboard.board</field>
+        <field name="arch" type="xml">
+            <tree string="Dashboard Boards">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="category"/>
+                <field name="owner_id"/>
+                <field name="tile_count"/>
+                <field name="is_default"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_dashboard_board_search" model="ir.ui.view">
+        <field name="name">garment.dashboard.board.search</field>
+        <field name="model">garment.dashboard.board</field>
+        <field name="arch" type="xml">
+            <search string="Search Dashboard Boards">
+                <field name="name"/>
+                <field name="category"/>
+                <group expand="0" string="Group By">
+                    <filter string="Category" name="group_category" context="{'group_by': 'category'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_dashboard_board" model="ir.actions.act_window">
+        <field name="name">Dashboard Boards</field>
+        <field name="res_model">garment.dashboard.board</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first dashboard board.</p>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_report_garment_merch_quotation" model="ir.actions.report">
+        <field name="name">Quotation</field>
+        <field name="model">garment.merch.quotation</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">garment_merchandising.report_garment_merch_quotation</field>
+        <field name="report_file">garment_merchandising.report_garment_merch_quotation</field>
+        <field name="binding_model_id" ref="model_garment_merch_quotation"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'Quotation - %s' % (object.quotation_number)</field>
+    </record>
+
+    <template id="report_garment_merch_quotation">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Quotation <span t-field="o.quotation_number"/></h2>
+                        <p class="text-muted">
+                            Buyer: <span t-field="o.buyer_id.name"/> | Date: <span t-field="o.quotation_date"/>
+                            | Valid Until: <span t-field="o.valid_until"/>
+                        </p>
+
+                        <table class="table table-sm">
+                            <thead><tr><th>Style</th><th>Quantity</th><th>Unit Price</th><th>Total</th></tr></thead>
+                            <tbody>
+                                <tr t-foreach="o.line_ids" t-as="l">
+                                    <td><span t-field="l.style_id.style_name"/></td>
+                                    <td><span t-field="l.quantity"/></td>
+                                    <td><span t-field="l.unit_price"/></td>
+                                    <td><span t-field="l.total_value"/></td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr><td colspan="3"><strong>Total</strong></td><td><strong><span t-field="o.total_value"/></strong></td></tr>
+                            </tfoot>
+                        </table>
+
+                        <p>Incoterms: <span t-field="o.incoterm_id.name"/> | Payment Terms: <span t-field="o.payment_term_id.name"/></p>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

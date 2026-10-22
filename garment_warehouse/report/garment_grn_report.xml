@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_report_garment_grn" model="ir.actions.report">
+        <field name="name">GRN</field>
+        <field name="model">garment.grn</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">garment_warehouse.report_garment_grn</field>
+        <field name="report_file">garment_warehouse.report_garment_grn</field>
+        <field name="binding_model_id" ref="model_garment_grn"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'GRN - %s' % (object.grn_number)</field>
+    </record>
+
+    <template id="report_garment_grn">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Goods Receipt Note <span t-field="o.grn_number"/></h2>
+                        <p class="text-muted">
+                            Supplier: <span t-field="o.supplier_id.name"/> | Warehouse: <span t-field="o.warehouse_id.name"/>
+                            | Arrival: <span t-field="o.arrival_datetime"/>
+                        </p>
+
+                        <table class="table table-sm">
+                            <thead><tr><th>Material</th><th>Received</th><th>Accepted</th><th>Rejected</th><th>Quality</th></tr></thead>
+                            <tbody>
+                                <tr t-foreach="o.line_ids" t-as="l">
+                                    <td><span t-field="l.material_id.name"/></td>
+                                    <td><span t-field="l.received_qty"/></td>
+                                    <td><span t-field="l.accepted_qty"/></td>
+                                    <td><span t-field="l.rejected_qty"/></td>
+                                    <td><span t-field="l.quality_status"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_tna_activity_tree" model="ir.ui.view">
+        <field name="name">garment.tna.activity.tree</field>
+        <field name="model">garment.tna.activity</field>
+        <field name="arch" type="xml">
+            <tree string="TNA Activities" decoration-danger="delay_status in ('delayed', 'critical')"
+                  decoration-warning="delay_status == 'warning'" decoration-success="status == 'completed'">
+                <field name="tna_id"/>
+                <field name="buyer_id"/>
+                <field name="style_id"/>
+                <field name="activity_name"/>
+                <field name="category"/>
+                <field name="department"/>
+                <field name="responsible_person_id"/>
+                <field name="planned_start_date"/>
+                <field name="planned_end_date"/>
+                <field name="progress_pct"/>
+                <field name="priority"/>
+                <field name="is_critical_path"/>
+                <field name="delay_status"/>
+                <field name="status"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_tna_activity_form" model="ir.ui.view">
+        <field name="name">garment.tna.activity.form</field>
+        <field name="model">garment.tna.activity</field>
+        <field name="arch" type="xml">
+            <form string="TNA Activity">
+                <header>
+                    <field name="status" widget="statusbar" statusbar_visible="pending,in_progress,completed"/>
+                    <button name="action_mark_completed" type="object" string="Mark Completed" class="btn-primary"
+                            invisible="status == 'completed'"/>
+                    <button name="action_mark_delayed" type="object" string="Mark Delayed" class="btn-secondary"
+                            invisible="status in ('completed', 'delayed')"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="activity_name"/>
+                        <h1><field name="activity_name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="tna_id"/>
+                            <field name="activity_code"/>
+                            <field name="category"/>
+                            <field name="department"/>
+                            <field name="responsible_person_id"/>
+                            <field name="priority"/>
+                            <field name="is_milestone"/>
+                        </group>
+                        <group>
+                            <field name="planned_start_date"/>
+                            <field name="planned_end_date"/>
+                            <field name="actual_start_date"/>
+                            <field name="actual_end_date"/>
+                            <field name="duration_days" readonly="1"/>
+                            <field name="progress_pct"/>
+                            <field name="delay_status" readonly="1"/>
+                            <field name="is_critical_path" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Dependency">
+                        <field name="dependency_type"/>
+                        <field name="predecessor_activity_id"/>
+                    </group>
+                    <field name="remarks" placeholder="Remarks..."/>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_tna_activity_calendar" model="ir.ui.view">
+        <field name="name">garment.tna.activity.calendar</field>
+        <field name="model">garment.tna.activity</field>
+        <field name="arch" type="xml">
+            <calendar string="Activity Timeline" date_start="planned_start_date" date_stop="planned_end_date" color="category">
+                <field name="activity_name"/>
+                <field name="tna_id"/>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="view_garment_tna_activity_search" model="ir.ui.view">
+        <field name="name">garment.tna.activity.search</field>
+        <field name="model">garment.tna.activity</field>
+        <field name="arch" type="xml">
+            <search string="Search TNA Activities">
+                <field name="activity_name"/>
+                <field name="tna_id"/>
+                <field name="buyer_id"/>
+                <field name="style_id"/>
+                <field name="responsible_person_id"/>
+                <!-- Calendar Filters (SRS section 21): Buyer, Order, Style,
+                     Department, Responsible Person, Status, Priority. -->
+                <filter string="My Activities" name="filter_my" domain="[('responsible_person_id', '=', uid)]"/>
+                <filter string="Milestones" name="filter_milestone" domain="[('is_milestone', '=', True)]"/>
+                <filter string="Critical Path" name="filter_critical" domain="[('is_critical_path', '=', True)]"/>
+                <filter string="Delayed" name="filter_delayed" domain="[('status', '=', 'delayed')]"/>
+                <filter string="Pending" name="filter_pending" domain="[('status', '=', 'pending')]"/>
+                <filter string="Urgent Priority" name="filter_urgent" domain="[('priority', '=', '3')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Buyer" name="group_buyer" context="{'group_by': 'buyer_id'}"/>
+                    <filter string="Style" name="group_style" context="{'group_by': 'style_id'}"/>
+                    <filter string="Category" name="group_category" context="{'group_by': 'category'}"/>
+                    <filter string="Department" name="group_department" context="{'group_by': 'department'}"/>
+                    <filter string="Responsible Person" name="group_responsible" context="{'group_by': 'responsible_person_id'}"/>
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                    <filter string="Priority" name="group_priority" context="{'group_by': 'priority'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_tna_activity" model="ir.actions.act_window">
+        <field name="name">TNA Activities</field>
+        <field name="res_model">garment.tna.activity</field>
+        <field name="view_mode">calendar,tree,form</field>
+        <field name="search_view_id" ref="view_garment_tna_activity_search"/>
+    </record>
+</odoo>

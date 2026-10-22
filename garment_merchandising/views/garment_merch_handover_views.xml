@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_merch_handover_tree" model="ir.ui.view">
+        <field name="name">garment.merch.handover.tree</field>
+        <field name="model">garment.merch.handover</field>
+        <field name="arch" type="xml">
+            <tree string="Production Handovers" decoration-success="status == 'accepted'">
+                <field name="handover_number"/>
+                <field name="order_confirmation_id"/>
+                <field name="buyer_id"/>
+                <field name="style_id"/>
+                <field name="handover_date"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_merch_handover_form" model="ir.ui.view">
+        <field name="name">garment.merch.handover.form</field>
+        <field name="model">garment.merch.handover</field>
+        <field name="arch" type="xml">
+            <form string="Production Handover">
+                <header>
+                    <field name="status" widget="statusbar"
+                           statusbar_visible="draft,merchandiser_submitted,merchandising_manager_review,planning_manager_review,production_manager_review,accepted"/>
+                    <button name="action_next_stage" type="object" string="Move to Next Stage" class="btn-primary"
+                            invisible="status == 'accepted'"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="handover_number" readonly="1"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="order_confirmation_id"/>
+                            <field name="buyer_id"/>
+                            <field name="style_id"/>
+                            <field name="handover_date"/>
+                        </group>
+                    </group>
+                    <group string="Handover Checklist" col="4">
+                        <field name="chk_buyer_po"/>
+                        <field name="chk_approved_techpack"/>
+                        <field name="chk_approved_bom"/>
+                        <field name="chk_approved_cost_sheet"/>
+                        <field name="chk_approved_tna"/>
+                        <field name="chk_fabric_booking"/>
+                        <field name="chk_trim_booking"/>
+                        <field name="chk_sample_approval"/>
+                        <field name="chk_size_specification"/>
+                        <field name="chk_measurement_sheet"/>
+                        <field name="chk_packaging_instructions"/>
+                        <field name="chk_artwork"/>
+                        <field name="chk_label_details"/>
+                        <field name="chk_washing_instructions"/>
+                    </group>
+                    <field name="production_comments"/>
+                    <group string="Approval Chain">
+                        <group>
+                            <field name="merchandiser_id"/>
+                            <field name="merchandiser_signed_date" readonly="1"/>
+                            <field name="merchandising_manager_id"/>
+                            <field name="merchandising_manager_signed_date" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="planning_manager_id"/>
+                            <field name="planning_manager_signed_date" readonly="1"/>
+                            <field name="production_manager_id"/>
+                            <field name="production_manager_signed_date" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_merch_handover" model="ir.actions.act_window">
+        <field name="name">Production Handovers</field>
+        <field name="res_model">garment.merch.handover</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

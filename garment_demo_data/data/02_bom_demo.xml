@@ -1,0 +1,415 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Smart Complete Garment Software
+    Demo Data: Bill of Materials (garment_bom_management)
+
+    Copyright (c) Nelsis Tech (www.nelsistech.com)
+    License: LGPL-3
+
+    NOTE on supplier linkage: garment.fabric.bom / garment.trim.bom /
+    garment.packaging.bom .supplier_id are Many2one to res.partner (not
+    garment.supplier) — see garment_bom_management/models/garment_fabric_bom.py
+    etc. partner_deltaknit / partner_brighttrim (defined in
+    01_supplier_demo.xml) are the same underlying contacts as
+    supplier_deltaknit / supplier_brighttrim (garment.supplier), so these
+    lines point at the same real-world companies.
+
+    NOTE on material linkage: garment.fabric.bom / .trim.bom / .packaging.bom
+    have no Many2one field to garment.material (only descriptive Char fields
+    such as fabric_name/composition/gsm). Per the task instructions, each
+    line's descriptive fields are kept in lock-step with the matching batch-1
+    garment.material record (mat_fabric_jersey, mat_fabric_fleece,
+    mat_trim_label, mat_trim_zipper, mat_pack_polybag, mat_pack_carton) so the
+    two are recognizably "the same material" even though the schema itself
+    has no direct relation between them.
+
+    garment.bom.line (the consolidated line_ids) is intentionally NOT
+    populated by hand here — per garment_bom.py it is a computed/auto-synced
+    list (action_sync_material_lines), rebuilt from fabric_bom_ids /
+    trim_bom_ids / packaging_bom_ids whenever the BOM is submitted for
+    Production Approval or Final Approval. Hand-writing it in demo XML would
+    duplicate and could drift from those source lines.
+-->
+<odoo>
+<data noupdate="1">
+
+    <!-- =================================================================
+         BOM — style_tee (Men's Crew Neck T-Shirt, Northwind, 24,000 pcs)
+         ================================================================= -->
+
+    <record id="bom_tee" model="garment.bom">
+        <field name="bom_number">BOM-NSG-TS-2601</field>
+        <field name="bom_type">production</field>
+        <field name="style_id" ref="style_tee"/>
+        <field name="version">1.0</field>
+        <field name="order_quantity">24000</field>
+        <field name="delivery_date">2026-06-15</field>
+        <field name="factory">Ashulia Factory Complex</field>
+        <field name="production_unit">Sewing Line 1</field>
+        <field name="currency_id" ref="base.GBP"/>
+        <field name="target_cost">2.85</field>
+        <field name="fob_price">3.35</field>
+        <field name="profit_margin">15.0</field>
+        <field name="processing_cost">0.42</field>
+        <field name="status">active</field>
+        <field name="is_locked" eval="True"/>
+        <field name="approved_by_id" ref="base.user_admin"/>
+
+        <field name="fabric_bom_ids" eval="[
+            (0, 0, {
+                'sequence': 10,
+                'fabric_code': 'FB-JERSEY-180',
+                'fabric_name': 'Single Jersey Cotton 180 GSM',
+                'fabric_role': 'main',
+                'composition': '100% Cotton',
+                'gsm': '180',
+                'width': '60 inch tubular',
+                'construction': 'Single Jersey',
+                'knit_woven': 'knit',
+                'color': 'Per colorway (Optic White / Navy)',
+                'finish': 'Compact combed, piece-dyed',
+                'supplier_id': ref('partner_deltaknit'),
+                'mill': 'Delta Knit Fabrics Ltd',
+                'country_of_origin_id': ref('base.bd'),
+                'net_consumption': 0.19,
+                'cutting_wastage_pct': 4.0,
+                'shrinkage_wastage_pct': 3.0,
+                'marker_wastage_pct': 2.0,
+                'process_wastage_pct': 1.0,
+                'shade_wastage_pct': 1.0,
+                'quality_wastage_pct': 1.0,
+                'uom': 'Kg',
+                'unit_price': 4.85,
+                'yarn_count': '30s Combed',
+                'dye_lot': 'DK-DL-2601-A',
+                'shade_band': 'Band A',
+                'marker_efficiency_pct': 84.5,
+                'wash_loss_pct': 2.0,
+                'buyer_material_code': 'NW-FB-001',
+                'buyer_description': 'Single Jersey 180 GSM Cotton, per approved lab dip',
+                'is_approved_mill': True,
+                'compliance_oekotex': True,
+                'compliance_chemical_status': 'compliant',
+            }),
+        ]"/>
+
+        <field name="trim_bom_ids" eval="[
+            (0, 0, {
+                'sequence': 10,
+                'trim_type': 'label',
+                'description': 'Woven Main Label',
+                'color': 'White/Navy',
+                'size_spec': '3cm x 5cm folded',
+                'label_type': 'Woven Damask',
+                'label_material': '100% Polyester yarn',
+                'label_artwork_reference': 'NW-ART-LBL-001',
+                'label_position': 'Center back neck',
+                'supplier_id': ref('partner_brighttrim'),
+                'uom': 'Pcs',
+                'consumption_per_piece': 1.0,
+                'unit_price': 0.018,
+                'buyer_material_code': 'NW-TR-LBL-001',
+                'buyer_description': 'Woven main label, buyer logo, 4-color',
+                'compliance_oekotex': True,
+                'compliance_chemical_status': 'compliant',
+            }),
+            (0, 0, {
+                'sequence': 20,
+                'trim_type': 'thread',
+                'description': 'Sewing Thread, Poly-Poly Core Spun',
+                'color': 'Matching body color',
+                'thread_count': '40/2',
+                'thread_type': 'Poly-poly core spun',
+                'thread_brand': 'Coats',
+                'supplier_id': ref('partner_brighttrim'),
+                'uom': 'Cone',
+                'consumption_per_piece': 0.02,
+                'unit_price': 1.35,
+                'buyer_material_code': 'NW-TR-THR-001',
+            }),
+        ]"/>
+
+        <field name="packaging_bom_ids" eval="[
+            (0, 0, {
+                'sequence': 10,
+                'packaging_type': 'poly_bag',
+                'description': 'Printed LDPE Poly Bag',
+                'dimension': '12x16 inch',
+                'material': 'LDPE',
+                'weight': 8.0,
+                'supplier_id': ref('partner_brighttrim'),
+                'uom': 'Pcs',
+                'consumption_per_piece': 1.0,
+                'unit_price': 0.012,
+                'buyer_material_code': 'NW-PK-PB-001',
+            }),
+            (0, 0, {
+                'sequence': 20,
+                'packaging_type': 'master_carton',
+                'description': 'Export Carton 20x14x10, 6 dozen assortment',
+                'dimension': '20x14x10 inch',
+                'material': '5-ply corrugated',
+                'weight': 650.0,
+                'supplier_id': ref('partner_brighttrim'),
+                'uom': 'Pcs',
+                'consumption_per_piece': 0.01389,
+                'unit_price': 1.15,
+                'buyer_material_code': 'NW-PK-CT-001',
+            }),
+        ]"/>
+    </record>
+
+    <!-- =================================================================
+         BOM — style_polo (Classic Pique Polo, Northwind, 18,000 pcs)
+         ================================================================= -->
+
+    <record id="bom_polo" model="garment.bom">
+        <field name="bom_number">BOM-NSG-PL-2602</field>
+        <field name="bom_type">production</field>
+        <field name="style_id" ref="style_polo"/>
+        <field name="version">1.0</field>
+        <field name="order_quantity">18000</field>
+        <field name="delivery_date">2026-06-30</field>
+        <field name="factory">Ashulia Factory Complex</field>
+        <field name="production_unit">Sewing Line 1</field>
+        <field name="currency_id" ref="base.GBP"/>
+        <field name="target_cost">3.55</field>
+        <field name="fob_price">4.10</field>
+        <field name="profit_margin">15.5</field>
+        <field name="processing_cost">0.58</field>
+        <field name="status">active</field>
+        <field name="is_locked" eval="True"/>
+        <field name="approved_by_id" ref="base.user_admin"/>
+
+        <field name="fabric_bom_ids" eval="[
+            (0, 0, {
+                'sequence': 10,
+                'fabric_code': 'FB-JERSEY-180',
+                'fabric_name': 'Single Jersey Cotton 180 GSM',
+                'fabric_role': 'main',
+                'composition': '100% Cotton',
+                'gsm': '180',
+                'width': '60 inch tubular',
+                'construction': 'Single Jersey (body)',
+                'knit_woven': 'knit',
+                'color': 'Per colorway (Bottle Green / White)',
+                'finish': 'Compact combed, yarn-dyed',
+                'supplier_id': ref('partner_deltaknit'),
+                'mill': 'Delta Knit Fabrics Ltd',
+                'country_of_origin_id': ref('base.bd'),
+                'net_consumption': 0.21,
+                'cutting_wastage_pct': 4.5,
+                'shrinkage_wastage_pct': 3.0,
+                'marker_wastage_pct': 2.5,
+                'process_wastage_pct': 1.0,
+                'shade_wastage_pct': 1.0,
+                'quality_wastage_pct': 1.0,
+                'uom': 'Kg',
+                'unit_price': 5.30,
+                'yarn_count': '20s Combed',
+                'dye_lot': 'DK-DL-2602-A',
+                'shade_band': 'Band A',
+                'marker_efficiency_pct': 82.0,
+                'wash_loss_pct': 2.0,
+                'buyer_material_code': 'NW-FB-002',
+                'buyer_description': 'Pique-construction single jersey 180 GSM cotton, per approved lab dip',
+                'is_approved_mill': True,
+                'compliance_oekotex': True,
+                'compliance_chemical_status': 'compliant',
+            }),
+        ]"/>
+
+        <field name="trim_bom_ids" eval="[
+            (0, 0, {
+                'sequence': 10,
+                'trim_type': 'label',
+                'description': 'Woven Main Label',
+                'color': 'White/Navy',
+                'size_spec': '3cm x 5cm folded',
+                'label_type': 'Woven Damask',
+                'label_material': '100% Polyester yarn',
+                'label_artwork_reference': 'NW-ART-LBL-002',
+                'label_position': 'Center back neck, below collar seam',
+                'supplier_id': ref('partner_brighttrim'),
+                'uom': 'Pcs',
+                'consumption_per_piece': 1.0,
+                'unit_price': 0.018,
+                'buyer_material_code': 'NW-TR-LBL-002',
+                'buyer_description': 'Woven main label, buyer logo, 4-color',
+                'compliance_oekotex': True,
+                'compliance_chemical_status': 'compliant',
+            }),
+            (0, 0, {
+                'sequence': 20,
+                'trim_type': 'button',
+                'description': 'Placket Button, 3-hole',
+                'color': 'Per colorway (Off-White / White)',
+                'button_size': '20L',
+                'button_material': 'Polyester resin',
+                'button_type': 'Flat sew-through',
+                'button_hole_type': '4_hole',
+                'supplier_id': ref('partner_brighttrim'),
+                'uom': 'Pcs',
+                'consumption_per_piece': 3.0,
+                'unit_price': 0.006,
+                'buyer_material_code': 'NW-TR-BTN-002',
+            }),
+        ]"/>
+
+        <field name="packaging_bom_ids" eval="[
+            (0, 0, {
+                'sequence': 10,
+                'packaging_type': 'poly_bag',
+                'description': 'Printed LDPE Poly Bag',
+                'dimension': '12x16 inch',
+                'material': 'LDPE',
+                'weight': 9.0,
+                'supplier_id': ref('partner_brighttrim'),
+                'uom': 'Pcs',
+                'consumption_per_piece': 1.0,
+                'unit_price': 0.012,
+                'buyer_material_code': 'NW-PK-PB-002',
+            }),
+            (0, 0, {
+                'sequence': 20,
+                'packaging_type': 'master_carton',
+                'description': 'Export Carton 20x14x10, 6 dozen assortment',
+                'dimension': '20x14x10 inch',
+                'material': '5-ply corrugated',
+                'weight': 700.0,
+                'supplier_id': ref('partner_brighttrim'),
+                'uom': 'Pcs',
+                'consumption_per_piece': 0.01389,
+                'unit_price': 1.15,
+                'buyer_material_code': 'NW-PK-CT-002',
+            }),
+        ]"/>
+    </record>
+
+    <!-- =================================================================
+         BOM — style_hoodie (Fleece Zip Hoodie, BalticHaus, 12,000 pcs)
+         ================================================================= -->
+
+    <record id="bom_hoodie" model="garment.bom">
+        <field name="bom_number">BOM-NSG-HD-2603</field>
+        <field name="bom_type">production</field>
+        <field name="style_id" ref="style_hoodie"/>
+        <field name="version">1.0</field>
+        <field name="order_quantity">12000</field>
+        <field name="delivery_date">2026-07-20</field>
+        <field name="factory">Ashulia Factory Complex</field>
+        <field name="production_unit">Sewing Line 2</field>
+        <field name="currency_id" ref="base.EUR"/>
+        <field name="target_cost">7.20</field>
+        <field name="fob_price">8.45</field>
+        <field name="profit_margin">17.0</field>
+        <field name="processing_cost">1.05</field>
+        <field name="status">active</field>
+        <field name="is_locked" eval="True"/>
+        <field name="approved_by_id" ref="base.user_admin"/>
+
+        <field name="fabric_bom_ids" eval="[
+            (0, 0, {
+                'sequence': 10,
+                'fabric_code': 'FB-FLEECE-280',
+                'fabric_name': 'Fleece 280 GSM',
+                'fabric_role': 'fleece',
+                'composition': 'Cotton-Polyester Blend',
+                'gsm': '280',
+                'width': '62 inch tubular',
+                'construction': 'Brushed Back Fleece (French Terry Backing)',
+                'knit_woven': 'knit',
+                'color': 'Per colorway (Charcoal / Olive)',
+                'finish': 'Brushed back, piece-dyed',
+                'supplier_id': ref('partner_deltaknit'),
+                'mill': 'Delta Knit Fabrics Ltd',
+                'country_of_origin_id': ref('base.bd'),
+                'net_consumption': 0.52,
+                'cutting_wastage_pct': 5.0,
+                'shrinkage_wastage_pct': 3.5,
+                'marker_wastage_pct': 3.0,
+                'process_wastage_pct': 1.5,
+                'shade_wastage_pct': 1.0,
+                'quality_wastage_pct': 1.0,
+                'uom': 'Kg',
+                'unit_price': 6.80,
+                'yarn_count': '20s OE',
+                'dye_lot': 'DK-DL-2603-A',
+                'shade_band': 'Band A',
+                'marker_efficiency_pct': 80.5,
+                'wash_loss_pct': 2.5,
+                'buyer_material_code': 'BH-FB-001',
+                'buyer_description': 'Brushed back fleece 280 GSM cotton-polyester, per approved lab dip',
+                'is_approved_mill': True,
+                'compliance_gots': False,
+                'compliance_grs': True,
+                'compliance_oekotex': True,
+                'compliance_chemical_status': 'compliant',
+            }),
+        ]"/>
+
+        <field name="trim_bom_ids" eval="[
+            (0, 0, {
+                'sequence': 10,
+                'trim_type': 'zipper',
+                'description': 'YKK Zipper 5mm, Close-End, Chin Guard',
+                'color': 'Per colorway (Charcoal / Olive)',
+                'size_spec': '60 cm',
+                'zipper_length': '60 cm',
+                'zipper_type': 'Nylon coil, close-end',
+                'zipper_slider_type': 'Auto-lock, reversed puller',
+                'supplier_id': ref('partner_brighttrim'),
+                'uom': 'Pcs',
+                'consumption_per_piece': 1.0,
+                'unit_price': 18.0,
+                'buyer_material_code': 'BH-TR-ZIP-001',
+                'buyer_description': 'YKK #5 nylon coil zipper with chin guard tape',
+                'compliance_oekotex': True,
+                'compliance_chemical_status': 'compliant',
+            }),
+            (0, 0, {
+                'sequence': 20,
+                'trim_type': 'drawcord',
+                'description': 'Flat Drawcord with Metal Eyelets',
+                'color': 'Per colorway (Charcoal / Olive)',
+                'size_spec': '120 cm flat cord',
+                'supplier_id': ref('partner_brighttrim'),
+                'uom': 'Set',
+                'consumption_per_piece': 1.0,
+                'unit_price': 0.22,
+                'buyer_material_code': 'BH-TR-DRC-001',
+            }),
+        ]"/>
+
+        <field name="packaging_bom_ids" eval="[
+            (0, 0, {
+                'sequence': 10,
+                'packaging_type': 'poly_bag',
+                'description': 'Recycled LDPE Poly Bag',
+                'dimension': '16x20 inch',
+                'material': 'Recycled LDPE',
+                'weight': 12.0,
+                'supplier_id': ref('partner_brighttrim'),
+                'uom': 'Pcs',
+                'consumption_per_piece': 1.0,
+                'unit_price': 0.02,
+                'buyer_material_code': 'BH-PK-PB-001',
+            }),
+            (0, 0, {
+                'sequence': 20,
+                'packaging_type': 'master_carton',
+                'description': 'FSC-Certified Export Carton 20x14x10, 3 dozen assortment',
+                'dimension': '20x14x10 inch',
+                'material': '5-ply corrugated, FSC-certified',
+                'weight': 750.0,
+                'supplier_id': ref('partner_brighttrim'),
+                'uom': 'Pcs',
+                'consumption_per_piece': 0.02778,
+                'unit_price': 1.15,
+                'buyer_material_code': 'BH-PK-CT-001',
+            }),
+        ]"/>
+    </record>
+
+</data>
+</odoo>

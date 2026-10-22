@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_costing_graph" model="ir.ui.view">
+        <field name="name">garment.costing.graph</field>
+        <field name="model">garment.costing</field>
+        <field name="arch" type="xml">
+            <graph string="FOB Price by Buyer" type="bar">
+                <field name="buyer_id"/>
+                <field name="fob_price" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_garment_costing_pivot" model="ir.ui.view">
+        <field name="name">garment.costing.pivot</field>
+        <field name="model">garment.costing</field>
+        <field name="arch" type="xml">
+            <pivot string="Costing Analysis">
+                <field name="buyer_id" type="row"/>
+                <field name="status" type="col"/>
+                <field name="material_cost" type="measure"/>
+                <field name="cm_cost" type="measure"/>
+                <field name="fob_price" type="measure"/>
+                <field name="profit_amount" type="measure"/>
+                <field name="profit_margin_actual_pct" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_garment_costing_dashboard" model="ir.actions.act_window">
+        <field name="name">Costing Dashboard</field>
+        <field name="res_model">garment.costing</field>
+        <field name="view_mode">graph,pivot,kanban,tree</field>
+        <field name="context">{'search_default_group_status': 1}</field>
+    </record>
+
+    <!-- SRS section 30 Cost Analysis Charts: Cost by Product Category, Material Cost Distribution -->
+    <record id="view_garment_costing_graph_category" model="ir.ui.view">
+        <field name="name">garment.costing.graph.category</field>
+        <field name="model">garment.costing</field>
+        <field name="arch" type="xml">
+            <graph string="Cost by Product Category" type="bar">
+                <field name="product_category_id"/>
+                <field name="material_cost" type="measure"/>
+                <field name="cm_cost" type="measure"/>
+                <field name="fob_price" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_garment_costing_graph_material_distribution" model="ir.ui.view">
+        <field name="name">garment.costing.graph.material.distribution</field>
+        <field name="model">garment.costing</field>
+        <field name="arch" type="xml">
+            <graph string="Material Cost Distribution" type="pie">
+                <field name="product_category_id"/>
+                <field name="material_cost" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_garment_costing_graph_margin_trend" model="ir.ui.view">
+        <field name="name">garment.costing.graph.margin.trend</field>
+        <field name="model">garment.costing</field>
+        <field name="arch" type="xml">
+            <graph string="Profit Margin Trend" type="line">
+                <field name="costing_date" interval="month"/>
+                <field name="profit_margin_actual_pct" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_garment_costing_category_dashboard" model="ir.actions.act_window">
+        <field name="name">Cost Analysis (Category / Material / Margin Trend)</field>
+        <field name="res_model">garment.costing</field>
+        <field name="view_mode">graph,pivot</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'graph', 'view_id': ref('view_garment_costing_graph_category')}),
+            (0, 0, {'view_mode': 'pivot', 'view_id': ref('view_garment_costing_pivot')})]"/>
+    </record>
+
+    <!-- SRS section 32 Management Profit Dashboard: Top Profitable / Low Margin Orders -->
+    <record id="view_garment_costing_tree_profitability" model="ir.ui.view">
+        <field name="name">garment.costing.tree.profitability</field>
+        <field name="model">garment.costing</field>
+        <field name="arch" type="xml">
+            <tree string="Profitability Report" decoration-danger="profit_margin_actual_pct &lt; 8" decoration-success="profit_margin_actual_pct &gt;= 15">
+                <field name="costing_number"/>
+                <field name="buyer_id"/>
+                <field name="style_id"/>
+                <field name="product_category_id"/>
+                <field name="material_cost"/>
+                <field name="fob_price"/>
+                <field name="profit_amount"/>
+                <field name="profit_margin_actual_pct"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_garment_costing_profitability_report" model="ir.actions.act_window">
+        <field name="name">Profitability Report</field>
+        <field name="res_model">garment.costing</field>
+        <field name="view_mode">tree,pivot,graph</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'tree', 'view_id': ref('view_garment_costing_tree_profitability')}),
+            (0, 0, {'view_mode': 'pivot', 'view_id': ref('view_garment_costing_pivot')}),
+            (0, 0, {'view_mode': 'graph', 'view_id': ref('view_garment_costing_graph')})]"/>
+        <field name="context">{'search_default_group_buyer': 1}</field>
+    </record>
+
+    <!-- SRS section 33 Cost Variance Report -->
+    <record id="view_garment_cost_variance_pivot" model="ir.ui.view">
+        <field name="name">garment.cost.variance.pivot</field>
+        <field name="model">garment.cost.variance</field>
+        <field name="arch" type="xml">
+            <pivot string="Cost Variance Report">
+                <field name="costing_id" type="row"/>
+                <field name="variance_type" type="col"/>
+                <field name="estimated_cost" type="measure"/>
+                <field name="actual_cost" type="measure"/>
+                <field name="variance_amount" type="measure"/>
+                <field name="variance_pct" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_garment_cost_variance_report" model="ir.actions.act_window">
+        <field name="name">Cost Variance Report</field>
+        <field name="res_model">garment.cost.variance</field>
+        <field name="view_mode">pivot,tree,graph</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'pivot', 'view_id': ref('view_garment_cost_variance_pivot')})]"/>
+    </record>
+
+</odoo>

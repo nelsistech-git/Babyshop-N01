@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_sample_cost_tree" model="ir.ui.view">
+        <field name="name">garment.sample.cost.tree</field>
+        <field name="model">garment.sample.cost</field>
+        <field name="arch" type="xml">
+            <tree string="Sample Costs">
+                <field name="sample_id"/>
+                <field name="material_cost"/>
+                <field name="labor_cost"/>
+                <field name="processing_cost"/>
+                <field name="total_cost"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_sample_cost_form" model="ir.ui.view">
+        <field name="name">garment.sample.cost.form</field>
+        <field name="model">garment.sample.cost</field>
+        <field name="arch" type="xml">
+            <form string="Sample Cost">
+                <header>
+                    <field name="state" widget="statusbar"/>
+                    <button name="action_next_stage" type="object" string="Move to Next Stage" class="btn-primary"
+                            invisible="state == 'final'"/>
+                </header>
+                <sheet>
+                    <group>
+                        <field name="sample_id"/>
+                        <field name="currency_id" invisible="1"/>
+                    </group>
+                    <group string="Material Cost" col="4">
+                        <field name="fabric_cost"/>
+                        <field name="trim_cost"/>
+                        <field name="label_cost"/>
+                        <field name="packaging_material_cost"/>
+                    </group>
+                    <group string="Labor Cost" col="4">
+                        <field name="cutting_labor_cost"/>
+                        <field name="sewing_labor_cost"/>
+                        <field name="finishing_labor_cost"/>
+                        <field name="qc_labor_cost"/>
+                    </group>
+                    <group string="Processing Cost" col="4">
+                        <field name="printing_cost"/>
+                        <field name="embroidery_cost"/>
+                        <field name="washing_cost"/>
+                        <field name="special_treatment_cost"/>
+                    </group>
+                    <group string="Other Cost" col="3">
+                        <field name="machine_cost"/>
+                        <field name="courier_cost"/>
+                        <field name="miscellaneous_cost"/>
+                    </group>
+                    <group string="Totals">
+                        <field name="material_cost" readonly="1"/>
+                        <field name="labor_cost" readonly="1"/>
+                        <field name="processing_cost" readonly="1"/>
+                        <field name="total_cost" readonly="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_sample_cost" model="ir.actions.act_window">
+        <field name="name">Sample Costs</field>
+        <field name="res_model">garment.sample.cost</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

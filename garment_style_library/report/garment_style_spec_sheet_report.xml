@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Style Specification Sheet (SRS section 32 Print Formats) -->
+    <record id="action_report_garment_style_spec_sheet" model="ir.actions.report">
+        <field name="name">Style Specification Sheet</field>
+        <field name="model">garment.style</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">garment_style_library.report_garment_style_spec_sheet</field>
+        <field name="report_file">garment_style_library.report_garment_style_spec_sheet</field>
+        <field name="binding_model_id" ref="model_garment_style"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'Style Specification Sheet - %s' % (object.style_number or object.style_name)</field>
+    </record>
+
+    <template id="report_garment_style_spec_sheet">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Style Specification Sheet</h2>
+                        <div class="row mb-3">
+                            <div class="col-3" t-if="o.front_view_image">
+                                <img t-att-src="image_data_uri(o.front_view_image)" style="max-width:150px;max-height:150px;"/>
+                            </div>
+                            <div class="col-9">
+                                <table class="table table-sm">
+                                    <tr><td><strong>Style Number</strong></td><td><span t-field="o.style_number"/></td>
+                                        <td><strong>Buyer</strong></td><td><span t-field="o.buyer_id.name"/></td></tr>
+                                    <tr><td><strong>Style Name</strong></td><td><span t-field="o.style_name"/></td>
+                                        <td><strong>Season</strong></td><td><span t-field="o.season"/></td></tr>
+                                    <tr><td><strong>Product Category</strong></td><td><span t-field="o.style_category_id.name"/></td>
+                                        <td><strong>Status</strong></td><td><span t-field="o.status"/></td></tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <h4>Technical Description</h4>
+                        <table class="table table-sm table-bordered">
+                            <tr><td>Sleeve Type</td><td><span t-field="o.sleeve_type"/></td>
+                                <td>Collar Type</td><td><span t-field="o.collar_type"/></td></tr>
+                            <tr><td>Fit Type</td><td><span t-field="o.fit_type"/></td>
+                                <td>Construction Type</td><td><span t-field="o.construction_type"/></td></tr>
+                        </table>
+
+                        <h4>Fabric Details</h4>
+                        <table class="table table-sm table-bordered">
+                            <thead><tr><th>Role</th><th>Composition</th><th>GSM</th><th>Width</th><th>Supplier</th></tr></thead>
+                            <tbody>
+                                <tr t-foreach="o.fabric_line_ids" t-as="fl">
+                                    <td><span t-field="fl.fabric_role"/></td>
+                                    <td><span t-field="fl.composition"/></td>
+                                    <td><span t-field="fl.gsm"/></td>
+                                    <td><span t-field="fl.width"/></td>
+                                    <td><span t-field="fl.supplier_id.name"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4>Trim Details</h4>
+                        <table class="table table-sm table-bordered">
+                            <thead><tr><th>Type</th><th>Description</th><th>Color</th><th>Supplier</th></tr></thead>
+                            <tbody>
+                                <tr t-foreach="o.trim_line_ids" t-as="tl">
+                                    <td><span t-field="tl.trim_type"/></td>
+                                    <td><span t-field="tl.description"/></td>
+                                    <td><span t-field="tl.color"/></td>
+                                    <td><span t-field="tl.supplier_id.name"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4>Measurement Chart</h4>
+                        <t t-set="chart" t-value="o.measurement_chart_ids[:1]"/>
+                        <table class="table table-sm table-bordered" t-if="chart">
+                            <thead><tr><th>Point</th><th>Base Size Value</th><th>Tolerance (+/-)</th></tr></thead>
+                            <tbody>
+                                <tr t-foreach="chart.line_ids" t-as="ml">
+                                    <td><span t-field="ml.description"/></td>
+                                    <td><span t-field="ml.base_size_value"/></td>
+                                    <td>
+                                        <span t-field="ml.tolerance_plus"/> / <span t-field="ml.tolerance_minus"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <p t-if="not chart"><em>No measurement chart recorded yet.</em></p>
+
+                        <h4>Colorways</h4>
+                        <table class="table table-sm table-bordered">
+                            <thead><tr><th>Code</th><th>Name</th><th>Pantone</th><th>Status</th></tr></thead>
+                            <tbody>
+                                <tr t-foreach="o.color_ids" t-as="c">
+                                    <td><span t-field="c.colorway_code"/></td>
+                                    <td><span t-field="c.colorway_name"/></td>
+                                    <td><span t-field="c.pantone_number"/></td>
+                                    <td><span t-field="c.status"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4>Packaging Instructions</h4>
+                        <p><span t-field="o.packaging_instructions"/></p>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

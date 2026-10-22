@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_forwarder_tree" model="ir.ui.view">
+        <field name="name">garment.forwarder.tree</field>
+        <field name="model">garment.forwarder</field>
+        <field name="arch" type="xml">
+            <tree string="Freight Forwarders" decoration-success="performance_grade == 'excellent'"
+                  decoration-danger="performance_grade == 'poor'">
+                <field name="name"/>
+                <field name="service_type"/>
+                <field name="performance_rating"/>
+                <field name="damage_rate"/>
+                <field name="avg_response_time_hours"/>
+                <field name="performance_grade" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_forwarder_form" model="ir.ui.view">
+        <field name="name">garment.forwarder.form</field>
+        <field name="model">garment.forwarder</field>
+        <field name="arch" type="xml">
+            <form string="Freight Forwarder">
+                <sheet>
+                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="contact_person"/>
+                            <field name="address"/>
+                            <field name="service_type"/>
+                        </group>
+                        <group>
+                            <field name="agreement_reference"/>
+                            <field name="agreement_start"/>
+                            <field name="agreement_end"/>
+                        </group>
+                    </group>
+                    <group string="Carrier Performance">
+                        <group>
+                            <field name="performance_rating"/>
+                            <field name="performance_grade" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="damage_rate"/>
+                            <field name="avg_response_time_hours"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_forwarder" model="ir.actions.act_window">
+        <field name="name">Freight Forwarders</field>
+        <field name="res_model">garment.forwarder</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

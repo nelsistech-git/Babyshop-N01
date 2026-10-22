@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_export_documentation_tree" model="ir.ui.view">
+        <field name="name">garment.export.documentation.tree</field>
+        <field name="model">garment.export.documentation</field>
+        <field name="arch" type="xml">
+            <tree string="Export Documentation">
+                <field name="document_number"/>
+                <field name="document_type"/>
+                <field name="shipment_id"/>
+                <field name="buyer_id"/>
+                <field name="document_date"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_export_documentation_form" model="ir.ui.view">
+        <field name="name">garment.export.documentation.form</field>
+        <field name="model">garment.export.documentation</field>
+        <field name="arch" type="xml">
+            <form string="Export Documentation">
+                <header>
+                    <field name="status" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="document_number" readonly="1"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="document_type"/>
+                            <field name="shipment_id"/>
+                            <field name="buyer_id" readonly="1"/>
+                            <field name="lc_id"/>
+                            <field name="document_date"/>
+                        </group>
+                        <group>
+                            <field name="total_quantity"/>
+                            <field name="total_cartons"/>
+                            <field name="currency_id"/>
+                            <field name="total_value"/>
+                            <field name="file" filename="filename"/>
+                            <field name="filename" invisible="1"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_export_documentation" model="ir.actions.act_window">
+        <field name="name">Export Documentation</field>
+        <field name="res_model">garment.export.documentation</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first export document.</p>
+        </field>
+    </record>
+</odoo>

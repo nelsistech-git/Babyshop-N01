@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_merch_quotation_graph" model="ir.ui.view">
+        <field name="name">garment.merch.quotation.graph</field>
+        <field name="model">garment.merch.quotation</field>
+        <field name="arch" type="xml">
+            <graph string="Quotation Pipeline" type="bar">
+                <field name="status"/>
+                <field name="total_value" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_garment_merch_quotation_pivot" model="ir.ui.view">
+        <field name="name">garment.merch.quotation.pivot</field>
+        <field name="model">garment.merch.quotation</field>
+        <field name="arch" type="xml">
+            <pivot string="Quotation Analysis">
+                <field name="buyer_id" type="row"/>
+                <field name="status" type="col"/>
+                <field name="total_value" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_garment_merch_dashboard" model="ir.actions.act_window">
+        <field name="name">Merchandising Dashboard</field>
+        <field name="res_model">garment.merch.quotation</field>
+        <field name="view_mode">graph,pivot,tree</field>
+    </record>
+
+    <!-- Order Pipeline / Buyer-wise Performance (Garment Merchandising Management
+         System SRS sections 13, 42-43: order pipeline dashboard, buyer performance) -->
+    <record id="view_garment_merch_order_confirmation_graph" model="ir.ui.view">
+        <field name="name">garment.merch.order.confirmation.graph</field>
+        <field name="model">garment.merch.order.confirmation</field>
+        <field name="arch" type="xml">
+            <graph string="Order Pipeline" type="bar">
+                <field name="status"/>
+                <field name="fob_value" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_garment_merch_order_confirmation_pivot" model="ir.ui.view">
+        <field name="name">garment.merch.order.confirmation.pivot</field>
+        <field name="model">garment.merch.order.confirmation</field>
+        <field name="arch" type="xml">
+            <pivot string="Buyer-wise Order Performance">
+                <field name="buyer_id" type="row"/>
+                <field name="status" type="col"/>
+                <field name="fob_value" type="measure"/>
+                <field name="quantity" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_garment_merch_order_dashboard" model="ir.actions.act_window">
+        <field name="name">Order Pipeline &amp; Buyer Performance</field>
+        <field name="res_model">garment.merch.order.confirmation</field>
+        <field name="view_mode">graph,pivot,kanban,tree</field>
+    </record>
+
+    <!-- Merchandiser Workload (SRS section 34 chart: Merchandiser Workload) -->
+    <record id="view_garment_merch_task_graph" model="ir.ui.view">
+        <field name="name">garment.merch.task.graph</field>
+        <field name="model">garment.merch.task</field>
+        <field name="arch" type="xml">
+            <graph string="Merchandiser Workload" type="bar">
+                <field name="assigned_to_id"/>
+                <field name="status"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_garment_merch_task_pivot" model="ir.ui.view">
+        <field name="name">garment.merch.task.pivot</field>
+        <field name="model">garment.merch.task</field>
+        <field name="arch" type="xml">
+            <pivot string="Merchandiser Workload Analysis">
+                <field name="assigned_to_id" type="row"/>
+                <field name="status" type="col"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_garment_merch_task_dashboard" model="ir.actions.act_window">
+        <field name="name">Merchandiser Workload</field>
+        <field name="res_model">garment.merch.task</field>
+        <field name="view_mode">graph,pivot,kanban,tree</field>
+    </record>
+
+</odoo>

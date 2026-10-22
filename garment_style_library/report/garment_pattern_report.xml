@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Pattern Report (SRS section 32 Print Formats) -->
+    <record id="action_report_garment_pattern" model="ir.actions.report">
+        <field name="name">Pattern Report</field>
+        <field name="model">garment.pattern</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">garment_style_library.report_garment_pattern</field>
+        <field name="report_file">garment_style_library.report_garment_pattern</field>
+        <field name="binding_model_id" ref="model_garment_pattern"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'Pattern Report - %s' % (object.pattern_number or object.pattern_name)</field>
+    </record>
+
+    <template id="report_garment_pattern">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Pattern Report</h2>
+                        <table class="table table-sm">
+                            <tr><td><strong>Pattern Number</strong></td><td><span t-field="o.pattern_number"/></td>
+                                <td><strong>Style</strong></td><td><span t-field="o.style_id.style_number"/></td></tr>
+                            <tr><td><strong>Pattern Name</strong></td><td><span t-field="o.pattern_name"/></td>
+                                <td><strong>Version</strong></td><td><span t-field="o.version"/></td></tr>
+                            <tr><td><strong>Pattern Type</strong></td><td><span t-field="o.pattern_type"/></td>
+                                <td><strong>Status</strong></td><td><span t-field="o.status"/></td></tr>
+                            <tr><td><strong>CAD Software</strong></td><td><span t-field="o.cad_software"/></td>
+                                <td><strong>Approved By</strong></td><td><span t-field="o.approved_by_id.name"/></td></tr>
+                        </table>
+
+                        <h4>Pattern Components</h4>
+                        <table class="table table-sm table-bordered">
+                            <tr>
+                                <td t-if="o.comp_front_panel">Front Panel</td>
+                                <td t-if="o.comp_back_panel">Back Panel</td>
+                                <td t-if="o.comp_sleeve">Sleeve</td>
+                                <td t-if="o.comp_collar">Collar</td>
+                                <td t-if="o.comp_cuff">Cuff</td>
+                                <td t-if="o.comp_pocket">Pocket</td>
+                            </tr>
+                            <tr>
+                                <td t-if="o.comp_hood">Hood</td>
+                                <td t-if="o.comp_waistband">Waistband</td>
+                                <td t-if="o.comp_rib">Rib</td>
+                                <td t-if="o.comp_facing">Facing</td>
+                                <td t-if="o.comp_placket">Placket</td>
+                                <td t-if="o.comp_belt_loop">Belt Loop</td>
+                            </tr>
+                        </table>
+
+                        <h4>Pattern Properties</h4>
+                        <table class="table table-sm">
+                            <tr><td>Seam Allowance</td><td><span t-field="o.seam_allowance"/></td>
+                                <td>Fabric Grain</td><td><span t-field="o.fabric_grain"/></td></tr>
+                            <tr><td>Piece Quantity</td><td><span t-field="o.piece_quantity"/></td>
+                                <td>Fabric Consumption</td><td><span t-field="o.fabric_consumption"/></td></tr>
+                            <tr><td>Marker Efficiency</td><td><span t-field="o.marker_efficiency"/>%</td>
+                                <td/><td/></tr>
+                        </table>
+
+                        <h4>CAD Files</h4>
+                        <table class="table table-sm table-bordered">
+                            <thead><tr><th>CAD Number</th><th>Marker Type</th><th>Marker Length</th>
+                                       <th>Marker Width</th><th>Efficiency %</th></tr></thead>
+                            <tbody>
+                                <tr t-foreach="o.env['garment.cad.file'].search([('pattern_id', '=', o.id)])" t-as="c">
+                                    <td><span t-field="c.cad_number"/></td>
+                                    <td><span t-field="c.marker_type"/></td>
+                                    <td><span t-field="c.marker_length"/></td>
+                                    <td><span t-field="c.marker_width"/></td>
+                                    <td><span t-field="c.marker_efficiency"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

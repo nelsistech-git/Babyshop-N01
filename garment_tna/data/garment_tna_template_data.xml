@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="0">
+
+    <record id="tna_template_knitwear_example" model="garment.tna.template">
+        <field name="name">Example - Knitwear (120 Days Lead Time)</field>
+        <field name="lead_time_days">120</field>
+        <field name="shipment_type">sea</field>
+        <field name="line_ids" eval="[
+            (0,0,{'sequence':10,'activity_name':'PO Confirmation','category':'merchandising','days_before_shipment':120}),
+            (0,0,{'sequence':20,'activity_name':'Fabric Booking','category':'material','days_before_shipment':110}),
+            (0,0,{'sequence':30,'activity_name':'Lab Dip Approval','category':'material','days_before_shipment':90,'is_milestone':True}),
+            (0,0,{'sequence':40,'activity_name':'PP Sample Approval','category':'product_development','days_before_shipment':60,'is_milestone':True}),
+            (0,0,{'sequence':50,'activity_name':'Cutting Start','category':'production','days_before_shipment':30,'is_milestone':True}),
+            (0,0,{'sequence':60,'activity_name':'Shipment','category':'commercial','days_before_shipment':0,'is_milestone':True}),
+        ]"/>
+    </record>
+
+    <record id="tna_template_woven_example" model="garment.tna.template">
+        <field name="name">Example - Woven (100 Days Lead Time)</field>
+        <field name="lead_time_days">100</field>
+        <field name="shipment_type">sea</field>
+        <field name="line_ids" eval="[
+            (0,0,{'sequence':10,'activity_name':'Tech Pack Approval','category':'product_development','days_before_shipment':100}),
+            (0,0,{'sequence':20,'activity_name':'Fabric Approval','category':'material','days_before_shipment':80,'is_milestone':True}),
+            (0,0,{'sequence':30,'activity_name':'Sample Approval','category':'product_development','days_before_shipment':60,'is_milestone':True}),
+            (0,0,{'sequence':40,'activity_name':'Production Start','category':'production','days_before_shipment':35,'is_milestone':True}),
+            (0,0,{'sequence':50,'activity_name':'Final Inspection','category':'quality','days_before_shipment':5,'is_milestone':True}),
+            (0,0,{'sequence':60,'activity_name':'Shipment','category':'commercial','days_before_shipment':0,'is_milestone':True}),
+        ]"/>
+    </record>
+
+</odoo>

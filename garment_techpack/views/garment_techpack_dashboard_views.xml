@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_techpack_graph" model="ir.ui.view">
+        <field name="name">garment.techpack.graph</field>
+        <field name="model">garment.techpack</field>
+        <field name="arch" type="xml">
+            <graph string="Tech Packs by Status" type="bar">
+                <field name="state"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_garment_techpack_pivot" model="ir.ui.view">
+        <field name="name">garment.techpack.pivot</field>
+        <field name="model">garment.techpack</field>
+        <field name="arch" type="xml">
+            <pivot string="Tech Pack Analysis">
+                <field name="buyer_id" type="row"/>
+                <field name="season" type="row"/>
+                <field name="state" type="col"/>
+                <field name="id" type="measure"/>
+                <field name="version_count" type="measure" string="Revision Count"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_garment_techpack_dashboard" model="ir.actions.act_window">
+        <field name="name">Tech Pack Dashboard</field>
+        <field name="res_model">garment.techpack</field>
+        <field name="view_mode">graph,pivot,kanban,tree</field>
+    </record>
+
+    <!-- Revision Trend (SRS section 41) -->
+    <record id="view_garment_techpack_version_graph" model="ir.ui.view">
+        <field name="name">garment.techpack.version.graph</field>
+        <field name="model">garment.techpack.version</field>
+        <field name="arch" type="xml">
+            <graph string="Revision Trend" type="line">
+                <field name="create_date" interval="month"/>
+                <field name="revision_type"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_garment_techpack_version_trend" model="ir.actions.act_window">
+        <field name="name">Revision Trend</field>
+        <field name="res_model">garment.techpack.version</field>
+        <field name="view_mode">graph,pivot,tree</field>
+    </record>
+
+    <!-- Approval Trend / Buyer Approval Performance / Department Delay (SRS section 41) -->
+    <record id="view_garment_tech_approval_graph" model="ir.ui.view">
+        <field name="name">garment.tech.approval.graph</field>
+        <field name="model">garment.tech.approval</field>
+        <field name="arch" type="xml">
+            <graph string="Approval Trend" type="bar">
+                <field name="approval_stage"/>
+                <field name="status"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_garment_tech_approval_pivot" model="ir.ui.view">
+        <field name="name">garment.tech.approval.pivot</field>
+        <field name="model">garment.tech.approval</field>
+        <field name="arch" type="xml">
+            <pivot string="Approval / Department Delay Analysis">
+                <field name="approval_stage" type="row"/>
+                <field name="status" type="col"/>
+                <field name="id" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_garment_tech_approval_trend" model="ir.actions.act_window">
+        <field name="name">Approval Trend</field>
+        <field name="res_model">garment.tech.approval</field>
+        <field name="view_mode">graph,pivot,tree</field>
+    </record>
+
+</odoo>

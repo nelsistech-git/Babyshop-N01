@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_tna_revision_tree" model="ir.ui.view">
+        <field name="name">garment.tna.revision.tree</field>
+        <field name="model">garment.tna.revision</field>
+        <field name="arch" type="xml">
+            <tree string="TNA Revisions" decoration-success="state == 'approved'" decoration-danger="state == 'rejected'">
+                <field name="revision_number"/>
+                <field name="tna_id"/>
+                <field name="previous_shipment_date"/>
+                <field name="new_shipment_date"/>
+                <field name="change_reason"/>
+                <field name="requested_by_id"/>
+                <field name="approved_by_id"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_tna_revision_form" model="ir.ui.view">
+        <field name="name">garment.tna.revision.form</field>
+        <field name="model">garment.tna.revision</field>
+        <field name="arch" type="xml">
+            <form string="TNA Revision">
+                <header>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,approved"/>
+                    <button name="action_approve" type="object" string="Approve" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_reject" type="object" string="Reject" class="btn-secondary"
+                            invisible="state != 'draft'"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="revision_number"/>
+                        <h1><field name="revision_number" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="tna_id"/>
+                            <field name="previous_shipment_date"/>
+                            <field name="new_shipment_date"/>
+                            <field name="change_reason"/>
+                        </group>
+                        <group>
+                            <field name="requested_by_id"/>
+                            <field name="approved_by_id" readonly="1"/>
+                            <field name="date"/>
+                        </group>
+                    </group>
+                    <field name="notes" placeholder="Notes..."/>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_tna_revision" model="ir.actions.act_window">
+        <field name="name">TNA Revisions</field>
+        <field name="res_model">garment.tna.revision</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

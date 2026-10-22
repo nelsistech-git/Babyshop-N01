@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <record id="module_category_garment_purchase" model="ir.module.category">
+            <field name="name">Smart Garment ERP - Purchase</field>
+            <field name="sequence">58</field>
+        </record>
+
+        <record id="group_purchase_requester" model="res.groups">
+            <field name="name">Requester (Create PR)</field>
+            <field name="category_id" ref="module_category_garment_purchase"/>
+        </record>
+
+        <record id="group_purchase_manager" model="res.groups">
+            <field name="name">Purchase Manager (RFQ/PO, Approve &lt; 1 Lakh)</field>
+            <field name="category_id" ref="module_category_garment_purchase"/>
+            <field name="implied_ids" eval="[(4, ref('group_purchase_requester'))]"/>
+        </record>
+
+        <record id="group_purchase_director" model="res.groups">
+            <field name="name">Director (Approve 1-10 Lakh)</field>
+            <field name="category_id" ref="module_category_garment_purchase"/>
+            <field name="implied_ids" eval="[(4, ref('group_purchase_manager'))]"/>
+        </record>
+
+        <record id="group_purchase_md" model="res.groups">
+            <field name="name">Managing Director (Approve Above 10 Lakh, Full Access)</field>
+            <field name="category_id" ref="module_category_garment_purchase"/>
+            <field name="implied_ids" eval="[(4, ref('group_purchase_director'))]"/>
+        </record>
+
+        <record id="rule_garment_purchase_requisition_own" model="ir.rule">
+            <field name="name">Requester: Own PRs</field>
+            <field name="model_id" ref="model_garment_purchase_requisition"/>
+            <field name="domain_force">[('requested_by_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_purchase_requester'))]"/>
+            <field name="perm_read">1</field>
+            <field name="perm_write">1</field>
+            <field name="perm_create">1</field>
+            <field name="perm_unlink">0</field>
+        </record>
+
+        <record id="rule_garment_purchase_requisition_manager" model="ir.rule">
+            <field name="name">Purchase Manager+: All PRs</field>
+            <field name="model_id" ref="model_garment_purchase_requisition"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_purchase_manager'))]"/>
+        </record>
+
+        <!-- Supplier RFQ Portal Integration (SRS sections 15, 46): a supplier
+             portal user may only see their own RFQs / quotations / POs, and
+             can never see a competitor's quotation or another supplier's
+             internal costing. -->
+        <record id="rule_garment_purchase_rfq_portal_own" model="ir.rule">
+            <field name="name">Supplier Portal User: Own RFQs Only</field>
+            <field name="model_id" ref="model_garment_purchase_rfq"/>
+            <field name="domain_force">[('supplier_id', '=', user.partner_id.id)]</field>
+            <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+            <field name="perm_read">1</field>
+            <field name="perm_write">0</field>
+            <field name="perm_create">0</field>
+            <field name="perm_unlink">0</field>
+        </record>
+
+        <record id="rule_garment_supplier_quotation_portal_own" model="ir.rule">
+            <field name="name">Supplier Portal User: Own Quotations Only (No Competitor Visibility)</field>
+            <field name="model_id" ref="model_garment_supplier_quotation"/>
+            <field name="domain_force">[('supplier_id', '=', user.partner_id.id)]</field>
+            <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+            <field name="perm_read">1</field>
+            <field name="perm_write">1</field>
+            <field name="perm_create">1</field>
+            <field name="perm_unlink">0</field>
+        </record>
+
+        <record id="rule_garment_purchase_order_portal_own" model="ir.rule">
+            <field name="name">Supplier Portal User: Own Purchase Orders Only</field>
+            <field name="model_id" ref="model_garment_purchase_order"/>
+            <field name="domain_force">[('supplier_id', '=', user.partner_id.id)]</field>
+            <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+            <field name="perm_read">1</field>
+            <field name="perm_write">1</field>
+            <field name="perm_create">0</field>
+            <field name="perm_unlink">0</field>
+        </record>
+
+    </data>
+</odoo>

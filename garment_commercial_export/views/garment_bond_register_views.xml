@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_bond_register_tree" model="ir.ui.view">
+        <field name="name">garment.bond.register.tree</field>
+        <field name="model">garment.bond.register</field>
+        <field name="arch" type="xml">
+            <tree string="Bond Register" editable="bottom" decoration-danger="balance_qty &lt; 0">
+                <field name="bond_license_id"/>
+                <field name="material_id"/>
+                <field name="material_name"/>
+                <field name="uom"/>
+                <field name="import_qty"/>
+                <field name="used_qty"/>
+                <field name="balance_qty" readonly="1"/>
+                <field name="import_permission_id"/>
+                <field name="export_documentation_id"/>
+                <field name="shipment_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_bond_register_form" model="ir.ui.view">
+        <field name="name">garment.bond.register.form</field>
+        <field name="model">garment.bond.register</field>
+        <field name="arch" type="xml">
+            <form string="Bond Register Line">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="bond_license_id"/>
+                            <field name="material_id"/>
+                            <field name="material_name"/>
+                            <field name="uom"/>
+                        </group>
+                        <group>
+                            <field name="import_qty"/>
+                            <field name="used_qty"/>
+                            <field name="balance_qty" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Export Adjustment">
+                        <field name="import_permission_id"/>
+                        <field name="export_documentation_id"/>
+                        <field name="shipment_id"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_bond_register" model="ir.actions.act_window">
+        <field name="name">Bond Register</field>
+        <field name="res_model">garment.bond.register</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Add your first Bond Register line.</p>
+        </field>
+    </record>
+
+</odoo>

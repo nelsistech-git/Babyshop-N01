@@ -1,0 +1,437 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Part of Smart Complete Garment Software. Copyright (c) Nelsis Tech (www.nelsistech.com) -->
+<!--
+     Merchandising pipeline (garment_merchandising): Inquiry -> Quotation ->
+     Order Confirmation, one per style, plus a merchandiser workload task
+     list. 2026 timeline: inquiries Jan 2026, quotations Feb 2026, order
+     confirmations Mar 2026 (matching costing_tee/polo/hoodie's costing_date
+     / negotiation dates in 02_costing_demo.xml).
+
+     Note on person references: garment.merch.inquiry.assigned_merchandiser_id,
+     garment.merch.quotation (no direct merchandiser field), garment.merch.
+     order.confirmation.merchandiser_id/*_approver_id and garment.merch.task.
+     assigned_to_id are all Many2one('res.users') — not garment.hr.employee —
+     so, per the convention already established in 02_techpack_demo.xml /
+     02_bom_demo.xml / 02_costing_demo.xml (no res.users demo records exist
+     for the HR employees), they point at base.user_admin. The actual human
+     merchandiser of record throughout this pipeline is Farhana Akter
+     (emp_merchandiser, Senior Merchandiser / Merchandising dept. manager per
+     01_hr_demo.xml) — named explicitly in each record's description/remarks
+     text so the story stays attributed to her even though the technical
+     "owner" field is the seed Administrator user.
+
+     FOB prices quoted below are taken from the computed garment.costing
+     fob_price on costing_tee/costing_polo/costing_hoodie (material_cost 0 +
+     cm_cost + overhead_cost + additional_cost_total, +10%/+10%/+12% margin
+     per 02_costing_demo.xml): tee $3.20, polo $4.32, hoodie $8.50.
+-->
+<odoo>
+<data noupdate="1">
+
+    <!-- =================================================================
+         Inquiries (garment.merch.inquiry) — one per style
+         ================================================================= -->
+
+    <record id="inquiry_tee" model="garment.merch.inquiry">
+        <field name="inquiry_date">2026-01-08</field>
+        <field name="buyer_id" ref="buyer_northwind"/>
+        <field name="buyer_contact_id" ref="contact_northwind_merch"/>
+        <field name="buying_house">Northwind Apparel Sourcing Ltd</field>
+        <field name="brand">Northwind</field>
+        <field name="season">Spring/Summer 2026</field>
+        <field name="product_category_id" ref="garment_style_library.style_category_knit"/>
+        <field name="product_type">T-Shirt</field>
+        <field name="collection">Core Basics</field>
+        <field name="priority">2</field>
+
+        <field name="product_description">Men's regular-fit single jersey crew neck tee, short sleeve, left
+chest screen print — Core Basics program, repeat style from NSG-TS-2601 (style_tee).</field>
+        <field name="fabric_type">Single Jersey Knit</field>
+        <field name="fabric_composition">100% Cotton</field>
+        <field name="gsm">180</field>
+        <field name="knit_type">Single Jersey</field>
+        <field name="print_type">Screen Print, 1-colour water-based</field>
+
+        <field name="moq">10000</field>
+        <field name="order_quantity">24000</field>
+        <field name="size_breakdown">XS-S-M-L-XL-XXL, standard bell curve, heaviest in M/L</field>
+        <field name="color_breakdown">White, Navy</field>
+        <field name="destination_country_id" ref="base.uk"/>
+        <field name="delivery_schedule">2026-06-20</field>
+
+        <field name="target_fob">3.30</field>
+        <field name="currency_id" ref="base.USD"/>
+        <field name="payment_term_id" ref="account.account_payment_term_30days"/>
+        <field name="incoterm_id" ref="account.incoterm_FOB"/>
+        <field name="shipment_mode">sea</field>
+        <field name="port_of_loading">Chittagong</field>
+        <field name="destination_port">Felixstowe</field>
+
+        <field name="assigned_merchandiser_id" ref="base.user_admin"/>
+        <field name="assignment_department">Merchandising</field>
+        <field name="assignment_team">Northwind Account Team (Farhana Akter, Senior Merchandiser)</field>
+        <field name="status">order_confirmed</field>
+    </record>
+
+    <record id="style_line_tee" model="garment.merch.style.line">
+        <field name="inquiry_id" ref="inquiry_tee"/>
+        <field name="sequence">10</field>
+        <field name="style_id" ref="style_tee"/>
+        <field name="style_name">Men's Crew Neck T-Shirt</field>
+        <field name="buyer_style_number">NW-TS-001</field>
+        <field name="factory_style_number">NSG-TS-2601</field>
+        <field name="product_type">T-Shirt</field>
+        <field name="gender">men</field>
+        <field name="age_group">adult</field>
+        <field name="fit_type">Regular Fit</field>
+        <field name="construction_type">Single Jersey Knit</field>
+        <field name="main_fabric">Single Jersey Cotton 180 GSM</field>
+        <field name="size_range">XS-XXL</field>
+        <field name="color_name">White / Navy</field>
+        <field name="status">costed</field>
+    </record>
+
+    <record id="inquiry_polo" model="garment.merch.inquiry">
+        <field name="inquiry_date">2026-01-12</field>
+        <field name="buyer_id" ref="buyer_northwind"/>
+        <field name="buyer_contact_id" ref="contact_northwind_merch"/>
+        <field name="buying_house">Northwind Apparel Sourcing Ltd</field>
+        <field name="brand">Northwind</field>
+        <field name="season">Spring/Summer 2026</field>
+        <field name="product_category_id" ref="garment_style_library.style_category_knit"/>
+        <field name="product_type">Polo Shirt</field>
+        <field name="collection">Core Basics</field>
+        <field name="priority">1</field>
+
+        <field name="product_description">Men's regular-fit pique knit polo, rib knit collar, 3-button placket,
+left chest embroidered logo — Core Basics program companion piece to style_tee.</field>
+        <field name="fabric_type">Pique Knit</field>
+        <field name="fabric_composition">100% Cotton</field>
+        <field name="gsm">180</field>
+        <field name="knit_type">Pique</field>
+        <field name="embroidery_type">Left chest, 3000 stitches, tone-on-tone</field>
+
+        <field name="moq">8000</field>
+        <field name="order_quantity">18000</field>
+        <field name="size_breakdown">XS-S-M-L-XL-XXL, standard bell curve, heaviest in M/L</field>
+        <field name="color_breakdown">Bottle Green, White</field>
+        <field name="destination_country_id" ref="base.uk"/>
+        <field name="delivery_schedule">2026-06-25</field>
+
+        <field name="target_fob">4.50</field>
+        <field name="currency_id" ref="base.USD"/>
+        <field name="payment_term_id" ref="account.account_payment_term_30days"/>
+        <field name="incoterm_id" ref="account.incoterm_FOB"/>
+        <field name="shipment_mode">sea</field>
+        <field name="port_of_loading">Chittagong</field>
+        <field name="destination_port">Felixstowe</field>
+
+        <field name="assigned_merchandiser_id" ref="base.user_admin"/>
+        <field name="assignment_department">Merchandising</field>
+        <field name="assignment_team">Northwind Account Team (Farhana Akter, Senior Merchandiser)</field>
+        <field name="status">order_confirmed</field>
+    </record>
+
+    <record id="style_line_polo" model="garment.merch.style.line">
+        <field name="inquiry_id" ref="inquiry_polo"/>
+        <field name="sequence">10</field>
+        <field name="style_id" ref="style_polo"/>
+        <field name="style_name">Classic Pique Polo</field>
+        <field name="buyer_style_number">NW-PL-002</field>
+        <field name="factory_style_number">NSG-PL-2602</field>
+        <field name="product_type">Polo Shirt</field>
+        <field name="gender">men</field>
+        <field name="age_group">adult</field>
+        <field name="fit_type">Regular Fit</field>
+        <field name="construction_type">Pique Knit</field>
+        <field name="main_fabric">Pique Knit Cotton 180 GSM</field>
+        <field name="size_range">XS-XXL</field>
+        <field name="color_name">Bottle Green / White</field>
+        <field name="status">costed</field>
+    </record>
+
+    <record id="inquiry_hoodie" model="garment.merch.inquiry">
+        <field name="inquiry_date">2026-01-20</field>
+        <field name="buyer_id" ref="buyer_baltichaus"/>
+        <field name="buyer_contact_id" ref="contact_baltichaus_merch"/>
+        <field name="buying_house">BalticHaus Fashion GmbH</field>
+        <field name="brand">BalticHaus</field>
+        <field name="season">Autumn/Winter 2026</field>
+        <field name="product_category_id" ref="garment_style_library.style_category_knit"/>
+        <field name="product_type">Zip Hoodie</field>
+        <field name="collection">Urban Fleece</field>
+        <field name="priority">2</field>
+
+        <field name="product_description">Unisex regular-fit brushed fleece full-zip hoodie, 3-panel drawcord
+hood, kangaroo pocket, YKK zip — BalticHaus's first Bangladesh-sourced program (premium fleece, sustainability
+packaging requirements).</field>
+        <field name="fabric_type">Brushed Fleece Knit (French Terry Backing)</field>
+        <field name="fabric_composition">Cotton-Polyester Blend</field>
+        <field name="gsm">280</field>
+        <field name="knit_type">Fleece</field>
+        <field name="embroidery_type">Left chest wordmark, embroidered</field>
+
+        <field name="moq">5000</field>
+        <field name="order_quantity">12000</field>
+        <field name="size_breakdown">S-M-L-XL-XXL, unisex sizing, heaviest in M/L</field>
+        <field name="color_breakdown">Charcoal, Olive</field>
+        <field name="destination_country_id" ref="base.de"/>
+        <field name="delivery_schedule">2026-07-15</field>
+
+        <field name="target_fob">9.00</field>
+        <field name="currency_id" ref="base.USD"/>
+        <field name="payment_term_id" ref="account.account_payment_term_45days"/>
+        <field name="incoterm_id" ref="account.incoterm_FOB"/>
+        <field name="shipment_mode">sea</field>
+        <field name="port_of_loading">Chittagong</field>
+        <field name="destination_port">Hamburg</field>
+
+        <field name="assigned_merchandiser_id" ref="base.user_admin"/>
+        <field name="assignment_department">Merchandising</field>
+        <field name="assignment_team">BalticHaus Account Team (Farhana Akter, Senior Merchandiser)</field>
+        <field name="status">order_confirmed</field>
+    </record>
+
+    <record id="style_line_hoodie" model="garment.merch.style.line">
+        <field name="inquiry_id" ref="inquiry_hoodie"/>
+        <field name="sequence">10</field>
+        <field name="style_id" ref="style_hoodie"/>
+        <field name="style_name">Fleece Zip Hoodie</field>
+        <field name="buyer_style_number">BH-HD-101</field>
+        <field name="factory_style_number">NSG-HD-2603</field>
+        <field name="product_type">Zip Hoodie</field>
+        <field name="gender">unisex</field>
+        <field name="age_group">adult</field>
+        <field name="fit_type">Regular Fit</field>
+        <field name="construction_type">Brushed Fleece Knit (French Terry Backing)</field>
+        <field name="main_fabric">Fleece 280 GSM</field>
+        <field name="size_range">S-XXL</field>
+        <field name="color_name">Charcoal / Olive</field>
+        <field name="status">costed</field>
+    </record>
+
+    <!-- =================================================================
+         Quotations (garment.merch.quotation) + lines — FOB prices per
+         costing_tee/costing_polo/costing_hoodie's computed fob_price.
+         ================================================================= -->
+
+    <record id="quotation_tee" model="garment.merch.quotation">
+        <field name="quotation_date">2026-02-05</field>
+        <field name="inquiry_id" ref="inquiry_tee"/>
+        <field name="buyer_id" ref="buyer_northwind"/>
+        <field name="style_id" ref="style_tee"/>
+        <field name="bom_id" ref="bom_tee"/>
+        <field name="currency_id" ref="base.USD"/>
+        <field name="incoterm_id" ref="account.incoterm_FOB"/>
+        <field name="valid_until">2026-03-05</field>
+        <field name="payment_term_id" ref="account.account_payment_term_30days"/>
+        <field name="delivery_terms">FOB Chittagong, sea freight, delivery to Felixstowe by 20 Jun 2026</field>
+        <field name="line_ids" eval="[(0, 0, {
+            'sequence': 10,
+            'style_id': ref('style_tee'),
+            'quantity': 24000,
+            'fob_price': 3.20,
+            'unit_price': 3.20,
+            'delivery_date': '2026-06-20',
+            'remarks': 'Per costing_tee (CST-NSG-TS-2601-01), negotiated final price $3.20/pc.',
+        })]"/>
+        <field name="status">accepted</field>
+    </record>
+
+    <record id="quotation_polo" model="garment.merch.quotation">
+        <field name="quotation_date">2026-02-06</field>
+        <field name="inquiry_id" ref="inquiry_polo"/>
+        <field name="buyer_id" ref="buyer_northwind"/>
+        <field name="style_id" ref="style_polo"/>
+        <field name="bom_id" ref="bom_polo"/>
+        <field name="currency_id" ref="base.USD"/>
+        <field name="incoterm_id" ref="account.incoterm_FOB"/>
+        <field name="valid_until">2026-03-06</field>
+        <field name="payment_term_id" ref="account.account_payment_term_30days"/>
+        <field name="delivery_terms">FOB Chittagong, sea freight, delivery to Felixstowe by 25 Jun 2026</field>
+        <field name="line_ids" eval="[(0, 0, {
+            'sequence': 10,
+            'style_id': ref('style_polo'),
+            'quantity': 18000,
+            'fob_price': 4.32,
+            'unit_price': 4.32,
+            'delivery_date': '2026-06-25',
+            'remarks': 'Per costing_polo (CST-NSG-PL-2602-01) computed FOB price, $4.32/pc.',
+        })]"/>
+        <field name="status">accepted</field>
+    </record>
+
+    <record id="quotation_hoodie" model="garment.merch.quotation">
+        <field name="quotation_date">2026-02-14</field>
+        <field name="inquiry_id" ref="inquiry_hoodie"/>
+        <field name="buyer_id" ref="buyer_baltichaus"/>
+        <field name="style_id" ref="style_hoodie"/>
+        <field name="bom_id" ref="bom_hoodie"/>
+        <field name="currency_id" ref="base.USD"/>
+        <field name="incoterm_id" ref="account.incoterm_FOB"/>
+        <field name="valid_until">2026-03-14</field>
+        <field name="payment_term_id" ref="account.account_payment_term_45days"/>
+        <field name="delivery_terms">FOB Chittagong, sea freight, delivery to Hamburg by 15 Jul 2026</field>
+        <field name="line_ids" eval="[(0, 0, {
+            'sequence': 10,
+            'style_id': ref('style_hoodie'),
+            'quantity': 12000,
+            'fob_price': 8.50,
+            'unit_price': 8.50,
+            'delivery_date': '2026-07-15',
+            'remarks': 'Per costing_hoodie (CST-NSG-HD-2603-01) computed FOB price, $8.50/pc.',
+        })]"/>
+        <field name="status">accepted</field>
+    </record>
+
+    <!-- =================================================================
+         Order Confirmations (garment.merch.order.confirmation)
+         ================================================================= -->
+
+    <record id="order_confirmation_tee" model="garment.merch.order.confirmation">
+        <field name="buyer_po_number">NW-PO-2026-0114</field>
+        <field name="quotation_id" ref="quotation_tee"/>
+        <field name="buyer_id" ref="buyer_northwind"/>
+        <field name="style_id" ref="style_tee"/>
+        <field name="order_date">2026-03-05</field>
+        <field name="quantity">24000</field>
+        <field name="color">White, Navy</field>
+        <field name="size_breakdown">XS-S-M-L-XL-XXL, standard bell curve, heaviest in M/L</field>
+        <field name="unit_price">3.20</field>
+        <field name="currency_id" ref="base.USD"/>
+        <field name="payment_term_id" ref="account.account_payment_term_30days"/>
+        <field name="incoterm_id" ref="account.incoterm_FOB"/>
+        <field name="delivery_date">2026-06-20</field>
+        <field name="shipment_date">2026-06-10</field>
+        <field name="factory">Nelsis Main Factory, Ashulia</field>
+        <field name="production_unit">Sewing Line 1</field>
+        <field name="merchandiser_id" ref="base.user_admin"/>
+        <field name="status">confirmed</field>
+        <field name="approval_stage">approved</field>
+        <field name="merchandiser_approver_id" ref="base.user_admin"/>
+        <field name="merchandiser_approved_date">2026-03-05 09:00:00</field>
+        <field name="merchandising_manager_id" ref="base.user_admin"/>
+        <field name="merchandising_manager_approved_date">2026-03-05 14:00:00</field>
+        <field name="production_manager_id" ref="base.user_admin"/>
+        <field name="production_manager_approved_date">2026-03-06 10:00:00</field>
+        <field name="commercial_manager_id" ref="base.user_admin"/>
+        <field name="commercial_manager_approved_date">2026-03-06 15:00:00</field>
+        <field name="factory_head_id" ref="base.user_admin"/>
+        <field name="factory_head_approved_date">2026-03-07 11:00:00</field>
+    </record>
+
+    <record id="order_confirmation_polo" model="garment.merch.order.confirmation">
+        <field name="buyer_po_number">NW-PO-2026-0115</field>
+        <field name="quotation_id" ref="quotation_polo"/>
+        <field name="buyer_id" ref="buyer_northwind"/>
+        <field name="style_id" ref="style_polo"/>
+        <field name="order_date">2026-03-06</field>
+        <field name="quantity">18000</field>
+        <field name="color">Bottle Green, White</field>
+        <field name="size_breakdown">XS-S-M-L-XL-XXL, standard bell curve, heaviest in M/L</field>
+        <field name="unit_price">4.32</field>
+        <field name="currency_id" ref="base.USD"/>
+        <field name="payment_term_id" ref="account.account_payment_term_30days"/>
+        <field name="incoterm_id" ref="account.incoterm_FOB"/>
+        <field name="delivery_date">2026-06-25</field>
+        <field name="shipment_date">2026-06-15</field>
+        <field name="factory">Nelsis Main Factory, Ashulia</field>
+        <field name="production_unit">Sewing Line 1</field>
+        <field name="merchandiser_id" ref="base.user_admin"/>
+        <field name="status">confirmed</field>
+        <field name="approval_stage">approved</field>
+        <field name="merchandiser_approver_id" ref="base.user_admin"/>
+        <field name="merchandiser_approved_date">2026-03-06 09:00:00</field>
+        <field name="merchandising_manager_id" ref="base.user_admin"/>
+        <field name="merchandising_manager_approved_date">2026-03-06 14:00:00</field>
+        <field name="production_manager_id" ref="base.user_admin"/>
+        <field name="production_manager_approved_date">2026-03-07 10:00:00</field>
+        <field name="commercial_manager_id" ref="base.user_admin"/>
+        <field name="commercial_manager_approved_date">2026-03-07 15:00:00</field>
+        <field name="factory_head_id" ref="base.user_admin"/>
+        <field name="factory_head_approved_date">2026-03-08 11:00:00</field>
+    </record>
+
+    <record id="order_confirmation_hoodie" model="garment.merch.order.confirmation">
+        <field name="buyer_po_number">BH-PO-2026-0031</field>
+        <field name="quotation_id" ref="quotation_hoodie"/>
+        <field name="buyer_id" ref="buyer_baltichaus"/>
+        <field name="style_id" ref="style_hoodie"/>
+        <field name="order_date">2026-03-13</field>
+        <field name="quantity">12000</field>
+        <field name="color">Charcoal, Olive</field>
+        <field name="size_breakdown">S-M-L-XL-XXL, unisex sizing, heaviest in M/L</field>
+        <field name="unit_price">8.50</field>
+        <field name="currency_id" ref="base.USD"/>
+        <field name="payment_term_id" ref="account.account_payment_term_45days"/>
+        <field name="incoterm_id" ref="account.incoterm_FOB"/>
+        <field name="delivery_date">2026-07-15</field>
+        <field name="shipment_date">2026-07-05</field>
+        <field name="factory">Nelsis Main Factory, Ashulia</field>
+        <field name="production_unit">Sewing Line 2</field>
+        <field name="merchandiser_id" ref="base.user_admin"/>
+        <field name="status">confirmed</field>
+        <field name="approval_stage">approved</field>
+        <field name="merchandiser_approver_id" ref="base.user_admin"/>
+        <field name="merchandiser_approved_date">2026-03-13 09:00:00</field>
+        <field name="merchandising_manager_id" ref="base.user_admin"/>
+        <field name="merchandising_manager_approved_date">2026-03-13 14:00:00</field>
+        <field name="production_manager_id" ref="base.user_admin"/>
+        <field name="production_manager_approved_date">2026-03-14 10:00:00</field>
+        <field name="commercial_manager_id" ref="base.user_admin"/>
+        <field name="commercial_manager_approved_date">2026-03-14 15:00:00</field>
+        <field name="factory_head_id" ref="base.user_admin"/>
+        <field name="factory_head_approved_date">2026-03-16 11:00:00</field>
+    </record>
+
+    <!-- =================================================================
+         Merchandising Tasks (garment.merch.task) — Farhana Akter's
+         (emp_merchandiser) workload, linked back to the records above.
+         ================================================================= -->
+
+    <record id="task_hoodie_sample_followup" model="garment.merch.task">
+        <field name="name">Follow up BalticHaus PP sample approval before bulk cutting — Fleece Zip Hoodie</field>
+        <field name="task_type">sample_followup</field>
+        <field name="inquiry_id" ref="inquiry_hoodie"/>
+        <field name="buyer_id" ref="buyer_baltichaus"/>
+        <field name="assigned_to_id" ref="base.user_admin"/>
+        <field name="department_role">senior_merchandiser</field>
+        <field name="priority">2</field>
+        <field name="due_date">2026-02-20</field>
+        <field name="status">done</field>
+        <field name="completed_date">2026-02-18</field>
+        <field name="description">Farhana Akter to confirm BalticHaus's sign-off on sample_hoodie_pp (PP sample)
+so bulk fabric cutting for order_hoodie can start on schedule; sustainability packaging requirements to be
+re-confirmed with buyer contact.</field>
+    </record>
+
+    <record id="task_tee_polo_documentation" model="garment.merch.task">
+        <field name="name">Prepare buyer PO documentation pack — Northwind Tee &amp; Polo (NW-PO-2026-0114 / 0115)</field>
+        <field name="task_type">documentation</field>
+        <field name="order_confirmation_id" ref="order_confirmation_polo"/>
+        <field name="buyer_id" ref="buyer_northwind"/>
+        <field name="assigned_to_id" ref="base.user_admin"/>
+        <field name="department_role">senior_merchandiser</field>
+        <field name="priority">1</field>
+        <field name="due_date">2026-03-12</field>
+        <field name="status">in_progress</field>
+        <field name="description">Farhana Akter compiling confirmed order documentation (PO copies, quotation
+sign-off, packing instructions) for both Northwind Core Basics styles ahead of material planning handover.</field>
+    </record>
+
+    <record id="task_hoodie_delivery_followup" model="garment.merch.task">
+        <field name="name">Delivery schedule follow-up with BalticHaus — Fleece Zip Hoodie (BH-PO-2026-0031)</field>
+        <field name="task_type">delivery_followup</field>
+        <field name="order_confirmation_id" ref="order_confirmation_hoodie"/>
+        <field name="buyer_id" ref="buyer_baltichaus"/>
+        <field name="assigned_to_id" ref="base.user_admin"/>
+        <field name="department_role">senior_merchandiser</field>
+        <field name="priority">1</field>
+        <field name="due_date">2026-06-25</field>
+        <field name="status">draft</field>
+        <field name="description">Farhana Akter to reconfirm the 15 Jul 2026 Hamburg delivery window with
+BalticHaus once production status for order_hoodie reaches quality inspection.</field>
+    </record>
+
+</data>
+</odoo>

@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_mobile_device_form" model="ir.ui.view">
+        <field name="name">garment.mobile.device.form</field>
+        <field name="model">garment.mobile.device</field>
+        <field name="arch" type="xml">
+            <form string="Mobile Device">
+                <header>
+                    <button name="action_generate_api_key" type="object" string="Regenerate API Key"
+                            class="btn-secondary" confirm="This invalidates the current key for this device. Continue?"/>
+                    <button name="action_block" type="object" string="Block" class="btn-secondary"
+                            invisible="status == 'blocked'"/>
+                    <button name="action_activate" type="object" string="Activate" class="btn-secondary"
+                            invisible="status == 'active'"/>
+                    <field name="status" widget="statusbar" statusbar_visible="active,blocked"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_sessions" type="object" class="oe_stat_button" icon="fa-clock-o">
+                            <field name="session_count" widget="statinfo" string="Sessions"/>
+                        </button>
+                        <button name="action_view_sync_logs" type="object" class="oe_stat_button" icon="fa-refresh">
+                            <field name="sync_log_count" widget="statinfo" string="Sync Log"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Blocked" bg_color="text-bg-danger"
+                            invisible="status != 'blocked'"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="e.g. Samsung Galaxy S25 - Line Supervisor"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="device_code"/>
+                            <field name="user_id"/>
+                            <field name="employee_id"/>
+                            <field name="app_type"/>
+                        </group>
+                        <group>
+                            <field name="platform"/>
+                            <field name="device_model"/>
+                            <field name="os_version"/>
+                            <field name="app_version"/>
+                        </group>
+                    </group>
+                    <group string="Push &amp; API">
+                        <group>
+                            <field name="push_provider"/>
+                            <field name="push_token"/>
+                        </group>
+                        <group>
+                            <field name="api_key" readonly="1"/>
+                            <field name="device_identifier"/>
+                        </group>
+                    </group>
+                    <group string="Activity">
+                        <group>
+                            <field name="registered_date"/>
+                            <field name="last_login"/>
+                        </group>
+                        <group>
+                            <field name="last_seen"/>
+                            <field name="last_ip"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_mobile_device_tree" model="ir.ui.view">
+        <field name="name">garment.mobile.device.tree</field>
+        <field name="model">garment.mobile.device</field>
+        <field name="arch" type="xml">
+            <tree string="Mobile Devices" decoration-muted="status == 'inactive'"
+                  decoration-danger="status == 'blocked'">
+                <field name="device_code"/>
+                <field name="name"/>
+                <field name="user_id"/>
+                <field name="app_type"/>
+                <field name="platform"/>
+                <field name="app_version"/>
+                <field name="last_seen"/>
+                <field name="status"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_mobile_device_search" model="ir.ui.view">
+        <field name="name">garment.mobile.device.search</field>
+        <field name="model">garment.mobile.device</field>
+        <field name="arch" type="xml">
+            <search string="Search Mobile Devices">
+                <field name="device_code"/>
+                <field name="name"/>
+                <field name="user_id"/>
+                <field name="employee_id"/>
+                <filter name="filter_active" string="Active" domain="[('status', '=', 'active')]"/>
+                <filter name="filter_blocked" string="Blocked" domain="[('status', '=', 'blocked')]"/>
+                <separator/>
+                <filter name="filter_android" string="Android" domain="[('platform', '=', 'android')]"/>
+                <filter name="filter_ios" string="iOS" domain="[('platform', '=', 'ios')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_by_app_type" string="Mobile App" context="{'group_by': 'app_type'}"/>
+                    <filter name="group_by_platform" string="Platform" context="{'group_by': 'platform'}"/>
+                    <filter name="group_by_status" string="Status" context="{'group_by': 'status'}"/>
+                    <filter name="group_by_user" string="User" context="{'group_by': 'user_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_mobile_device" model="ir.actions.act_window">
+        <field name="name">Mobile Devices</field>
+        <field name="res_model">garment.mobile.device</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_garment_mobile_device_search"/>
+        <field name="context">{'search_default_filter_active': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Register your first mobile device.</p>
+            <p>Devices are normally self-registered by the mobile client via
+               POST /api/mobile/auth/login — create one here only for manual
+               setup or testing.</p>
+        </field>
+    </record>
+
+</odoo>

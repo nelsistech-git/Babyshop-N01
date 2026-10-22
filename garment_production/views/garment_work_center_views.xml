@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_work_center_tree" model="ir.ui.view">
+        <field name="name">garment.work.center.tree</field>
+        <field name="model">garment.work.center</field>
+        <field name="arch" type="xml">
+            <tree string="Work Centers">
+                <field name="name"/>
+                <field name="work_center_type"/>
+                <field name="department"/>
+                <field name="capacity"/>
+                <field name="machine_count"/>
+                <field name="operator_count"/>
+                <field name="supervisor_id"/>
+                <field name="status" decoration-success="status == 'active'" decoration-danger="status == 'maintenance'"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_work_center_form" model="ir.ui.view">
+        <field name="name">garment.work.center.form</field>
+        <field name="model">garment.work.center</field>
+        <field name="arch" type="xml">
+            <form string="Work Center">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="%(action_garment_production_machine)d" type="action" class="oe_stat_button"
+                                icon="fa-cogs" context="{'default_work_center_id': id}">
+                            <field name="machine_ids_count" widget="statinfo" string="Machines"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="work_center_type"/>
+                            <field name="department"/>
+                            <field name="factory"/>
+                            <field name="floor"/>
+                            <field name="location"/>
+                        </group>
+                        <group>
+                            <field name="supervisor_id"/>
+                            <field name="capacity"/>
+                            <field name="capacity_per_hour"/>
+                            <field name="machine_count"/>
+                            <field name="operator_count"/>
+                            <field name="working_hours"/>
+                            <field name="status"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_work_center" model="ir.actions.act_window">
+        <field name="name">Work Centers</field>
+        <field name="res_model">garment.work.center</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

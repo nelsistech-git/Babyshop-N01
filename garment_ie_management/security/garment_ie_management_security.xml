@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <record id="module_category_garment_ie" model="ir.module.category">
+            <field name="name">Smart Garment ERP - Industrial Engineering</field>
+            <field name="sequence">18</field>
+        </record>
+
+        <record id="group_ie_supervisor" model="res.groups">
+            <field name="name">Line Supervisor (View Recommendations &amp; Dashboards)</field>
+            <field name="category_id" ref="module_category_garment_ie"/>
+        </record>
+
+        <record id="group_ie_engineer" model="res.groups">
+            <field name="name">IE Engineer (Study &amp; Analysis)</field>
+            <field name="category_id" ref="module_category_garment_ie"/>
+            <field name="implied_ids" eval="[(4, ref('group_ie_supervisor'))]"/>
+        </record>
+
+        <record id="group_ie_planning" model="res.groups">
+            <field name="name">Planning Manager (Capacity Planning)</field>
+            <field name="category_id" ref="module_category_garment_ie"/>
+            <field name="implied_ids" eval="[(4, ref('group_ie_supervisor'))]"/>
+        </record>
+
+        <record id="group_ie_manager" model="res.groups">
+            <field name="name">IE Manager (Full Access)</field>
+            <field name="category_id" ref="module_category_garment_ie"/>
+            <field name="implied_ids" eval="[(4, ref('group_ie_engineer')), (4, ref('group_ie_planning'))]"/>
+        </record>
+
+    </data>
+</odoo>

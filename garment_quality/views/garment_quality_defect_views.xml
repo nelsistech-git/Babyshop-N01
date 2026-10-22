@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_quality_defect_form" model="ir.ui.view">
+        <field name="name">garment.quality.defect.form</field>
+        <field name="model">garment.quality.defect</field>
+        <field name="arch" type="xml">
+            <form string="Quality Defect">
+                <header>
+                    <field name="status" widget="statusbar" statusbar_visible="open,under_repair,corrected,closed"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="defect_code_id"/>
+                            <field name="name"/>
+                            <field name="category" readonly="1"/>
+                            <field name="severity"/>
+                            <field name="department"/>
+                        </group>
+                        <group>
+                            <field name="inspection_id"/>
+                            <field name="aql_inspection_id"/>
+                            <field name="style_id"/>
+                            <field name="production_order_id"/>
+                            <field name="sewing_line"/>
+                            <field name="location"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="quantity"/>
+                        <field name="responsible_user_id"/>
+                        <field name="capa_id"/>
+                    </group>
+                    <group string="Corrective Action">
+                        <field name="corrective_action" nolabel="1"/>
+                    </group>
+                    <group string="Photo Evidence">
+                        <field name="photo" widget="image" class="oe_avatar"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_quality_defect_tree" model="ir.ui.view">
+        <field name="name">garment.quality.defect.tree</field>
+        <field name="model">garment.quality.defect</field>
+        <field name="arch" type="xml">
+            <tree string="Quality Defects" decoration-danger="severity == 'critical'" decoration-warning="severity == 'major'">
+                <field name="create_date"/>
+                <field name="defect_code_id"/>
+                <field name="name"/>
+                <field name="category"/>
+                <field name="severity"/>
+                <field name="department"/>
+                <field name="quantity"/>
+                <field name="responsible_user_id"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_quality_defect_search" model="ir.ui.view">
+        <field name="name">garment.quality.defect.search</field>
+        <field name="model">garment.quality.defect</field>
+        <field name="arch" type="xml">
+            <search string="Search Defects">
+                <field name="defect_code_id"/>
+                <field name="name"/>
+                <field name="style_id"/>
+                <filter string="Open" name="filter_open" domain="[('status', '=', 'open')]"/>
+                <filter string="Critical" name="filter_critical" domain="[('severity', '=', 'critical')]"/>
+                <filter string="Major" name="filter_major" domain="[('severity', '=', 'major')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Category" name="group_category" context="{'group_by': 'category'}"/>
+                    <filter string="Severity" name="group_severity" context="{'group_by': 'severity'}"/>
+                    <filter string="Department" name="group_department" context="{'group_by': 'department'}"/>
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_garment_quality_defect_pivot" model="ir.ui.view">
+        <field name="name">garment.quality.defect.pivot</field>
+        <field name="model">garment.quality.defect</field>
+        <field name="arch" type="xml">
+            <pivot string="Defect Analysis">
+                <field name="defect_code_id" type="row"/>
+                <field name="department" type="col"/>
+                <field name="quantity" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_garment_quality_defect" model="ir.actions.act_window">
+        <field name="name">Defects</field>
+        <field name="res_model">garment.quality.defect</field>
+        <field name="view_mode">tree,form,pivot</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Log your first quality defect.</p>
+        </field>
+    </record>
+
+</odoo>

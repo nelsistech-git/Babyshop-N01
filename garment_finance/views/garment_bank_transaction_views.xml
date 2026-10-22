@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_bank_transaction_tree" model="ir.ui.view">
+        <field name="name">garment.bank.transaction.tree</field>
+        <field name="model">garment.bank.transaction</field>
+        <field name="arch" type="xml">
+            <tree string="Bank Transactions" decoration-muted="reconciliation_status in ('reconciled', 'closed')"
+                  decoration-danger="reconciliation_status == 'disputed'">
+                <field name="bank_account_id"/>
+                <field name="transaction_date"/>
+                <field name="transaction_type"/>
+                <field name="reference"/>
+                <field name="amount"/>
+                <field name="statement_line_id"/>
+                <field name="reconciliation_status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_bank_transaction_form" model="ir.ui.view">
+        <field name="name">garment.bank.transaction.form</field>
+        <field name="model">garment.bank.transaction</field>
+        <field name="arch" type="xml">
+            <form string="Bank Transaction">
+                <header>
+                    <button name="action_reconcile" type="object" string="Reconcile" class="btn-primary"
+                            invisible="reconciliation_status != 'matched'"/>
+                    <button name="action_close" type="object" string="Close" class="btn-primary"
+                            invisible="reconciliation_status != 'reconciled'"/>
+                    <button name="action_mark_disputed" type="object" string="Mark Disputed" class="btn-secondary"
+                            invisible="reconciliation_status in ('disputed', 'closed')"/>
+                    <button name="action_reset_to_unreconciled" type="object" string="Reset to Unreconciled"
+                            invisible="reconciliation_status == 'unreconciled'"/>
+                    <field name="reconciliation_status" widget="statusbar"
+                           statusbar_visible="unreconciled,matched,reconciled,closed"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="bank_account_id"/>
+                            <field name="transaction_date"/>
+                            <field name="transaction_type"/>
+                            <field name="reference"/>
+                        </group>
+                        <group>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="amount"/>
+                            <field name="related_payment_id"/>
+                            <field name="related_receivable_id"/>
+                        </group>
+                    </group>
+                    <group string="Bank Statement Match">
+                        <group>
+                            <field name="statement_line_id" readonly="1"/>
+                            <field name="statement_amount" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="reconciliation_difference" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_bank_transaction_search" model="ir.ui.view">
+        <field name="name">garment.bank.transaction.search</field>
+        <field name="model">garment.bank.transaction</field>
+        <field name="arch" type="xml">
+            <search string="Search Bank Transactions">
+                <field name="bank_account_id"/>
+                <field name="reference"/>
+                <filter string="Unreconciled" name="filter_unreconciled" domain="[('reconciliation_status', '=', 'unreconciled')]"/>
+                <filter string="Matched" name="filter_matched" domain="[('reconciliation_status', '=', 'matched')]"/>
+                <filter string="Disputed" name="filter_disputed" domain="[('reconciliation_status', '=', 'disputed')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Bank Account" name="group_bank_account" context="{'group_by': 'bank_account_id'}"/>
+                    <filter string="Reconciliation Status" name="group_status" context="{'group_by': 'reconciliation_status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_bank_transaction" model="ir.actions.act_window">
+        <field name="name">Bank Transactions</field>
+        <field name="res_model">garment.bank.transaction</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

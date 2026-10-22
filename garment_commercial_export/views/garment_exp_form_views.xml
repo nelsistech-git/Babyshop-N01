@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_exp_form_form" model="ir.ui.view">
+        <field name="name">garment.exp.form.form</field>
+        <field name="model">garment.exp.form</field>
+        <field name="arch" type="xml">
+            <form string="EXP Form">
+                <header>
+                    <field name="workflow_stage" widget="statusbar"
+                           statusbar_visible="commercial_officer,bank_verification,exp_approval,shipment"/>
+                    <button name="action_next_stage" type="object" string="Move to Next Stage" class="btn-primary"
+                            invisible="workflow_stage == 'shipment'"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="exp_number" readonly="1"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="exporter"/>
+                            <field name="buyer_id"/>
+                            <field name="export_documentation_id"/>
+                            <field name="shipment_id"/>
+                            <field name="lc_id"/>
+                        </group>
+                        <group>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="export_value"/>
+                            <field name="shipment_date"/>
+                            <field name="bank_id"/>
+                            <field name="status" widget="badge"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_exp_form_tree" model="ir.ui.view">
+        <field name="name">garment.exp.form.tree</field>
+        <field name="model">garment.exp.form</field>
+        <field name="arch" type="xml">
+            <tree string="EXP Forms" decoration-success="status == 'approved'">
+                <field name="exp_number"/>
+                <field name="buyer_id"/>
+                <field name="shipment_id"/>
+                <field name="shipment_date"/>
+                <field name="export_value"/>
+                <field name="workflow_stage" widget="badge"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_exp_form_search" model="ir.ui.view">
+        <field name="name">garment.exp.form.search</field>
+        <field name="model">garment.exp.form</field>
+        <field name="arch" type="xml">
+            <search string="Search EXP Forms">
+                <field name="exp_number"/>
+                <field name="buyer_id"/>
+                <field name="shipment_id"/>
+                <group expand="0" string="Group By">
+                    <filter string="Workflow Stage" name="group_stage" context="{'group_by': 'workflow_stage'}"/>
+                    <filter string="Buyer" name="group_buyer" context="{'group_by': 'buyer_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_exp_form" model="ir.actions.act_window">
+        <field name="name">EXP Forms</field>
+        <field name="res_model">garment.exp.form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first EXP Form.</p>
+        </field>
+    </record>
+
+</odoo>

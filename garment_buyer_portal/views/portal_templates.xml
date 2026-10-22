@@ -1,0 +1,710 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ================================================================
+         Extend the standard /my landing page with the Buyer Dashboard
+         (SRS section 8) and the Buyer Portal main menu (SRS section 38).
+         ================================================================ -->
+    <template id="portal_my_home_garment_buyer" name="Buyer Portal: My Home" inherit_id="portal.portal_my_home">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="before">
+            <t t-if="garment_buyer">
+                <h3>Buyer Dashboard</h3>
+                <div class="row mt-2 mb-4">
+                    <div class="col-md-3 col-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h6 class="card-title">Active Orders</h6>
+                                <p class="mb-1">Total: <strong t-esc="dashboard_orders_total"/></p>
+                                <p class="mb-1">Running: <strong t-esc="dashboard_orders_running"/></p>
+                                <p class="mb-0">Completed: <strong t-esc="dashboard_orders_completed"/></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h6 class="card-title">Sample Status</h6>
+                                <p class="mb-1">Pending Approval: <strong t-esc="dashboard_samples_pending"/></p>
+                                <p class="mb-1">Approved: <strong t-esc="dashboard_samples_approved"/></p>
+                                <p class="mb-0">Revision Required: <strong t-esc="dashboard_samples_revision"/></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h6 class="card-title">Shipment Status</h6>
+                                <p class="mb-1">Upcoming: <strong t-esc="dashboard_shipments_upcoming"/></p>
+                                <p class="mb-1">In Transit: <strong t-esc="dashboard_shipments_transit"/></p>
+                                <p class="mb-0">Delivered: <strong t-esc="dashboard_shipments_delivered"/></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h6 class="card-title">Buyer</h6>
+                                <p class="mb-0"><strong t-esc="garment_buyer.name"/></p>
+                                <p class="text-muted mb-0" t-esc="garment_buyer.brand_name"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <h3>Buyer Portal Menu</h3>
+                <div class="row mt-2 mb-4">
+                    <div class="col-md-3 col-6 mb-2">
+                        <a href="/my/orders" class="btn btn-outline-primary w-100">Orders</a>
+                    </div>
+                    <div class="col-md-3 col-6 mb-2">
+                        <a href="/my/samples" class="btn btn-outline-primary w-100">Samples</a>
+                    </div>
+                    <div class="col-md-3 col-6 mb-2">
+                        <a href="/my/shipments" class="btn btn-outline-primary w-100">Shipments</a>
+                    </div>
+                    <div class="col-md-3 col-6 mb-2">
+                        <a href="/my/quality" class="btn btn-outline-primary w-100">Quality</a>
+                    </div>
+                    <div class="col-md-3 col-6 mb-2">
+                        <a href="/my/approvals" class="btn btn-outline-primary w-100">Approvals</a>
+                    </div>
+                    <div class="col-md-3 col-6 mb-2">
+                        <a href="/my/messages" class="btn btn-outline-primary w-100">Messages</a>
+                    </div>
+                </div>
+            </t>
+        </xpath>
+    </template>
+
+    <!-- ================================================================
+         Orders (SRS sections 9-10)
+         ================================================================ -->
+    <template id="portal_my_orders" name="My Orders">
+        <t t-call="portal.portal_layout">
+            <h3>My Orders</h3>
+            <t t-if="not orders">
+                <p>There are currently no orders for your account.</p>
+            </t>
+            <t t-else="">
+                <div class="table-responsive">
+                    <table class="table table-hover o_portal_my_doc_table">
+                        <thead>
+                            <tr class="active">
+                                <th>Order #</th>
+                                <th>Style</th>
+                                <th>Quantity</th>
+                                <th>Delivery Date</th>
+                                <th>Status</th>
+                                <th>Progress</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="orders" t-as="order">
+                                <td>
+                                    <a t-attf-href="/my/orders/#{order.id}" t-esc="order.name"/>
+                                </td>
+                                <td t-esc="order.style_id.display_name"/>
+                                <td t-esc="order.quantity"/>
+                                <td t-esc="order.delivery_date"/>
+                                <td t-esc="order.state"/>
+                                <td>
+                                    <t t-esc="'%.0f' % order.progress"/>%
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <t t-call="portal.pager"/>
+            </t>
+        </t>
+    </template>
+
+    <template id="portal_order_detail" name="Order Detail">
+        <t t-call="portal.portal_layout">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="my-0" t-esc="order.name"/>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h6>Basic Information</h6>
+                            <p>Buyer PO: <span t-esc="order.buyer_po_number"/></p>
+                            <p>Style: <span t-esc="order.style_id.display_name"/></p>
+                            <p>Product: <span t-esc="order.style_id.product_name"/></p>
+                            <p>Quantity: <span t-esc="order.quantity"/></p>
+                            <p>Delivery Date: <span t-esc="order.delivery_date"/></p>
+                        </div>
+                        <div class="col-md-4">
+                            <h6>Production Information</h6>
+                            <p>Factory: <span t-esc="order.factory"/></p>
+                            <p>Production Unit: <span t-esc="order.production_unit"/></p>
+                            <p>Current Stage: <span t-esc="order.state"/></p>
+                            <p>Progress: <t t-esc="'%.0f' % order.progress"/>%</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h6>Shipment Information</h6>
+                            <p>Shipment Date: <span t-esc="order.shipment_date"/></p>
+                            <p>Port of Loading: <span t-esc="order.port_of_loading"/></p>
+                            <p>Port of Destination: <span t-esc="order.port_of_destination"/></p>
+                        </div>
+                    </div>
+                    <h6 class="mt-4">Order Timeline</h6>
+                    <table class="table table-sm">
+                        <tbody>
+                            <tr>
+                                <td>Material</td>
+                                <td><t t-esc="'%.0f' % order.material_progress"/>%</td>
+                            </tr>
+                            <tr>
+                                <td>Cutting</td>
+                                <td><t t-esc="'%.0f' % order.cutting_progress"/>%</td>
+                            </tr>
+                            <tr>
+                                <td>Sewing</td>
+                                <td><t t-esc="'%.0f' % order.sewing_progress"/>%</td>
+                            </tr>
+                            <tr>
+                                <td>Finishing</td>
+                                <td><t t-esc="'%.0f' % order.finishing_progress"/>%</td>
+                            </tr>
+                            <tr>
+                                <td>Inspection</td>
+                                <td><t t-esc="'%.0f' % order.inspection_progress"/>%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <h6 class="mt-4">Order Lines</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Style</th>
+                                    <th>Color</th>
+                                    <th>Quantity</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="order.line_ids" t-as="line">
+                                    <td t-esc="line.style_id.display_name"/>
+                                    <td t-esc="line.color"/>
+                                    <td t-esc="line.quantity"/>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- ================================================================
+         Samples (SRS section 12)
+         ================================================================ -->
+    <template id="portal_my_samples" name="My Samples">
+        <t t-call="portal.portal_layout">
+            <h3>My Samples</h3>
+            <t t-if="not samples">
+                <p>There are currently no samples for your account.</p>
+            </t>
+            <t t-else="">
+                <div class="table-responsive">
+                    <table class="table table-hover o_portal_my_doc_table">
+                        <thead>
+                            <tr class="active">
+                                <th>Sample #</th>
+                                <th>Style</th>
+                                <th>Sample Type</th>
+                                <th>Required Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="samples" t-as="sample">
+                                <td>
+                                    <a t-attf-href="/my/samples/#{sample.id}" t-esc="sample.sample_number"/>
+                                </td>
+                                <td t-esc="sample.style_id.display_name"/>
+                                <td t-esc="sample.sample_type_id.display_name"/>
+                                <td t-esc="sample.required_date"/>
+                                <td t-esc="sample.status"/>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <t t-call="portal.pager"/>
+            </t>
+        </t>
+    </template>
+
+    <template id="portal_sample_detail" name="Sample Detail">
+        <t t-call="portal.portal_layout">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="my-0" t-esc="sample.sample_number"/>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p>Style: <span t-esc="sample.style_id.display_name"/></p>
+                            <p>Sample Type: <span t-esc="sample.sample_type_id.display_name"/></p>
+                            <p>Required Date: <span t-esc="sample.required_date"/></p>
+                            <p>Submission Date: <span t-esc="sample.submission_date"/></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p>Status: <span t-esc="sample.status"/></p>
+                            <img t-if="sample.developed_sample_image"
+                                 t-attf-src="/web/image/garment.sample/#{sample.id}/developed_sample_image"
+                                 class="img-fluid rounded" style="max-height:220px;"/>
+                        </div>
+                    </div>
+                    <h6 class="mt-4">Buyer Comments</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Description</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="sample.comment_ids" t-as="comment">
+                                    <td t-esc="comment.comment_date"/>
+                                    <td t-esc="comment.comment_description"/>
+                                    <td t-esc="comment.completion_status"/>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p>
+                        <a href="/my/approvals" class="btn btn-primary">Go to Approvals Inbox</a>
+                    </p>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- ================================================================
+         Shipments (SRS section 30)
+         ================================================================ -->
+    <template id="portal_my_shipments" name="My Shipments">
+        <t t-call="portal.portal_layout">
+            <h3>My Shipments</h3>
+            <t t-if="not shipments">
+                <p>There are currently no shipments for your account.</p>
+            </t>
+            <t t-else="">
+                <div class="table-responsive">
+                    <table class="table table-hover o_portal_my_doc_table">
+                        <thead>
+                            <tr class="active">
+                                <th>Shipment #</th>
+                                <th>Mode</th>
+                                <th>Destination</th>
+                                <th>Shipment Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="shipments" t-as="shipment">
+                                <td>
+                                    <a t-attf-href="/my/shipments/#{shipment.id}" t-esc="shipment.shipment_no"/>
+                                </td>
+                                <td t-esc="shipment.mode"/>
+                                <td t-esc="shipment.destination"/>
+                                <td t-esc="shipment.shipment_date"/>
+                                <td t-esc="shipment.status"/>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <t t-call="portal.pager"/>
+            </t>
+        </t>
+    </template>
+
+    <template id="portal_shipment_detail" name="Shipment Detail">
+        <t t-call="portal.portal_layout">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="my-0" t-esc="shipment.shipment_no"/>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p>Mode: <span t-esc="shipment.mode"/></p>
+                            <p>Destination: <span t-esc="shipment.destination"/></p>
+                            <p>Shipment Date: <span t-esc="shipment.shipment_date"/></p>
+                            <p>Status: <span t-esc="shipment.status"/></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p>Forwarder: <span t-esc="shipment.forwarder_id.display_name"/></p>
+                            <p>Shipping Line: <span t-esc="shipment.shipping_line_id.display_name"/></p>
+                            <p>AWB Number: <span t-esc="shipment.awb_number"/></p>
+                        </div>
+                    </div>
+                    <h6 class="mt-4">Containers</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Container #</th>
+                                    <th>Vessel</th>
+                                    <th>ETD</th>
+                                    <th>ETA</th>
+                                    <th>Port</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="shipment.container_ids" t-as="container">
+                                    <td t-esc="container.container_no"/>
+                                    <td t-esc="container.vessel_name"/>
+                                    <td t-esc="container.etd"/>
+                                    <td t-esc="container.eta"/>
+                                    <td t-esc="container.port"/>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- ================================================================
+         Quality (SRS section 29)
+         ================================================================ -->
+    <template id="portal_my_quality" name="My Quality Reports">
+        <t t-call="portal.portal_layout">
+            <h3>Quality Reports</h3>
+            <t t-if="not inspections">
+                <p>There are currently no released quality reports for your account.</p>
+            </t>
+            <t t-else="">
+                <div class="table-responsive">
+                    <table class="table table-hover o_portal_my_doc_table">
+                        <thead>
+                            <tr class="active">
+                                <th>Inspection #</th>
+                                <th>Type</th>
+                                <th>Style</th>
+                                <th>Date</th>
+                                <th>Quality Score</th>
+                                <th>Disposition</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="inspections" t-as="inspection">
+                                <td>
+                                    <a t-attf-href="/my/quality/#{inspection.id}" t-esc="inspection.inspection_no"/>
+                                </td>
+                                <td t-esc="inspection.inspection_type"/>
+                                <td t-esc="inspection.style_id.display_name"/>
+                                <td t-esc="inspection.inspection_date"/>
+                                <td>
+                                    <t t-esc="'%.1f' % inspection.quality_score"/>%
+                                </td>
+                                <td t-esc="inspection.disposition"/>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <t t-call="portal.pager"/>
+            </t>
+        </t>
+    </template>
+
+    <template id="portal_quality_detail" name="Quality Report Detail">
+        <t t-call="portal.portal_layout">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="my-0" t-esc="inspection.inspection_no"/>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p>Inspection Type: <span t-esc="inspection.inspection_type"/></p>
+                            <p>Style: <span t-esc="inspection.style_id.display_name"/></p>
+                            <p>Inspection Date: <span t-esc="inspection.inspection_date"/></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p>Inspected Qty: <span t-esc="inspection.quantity"/></p>
+                            <p>Defect Qty: <span t-esc="inspection.defect_qty"/></p>
+                            <p>Quality Score: <t t-esc="'%.1f' % inspection.quality_score"/>%</p>
+                            <p>Disposition: <span t-esc="inspection.disposition"/></p>
+                        </div>
+                    </div>
+                    <h6 class="mt-4">Defects</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Defect</th>
+                                    <th>Quantity</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="inspection.defect_ids" t-as="defect">
+                                    <td t-esc="defect.name"/>
+                                    <td t-esc="defect.quantity"/>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- ================================================================
+         Tech Pack context page (reached from the Approvals inbox)
+         ================================================================ -->
+    <template id="portal_techpack_detail" name="Tech Pack Detail">
+        <t t-call="portal.portal_layout">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="my-0" t-esc="techpack.name"/>
+                </div>
+                <div class="card-body">
+                    <p>Style: <span t-esc="techpack.style_id.display_name"/></p>
+                    <p>Version: <span t-esc="techpack.version"/></p>
+                    <p>Status: <span t-esc="techpack.state"/></p>
+                    <p>Product Description: <span t-esc="techpack.product_description"/></p>
+                    <p>
+                        <a href="/my/approvals" class="btn btn-primary">Go to Approvals Inbox</a>
+                    </p>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- ================================================================
+         Approvals inbox — Tech Pack / Sample / Style buyer sign-off
+         (SRS sections 12, 26, 32)
+         ================================================================ -->
+    <template id="portal_my_approvals" name="My Approvals">
+        <t t-call="portal.portal_layout">
+            <h3>Approvals Awaiting My Sign-Off</h3>
+            <t t-if="not approvals">
+                <p>There is currently nothing awaiting your approval.</p>
+            </t>
+            <t t-else="">
+                <div class="table-responsive">
+                    <table class="table table-hover o_portal_my_doc_table">
+                        <thead>
+                            <tr class="active">
+                                <th>Ref.</th>
+                                <th>Type</th>
+                                <th>Document</th>
+                                <th>Requested Date</th>
+                                <th>Decision</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="approvals" t-as="approval">
+                                <td>
+                                    <a t-attf-href="/my/approvals/#{approval.id}" t-esc="approval.name"/>
+                                </td>
+                                <td t-esc="approval.approval_type"/>
+                                <td>
+                                    <t t-if="approval.approval_type == 'techpack'" t-esc="approval.techpack_id.display_name"/>
+                                    <t t-if="approval.approval_type == 'sample'" t-esc="approval.sample_id.display_name"/>
+                                    <t t-if="approval.approval_type == 'style'" t-esc="approval.style_id.display_name"/>
+                                </td>
+                                <td t-esc="approval.requested_date"/>
+                                <td t-esc="approval.decision"/>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <t t-call="portal.pager"/>
+            </t>
+        </t>
+    </template>
+
+    <template id="portal_approval_detail" name="Approval Detail">
+        <t t-call="portal.portal_layout">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="my-0" t-esc="approval.name"/>
+                </div>
+                <div class="card-body">
+                    <p>Type: <span t-esc="approval.approval_type"/></p>
+                    <p t-if="approval.approval_type == 'techpack'">
+                        Tech Pack:
+                        <a t-attf-href="/my/techpacks/#{approval.techpack_id.id}" t-esc="approval.techpack_id.display_name"/>
+                    </p>
+                    <p t-if="approval.approval_type == 'sample'">
+                        Sample:
+                        <a t-attf-href="/my/samples/#{approval.sample_id.id}" t-esc="approval.sample_id.display_name"/>
+                    </p>
+                    <p t-if="approval.approval_type == 'style'">
+                        Style: <span t-esc="approval.style_id.display_name"/>
+                    </p>
+                    <p>Version: <span t-esc="approval.version"/></p>
+                    <p>Current Decision: <span t-esc="approval.decision"/></p>
+                    <p t-if="approval.comments">Comments: <span t-esc="approval.comments"/></p>
+
+                    <t t-if="approval.decision == 'pending'">
+                        <form t-attf-action="/my/approvals/#{approval.id}/action" method="post" class="mt-3">
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <div class="mb-3">
+                                <label for="comments">Comments</label>
+                                <textarea class="form-control" name="comments" rows="3"/>
+                            </div>
+                            <button type="submit" name="decision" value="approved" class="btn btn-success">Approve</button>
+                            <button type="submit" name="decision" value="revision_required" class="btn btn-warning">Request Revision</button>
+                            <button type="submit" name="decision" value="rejected" class="btn btn-danger">Reject</button>
+                        </form>
+                    </t>
+                    <t t-else="">
+                        <p>Decided on <span t-esc="approval.decision_date"/></p>
+                    </t>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- ================================================================
+         Buyer <-> Factory Messages (SRS sections 13, 16)
+         ================================================================ -->
+    <template id="portal_my_messages" name="My Messages">
+        <t t-call="portal.portal_layout">
+            <h3>Messages</h3>
+            <t t-if="not messages">
+                <p>There are currently no messages.</p>
+            </t>
+            <t t-else="">
+                <div class="table-responsive">
+                    <table class="table table-hover o_portal_my_doc_table">
+                        <thead>
+                            <tr class="active">
+                                <th>Ref.</th>
+                                <th>Subject</th>
+                                <th>Direction</th>
+                                <th>Department</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th/>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="messages" t-as="message">
+                                <td t-esc="message.name"/>
+                                <td t-esc="message.subject"/>
+                                <td t-esc="message.direction"/>
+                                <td t-esc="message.responsible_department"/>
+                                <td t-esc="message.message_date"/>
+                                <td t-esc="message.completion_status"/>
+                                <td>
+                                    <form t-if="message.completion_status == 'response_submitted'"
+                                          t-attf-action="/my/messages/#{message.id}/confirm" method="post">
+                                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                        <button type="submit" class="btn btn-sm btn-primary">Confirm</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <t t-call="portal.pager"/>
+            </t>
+
+            <h4 class="mt-4">New Message</h4>
+            <form action="/my/messages/new" method="post" class="mt-2">
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                <div class="mb-3">
+                    <label for="subject">Subject</label>
+                    <input type="text" class="form-control" name="subject"/>
+                </div>
+                <div class="mb-3">
+                    <label for="responsible_department">Department</label>
+                    <select class="form-control" name="responsible_department">
+                        <option value="merchandising">Merchandising</option>
+                        <option value="quality">Quality</option>
+                        <option value="production">Production</option>
+                        <option value="logistics">Logistics</option>
+                        <option value="commercial">Commercial</option>
+                        <option value="sampling">Sampling</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="body">Message</label>
+                    <textarea class="form-control" name="body" rows="4"/>
+                </div>
+                <button type="submit" class="btn btn-primary">Send</button>
+            </form>
+        </t>
+    </template>
+
+    <!-- ================================================================
+         Public Buyer Registration (SRS sections 21-22)
+         ================================================================ -->
+    <template id="portal_access_request_form" name="Buyer Portal Registration">
+        <t t-call="web.frontend_layout">
+            <div class="container mt-5 mb-5" style="max-width: 640px;">
+                <h2>Request Buyer Portal Access</h2>
+                <p>Register your company to collaborate with our factory on orders, samples, quality and
+                    shipments without email.</p>
+                <form action="/buyer-portal/register/submit" method="post">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                    <div class="mb-3">
+                        <label for="company_name">Company Name *</label>
+                        <input type="text" class="form-control" name="company_name" required="required"/>
+                    </div>
+                    <div class="mb-3">
+                        <label for="brand_name">Brand Name</label>
+                        <input type="text" class="form-control" name="brand_name"/>
+                    </div>
+                    <div class="mb-3">
+                        <label for="website">Website</label>
+                        <input type="text" class="form-control" name="website"/>
+                    </div>
+                    <div class="mb-3">
+                        <label for="business_category">Business Category</label>
+                        <input type="text" class="form-control" name="business_category"/>
+                    </div>
+                    <div class="mb-3">
+                        <label for="contact_person">Contact Person *</label>
+                        <input type="text" class="form-control" name="contact_person" required="required"/>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email">Email *</label>
+                        <input type="email" class="form-control" name="email" required="required"/>
+                    </div>
+                    <div class="mb-3">
+                        <label for="phone">Phone</label>
+                        <input type="text" class="form-control" name="phone"/>
+                    </div>
+                    <div class="mb-3">
+                        <label for="requested_role">Requested Portal Role</label>
+                        <select class="form-control" name="requested_role">
+                            <option value="buyer_admin">Buyer Admin - Full Buyer Access</option>
+                            <option value="buyer_merchandiser">Buyer Merchandiser - Order &amp; Sample</option>
+                            <option value="buyer_qa">Buyer QA - Quality Data</option>
+                            <option value="buyer_logistics">Buyer Logistics - Shipment Data</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="department">Department</label>
+                        <input type="text" class="form-control" name="department"/>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit Registration Request</button>
+                </form>
+            </div>
+        </t>
+    </template>
+
+    <template id="portal_access_request_thanks" name="Buyer Portal Registration Submitted">
+        <t t-call="web.frontend_layout">
+            <div class="container mt-5 mb-5" style="max-width: 640px;">
+                <h2>Registration Request Received</h2>
+                <p>Thank you. Your request <strong t-esc="access_request.name"/> has been submitted for Sales
+                    Review and Management Approval. You will receive a welcome email once your Buyer Portal
+                    account is created.</p>
+                <a href="/" class="btn btn-primary">Back to Home</a>
+            </div>
+        </t>
+    </template>
+
+</odoo>

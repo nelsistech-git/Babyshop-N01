@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_hr_payroll_tree" model="ir.ui.view">
+        <field name="name">garment.hr.payroll.tree</field>
+        <field name="model">garment.hr.payroll</field>
+        <field name="arch" type="xml">
+            <tree string="Payroll" decoration-success="payment_status == 'paid'">
+                <field name="payslip_number"/>
+                <field name="employee_id"/>
+                <field name="period_start"/>
+                <field name="period_end"/>
+                <field name="gross_earnings"/>
+                <field name="total_deductions"/>
+                <field name="net_salary"/>
+                <field name="payment_status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_hr_payroll_form" model="ir.ui.view">
+        <field name="name">garment.hr.payroll.form</field>
+        <field name="model">garment.hr.payroll</field>
+        <field name="arch" type="xml">
+            <form string="Payslip">
+                <header>
+                    <field name="payment_status" widget="statusbar"/>
+                    <button name="action_pull_salary_structure" type="object" string="Pull From Salary Structure"
+                            class="btn-secondary" invisible="payment_status != 'draft'"/>
+                    <button name="action_pull_attendance" type="object" string="Pull From Attendance"
+                            class="btn-secondary" invisible="payment_status != 'draft'"/>
+                    <button name="action_pull_bonuses_and_incentives" type="object" string="Pull Bonuses/Incentives"
+                            class="btn-secondary" invisible="payment_status != 'draft'"/>
+                    <button name="action_hr_verify" type="object" string="HR Verify" class="btn-primary"
+                            invisible="payment_status != 'draft'"/>
+                    <button name="action_approve" type="object" string="Approve" class="btn-primary"
+                            invisible="payment_status != 'hr_verified'"/>
+                    <button name="action_process" type="object" string="Process" class="btn-primary"
+                            invisible="payment_status != 'approved'"/>
+                    <button name="action_mark_paid" type="object" string="Mark Paid" class="btn-primary"
+                            invisible="payment_status not in ('processed', 'bank_transfer_initiated')"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="payslip_number" readonly="1"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="employee_id"/>
+                            <field name="salary_structure_id"/>
+                            <field name="period_start"/>
+                            <field name="period_end"/>
+                            <field name="currency_id"/>
+                            <field name="bank_account_number"/>
+                        </group>
+                        <group>
+                            <field name="worked_days"/>
+                            <field name="absent_days"/>
+                            <field name="late_minutes_total"/>
+                            <field name="is_below_minimum_wage"/>
+                        </group>
+                    </group>
+                    <group string="Earnings" col="4">
+                        <field name="basic_salary"/>
+                        <field name="house_rent"/>
+                        <field name="medical_allowance"/>
+                        <field name="food_allowance"/>
+                        <field name="transport_allowance"/>
+                        <field name="attendance_bonus"/>
+                        <field name="festival_bonus"/>
+                        <field name="production_incentive_amount"/>
+                        <field name="bonus_type"/>
+                        <field name="bonus_amount"/>
+                    </group>
+                    <group string="Overtime (Bangladesh Labour Act: 2x Hourly Rate)" col="3">
+                        <field name="hourly_rate"/>
+                        <field name="overtime_hours"/>
+                        <field name="overtime_rate_multiplier"/>
+                        <field name="overtime_amount" readonly="1"/>
+                    </group>
+                    <group>
+                        <field name="gross_earnings" readonly="1"/>
+                    </group>
+                    <group string="Deductions" col="3">
+                        <field name="late_deduction"/>
+                        <field name="advance_deduction"/>
+                        <field name="loan_recovery"/>
+                        <field name="tax_deduction"/>
+                        <field name="provident_fund_deduction"/>
+                        <field name="other_deduction"/>
+                    </group>
+                    <group>
+                        <field name="total_deductions" readonly="1"/>
+                        <field name="net_salary" readonly="1" class="oe_subtotal_footer_separator"/>
+                    </group>
+                    <group string="Provident Fund (Employer) &amp; Gratuity Accrual — Informational Only" col="2">
+                        <field name="provident_fund_employer_contribution"/>
+                        <field name="gratuity_accrual" readonly="1"/>
+                    </group>
+                    <group string="Advance Tracking">
+                        <field name="advance_requested"/>
+                        <field name="advance_balance"/>
+                    </group>
+                    <notebook>
+                        <page string="Itemised Bonuses">
+                            <field name="bonus_ids" readonly="1">
+                                <tree>
+                                    <field name="bonus_type"/>
+                                    <field name="period"/>
+                                    <field name="amount"/>
+                                    <field name="status"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Itemised Incentives">
+                            <field name="incentive_ids" readonly="1">
+                                <tree>
+                                    <field name="production_reference"/>
+                                    <field name="extra_output"/>
+                                    <field name="incentive_amount"/>
+                                    <field name="status"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_hr_payroll" model="ir.actions.act_window">
+        <field name="name">Payroll</field>
+        <field name="res_model">garment.hr.payroll</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first payslip.</p>
+        </field>
+    </record>
+
+</odoo>

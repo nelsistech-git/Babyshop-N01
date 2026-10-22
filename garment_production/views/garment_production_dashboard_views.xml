@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_production_order_graph" model="ir.ui.view">
+        <field name="name">garment.production.order.graph</field>
+        <field name="model">garment.production.order</field>
+        <field name="arch" type="xml">
+            <graph string="Production Orders by Status" type="bar">
+                <field name="status"/>
+                <field name="quantity" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_garment_production_order_pivot" model="ir.ui.view">
+        <field name="name">garment.production.order.pivot</field>
+        <field name="model">garment.production.order</field>
+        <field name="arch" type="xml">
+            <pivot string="Production Order Analysis">
+                <field name="production_line_id" type="row"/>
+                <field name="status" type="col"/>
+                <field name="quantity" type="measure"/>
+                <field name="packing_pct" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_garment_production_dashboard" model="ir.actions.act_window">
+        <field name="name">Production Control Room</field>
+        <field name="res_model">garment.production.order</field>
+        <field name="view_mode">graph,pivot,tree</field>
+        <field name="context">{'search_default_filter_running': 1}</field>
+    </record>
+
+    <record id="action_garment_mes_dashboard" model="ir.actions.act_window">
+        <field name="name">MES Live Output Dashboard</field>
+        <field name="res_model">garment.production.entry</field>
+        <field name="view_mode">graph,pivot,tree</field>
+        <field name="context">{'search_default_filter_today': 1, 'search_default_group_line': 1}</field>
+    </record>
+
+</odoo>

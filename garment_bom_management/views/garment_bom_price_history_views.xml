@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_bom_price_history_tree" model="ir.ui.view">
+        <field name="name">garment.bom.price.history.tree</field>
+        <field name="model">garment.bom.price.history</field>
+        <field name="arch" type="xml">
+            <tree string="Material Price History" create="0">
+                <field name="bom_supplier_id" invisible="1"/>
+                <field name="material_reference"/>
+                <field name="supplier_id"/>
+                <field name="previous_price"/>
+                <field name="current_price"/>
+                <field name="price_change_pct"/>
+                <field name="effective_date"/>
+                <field name="changed_by_id"/>
+                <field name="reason"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_bom_price_history_search" model="ir.ui.view">
+        <field name="name">garment.bom.price.history.search</field>
+        <field name="model">garment.bom.price.history</field>
+        <field name="arch" type="xml">
+            <search string="Search Price History">
+                <field name="material_reference"/>
+                <field name="supplier_id"/>
+                <filter string="Price Increase" name="filter_increase" domain="[('price_change_pct', '&gt;', 0)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Material" name="group_material" context="{'group_by': 'material_reference'}"/>
+                    <filter string="Supplier" name="group_supplier" context="{'group_by': 'supplier_id'}"/>
+                    <filter string="Effective Date" name="group_date" context="{'group_by': 'effective_date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_bom_price_history" model="ir.actions.act_window">
+        <field name="name">Material Price History</field>
+        <field name="res_model">garment.bom.price.history</field>
+        <field name="view_mode">tree</field>
+    </record>
+</odoo>

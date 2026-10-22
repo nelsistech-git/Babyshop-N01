@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- garment_analytics_bi already ships its own 11 garment.kpi.definition and
+     4 garment.dashboard.board/tile seed records (see
+     garment_analytics_bi/data/garment_kpi_definition_data.xml and
+     garment_dashboard_board_data.xml) — NOT duplicated here. This file only
+     adds a few garment.kpi.snapshot data points (the fact-table rows the
+     daily ir.cron would otherwise only create the day after install) so the
+     Executive / Production / Finance dashboards have something to chart
+     immediately, computed to be consistent with this module's own demo
+     records:
+       - snap_oee_line1_apr23: matches oee_tee_line1_apr23 in
+         04_production_demo.xml (availability 88.5% x performance 76.4% x
+         quality 98.9% / 10000 = 66.9% OEE) against kpi_def_oee (target 85%)
+         -> Warning status.
+       - snap_quality_score_may04: matches inspection_sewing_tee_3 in
+         04_quality_demo.xml (520 inspected, 6 defective -> 514 passed ->
+         98.85%) against kpi_def_quality_score (target 98%) -> On Target.
+       - snap_avg_fob_price_mar: average of the three approved FOB prices in
+         02_costing_demo.xml (style_tee $3.20, style_polo $4.32, style_hoodie
+         $8.50 -> avg $5.34) against kpi_def_avg_fob_price (monitoring KPI,
+         no fixed target) -> On Target. -->
+<odoo>
+<data noupdate="1">
+
+    <record id="snap_oee_line1_apr23" model="garment.kpi.snapshot">
+        <field name="kpi_id" ref="garment_analytics_bi.kpi_def_oee"/>
+        <field name="period_date">2026-04-23</field>
+        <field name="period_type">daily</field>
+        <field name="date_from">2026-04-23</field>
+        <field name="date_to">2026-04-23</field>
+        <field name="group_label">Sewing Line 1</field>
+        <field name="computed_value">66.9</field>
+        <field name="record_count">1</field>
+        <field name="target_value">85</field>
+        <field name="computation_datetime">2026-04-24 06:05:00</field>
+    </record>
+
+    <record id="snap_quality_score_may04" model="garment.kpi.snapshot">
+        <field name="kpi_id" ref="garment_analytics_bi.kpi_def_quality_score"/>
+        <field name="period_date">2026-05-04</field>
+        <field name="period_type">daily</field>
+        <field name="date_from">2026-05-04</field>
+        <field name="date_to">2026-05-04</field>
+        <field name="computed_value">98.85</field>
+        <field name="record_count">1</field>
+        <field name="target_value">98</field>
+        <field name="computation_datetime">2026-05-05 06:05:00</field>
+    </record>
+
+    <record id="snap_avg_fob_price_mar" model="garment.kpi.snapshot">
+        <field name="kpi_id" ref="garment_analytics_bi.kpi_def_avg_fob_price"/>
+        <field name="period_date">2026-04-01</field>
+        <field name="period_type">monthly</field>
+        <field name="date_from">2026-03-01</field>
+        <field name="date_to">2026-03-31</field>
+        <field name="computed_value">5.34</field>
+        <field name="record_count">3</field>
+        <field name="target_value">0</field>
+        <field name="computation_datetime">2026-04-01 06:15:00</field>
+    </record>
+
+</data>
+</odoo>

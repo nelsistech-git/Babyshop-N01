@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- PLM Dashboard (SRS sections 19, 50): Active Styles / Pending Approvals /
+         Sample Status / Development Delay / Production Ready Styles, built on
+         the garment.plm.project cross-module status record (no data duplicated). -->
+
+    <record id="view_garment_plm_project_graph" model="ir.ui.view">
+        <field name="name">garment.plm.project.graph</field>
+        <field name="model">garment.plm.project</field>
+        <field name="arch" type="xml">
+            <graph string="PLM Projects by Stage" type="bar">
+                <field name="current_stage"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_garment_plm_project_pivot" model="ir.ui.view">
+        <field name="name">garment.plm.project.pivot</field>
+        <field name="model">garment.plm.project</field>
+        <field name="arch" type="xml">
+            <pivot string="PLM Development Analysis">
+                <field name="buyer_id" type="row"/>
+                <field name="current_stage" type="col"/>
+                <field name="id" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_garment_plm_dashboard" model="ir.actions.act_window">
+        <field name="name">PLM Dashboard</field>
+        <field name="res_model">garment.plm.project</field>
+        <field name="view_mode">kanban,graph,pivot,tree,form</field>
+        <field name="search_view_id" ref="view_garment_plm_project_search"/>
+        <field name="context">{'search_default_groupby_stage': 1}</field>
+    </record>
+
+</odoo>

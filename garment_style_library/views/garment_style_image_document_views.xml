@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_style_image_tree" model="ir.ui.view">
+        <field name="name">garment.style.image.tree</field>
+        <field name="model">garment.style.image</field>
+        <field name="arch" type="xml">
+            <tree string="Image Gallery">
+                <field name="style_id"/>
+                <field name="image_category"/>
+                <field name="image_version"/>
+                <field name="uploaded_by_id"/>
+                <field name="upload_date"/>
+                <field name="approval_status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_style_image_form" model="ir.ui.view">
+        <field name="name">garment.style.image.form</field>
+        <field name="model">garment.style.image</field>
+        <field name="arch" type="xml">
+            <form string="Style Image">
+                <sheet>
+                    <field name="image" widget="image" class="oe_avatar"/>
+                    <group>
+                        <group>
+                            <field name="style_id"/>
+                            <field name="image_category"/>
+                            <field name="image_version"/>
+                        </group>
+                        <group>
+                            <field name="uploaded_by_id"/>
+                            <field name="upload_date"/>
+                            <field name="approval_status"/>
+                        </group>
+                    </group>
+                    <field name="notes" placeholder="Image Notes..."/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_style_image" model="ir.actions.act_window">
+        <field name="name">Image Gallery</field>
+        <field name="res_model">garment.style.image</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="view_garment_style_document_tree" model="ir.ui.view">
+        <field name="name">garment.style.document.tree</field>
+        <field name="model">garment.style.document</field>
+        <field name="arch" type="xml">
+            <tree string="Digital Assets">
+                <field name="style_id"/>
+                <field name="name"/>
+                <field name="document_type_id"/>
+                <field name="asset_category"/>
+                <field name="version"/>
+                <field name="tag_ids" widget="many2many_tags"/>
+                <field name="download_permission"/>
+                <field name="approval_status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_style_document_form" model="ir.ui.view">
+        <field name="name">garment.style.document.form</field>
+        <field name="model">garment.style.document</field>
+        <field name="arch" type="xml">
+            <form string="Digital Asset">
+                <sheet>
+                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="style_id"/>
+                            <field name="asset_category"/>
+                            <field name="document_type_id"
+                                   domain="[('category', '=', asset_category)]"/>
+                            <field name="version"/>
+                        </group>
+                        <group>
+                            <field name="tag_ids" widget="many2many_tags"/>
+                            <field name="download_permission"/>
+                            <field name="approval_status"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="thumbnail" widget="image" class="oe_avatar"/>
+                        <field name="file" filename="filename"/>
+                        <field name="filename" invisible="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_style_document" model="ir.actions.act_window">
+        <field name="name">Digital Assets</field>
+        <field name="res_model">garment.style.document</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_report_garment_costing" model="ir.actions.report">
+        <field name="name">Costing Sheet</field>
+        <field name="model">garment.costing</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">garment_costing.report_garment_costing</field>
+        <field name="report_file">garment_costing.report_garment_costing</field>
+        <field name="binding_model_id" ref="model_garment_costing"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'Costing - %s' % (object.costing_number)</field>
+    </record>
+
+    <template id="report_garment_costing">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Costing Sheet <span t-field="o.costing_number"/></h2>
+                        <p class="text-muted">
+                            Style: <span t-field="o.style_id.style_name"/> | Buyer: <span t-field="o.buyer_id.name"/>
+                            | Type: <span t-field="o.costing_type"/> | Status: <span t-field="o.status"/>
+                        </p>
+
+                        <table class="table table-sm">
+                            <tr><td>Fabric Cost</td><td><span t-field="o.fabric_cost"/></td></tr>
+                            <tr><td>Trim Cost</td><td><span t-field="o.trim_cost"/></td></tr>
+                            <tr><td>Packaging Cost</td><td><span t-field="o.packaging_cost"/></td></tr>
+                            <tr><td><strong>Total Material Cost</strong></td><td><strong><span t-field="o.material_cost"/></strong></td></tr>
+                            <tr><td>CM Cost</td><td><span t-field="o.cm_cost"/></td></tr>
+                            <tr><td>Factory Overhead</td><td><span t-field="o.overhead_cost"/></td></tr>
+                            <tr><td>Additional Costs</td><td><span t-field="o.additional_cost_total"/></td></tr>
+                            <tr><td>Profit Amount</td><td><span t-field="o.profit_amount"/></td></tr>
+                            <tr><td><strong>FOB Price (per piece)</strong></td><td><strong><span t-field="o.fob_price"/></strong></td></tr>
+                            <tr><td><strong>Total FOB Value</strong></td><td><strong><span t-field="o.fob_value_total"/></strong></td></tr>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

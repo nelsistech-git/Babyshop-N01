@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_quality_rca_form" model="ir.ui.view">
+        <field name="name">garment.quality.rca.form</field>
+        <field name="model">garment.quality.rca</field>
+        <field name="arch" type="xml">
+            <form string="Root Cause Analysis">
+                <header>
+                    <field name="status" widget="statusbar" statusbar_visible="draft,analysis,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="method"/>
+                            <field name="capa_id"/>
+                            <field name="defect_id"/>
+                        </group>
+                        <group>
+                            <field name="fishbone_category" invisible="method != 'fishbone'"/>
+                            <field name="pareto_rank" invisible="method != 'pareto'"/>
+                            <field name="pareto_percentage" invisible="method != 'pareto'"/>
+                        </group>
+                    </group>
+                    <group string="Problem Statement">
+                        <field name="problem_statement" nolabel="1"/>
+                    </group>
+                    <group string="5 Why Analysis" invisible="method != '5why'">
+                        <field name="why_1"/>
+                        <field name="why_2"/>
+                        <field name="why_3"/>
+                        <field name="why_4"/>
+                        <field name="why_5"/>
+                    </group>
+                    <group string="Root Cause &amp; Recommendation">
+                        <field name="root_cause" nolabel="1" placeholder="Root Cause..."/>
+                        <field name="recommended_action" nolabel="1" placeholder="Recommended Action..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_quality_rca_tree" model="ir.ui.view">
+        <field name="name">garment.quality.rca.tree</field>
+        <field name="model">garment.quality.rca</field>
+        <field name="arch" type="xml">
+            <tree string="Root Cause Analyses">
+                <field name="name"/>
+                <field name="method"/>
+                <field name="capa_id"/>
+                <field name="root_cause"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_quality_rca_search" model="ir.ui.view">
+        <field name="name">garment.quality.rca.search</field>
+        <field name="model">garment.quality.rca</field>
+        <field name="arch" type="xml">
+            <search string="Search RCA">
+                <field name="name"/>
+                <field name="capa_id"/>
+                <group expand="0" string="Group By">
+                    <filter string="Method" name="group_method" context="{'group_by': 'method'}"/>
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_quality_rca" model="ir.actions.act_window">
+        <field name="name">Root Cause Analysis</field>
+        <field name="res_model">garment.quality.rca</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first root cause analysis.</p>
+        </field>
+    </record>
+
+</odoo>

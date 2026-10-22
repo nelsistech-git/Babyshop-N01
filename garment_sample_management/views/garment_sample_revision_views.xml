@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_sample_revision_tree" model="ir.ui.view">
+        <field name="name">garment.sample.revision.tree</field>
+        <field name="model">garment.sample.revision</field>
+        <field name="arch" type="xml">
+            <tree string="Sample Revisions">
+                <field name="sample_id"/>
+                <field name="revision_number"/>
+                <field name="responsible_department"/>
+                <field name="new_sample_date"/>
+                <field name="approval_status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_sample_revision_form" model="ir.ui.view">
+        <field name="name">garment.sample.revision.form</field>
+        <field name="model">garment.sample.revision</field>
+        <field name="arch" type="xml">
+            <form string="Sample Revision">
+                <header>
+                    <field name="approval_status" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="sample_id"/>
+                            <field name="revision_number"/>
+                            <field name="comment_id"/>
+                        </group>
+                        <group>
+                            <field name="responsible_department"/>
+                            <field name="new_sample_date"/>
+                        </group>
+                    </group>
+                    <field name="previous_issue"/>
+                    <field name="correction_action"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_sample_revision" model="ir.actions.act_window">
+        <field name="name">Sample Revisions</field>
+        <field name="res_model">garment.sample.revision</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

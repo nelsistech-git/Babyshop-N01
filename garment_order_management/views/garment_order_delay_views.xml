@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_order_delay_tree" model="ir.ui.view">
+        <field name="name">garment.order.delay.tree</field>
+        <field name="model">garment.order.delay</field>
+        <field name="arch" type="xml">
+            <tree string="Delays" decoration-danger="status == 'open'" decoration-warning="status == 'in_progress'"
+                  decoration-success="status == 'resolved'">
+                <field name="order_id"/>
+                <field name="delay_department"/>
+                <field name="delay_reason"/>
+                <field name="delay_days"/>
+                <field name="start_date"/>
+                <field name="expected_recovery_date"/>
+                <field name="responsible_id"/>
+                <field name="status"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_order_delay_form" model="ir.ui.view">
+        <field name="name">garment.order.delay.form</field>
+        <field name="model">garment.order.delay</field>
+        <field name="arch" type="xml">
+            <form string="Order Delay">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="order_id"/>
+                            <field name="delay_department"/>
+                            <field name="delay_reason"/>
+                            <field name="status"/>
+                        </group>
+                        <group>
+                            <field name="delay_days"/>
+                            <field name="start_date"/>
+                            <field name="expected_recovery_date"/>
+                            <field name="responsible_id"/>
+                        </group>
+                    </group>
+                    <group string="Recovery Plan">
+                        <field name="recovery_plan" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_order_delay" model="ir.actions.act_window">
+        <field name="name">Delays</field>
+        <field name="res_model">garment.order.delay</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

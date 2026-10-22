@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_import_permission_form" model="ir.ui.view">
+        <field name="name">garment.import.permission.form</field>
+        <field name="model">garment.import.permission</field>
+        <field name="arch" type="xml">
+            <form string="Import Permission">
+                <header>
+                    <field name="status" widget="statusbar" statusbar_visible="draft,submitted,approved,utilized"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_ud" type="object" class="oe_stat_button" icon="fa-list-alt">
+                            <field name="ud_count" widget="statinfo" string="UDs"/>
+                        </button>
+                    </div>
+                    <div class="oe_title"><h1><field name="ip_number" readonly="1"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="import_category"/>
+                            <field name="supplier_id"/>
+                            <field name="material_id"/>
+                            <field name="material_description"/>
+                            <field name="btb_lc_id"/>
+                            <field name="bond_license_id"/>
+                        </group>
+                        <group>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="quantity"/>
+                            <field name="uom"/>
+                            <field name="value"/>
+                            <field name="validity_date"/>
+                            <field name="consumed_qty" readonly="1"/>
+                            <field name="remaining_qty" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_import_permission_tree" model="ir.ui.view">
+        <field name="name">garment.import.permission.tree</field>
+        <field name="model">garment.import.permission</field>
+        <field name="arch" type="xml">
+            <tree string="Import Permissions" decoration-danger="remaining_qty &lt; 0">
+                <field name="ip_number"/>
+                <field name="import_category"/>
+                <field name="supplier_id"/>
+                <field name="quantity"/>
+                <field name="remaining_qty"/>
+                <field name="validity_date"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_import_permission_search" model="ir.ui.view">
+        <field name="name">garment.import.permission.search</field>
+        <field name="model">garment.import.permission</field>
+        <field name="arch" type="xml">
+            <search string="Search Import Permissions">
+                <field name="ip_number"/>
+                <field name="supplier_id"/>
+                <field name="btb_lc_id"/>
+                <group expand="0" string="Group By">
+                    <filter string="Import Category" name="group_category" context="{'group_by': 'import_category'}"/>
+                    <filter string="Supplier" name="group_supplier" context="{'group_by': 'supplier_id'}"/>
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_import_permission" model="ir.actions.act_window">
+        <field name="name">Import Permissions (IP)</field>
+        <field name="res_model">garment.import.permission</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first Import Permission.</p>
+        </field>
+    </record>
+
+</odoo>

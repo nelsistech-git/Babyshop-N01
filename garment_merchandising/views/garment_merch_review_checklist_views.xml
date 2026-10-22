@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_merch_review_checklist_tree" model="ir.ui.view">
+        <field name="name">garment.merch.review.checklist.tree</field>
+        <field name="model">garment.merch.review.checklist</field>
+        <field name="arch" type="xml">
+            <tree string="Review Checklists">
+                <field name="inquiry_id"/>
+                <field name="style_id"/>
+                <field name="reviewer_id"/>
+                <field name="review_date"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_merch_review_checklist_form" model="ir.ui.view">
+        <field name="name">garment.merch.review.checklist.form</field>
+        <field name="model">garment.merch.review.checklist</field>
+        <field name="arch" type="xml">
+            <form string="Internal Review Checklist">
+                <header>
+                    <field name="status" widget="statusbar"/>
+                    <button name="action_mark_completed" type="object" string="Mark Completed" class="btn-primary"/>
+                </header>
+                <sheet>
+                    <group>
+                        <field name="inquiry_id"/>
+                        <field name="style_id"/>
+                        <field name="reviewer_id"/>
+                        <field name="review_date"/>
+                    </group>
+                    <group string="Product Review" col="4">
+                        <field name="chk_style_complete"/>
+                        <field name="chk_techpack_verified"/>
+                        <field name="chk_measurement_verified"/>
+                        <field name="chk_artwork_verified"/>
+                        <field name="chk_fabric_requirement_verified"/>
+                        <field name="chk_accessories_verified"/>
+                        <field name="chk_packaging_verified"/>
+                        <field name="chk_testing_requirements_verified"/>
+                    </group>
+                    <group string="Compliance Review" col="4">
+                        <field name="chk_buyer_compliance"/>
+                        <field name="chk_factory_compliance"/>
+                        <field name="chk_chemical_compliance"/>
+                        <field name="chk_sustainability_requirements"/>
+                        <field name="chk_packaging_compliance"/>
+                        <field name="chk_country_regulations"/>
+                    </group>
+                    <group string="Commercial Review" col="4">
+                        <field name="chk_delivery_date_verified"/>
+                        <field name="chk_payment_terms_confirmed"/>
+                        <field name="chk_incoterms_confirmed"/>
+                        <field name="chk_moq_verified"/>
+                        <field name="chk_currency_confirmed"/>
+                    </group>
+                    <field name="remarks"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_merch_review_checklist" model="ir.actions.act_window">
+        <field name="name">Review Checklists</field>
+        <field name="res_model">garment.merch.review.checklist</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

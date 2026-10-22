@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_quality_defect_code_form" model="ir.ui.view">
+        <field name="name">garment.quality.defect.code.form</field>
+        <field name="model">garment.quality.defect.code</field>
+        <field name="arch" type="xml">
+            <form string="Defect Code">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="name"/>
+                            <field name="category"/>
+                            <field name="defect_group"/>
+                        </group>
+                        <group>
+                            <field name="severity"/>
+                            <field name="department"/>
+                            <field name="four_point_value"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <group string="Description">
+                        <field name="description" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_quality_defect_code_tree" model="ir.ui.view">
+        <field name="name">garment.quality.defect.code.tree</field>
+        <field name="model">garment.quality.defect.code</field>
+        <field name="arch" type="xml">
+            <tree string="Defect Codes" editable="bottom">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="category"/>
+                <field name="defect_group"/>
+                <field name="severity" widget="badge" decoration-danger="severity == 'critical'" decoration-warning="severity == 'major'"/>
+                <field name="department"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_quality_defect_code_search" model="ir.ui.view">
+        <field name="name">garment.quality.defect.code.search</field>
+        <field name="model">garment.quality.defect.code</field>
+        <field name="arch" type="xml">
+            <search string="Search Defect Codes">
+                <field name="code"/>
+                <field name="name"/>
+                <filter string="Critical" name="filter_critical" domain="[('severity', '=', 'critical')]"/>
+                <filter string="Major" name="filter_major" domain="[('severity', '=', 'major')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Category" name="group_category" context="{'group_by': 'category'}"/>
+                    <filter string="Severity" name="group_severity" context="{'group_by': 'severity'}"/>
+                    <filter string="Department" name="group_department" context="{'group_by': 'department'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_quality_defect_code" model="ir.actions.act_window">
+        <field name="name">Defect Codes</field>
+        <field name="res_model">garment.quality.defect.code</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first defect code.</p>
+        </field>
+    </record>
+
+</odoo>

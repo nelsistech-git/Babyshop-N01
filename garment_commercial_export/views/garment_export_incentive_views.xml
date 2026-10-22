@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_export_incentive_form" model="ir.ui.view">
+        <field name="name">garment.export.incentive.form</field>
+        <field name="model">garment.export.incentive</field>
+        <field name="arch" type="xml">
+            <form string="Export Incentive">
+                <header>
+                    <field name="approval_status" widget="statusbar"
+                           statusbar_visible="draft,submitted,under_review,approved"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="claim_number" readonly="1"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="export_documentation_id"/>
+                            <field name="shipment_id" readonly="1"/>
+                            <field name="buyer_id" readonly="1"/>
+                            <field name="incentive_type"/>
+                            <field name="incentive_rate"/>
+                        </group>
+                        <group>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="export_value"/>
+                            <field name="claim_amount"/>
+                            <field name="application_date"/>
+                            <field name="bank_id"/>
+                            <field name="received_amount"/>
+                            <field name="received_date"/>
+                            <field name="outstanding_amount" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_export_incentive_tree" model="ir.ui.view">
+        <field name="name">garment.export.incentive.tree</field>
+        <field name="model">garment.export.incentive</field>
+        <field name="arch" type="xml">
+            <tree string="Export Incentives" decoration-success="approval_status == 'approved'">
+                <field name="claim_number"/>
+                <field name="buyer_id"/>
+                <field name="incentive_type"/>
+                <field name="export_value"/>
+                <field name="claim_amount"/>
+                <field name="received_amount"/>
+                <field name="outstanding_amount"/>
+                <field name="approval_status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_export_incentive_search" model="ir.ui.view">
+        <field name="name">garment.export.incentive.search</field>
+        <field name="model">garment.export.incentive</field>
+        <field name="arch" type="xml">
+            <search string="Search Export Incentives">
+                <field name="claim_number"/>
+                <field name="buyer_id"/>
+                <group expand="0" string="Group By">
+                    <filter string="Incentive Type" name="group_type" context="{'group_by': 'incentive_type'}"/>
+                    <filter string="Status" name="group_status" context="{'group_by': 'approval_status'}"/>
+                    <filter string="Buyer" name="group_buyer" context="{'group_by': 'buyer_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_export_incentive" model="ir.actions.act_window">
+        <field name="name">Export Incentives</field>
+        <field name="res_model">garment.export.incentive</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">File your first Export Incentive claim.</p>
+        </field>
+    </record>
+
+</odoo>

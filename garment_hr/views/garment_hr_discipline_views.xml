@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_hr_discipline_tree" model="ir.ui.view">
+        <field name="name">garment.hr.discipline.tree</field>
+        <field name="model">garment.hr.discipline</field>
+        <field name="arch" type="xml">
+            <tree string="Disciplinary Records" decoration-danger="status == 'escalated'" decoration-muted="status == 'resolved'">
+                <field name="employee_id"/>
+                <field name="incident_date"/>
+                <field name="issue_type"/>
+                <field name="action_taken"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_hr_discipline_form" model="ir.ui.view">
+        <field name="name">garment.hr.discipline.form</field>
+        <field name="model">garment.hr.discipline</field>
+        <field name="arch" type="xml">
+            <form string="Disciplinary Record">
+                <header>
+                    <field name="status" widget="statusbar"/>
+                    <button name="action_resolve" type="object" string="Resolve" class="btn-primary"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="employee_id"/>
+                            <field name="incident_date"/>
+                            <field name="issue_type"/>
+                        </group>
+                        <group>
+                            <field name="action_taken"/>
+                            <field name="issued_by_id"/>
+                        </group>
+                    </group>
+                    <field name="description"/>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_hr_discipline" model="ir.actions.act_window">
+        <field name="name">Disciplinary Records</field>
+        <field name="res_model">garment.hr.discipline</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Log your first disciplinary record.</p>
+        </field>
+    </record>
+</odoo>

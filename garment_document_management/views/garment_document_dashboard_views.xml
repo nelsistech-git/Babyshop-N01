@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_document_graph" model="ir.ui.view">
+        <field name="name">garment.document.graph</field>
+        <field name="model">garment.document</field>
+        <field name="arch" type="xml">
+            <graph string="Documents by Status" type="bar">
+                <field name="department"/>
+                <field name="status"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_garment_document_pivot" model="ir.ui.view">
+        <field name="name">garment.document.pivot</field>
+        <field name="model">garment.document</field>
+        <field name="arch" type="xml">
+            <pivot string="Document Analysis">
+                <field name="category_id" type="row"/>
+                <field name="status" type="col"/>
+                <field name="file_size" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_garment_document_dashboard" model="ir.actions.act_window">
+        <field name="name">Document Dashboard</field>
+        <field name="res_model">garment.document</field>
+        <field name="view_mode">graph,pivot,kanban,tree</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_washing_order_tree" model="ir.ui.view">
+        <field name="name">garment.washing.order.tree</field>
+        <field name="model">garment.washing.order</field>
+        <field name="arch" type="xml">
+            <tree string="Washing Orders">
+                <field name="name"/>
+                <field name="production_order_id"/>
+                <field name="style_id"/>
+                <field name="wash_type"/>
+                <field name="quantity"/>
+                <field name="start_date"/>
+                <field name="completion_date"/>
+                <field name="status"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_washing_order_form" model="ir.ui.view">
+        <field name="name">garment.washing.order.form</field>
+        <field name="model">garment.washing.order</field>
+        <field name="arch" type="xml">
+            <form string="Washing Order">
+                <header>
+                    <field name="status" widget="statusbar"
+                           statusbar_visible="draft,garment_received,washing,drying,quality_check,completed"/>
+                    <button name="action_complete" type="object" string="Mark Completed" class="btn-primary"
+                            invisible="status == 'completed'"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="production_order_id"/>
+                            <field name="buyer_id"/>
+                            <field name="style_id"/>
+                            <field name="quantity"/>
+                        </group>
+                        <group>
+                            <field name="wash_type"/>
+                            <field name="recipe_id"/>
+                            <field name="machine_id"/>
+                            <field name="start_date"/>
+                            <field name="completion_date"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Chemical Consumption">
+                            <field name="chemical_line_ids">
+                                <tree editable="bottom">
+                                    <field name="chemical_name"/>
+                                    <field name="material_id"/>
+                                    <field name="batch"/>
+                                    <field name="uom"/>
+                                    <field name="required_qty"/>
+                                    <field name="used_qty"/>
+                                    <field name="variance_qty"/>
+                                    <field name="cost"/>
+                                    <field name="operator_id"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_washing_order" model="ir.actions.act_window">
+        <field name="name">Washing Orders</field>
+        <field name="res_model">garment.washing.order</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

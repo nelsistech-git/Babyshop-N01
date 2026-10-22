@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_ie_line_balance_form" model="ir.ui.view">
+        <field name="name">garment.ie.line.balance.form</field>
+        <field name="model">garment.ie.line.balance</field>
+        <field name="arch" type="xml">
+            <form string="Line Balancing Study">
+                <header>
+                    <button name="action_analyze" type="object" string="Analyze"
+                            class="btn-primary" invisible="status != 'draft'"/>
+                    <button name="action_simulate" type="object" string="Simulate"
+                            class="btn-primary" invisible="status != 'analyzing'"/>
+                    <button name="action_confirm" type="object" string="Confirm Final Line Setup"
+                            class="btn-primary" invisible="status != 'simulated'"/>
+                    <field name="status" widget="statusbar" statusbar_visible="draft,analyzing,simulated,confirmed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="balance_number"/>
+                        <h1><field name="balance_number" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="line_id"/>
+                            <field name="style_id"/>
+                            <field name="production_order_id"/>
+                            <field name="routing_id"/>
+                            <field name="date"/>
+                        </group>
+                        <group>
+                            <field name="target_qty"/>
+                            <field name="working_hours"/>
+                            <field name="efficiency_target"/>
+                        </group>
+                    </group>
+                    <group string="Study Results">
+                        <group>
+                            <field name="total_operators" readonly="1"/>
+                            <field name="required_smv" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="line_capacity_per_hour" readonly="1"/>
+                            <field name="estimated_output_per_day" readonly="1"/>
+                            <field name="projected_efficiency_pct" readonly="1"/>
+                            <field name="bottleneck_line_id" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Operation Allocation">
+                            <field name="allocation_line_ids">
+                                <tree editable="bottom" decoration-danger="is_bottleneck">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="operation_id"/>
+                                    <field name="routing_line_id"/>
+                                    <field name="operator_id"/>
+                                    <field name="operator_efficiency_pct"/>
+                                    <field name="smv"/>
+                                    <field name="allocated_operators"/>
+                                    <field name="required_output_per_hour"/>
+                                    <field name="capacity_per_hour"/>
+                                    <field name="is_bottleneck"/>
+                                    <field name="recommendation"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Recommendation">
+                            <group>
+                                <field name="ai_recommendation" nolabel="1" placeholder="e.g. Assign second operator on Collar Attach"/>
+                                <field name="expected_improvement_pct"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_ie_line_balance_tree" model="ir.ui.view">
+        <field name="name">garment.ie.line.balance.tree</field>
+        <field name="model">garment.ie.line.balance</field>
+        <field name="arch" type="xml">
+            <tree string="Line Balancing Studies">
+                <field name="balance_number"/>
+                <field name="line_id"/>
+                <field name="style_id"/>
+                <field name="date"/>
+                <field name="total_operators"/>
+                <field name="line_capacity_per_hour"/>
+                <field name="projected_efficiency_pct"/>
+                <field name="bottleneck_line_id"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_ie_line_balance_search" model="ir.ui.view">
+        <field name="name">garment.ie.line.balance.search</field>
+        <field name="model">garment.ie.line.balance</field>
+        <field name="arch" type="xml">
+            <search string="Search Line Balancing Studies">
+                <field name="balance_number"/>
+                <field name="line_id"/>
+                <field name="style_id"/>
+                <group expand="0" string="Group By">
+                    <filter string="Line" name="group_line" context="{'group_by': 'line_id'}"/>
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_ie_line_balance" model="ir.actions.act_window">
+        <field name="name">Line Balancing</field>
+        <field name="res_model">garment.ie.line.balance</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Start your first line balancing study.</p>
+        </field>
+    </record>
+
+</odoo>

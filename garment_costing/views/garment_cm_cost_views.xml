@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_cm_cost_tree" model="ir.ui.view">
+        <field name="name">garment.cm.cost.tree</field>
+        <field name="model">garment.cm.cost</field>
+        <field name="arch" type="xml">
+            <tree string="CM Cost Sheets">
+                <field name="costing_id"/>
+                <field name="calculation_mode"/>
+                <field name="total_cm"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_cm_cost_form" model="ir.ui.view">
+        <field name="name">garment.cm.cost.form</field>
+        <field name="model">garment.cm.cost</field>
+        <field name="arch" type="xml">
+            <form string="CM Cost Sheet">
+                <sheet>
+                    <group>
+                        <field name="costing_id"/>
+                        <field name="calculation_mode"/>
+                        <field name="currency_id" invisible="1"/>
+                    </group>
+                    <group string="SMV Based" invisible="calculation_mode != 'smv'">
+                        <field name="smv_minutes"/>
+                        <field name="cost_per_minute"/>
+                    </group>
+                    <group string="Direct Labor" col="4" invisible="calculation_mode != 'components'">
+                        <field name="cutting_cost"/>
+                        <field name="sewing_cost"/>
+                        <field name="finishing_cost"/>
+                        <field name="packing_cost"/>
+                    </group>
+                    <group string="Machine Cost" col="3" invisible="calculation_mode != 'components'">
+                        <field name="machine_hour_cost"/>
+                        <field name="maintenance_cost"/>
+                        <field name="depreciation_cost"/>
+                    </group>
+                    <group string="Factory Overhead" col="5" invisible="calculation_mode != 'components'">
+                        <field name="electricity_cost"/>
+                        <field name="gas_cost"/>
+                        <field name="rent_cost"/>
+                        <field name="admin_cost"/>
+                        <field name="security_cost"/>
+                    </group>
+                    <field name="operation_line_ids">
+                        <tree editable="bottom">
+                            <field name="operation"/>
+                            <field name="description"/>
+                            <field name="line_cost"/>
+                        </tree>
+                    </field>
+                    <group>
+                        <field name="total_cm" readonly="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_cm_cost" model="ir.actions.act_window">
+        <field name="name">CM Cost Sheets</field>
+        <field name="res_model">garment.cm.cost</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

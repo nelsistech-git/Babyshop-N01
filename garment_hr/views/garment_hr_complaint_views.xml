@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_hr_complaint_tree" model="ir.ui.view">
+        <field name="name">garment.hr.complaint.tree</field>
+        <field name="model">garment.hr.complaint</field>
+        <field name="arch" type="xml">
+            <tree string="Complaints" decoration-success="status in ('resolved', 'closed')" decoration-warning="status == 'investigation'">
+                <field name="employee_id"/>
+                <field name="category"/>
+                <field name="submitted_date"/>
+                <field name="assigned_to_id"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_hr_complaint_form" model="ir.ui.view">
+        <field name="name">garment.hr.complaint.form</field>
+        <field name="model">garment.hr.complaint</field>
+        <field name="arch" type="xml">
+            <form string="Employee Complaint">
+                <header>
+                    <field name="status" widget="statusbar"/>
+                    <button name="action_start_review" type="object" string="Start HR Review" class="btn-primary"
+                            invisible="status != 'submitted'"/>
+                    <button name="action_start_investigation" type="object" string="Start Investigation" class="btn-primary"
+                            invisible="status != 'hr_review'"/>
+                    <button name="action_resolve" type="object" string="Resolve" class="btn-primary"
+                            invisible="status != 'investigation'"/>
+                    <button name="action_close" type="object" string="Close" class="btn-secondary"
+                            invisible="status != 'resolved'"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="employee_id"/>
+                            <field name="category"/>
+                            <field name="submitted_date"/>
+                        </group>
+                        <group>
+                            <field name="assigned_to_id"/>
+                        </group>
+                    </group>
+                    <field name="description"/>
+                    <field name="investigation_notes"/>
+                    <field name="resolution_notes"/>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_hr_complaint" model="ir.actions.act_window">
+        <field name="name">Complaints</field>
+        <field name="res_model">garment.hr.complaint</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No complaints on file.</p>
+        </field>
+    </record>
+
+</odoo>

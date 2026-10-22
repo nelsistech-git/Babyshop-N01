@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_techpack_task_tree" model="ir.ui.view">
+        <field name="name">garment.techpack.task.tree</field>
+        <field name="model">garment.techpack.task</field>
+        <field name="arch" type="xml">
+            <tree string="Tasks" editable="bottom" decoration-success="status == 'done'" decoration-danger="status == 'cancelled'">
+                <field name="techpack_id"/>
+                <field name="name"/>
+                <field name="department"/>
+                <field name="assigned_to_id"/>
+                <field name="due_date"/>
+                <field name="priority" widget="priority"/>
+                <field name="completion_percent"/>
+                <field name="status"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_techpack_task_kanban" model="ir.ui.view">
+        <field name="name">garment.techpack.task.kanban</field>
+        <field name="model">garment.techpack.task</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="status" class="o_kanban_small_column">
+                <field name="name"/>
+                <field name="assigned_to_id"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click oe_kanban_card">
+                            <strong><field name="name"/></strong>
+                            <div><field name="assigned_to_id"/></div>
+                            <div class="text-muted"><field name="due_date"/></div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="action_garment_techpack_task" model="ir.actions.act_window">
+        <field name="name">Tasks</field>
+        <field name="res_model">garment.techpack.task</field>
+        <field name="view_mode">kanban,tree,form</field>
+    </record>
+</odoo>

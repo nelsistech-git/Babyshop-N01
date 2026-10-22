@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <record id="module_category_garment_style" model="ir.module.category">
+            <field name="name">Smart Garment ERP - Style Library</field>
+            <field name="sequence">51</field>
+        </record>
+
+        <record id="group_style_designer" model="res.groups">
+            <field name="name">Fashion Designer (Create/Edit Assigned Styles)</field>
+            <field name="category_id" ref="module_category_garment_style"/>
+        </record>
+
+        <record id="group_style_pattern_master" model="res.groups">
+            <field name="name">Pattern Master (Pattern Management)</field>
+            <field name="category_id" ref="module_category_garment_style"/>
+        </record>
+
+        <record id="group_style_cad_operator" model="res.groups">
+            <field name="name">CAD Operator (CAD Upload/Edit)</field>
+            <field name="category_id" ref="module_category_garment_style"/>
+        </record>
+
+        <record id="group_style_merchandiser" model="res.groups">
+            <field name="name">Merchandiser (Read/Create Styles)</field>
+            <field name="category_id" ref="module_category_garment_style"/>
+        </record>
+
+        <record id="group_style_readonly" model="res.groups">
+            <field name="name">Sampling / Quality / Production (Read Access)</field>
+            <field name="category_id" ref="module_category_garment_style"/>
+        </record>
+
+        <record id="group_style_design_manager" model="res.groups">
+            <field name="name">Design Manager (Full Access)</field>
+            <field name="category_id" ref="module_category_garment_style"/>
+            <field name="implied_ids" eval="[(4, ref('group_style_designer')),
+                                              (4, ref('group_style_pattern_master')),
+                                              (4, ref('group_style_cad_operator')),
+                                              (4, ref('group_style_merchandiser'))]"/>
+        </record>
+
+        <record id="group_style_product_dev_manager" model="res.groups">
+            <field name="name">Product Development Manager (Full Access + Configuration)</field>
+            <field name="category_id" ref="module_category_garment_style"/>
+            <field name="implied_ids" eval="[(4, ref('group_style_design_manager'))]"/>
+        </record>
+
+        <record id="group_style_top_management" model="res.groups">
+            <field name="name">Top Management (MD / Merchandising Manager - Full Access)</field>
+            <field name="category_id" ref="module_category_garment_style"/>
+            <field name="implied_ids" eval="[(4, ref('group_style_product_dev_manager'))]"/>
+        </record>
+
+        <!-- Record rule: Designers can edit only assigned styles -->
+        <record id="rule_garment_style_designer_assigned" model="ir.rule">
+            <field name="name">Designer: Assigned Styles Only</field>
+            <field name="model_id" ref="model_garment_style"/>
+            <field name="domain_force">[('designer_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_style_designer'))]"/>
+            <field name="perm_read">1</field>
+            <field name="perm_write">1</field>
+            <field name="perm_create">1</field>
+            <field name="perm_unlink">0</field>
+        </record>
+
+        <record id="rule_garment_style_full_access" model="ir.rule">
+            <field name="name">Full Access Roles: All Styles</field>
+            <field name="model_id" ref="model_garment_style"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_style_design_manager')),
+                                        (4, ref('group_style_merchandiser')),
+                                        (4, ref('group_style_readonly'))]"/>
+        </record>
+
+        <!-- Production users cannot view draft styles -->
+        <record id="rule_garment_style_readonly_no_draft" model="ir.rule">
+            <field name="name">Read-only roles: Hide Draft Styles</field>
+            <field name="model_id" ref="model_garment_style"/>
+            <field name="domain_force">[('status', '!=', 'draft')]</field>
+            <field name="groups" eval="[(4, ref('group_style_readonly'))]"/>
+            <field name="perm_read">1</field>
+            <field name="perm_write">0</field>
+            <field name="perm_create">0</field>
+            <field name="perm_unlink">0</field>
+        </record>
+
+        <!-- Buyers can view only approved styles -->
+        <record id="rule_garment_style_portal_approved_only" model="ir.rule">
+            <field name="name">Portal Buyer: Approved Styles Only</field>
+            <field name="model_id" ref="model_garment_style"/>
+            <field name="domain_force">[('status', 'in', ['approved', 'production_ready']),
+                                        ('buyer_id.partner_id', '=', user.partner_id.id)]</field>
+            <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+            <field name="perm_read">1</field>
+            <field name="perm_write">0</field>
+            <field name="perm_create">0</field>
+            <field name="perm_unlink">0</field>
+        </record>
+
+    </data>
+</odoo>

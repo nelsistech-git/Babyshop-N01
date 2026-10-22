@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_cost_simulation_wizard_form" model="ir.ui.view">
+        <field name="name">garment.cost.simulation.wizard.form</field>
+        <field name="model">garment.cost.simulation.wizard</field>
+        <field name="arch" type="xml">
+            <form string="AI Cost Simulation">
+                <p class="text-muted">
+                    Simulate a cost change (e.g. "What happens if fabric price increases 10%?") without
+                    modifying the actual costing sheet.
+                </p>
+                <group>
+                    <field name="costing_id" readonly="1"/>
+                    <field name="currency_id" invisible="1"/>
+                </group>
+                <group string="Simulated Change">
+                    <field name="material_cost_change_pct"/>
+                    <field name="cm_cost_change_pct"/>
+                    <field name="overhead_cost_change_pct"/>
+                </group>
+                <group string="Result">
+                    <field name="current_fob_price"/>
+                    <field name="simulated_fob_price"/>
+                    <field name="profit_impact"/>
+                    <field name="required_price_adjustment"/>
+                </group>
+                <footer>
+                    <button name="action_apply_as_revision" type="object" string="Create Revision from Simulation" class="btn-primary"/>
+                    <button string="Close" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_cost_simulation_wizard" model="ir.actions.act_window">
+        <field name="name">AI Cost Simulation</field>
+        <field name="res_model">garment.cost.simulation.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

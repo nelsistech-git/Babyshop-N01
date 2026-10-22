@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_purchase_order_form" model="ir.ui.view">
+        <field name="name">garment.purchase.order.form</field>
+        <field name="model">garment.purchase.order</field>
+        <field name="arch" type="xml">
+            <form string="Purchase Order">
+                <header>
+                    <field name="status" widget="statusbar"
+                           statusbar_visible="draft,pending_approval,approved,sent,partially_received,received,closed"/>
+                    <button name="action_submit_for_approval" type="object" string="Submit for Approval" class="btn-primary"
+                            invisible="status != 'draft'"/>
+                    <button name="action_approve" type="object" string="Approve" class="btn-primary"
+                            invisible="status != 'pending_approval'"/>
+                    <button name="action_send_to_supplier" type="object" string="Send to Supplier" class="btn-secondary"
+                            invisible="status != 'approved'"/>
+                    <button name="action_supplier_confirm" type="object" string="Supplier Confirm" class="btn-secondary"
+                            invisible="status != 'sent' or supplier_confirmed"/>
+                    <button name="action_verify_invoice_match" type="object" string="Verify 3-Way Match"
+                            class="btn-secondary" invisible="status not in ('sent','partially_received','received','closed')"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Exception" bg_color="text-bg-danger"
+                            invisible="not requires_exception_approval"/>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_deliveries" type="object" class="oe_stat_button" icon="fa-truck">
+                            <field name="delivery_count" widget="statinfo" string="Deliveries"/>
+                        </button>
+                    </div>
+                    <div class="oe_title"><h1><field name="po_number" readonly="1"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="supplier_id"/>
+                            <field name="requisition_id"/>
+                            <field name="rfq_id"/>
+                            <field name="contract_id"/>
+                            <field name="style_id"/>
+                            <field name="purchase_type"/>
+                        </group>
+                        <group>
+                            <field name="order_date"/>
+                            <field name="delivery_date"/>
+                            <field name="currency_id"/>
+                            <field name="payment_term_id"/>
+                            <field name="incoterm_id"/>
+                            <field name="approval_tier" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Local Purchase (SRS section 27)" invisible="purchase_type != 'local'">
+                        <group>
+                            <field name="delivery_location"/>
+                            <field name="vat_percentage"/>
+                            <field name="vat_amount" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Import Purchase (SRS sections 28-29, 52)" invisible="purchase_type != 'import'">
+                        <group>
+                            <field name="pi_number"/>
+                            <field name="supplier_country_id"/>
+                            <field name="lc_number"/>
+                            <field name="bank_name"/>
+                            <field name="import_stage"/>
+                        </group>
+                        <group>
+                            <field name="shipment_date"/>
+                            <field name="eta_date"/>
+                            <field name="port_of_entry"/>
+                            <field name="freight_cost"/>
+                            <field name="insurance_cost"/>
+                            <field name="cf_charges"/>
+                            <field name="landed_cost" readonly="1"/>
+                        </group>
+                    </group>
+                    <field name="line_ids">
+                        <tree editable="bottom">
+                            <field name="material_category"/>
+                            <field name="material_name"/>
+                            <field name="specification"/>
+                            <field name="quantity"/>
+                            <field name="uom"/>
+                            <field name="unit_price"/>
+                            <field name="previous_price" readonly="1" optional="hide"/>
+                            <field name="saving_pct" readonly="1" optional="hide"/>
+                            <field name="line_total"/>
+                            <field name="delivery_date"/>
+                        </tree>
+                    </field>
+                    <group>
+                        <group>
+                            <field name="total_value" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="department_budget_amount"/>
+                            <field name="budget_status" readonly="1" widget="badge"
+                                   decoration-danger="budget_status == 'exceeded'"/>
+                        </group>
+                    </group>
+                    <group string="Purchase Exception Management (SRS section 43)"
+                           invisible="not requires_exception_approval and not exception_type">
+                        <field name="exception_type" readonly="1"/>
+                        <field name="exception_note" readonly="1" nolabel="1"/>
+                        <field name="requires_exception_approval" readonly="1"/>
+                    </group>
+                    <group string="Purchase Invoice Matching (SRS section 35)">
+                        <group>
+                            <field name="invoice_ids" widget="many2many_tags"/>
+                            <field name="invoiced_amount" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="received_qty_total" readonly="1"/>
+                            <field name="match_status" readonly="1" widget="badge"
+                                   decoration-success="match_status == 'matched'"
+                                   decoration-danger="match_status == 'mismatch'"/>
+                        </group>
+                    </group>
+                    <group string="Supplier Portal Confirmation">
+                        <field name="supplier_confirmed" readonly="1"/>
+                        <field name="supplier_confirmation_date" readonly="1"/>
+                    </group>
+                    <field name="terms_conditions"/>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_purchase_order_tree" model="ir.ui.view">
+        <field name="name">garment.purchase.order.tree</field>
+        <field name="model">garment.purchase.order</field>
+        <field name="arch" type="xml">
+            <tree string="Purchase Orders" decoration-success="status in ('received','closed')"
+                  decoration-danger="requires_exception_approval">
+                <field name="po_number"/>
+                <field name="supplier_id"/>
+                <field name="purchase_type"/>
+                <field name="order_date"/>
+                <field name="total_value"/>
+                <field name="approval_tier"/>
+                <field name="match_status" widget="badge" optional="hide"/>
+                <field name="requires_exception_approval" column_invisible="1"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_purchase_order_search" model="ir.ui.view">
+        <field name="name">garment.purchase.order.search</field>
+        <field name="model">garment.purchase.order</field>
+        <field name="arch" type="xml">
+            <search string="Search Purchase Orders">
+                <field name="po_number"/>
+                <field name="supplier_id"/>
+                <filter string="Pending Approval" name="filter_pending_approval" domain="[('status', '=', 'pending_approval')]"/>
+                <filter string="Has Exception" name="filter_exception" domain="[('requires_exception_approval', '=', True)]"/>
+                <filter string="Import Purchase" name="filter_import" domain="[('purchase_type', '=', 'import')]"/>
+                <filter string="Local Purchase" name="filter_local" domain="[('purchase_type', '=', 'local')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                    <filter string="Supplier" name="group_supplier" context="{'group_by': 'supplier_id'}"/>
+                    <filter string="Purchase Type" name="group_purchase_type" context="{'group_by': 'purchase_type'}"/>
+                    <filter string="Approval Tier" name="group_approval_tier" context="{'group_by': 'approval_tier'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_purchase_order" model="ir.actions.act_window">
+        <field name="name">Purchase Orders</field>
+        <field name="res_model">garment.purchase.order</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first purchase order.</p>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Part of Smart Complete Garment Software. Copyright (c) Nelsis Tech (www.nelsistech.com) -->
+<!--
+     Buyer Portal demo data (garment_buyer_portal) — SRS sections 6-7, 13, 16, 21-22, 46.
+
+     One garment.portal.access.request per buyer contact created in 01_buyer_crm_demo.xml,
+     already approved (portal access granted). Since demo XML writes final field values
+     directly rather than invoking the request's workflow methods (action_approve() also
+     creates/writes a res.users via portal.wizard, which is not appropriate for a data
+     load), a matching res.partner "portal login" contact is created for each buyer contact
+     and linked as `partner_id` on the approved request — mirroring what action_approve()
+     would have produced.
+-->
+<odoo>
+<data noupdate="1">
+
+    <!-- =================================================================
+         Portal login contacts (res.partner) — the buyer-side contacts,
+         extended with the Buyer Portal identity fields from res_partner.py
+         ================================================================= -->
+
+    <record id="portal_partner_northwind_merch" model="res.partner">
+        <field name="name">Emma Whitfield</field>
+        <field name="email">emma.whitfield@northwindapparel.co.uk</field>
+        <field name="phone">+44 7700 900456</field>
+        <field name="company_name">Northwind Apparel Sourcing Ltd</field>
+        <field name="country_id" ref="base.uk"/>
+        <field name="garment_buyer_id" ref="buyer_northwind"/>
+        <field name="garment_portal_role">buyer_merchandiser</field>
+        <field name="garment_portal_department">Merchandising</field>
+    </record>
+
+    <record id="portal_partner_northwind_qa" model="res.partner">
+        <field name="name">James Carter</field>
+        <field name="email">james.carter@northwindapparel.co.uk</field>
+        <field name="phone">+44 7700 900789</field>
+        <field name="company_name">Northwind Apparel Sourcing Ltd</field>
+        <field name="country_id" ref="base.uk"/>
+        <field name="garment_buyer_id" ref="buyer_northwind"/>
+        <field name="garment_portal_role">buyer_qa</field>
+        <field name="garment_portal_department">Quality Assurance</field>
+    </record>
+
+    <record id="portal_partner_baltichaus_merch" model="res.partner">
+        <field name="name">Lena Fischer</field>
+        <field name="email">lena.fischer@baltichaus-fashion.de</field>
+        <field name="phone">+49 172 5566 778</field>
+        <field name="company_name">BalticHaus Fashion GmbH</field>
+        <field name="country_id" ref="base.de"/>
+        <field name="garment_buyer_id" ref="buyer_baltichaus"/>
+        <field name="garment_portal_role">buyer_admin</field>
+        <field name="garment_portal_department">Einkauf (Buying)</field>
+    </record>
+
+    <record id="portal_partner_baltichaus_tech" model="res.partner">
+        <field name="name">Markus Weber</field>
+        <field name="email">markus.weber@baltichaus-fashion.de</field>
+        <field name="phone">+49 172 6677 889</field>
+        <field name="company_name">BalticHaus Fashion GmbH</field>
+        <field name="country_id" ref="base.de"/>
+        <field name="garment_buyer_id" ref="buyer_baltichaus"/>
+        <field name="garment_portal_role">buyer_qa</field>
+        <field name="garment_portal_department">Product Development</field>
+    </record>
+
+    <!-- =================================================================
+         Portal access requests (garment.portal.access.request) — one per
+         buyer contact, already approved / portal access granted.
+         ================================================================= -->
+
+    <record id="portal_request_northwind_merch" model="garment.portal.access.request">
+        <field name="source">manual</field>
+        <field name="buyer_id" ref="buyer_northwind"/>
+        <field name="company_name">Northwind Apparel Sourcing Ltd</field>
+        <field name="brand_name">Northwind</field>
+        <field name="country_id" ref="base.uk"/>
+        <field name="website">https://www.northwindapparel.co.uk</field>
+        <field name="business_category">Buying House</field>
+        <field name="buyer_type">international</field>
+        <field name="contact_person">Emma Whitfield</field>
+        <field name="email">emma.whitfield@northwindapparel.co.uk</field>
+        <field name="phone">+44 7700 900456</field>
+        <field name="requested_role">buyer_merchandiser</field>
+        <field name="department">Merchandising</field>
+        <field name="request_date">2026-02-10</field>
+        <field name="state">approved</field>
+        <field name="reviewed_by_id" ref="base.user_admin"/>
+        <field name="review_date">2026-02-12 09:30:00</field>
+        <field name="partner_id" ref="portal_partner_northwind_merch"/>
+        <field name="welcome_email_sent" eval="True"/>
+    </record>
+
+    <record id="portal_request_northwind_qa" model="garment.portal.access.request">
+        <field name="source">manual</field>
+        <field name="buyer_id" ref="buyer_northwind"/>
+        <field name="company_name">Northwind Apparel Sourcing Ltd</field>
+        <field name="brand_name">Northwind</field>
+        <field name="country_id" ref="base.uk"/>
+        <field name="website">https://www.northwindapparel.co.uk</field>
+        <field name="business_category">Buying House</field>
+        <field name="buyer_type">international</field>
+        <field name="contact_person">James Carter</field>
+        <field name="email">james.carter@northwindapparel.co.uk</field>
+        <field name="phone">+44 7700 900789</field>
+        <field name="requested_role">buyer_qa</field>
+        <field name="department">Quality Assurance</field>
+        <field name="request_date">2026-02-10</field>
+        <field name="state">approved</field>
+        <field name="reviewed_by_id" ref="base.user_admin"/>
+        <field name="review_date">2026-02-12 09:45:00</field>
+        <field name="partner_id" ref="portal_partner_northwind_qa"/>
+        <field name="welcome_email_sent" eval="True"/>
+    </record>
+
+    <record id="portal_request_baltichaus_merch" model="garment.portal.access.request">
+        <field name="source">manual</field>
+        <field name="buyer_id" ref="buyer_baltichaus"/>
+        <field name="company_name">BalticHaus Fashion GmbH</field>
+        <field name="brand_name">BalticHaus</field>
+        <field name="country_id" ref="base.de"/>
+        <field name="website">https://www.baltichaus-fashion.de</field>
+        <field name="business_category">Fashion Brand</field>
+        <field name="buyer_type">international</field>
+        <field name="contact_person">Lena Fischer</field>
+        <field name="email">lena.fischer@baltichaus-fashion.de</field>
+        <field name="phone">+49 172 5566 778</field>
+        <field name="requested_role">buyer_admin</field>
+        <field name="department">Einkauf (Buying)</field>
+        <field name="request_date">2026-02-14</field>
+        <field name="state">approved</field>
+        <field name="reviewed_by_id" ref="base.user_admin"/>
+        <field name="review_date">2026-02-16 11:00:00</field>
+        <field name="partner_id" ref="portal_partner_baltichaus_merch"/>
+        <field name="welcome_email_sent" eval="True"/>
+    </record>
+
+    <record id="portal_request_baltichaus_tech" model="garment.portal.access.request">
+        <field name="source">manual</field>
+        <field name="buyer_id" ref="buyer_baltichaus"/>
+        <field name="company_name">BalticHaus Fashion GmbH</field>
+        <field name="brand_name">BalticHaus</field>
+        <field name="country_id" ref="base.de"/>
+        <field name="website">https://www.baltichaus-fashion.de</field>
+        <field name="business_category">Fashion Brand</field>
+        <field name="buyer_type">international</field>
+        <field name="contact_person">Markus Weber</field>
+        <field name="email">markus.weber@baltichaus-fashion.de</field>
+        <field name="phone">+49 172 6677 889</field>
+        <field name="requested_role">buyer_qa</field>
+        <field name="department">Product Development</field>
+        <field name="request_date">2026-02-14</field>
+        <field name="state">approved</field>
+        <field name="reviewed_by_id" ref="base.user_admin"/>
+        <field name="review_date">2026-02-16 11:15:00</field>
+        <field name="partner_id" ref="portal_partner_baltichaus_tech"/>
+        <field name="welcome_email_sent" eval="True"/>
+    </record>
+
+    <!-- =================================================================
+         Portal messages (garment.portal.message) — buyer asks about the
+         tee order status, factory responds.
+         ================================================================= -->
+
+    <record id="portal_message_northwind_tee_status_inquiry" model="garment.portal.message">
+        <field name="buyer_id" ref="buyer_northwind"/>
+        <field name="partner_id" ref="portal_partner_northwind_merch"/>
+        <field name="direction">inbound</field>
+        <field name="order_id" ref="order_tee"/>
+        <field name="subject">Status update on order NSG-TS-2601 (Men's Crew Neck T-Shirt)</field>
+        <field name="body"><![CDATA[<p>Hi team,</p><p>Could you share the latest production status for order
+NSG-TS-2601? We need an update for our retail partner meeting this Friday — in particular
+whether cutting/sewing is on track for the confirmed ship window.</p><p>Thanks,<br/>Emma</p>]]></field>
+        <field name="responsible_department">merchandising</field>
+        <field name="assigned_user_id" ref="base.user_admin"/>
+        <field name="completion_status">action_taken</field>
+        <field name="message_date">2026-06-10 08:15:00</field>
+        <field name="is_read" eval="True"/>
+    </record>
+
+    <record id="portal_message_northwind_tee_status_response" model="garment.portal.message">
+        <field name="buyer_id" ref="buyer_northwind"/>
+        <field name="author_user_id" ref="base.user_admin"/>
+        <field name="direction">outbound</field>
+        <field name="order_id" ref="order_tee"/>
+        <field name="parent_id" ref="portal_message_northwind_tee_status_inquiry"/>
+        <field name="subject">Re: Status update on order NSG-TS-2601 (Men's Crew Neck T-Shirt)</field>
+        <field name="body"><![CDATA[<p>Hi Emma,</p><p>Cutting is complete for both colorways and Sewing Line 1
+is running the White colorway at plan efficiency; Navy starts on Line 2 tomorrow. We remain on track
+for the confirmed ship window — will send the daily production summary and updated TNA milestones
+by end of week.</p><p>Best regards,<br/>Merchandising Team</p>]]></field>
+        <field name="responsible_department">merchandising</field>
+        <field name="assigned_user_id" ref="base.user_admin"/>
+        <field name="completion_status">response_submitted</field>
+        <field name="message_date">2026-06-11 14:40:00</field>
+        <field name="is_read" eval="False"/>
+    </record>
+
+</data>
+</odoo>

@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<data noupdate="1">
+
+    <!-- Industrial Engineering demo story for style_tee (Men's Crew Neck
+         T-Shirt, NSG-TS-2601): Operation Master -> SMV Master -> Time
+         Study -> Skill Matrix -> Line Balancing. Timeline: IE study
+         conducted Mar-Apr 2026, ahead of the production ramp-up. -->
+
+    <!-- Allowance Types (shared master, used by both SMV and Time Study) -->
+    <record id="ie_allowance_personal" model="garment.ie.allowance.type">
+        <field name="name">Personal Allowance</field>
+        <field name="code">PA</field>
+        <field name="category">personal</field>
+        <field name="default_pct">5.0</field>
+    </record>
+
+    <record id="ie_allowance_fatigue" model="garment.ie.allowance.type">
+        <field name="name">Fatigue Allowance</field>
+        <field name="code">FA</field>
+        <field name="category">fatigue</field>
+        <field name="default_pct">4.0</field>
+    </record>
+
+    <record id="ie_allowance_delay" model="garment.ie.allowance.type">
+        <field name="name">Contingency / Delay Allowance</field>
+        <field name="code">DA</field>
+        <field name="category">delay</field>
+        <field name="default_pct">3.0</field>
+    </record>
+
+    <!-- Operation Master (SRS s.11) - 6 sewing operations for a basic
+         crew-neck tee; cutting/finishing/packing left for other styles. -->
+    <record id="ie_op_neck_rib_attach" model="garment.ie.operation">
+        <field name="operation_code">OP-SEW-010</field>
+        <field name="name">Neck Rib Attach</field>
+        <field name="department">sewing</field>
+        <field name="machine_type">flatlock</field>
+        <field name="skill_required">skilled</field>
+        <field name="standard_smv">0.55</field>
+        <field name="sequence">10</field>
+        <field name="notes">Attach ribbed neck binding to body, flatlock machine.</field>
+    </record>
+
+    <record id="ie_op_shoulder_join" model="garment.ie.operation">
+        <field name="operation_code">OP-SEW-020</field>
+        <field name="name">Shoulder Join</field>
+        <field name="department">sewing</field>
+        <field name="machine_type">overlock</field>
+        <field name="skill_required">intermediate</field>
+        <field name="standard_smv">0.35</field>
+        <field name="sequence">20</field>
+        <field name="notes">Join front and back shoulder seams, 4-thread overlock.</field>
+    </record>
+
+    <record id="ie_op_sleeve_attach" model="garment.ie.operation">
+        <field name="operation_code">OP-SEW-030</field>
+        <field name="name">Sleeve Attach</field>
+        <field name="department">sewing</field>
+        <field name="machine_type">overlock</field>
+        <field name="skill_required">skilled</field>
+        <field name="standard_smv">0.65</field>
+        <field name="sequence">30</field>
+        <field name="notes">Attach set-in sleeve to armhole, both sides.</field>
+    </record>
+
+    <record id="ie_op_side_seam" model="garment.ie.operation">
+        <field name="operation_code">OP-SEW-040</field>
+        <field name="name">Side Seam</field>
+        <field name="department">sewing</field>
+        <field name="machine_type">overlock</field>
+        <field name="skill_required">intermediate</field>
+        <field name="standard_smv">0.60</field>
+        <field name="sequence">40</field>
+        <field name="notes">Close side seam from sleeve hem to bottom hem, both sides.</field>
+    </record>
+
+    <record id="ie_op_bottom_hem" model="garment.ie.operation">
+        <field name="operation_code">OP-SEW-050</field>
+        <field name="name">Bottom Hem</field>
+        <field name="department">sewing</field>
+        <field name="machine_type">flatlock</field>
+        <field name="skill_required">intermediate</field>
+        <field name="standard_smv">0.50</field>
+        <field name="sequence">50</field>
+        <field name="notes">Fold and topstitch bottom hem, flatlock machine.</field>
+    </record>
+
+    <record id="ie_op_label_attach" model="garment.ie.operation">
+        <field name="operation_code">OP-SEW-060</field>
+        <field name="name">Main Label Attach</field>
+        <field name="department">sewing</field>
+        <field name="machine_type">single_needle</field>
+        <field name="skill_required">beginner</field>
+        <field name="standard_smv">0.20</field>
+        <field name="sequence">60</field>
+        <field name="notes">Attach woven main label at back neck, single needle.</field>
+    </record>
+
+    <!-- SMV Master (SRS s.7-9) - one approved SMV per operation for
+         style_tee. Basic time close to the operation's reference SMV,
+         allowance build-up = Personal + Fatigue + Delay = 12%.
+         Sewing-line basic-time sum = 6.95 min; SMV sum = 7.784 min. -->
+    <record id="ie_smv_neck_rib_attach" model="garment.ie.smv">
+        <field name="style_id" ref="style_tee"/>
+        <field name="operation_id" ref="ie_op_neck_rib_attach"/>
+        <field name="machine_type">flatlock</field>
+        <field name="skill_level">skilled</field>
+        <field name="basic_time">1.35</field>
+        <field name="version">1.0</field>
+        <field name="status">approved</field>
+        <field name="approved_date">2026-03-18 10:00:00</field>
+        <field name="allowance_line_ids" eval="[
+            (0, 0, {'allowance_type_id': ref('ie_allowance_personal'), 'percentage': 5.0}),
+            (0, 0, {'allowance_type_id': ref('ie_allowance_fatigue'), 'percentage': 4.0}),
+            (0, 0, {'allowance_type_id': ref('ie_allowance_delay'), 'percentage': 3.0}),
+        ]"/>
+    </record>
+
+    <record id="ie_smv_shoulder_join" model="garment.ie.smv">
+        <field name="style_id" ref="style_tee"/>
+        <field name="operation_id" ref="ie_op_shoulder_join"/>
+        <field name="machine_type">overlock</field>
+        <field name="skill_level">intermediate</field>
+        <field name="basic_time">0.85</field>
+        <field name="version">1.0</field>
+        <field name="status">approved</field>
+        <field name="approved_date">2026-03-18 10:15:00</field>
+        <field name="allowance_line_ids" eval="[
+            (0, 0, {'allowance_type_id': ref('ie_allowance_personal'), 'percentage': 5.0}),
+            (0, 0, {'allowance_type_id': ref('ie_allowance_fatigue'), 'percentage': 4.0}),
+            (0, 0, {'allowance_type_id': ref('ie_allowance_delay'), 'percentage': 3.0}),
+        ]"/>
+    </record>
+
+    <record id="ie_smv_sleeve_attach" model="garment.ie.smv">
+        <field name="style_id" ref="style_tee"/>
+        <field name="operation_id" ref="ie_op_sleeve_attach"/>
+        <field name="machine_type">overlock</field>
+        <field name="skill_level">skilled</field>
+        <field name="basic_time">1.60</field>
+        <field name="version">1.0</field>
+        <field name="status">approved</field>
+        <field name="approved_date">2026-03-18 10:30:00</field>
+        <field name="allowance_line_ids" eval="[
+            (0, 0, {'allowance_type_id': ref('ie_allowance_personal'), 'percentage': 5.0}),
+            (0, 0, {'allowance_type_id': ref('ie_allowance_fatigue'), 'percentage': 4.0}),
+            (0, 0, {'allowance_type_id': ref('ie_allowance_delay'), 'percentage': 3.0}),
+        ]"/>
+    </record>
+
+    <record id="ie_smv_side_seam" model="garment.ie.smv">
+        <field name="style_id" ref="style_tee"/>
+        <field name="operation_id" ref="ie_op_side_seam"/>
+        <field name="machine_type">overlock</field>
+        <field name="skill_level">intermediate</field>
+        <field name="basic_time">1.45</field>
+        <field name="version">1.0</field>
+        <field name="status">approved</field>
+        <field name="approved_date">2026-03-18 10:45:00</field>
+        <field name="allowance_line_ids" eval="[
+            (0, 0, {'allowance_type_id': ref('ie_allowance_personal'), 'percentage': 5.0}),
+            (0, 0, {'allowance_type_id': ref('ie_allowance_fatigue'), 'percentage': 4.0}),
+            (0, 0, {'allowance_type_id': ref('ie_allowance_delay'), 'percentage': 3.0}),
+        ]"/>
+    </record>
+
+    <record id="ie_smv_bottom_hem" model="garment.ie.smv">
+        <field name="style_id" ref="style_tee"/>
+        <field name="operation_id" ref="ie_op_bottom_hem"/>
+        <field name="machine_type">flatlock</field>
+        <field name="skill_level">intermediate</field>
+        <field name="basic_time">1.20</field>
+        <field name="version">1.0</field>
+        <field name="status">approved</field>
+        <field name="approved_date">2026-03-18 11:00:00</field>
+        <field name="allowance_line_ids" eval="[
+            (0, 0, {'allowance_type_id': ref('ie_allowance_personal'), 'percentage': 5.0}),
+            (0, 0, {'allowance_type_id': ref('ie_allowance_fatigue'), 'percentage': 4.0}),
+            (0, 0, {'allowance_type_id': ref('ie_allowance_delay'), 'percentage': 3.0}),
+        ]"/>
+    </record>
+
+    <record id="ie_smv_label_attach" model="garment.ie.smv">
+        <field name="style_id" ref="style_tee"/>
+        <field name="operation_id" ref="ie_op_label_attach"/>
+        <field name="machine_type">single_needle</field>
+        <field name="skill_level">beginner</field>
+        <field name="basic_time">0.50</field>
+        <field name="version">1.0</field>
+        <field name="status">approved</field>
+        <field name="approved_date">2026-03-18 11:10:00</field>
+        <field name="allowance_line_ids" eval="[
+            (0, 0, {'allowance_type_id': ref('ie_allowance_personal'), 'percentage': 5.0}),
+            (0, 0, {'allowance_type_id': ref('ie_allowance_fatigue'), 'percentage': 4.0}),
+            (0, 0, {'allowance_type_id': ref('ie_allowance_delay'), 'percentage': 3.0}),
+        ]"/>
+    </record>
+
+    <!-- Time Study (SRS s.12-16) - stopwatch study on Sleeve Attach,
+         conducted by the IE officer, observing operator_1. -->
+    <record id="ie_time_study_sleeve_attach" model="garment.ie.time.study">
+        <field name="style_id" ref="style_tee"/>
+        <field name="operation_id" ref="ie_op_sleeve_attach"/>
+        <field name="employee_id" ref="emp_operator_1"/>
+        <field name="line_id" ref="line_sewing_1"/>
+        <field name="machine_type">overlock</field>
+        <field name="date">2026-03-20</field>
+        <field name="study_type">stopwatch</field>
+        <field name="status">completed</field>
+        <field name="observation_ids" eval="[
+            (0, 0, {'cycle_no': 1, 'start_time': 0.0, 'end_time': 1.62, 'rating_factor': 100.0, 'remarks': 'Normal pace, first cycle'}),
+            (0, 0, {'cycle_no': 2, 'start_time': 1.62, 'end_time': 3.20, 'rating_factor': 105.0, 'remarks': 'Slightly faster'}),
+            (0, 0, {'cycle_no': 3, 'start_time': 3.20, 'end_time': 4.85, 'rating_factor': 95.0, 'remarks': 'Minor thread break, re-start'}),
+            (0, 0, {'cycle_no': 4, 'start_time': 4.85, 'end_time': 6.42, 'rating_factor': 100.0, 'remarks': 'Steady pace'}),
+            (0, 0, {'cycle_no': 5, 'start_time': 6.42, 'end_time': 7.98, 'rating_factor': 100.0, 'remarks': 'Steady pace'}),
+        ]"/>
+        <field name="allowance_line_ids" eval="[
+            (0, 0, {'allowance_type_id': ref('ie_allowance_personal'), 'percentage': 5.0}),
+            (0, 0, {'allowance_type_id': ref('ie_allowance_fatigue'), 'percentage': 4.0}),
+            (0, 0, {'allowance_type_id': ref('ie_allowance_delay'), 'percentage': 3.0}),
+        ]"/>
+        <field name="smv_id" ref="ie_smv_sleeve_attach"/>
+    </record>
+
+    <!-- Skill Matrix (SRS s.17-19) - one profile per operator, covering
+         a spread of the 6 sewing operations with varying skill/efficiency;
+         operator_1 is the most versatile/expert operator on the line. -->
+    <record id="ie_skill_matrix_operator_1" model="garment.ie.skill.matrix">
+        <field name="employee_id" ref="emp_operator_1"/>
+        <field name="line_ids" eval="[
+            (0, 0, {'operation_id': ref('ie_op_neck_rib_attach'), 'skill_level': 'expert', 'efficiency_pct': 92.0, 'training_status': 'certified', 'certified_date': '2026-02-10', 'last_assessed_date': '2026-03-20'}),
+            (0, 0, {'operation_id': ref('ie_op_shoulder_join'), 'skill_level': 'expert', 'efficiency_pct': 90.0, 'training_status': 'certified', 'certified_date': '2026-02-10', 'last_assessed_date': '2026-03-20'}),
+            (0, 0, {'operation_id': ref('ie_op_sleeve_attach'), 'skill_level': 'expert', 'efficiency_pct': 88.0, 'training_status': 'certified', 'certified_date': '2026-02-10', 'last_assessed_date': '2026-03-20'}),
+            (0, 0, {'operation_id': ref('ie_op_side_seam'), 'skill_level': 'intermediate', 'efficiency_pct': 80.0, 'training_status': 'trained', 'last_assessed_date': '2026-03-20'}),
+        ]"/>
+    </record>
+
+    <record id="ie_skill_matrix_operator_2" model="garment.ie.skill.matrix">
+        <field name="employee_id" ref="emp_operator_2"/>
+        <field name="line_ids" eval="[
+            (0, 0, {'operation_id': ref('ie_op_shoulder_join'), 'skill_level': 'intermediate', 'efficiency_pct': 78.0, 'training_status': 'trained', 'last_assessed_date': '2026-03-20'}),
+            (0, 0, {'operation_id': ref('ie_op_side_seam'), 'skill_level': 'expert', 'efficiency_pct': 91.0, 'training_status': 'certified', 'certified_date': '2026-02-15', 'last_assessed_date': '2026-03-20'}),
+            (0, 0, {'operation_id': ref('ie_op_bottom_hem'), 'skill_level': 'expert', 'efficiency_pct': 87.0, 'training_status': 'certified', 'certified_date': '2026-02-15', 'last_assessed_date': '2026-03-20'}),
+            (0, 0, {'operation_id': ref('ie_op_label_attach'), 'skill_level': 'intermediate', 'efficiency_pct': 82.0, 'training_status': 'trained', 'last_assessed_date': '2026-03-20'}),
+        ]"/>
+    </record>
+
+    <record id="ie_skill_matrix_operator_3" model="garment.ie.skill.matrix">
+        <field name="employee_id" ref="emp_operator_3"/>
+        <field name="line_ids" eval="[
+            (0, 0, {'operation_id': ref('ie_op_neck_rib_attach'), 'skill_level': 'intermediate', 'efficiency_pct': 75.0, 'training_status': 'trained', 'last_assessed_date': '2026-03-20'}),
+            (0, 0, {'operation_id': ref('ie_op_bottom_hem'), 'skill_level': 'intermediate', 'efficiency_pct': 76.0, 'training_status': 'trained', 'last_assessed_date': '2026-03-20'}),
+            (0, 0, {'operation_id': ref('ie_op_label_attach'), 'skill_level': 'beginner', 'efficiency_pct': 60.0, 'training_status': 'in_training', 'last_assessed_date': '2026-03-20'}),
+            (0, 0, {'operation_id': ref('ie_op_sleeve_attach'), 'skill_level': 'beginner', 'efficiency_pct': 55.0, 'training_status': 'in_training', 'last_assessed_date': '2026-03-20'}),
+        ]"/>
+    </record>
+
+    <!-- Line Balancing Study (SRS s.21-25) - allocate the 6 style_tee
+         sewing operations across Sewing Line 1, target 280 pcs/day,
+         8-hour shift (35 pcs/hour required), 70% efficiency target.
+         Sleeve Attach (the longest SMV, single operator) is the
+         bottleneck: 1.792 SMV -> ~33.5 pcs/hour capacity < 35 required. -->
+    <record id="ie_line_balance_tee_line1" model="garment.ie.line.balance">
+        <field name="line_id" ref="line_sewing_1"/>
+        <field name="style_id" ref="style_tee"/>
+        <field name="date">2026-04-02</field>
+        <field name="target_qty">280.0</field>
+        <field name="working_hours">8.0</field>
+        <field name="efficiency_target">70.0</field>
+        <field name="status">confirmed</field>
+        <field name="ai_recommendation">Sleeve Attach is the bottleneck operation at 1.792 SMV with a single operator (~33.5 pcs/hour capacity vs. the 35 pcs/hour required to hit target). Adding a second operator on Sleeve Attach raises line capacity to ~67 pcs/hour and clears the target; alternatively, split the operation into left/right sleeve sub-operations across two skilled operators.</field>
+        <field name="expected_improvement_pct">18.0</field>
+        <field name="allocation_line_ids" eval="[
+            (0, 0, {'sequence': 10, 'operation_id': ref('ie_op_neck_rib_attach'), 'operator_id': ref('emp_operator_3'), 'smv': 1.512, 'allocated_operators': 1, 'required_output_per_hour': 35.0}),
+            (0, 0, {'sequence': 20, 'operation_id': ref('ie_op_shoulder_join'), 'operator_id': ref('emp_operator_1'), 'smv': 0.952, 'allocated_operators': 1, 'required_output_per_hour': 35.0}),
+            (0, 0, {'sequence': 30, 'operation_id': ref('ie_op_sleeve_attach'), 'operator_id': ref('emp_operator_1'), 'smv': 1.792, 'allocated_operators': 1, 'required_output_per_hour': 35.0}),
+            (0, 0, {'sequence': 40, 'operation_id': ref('ie_op_side_seam'), 'operator_id': ref('emp_operator_2'), 'smv': 1.624, 'allocated_operators': 1, 'required_output_per_hour': 35.0}),
+            (0, 0, {'sequence': 50, 'operation_id': ref('ie_op_bottom_hem'), 'operator_id': ref('emp_operator_2'), 'smv': 1.344, 'allocated_operators': 1, 'required_output_per_hour': 35.0}),
+            (0, 0, {'sequence': 60, 'operation_id': ref('ie_op_label_attach'), 'operator_id': ref('emp_operator_3'), 'smv': 0.560, 'allocated_operators': 1, 'required_output_per_hour': 35.0}),
+        ]"/>
+    </record>
+
+</data>
+</odoo>

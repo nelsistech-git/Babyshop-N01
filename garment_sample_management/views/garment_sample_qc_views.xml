@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_sample_qc_tree" model="ir.ui.view">
+        <field name="name">garment.sample.qc.tree</field>
+        <field name="model">garment.sample.qc</field>
+        <field name="arch" type="xml">
+            <tree string="Sample Quality Checks" decoration-success="result == 'pass'" decoration-danger="result == 'fail'">
+                <field name="sample_id"/>
+                <field name="qc_date"/>
+                <field name="qc_by_id"/>
+                <field name="result"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_sample_qc_form" model="ir.ui.view">
+        <field name="name">garment.sample.qc.form</field>
+        <field name="model">garment.sample.qc</field>
+        <field name="arch" type="xml">
+            <form string="Sample Quality Check">
+                <header>
+                    <field name="result" widget="statusbar"/>
+                    <button name="action_pass" type="object" string="Pass" class="btn-primary"/>
+                    <button name="action_fail" type="object" string="Fail" class="btn-secondary"/>
+                </header>
+                <sheet>
+                    <group>
+                        <field name="sample_id"/>
+                        <field name="qc_date"/>
+                        <field name="qc_by_id"/>
+                    </group>
+                    <group string="Measurement" col="4">
+                        <field name="measured_body_length"/>
+                        <field name="measured_chest"/>
+                        <field name="measured_sleeve_length"/>
+                        <field name="measured_collar"/>
+                        <field name="measured_waist"/>
+                        <field name="measured_hip"/>
+                    </group>
+                    <group string="Workmanship" col="4">
+                        <field name="chk_stitch_quality"/>
+                        <field name="chk_seam_quality"/>
+                        <field name="chk_thread_trimming"/>
+                        <field name="chk_label_position"/>
+                        <field name="chk_finishing_quality"/>
+                    </group>
+                    <group string="Appearance" col="4">
+                        <field name="chk_color"/>
+                        <field name="chk_shape"/>
+                        <field name="chk_design"/>
+                        <field name="chk_print"/>
+                        <field name="chk_embroidery"/>
+                    </group>
+                    <field name="remarks"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_sample_qc" model="ir.actions.act_window">
+        <field name="name">Sample Quality Checks</field>
+        <field name="res_model">garment.sample.qc</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Part of Smart Complete Garment Software. Copyright (c) Nelsis Tech (www.nelsistech.com) -->
+<!--
+     Finance (garment_finance): 1 Production cost center + its FY2026
+     budget, the company's negotiating/advising bank account, 1 export
+     Letter of Credit opened by buyer_northwind against order_tee (drawn
+     down to "utilized" once the export documents are accepted), 1 export
+     invoice document under that LC for the tee shipment, 2 vendor
+     payments (Delta Knit's fabric PO, Bright Trims' trims/packaging PO),
+     and 1 buyer receivable tracking the outstanding balance on the tee
+     shipment's export invoice.
+
+     NOTE on "buyer receivable payment inbound": garment.payment (SRS
+     section 14, garment_finance/models/garment_payment.py) is a
+     vendor-payment-only model — supplier_id (Many2one garment.supplier)
+     is required and there is no buyer/receivable-side field on it at
+     all, so a buyer-inbound collection cannot be represented as a
+     garment.payment record without violating the schema. The actual
+     buyer-inbound collection is instead represented the way the schema
+     supports it: as received_amount on the garment.receivable record
+     below (partial collection against the export invoice, leaving the
+     order balance outstanding). Both garment.payment records created
+     here are therefore realistic vendor payments (fabric mill +
+     trims/packaging supplier), matching required_field/model reality
+     over the literal instruction wording.
+
+     Timeline: LC opened Mar 2026 (order_tee confirmed 2026-03-16), vendor
+     payments Apr-Jun 2026, export documents + buyer collection Jun 2026,
+     per DEMO_STORY.md's 2026 timeline and 03_order_demo.xml /
+     03_purchase_demo.xml / 04_logistics_demo.xml / 04_commercial_export_demo.xml.
+-->
+<odoo>
+<data noupdate="1">
+
+    <!-- =================================================================
+         Cost Center — Production (garment.cost.center)
+         ================================================================= -->
+
+    <record id="cost_center_production" model="garment.cost.center">
+        <field name="name">Production Cost Center - Ashulia Unit 1</field>
+        <field name="department">sewing</field>
+        <field name="factory">Nelsis Apparel Ltd. — Ashulia Unit 1</field>
+        <field name="manager_id" ref="base.user_admin"/>
+        <field name="currency_id" ref="base.BDT"/>
+        <field name="monthly_output">42000</field>
+        <field name="active" eval="True"/>
+    </record>
+
+    <!-- =================================================================
+         Budget — Production FY2026 (garment.budget)
+         ================================================================= -->
+
+    <record id="budget_production_2026" model="garment.budget">
+        <field name="name">Production Department Budget FY2026</field>
+        <field name="budget_type">production</field>
+        <field name="cost_center_id" ref="cost_center_production"/>
+        <field name="period_start">2026-01-01</field>
+        <field name="period_end">2026-12-31</field>
+        <field name="currency_id" ref="base.BDT"/>
+        <field name="budgeted_amount">45000000.0</field>
+        <field name="status">monitoring</field>
+    </record>
+
+    <!-- =================================================================
+         Bank Account — company's negotiating/advising bank (garment.bank.account)
+         ================================================================= -->
+
+    <record id="bank_company_main" model="garment.bank.account">
+        <field name="bank_name">Standard Chartered Bank</field>
+        <field name="branch">Gulshan Corporate Branch, Dhaka</field>
+        <field name="account_number">0110-0987654-01</field>
+        <field name="account_type">current</field>
+        <field name="currency_id" ref="base.BDT"/>
+        <field name="swift_code">SCBLBDDX</field>
+        <field name="current_balance">18500000.0</field>
+    </record>
+
+    <!-- =================================================================
+         Letter of Credit — Northwind, export LC for order_tee (garment.lc)
+         ================================================================= -->
+
+    <record id="lc_northwind_tee" model="garment.lc">
+        <field name="lc_number">LC-NW-2026-00457</field>
+        <field name="buyer_id" ref="buyer_northwind"/>
+        <field name="order_confirmation_id" ref="order_confirmation_tee"/>
+        <field name="bank_id" ref="bank_company_main"/>
+        <field name="lc_amount">61200.0</field>
+        <field name="currency_id" ref="base.GBP"/>
+        <field name="issue_date">2026-03-20</field>
+        <field name="expiry_date">2026-07-31</field>
+        <field name="shipment_deadline">2026-06-20</field>
+        <field name="payment_terms">Irrevocable Sight LC — 100% payment at sight against presentation of clean shipping documents</field>
+        <field name="workflow_stage">payment_received</field>
+        <field name="status">utilized</field>
+        <field name="lc_type">export</field>
+        <field name="advising_bank_id" ref="bank_company_main"/>
+        <field name="amendment_count">0</field>
+    </record>
+
+    <!-- =================================================================
+         Export Documentation — Export Invoice for the order_tee shipment,
+         drawn under lc_northwind_tee (garment.export.documentation)
+         ================================================================= -->
+
+    <record id="export_doc_tee_invoice" model="garment.export.documentation">
+        <field name="document_type">export_invoice</field>
+        <field name="shipment_id" ref="shipment_tee_logistics"/>
+        <field name="lc_id" ref="lc_northwind_tee"/>
+        <field name="document_date">2026-06-10</field>
+        <field name="total_quantity">24000</field>
+        <field name="total_cartons">960</field>
+        <field name="total_value">61200.0</field>
+        <field name="currency_id" ref="base.GBP"/>
+        <field name="status">accepted</field>
+        <field name="po_number">NW-PO-2026-1101</field>
+        <field name="hs_code_id" ref="hs_code_tshirt_knit"/>
+        <field name="buyer_document_shared" eval="True"/>
+    </record>
+
+    <!-- =================================================================
+         Vendor Payment 1 — Delta Knit Fabrics, fabric PO (garment.payment)
+         Against the partial 3,600 kg delivery on purchase_order_fabric_tee
+         (GRN-2026-TS-001, delivered 2026-05-14) — fully verified, approved
+         and paid.
+         ================================================================= -->
+
+    <record id="payment_deltaknit_fabric_tee" model="garment.payment">
+        <field name="supplier_id" ref="supplier_deltaknit"/>
+        <field name="invoice_reference">DK-INV-2026-0514</field>
+        <field name="amount">17460.0</field>
+        <field name="currency_id" ref="base.GBP"/>
+        <field name="invoice_date">2026-05-14</field>
+        <field name="due_date">2026-06-13</field>
+        <field name="paid_amount">17460.0</field>
+        <field name="approval_status">approved</field>
+        <field name="verified_by_id" ref="base.user_admin"/>
+        <field name="verified_date">2026-06-08 09:30:00</field>
+        <field name="approved_by_id" ref="base.user_admin"/>
+        <field name="approval_date">2026-06-10 14:00:00</field>
+    </record>
+
+    <!-- =================================================================
+         Vendor Payment 2 — Bright Trims &amp; Accessories, trims/packaging PO
+         (garment.payment). Against purchase_order_trims_tee — invoice
+         verified but still pending management approval, so not yet paid.
+         ================================================================= -->
+
+    <record id="payment_brighttrim_trims_tee" model="garment.payment">
+        <field name="supplier_id" ref="supplier_brighttrim"/>
+        <field name="invoice_reference">BT-INV-2026-0505</field>
+        <field name="amount">780.0</field>
+        <field name="currency_id" ref="base.GBP"/>
+        <field name="invoice_date">2026-05-05</field>
+        <field name="due_date">2026-06-04</field>
+        <field name="paid_amount">0.0</field>
+        <field name="approval_status">pending_approval</field>
+        <field name="verified_by_id" ref="base.user_admin"/>
+        <field name="verified_date">2026-05-20 11:15:00</field>
+    </record>
+
+    <!-- =================================================================
+         Receivable — buyer_northwind, order_tee export invoice balance
+         (garment.receivable). Buyer paid the bulk of the invoice value at
+         sight against export_doc_tee_invoice; the remainder is the
+         outstanding order balance still due.
+         ================================================================= -->
+
+    <record id="receivable_tee_balance" model="garment.receivable">
+        <field name="buyer_id" ref="buyer_northwind"/>
+        <field name="export_invoice_reference">CI-NW-TS-2601-01</field>
+        <field name="shipment_id" ref="shipment_tee_logistics"/>
+        <field name="amount">61200.0</field>
+        <field name="currency_id" ref="base.GBP"/>
+        <field name="invoice_date">2026-06-12</field>
+        <field name="due_date">2026-07-12</field>
+        <field name="received_amount">41200.0</field>
+    </record>
+
+</data>
+</odoo>

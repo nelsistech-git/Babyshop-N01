@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Part of Smart Complete Garment Software. Copyright (c) Nelsis Tech (www.nelsistech.com) -->
+<!--
+     Orders (garment.order) — garment_order_management. One order per style,
+     raised from the Merchandising Order Confirmation created in
+     03_merchandising_demo.xml (order_confirmation_tee / _polo / _hoodie),
+     linked to the BOM (02_bom_demo.xml) and Costing (02_costing_demo.xml)
+     created for the same style. Timeline: orders confirmed March 2026,
+     single shipment window per order in Jun/Jul 2026 (per DEMO_STORY.md).
+-->
+<odoo>
+<data noupdate="1">
+
+    <!-- =================================================================
+         Order — order_tee (Northwind, Men's Crew Neck T-Shirt, 24,000 pcs, GBP)
+         ================================================================= -->
+
+    <record id="order_tee" model="garment.order">
+        <field name="name">ORD-NSG-TS-2601</field>
+        <field name="buyer_po_number">NW-PO-2026-1101</field>
+        <field name="po_date">2026-03-14</field>
+        <field name="buyer_reference">NW-SS26-CoreBasics-Tee</field>
+        <field name="buyer_id" ref="buyer_northwind"/>
+        <field name="brand">Northwind</field>
+        <field name="buying_house">Northwind Apparel Sourcing Ltd</field>
+        <field name="season">Spring/Summer 2026</field>
+        <field name="collection">Core Basics</field>
+        <field name="merch_order_confirmation_id" ref="order_confirmation_tee"/>
+        <field name="style_id" ref="style_tee"/>
+        <field name="bom_id" ref="bom_tee"/>
+        <field name="costing_id" ref="costing_tee"/>
+        <field name="order_date">2026-03-16</field>
+        <field name="delivery_date">2026-06-15</field>
+        <field name="shipment_date">2026-06-10</field>
+        <field name="factory">Nelsis Apparel Ltd. — Ashulia Unit 1</field>
+        <field name="production_unit">Unit 1</field>
+        <field name="merchandiser_id" ref="base.user_admin"/>
+        <field name="currency_id" ref="base.GBP"/>
+        <field name="payment_term_id" ref="account.account_payment_term_30days"/>
+        <field name="shipment_term">fob</field>
+        <field name="delivery_location">Felixstowe, UK</field>
+        <field name="port_of_loading">Chattogram Sea Port, Bangladesh</field>
+        <field name="port_of_destination">Felixstowe, UK</field>
+        <field name="buyer_country_id" ref="base.uk"/>
+        <field name="hs_code">6109.10</field>
+        <field name="export_category">RMG - Knitwear</field>
+        <field name="shipment_mode">sea</field>
+        <field name="forwarder_details">Kuehne+Nagel Bangladesh Ltd.</field>
+        <field name="state">confirmed</field>
+        <field name="is_locked" eval="True"/>
+        <field name="locked_date">2026-03-16 10:30:00</field>
+        <field name="sample_approval_done" eval="True"/>
+        <field name="fabric_consumption_per_pc">0.85</field>
+        <field name="material_status">partial</field>
+        <field name="risk_level">low</field>
+    </record>
+
+    <record id="line_tee_white" model="garment.order.line">
+        <field name="order_id" ref="order_tee"/>
+        <field name="sequence">10</field>
+        <field name="style_id" ref="style_tee"/>
+        <field name="product_name">Crew Neck Tee</field>
+        <field name="color">Optic White</field>
+        <field name="size_set_id" ref="garment_style_library.size_set_international"/>
+        <field name="size_range">S-XXL</field>
+        <field name="quantity">14400</field>
+        <field name="unit_price">2.55</field>
+        <field name="delivery_date">2026-06-15</field>
+        <field name="color_ids" eval="[(0, 0, {
+            'color_name': 'Optic White', 'buyer_color_code': 'WHT', 'factory_color_code': 'White',
+            'pantone_number': '11-0601 TPX', 'shade_group': 'Core', 'lab_dip_reference': 'LD-WHT-01',
+            'approval_status': 'approved', 'approval_date': '2026-02-10',
+        })]"/>
+        <field name="size_ids" eval="[
+            (0, 0, {'sequence': 10, 'size_code': 'S', 'ratio_pct': 15.0, 'quantity': 2160}),
+            (0, 0, {'sequence': 20, 'size_code': 'M', 'ratio_pct': 30.0, 'quantity': 4320}),
+            (0, 0, {'sequence': 30, 'size_code': 'L', 'ratio_pct': 30.0, 'quantity': 4320}),
+            (0, 0, {'sequence': 40, 'size_code': 'XL', 'ratio_pct': 20.0, 'quantity': 2880}),
+            (0, 0, {'sequence': 50, 'size_code': 'XXL', 'ratio_pct': 5.0, 'quantity': 720}),
+        ]"/>
+    </record>
+
+    <record id="line_tee_navy" model="garment.order.line">
+        <field name="order_id" ref="order_tee"/>
+        <field name="sequence">20</field>
+        <field name="style_id" ref="style_tee"/>
+        <field name="product_name">Crew Neck Tee</field>
+        <field name="color">Navy</field>
+        <field name="size_set_id" ref="garment_style_library.size_set_international"/>
+        <field name="size_range">S-XXL</field>
+        <field name="quantity">9600</field>
+        <field name="unit_price">2.55</field>
+        <field name="delivery_date">2026-06-15</field>
+        <field name="color_ids" eval="[(0, 0, {
+            'color_name': 'Navy', 'buyer_color_code': 'NVY', 'factory_color_code': 'Navy Blue',
+            'pantone_number': '19-3832 TPX', 'shade_group': 'Core', 'lab_dip_reference': 'LD-NVY-01',
+            'approval_status': 'approved', 'approval_date': '2026-02-10',
+        })]"/>
+        <field name="size_ids" eval="[
+            (0, 0, {'sequence': 10, 'size_code': 'S', 'ratio_pct': 15.0, 'quantity': 1440}),
+            (0, 0, {'sequence': 20, 'size_code': 'M', 'ratio_pct': 30.0, 'quantity': 2880}),
+            (0, 0, {'sequence': 30, 'size_code': 'L', 'ratio_pct': 30.0, 'quantity': 2880}),
+            (0, 0, {'sequence': 40, 'size_code': 'XL', 'ratio_pct': 20.0, 'quantity': 1920}),
+            (0, 0, {'sequence': 50, 'size_code': 'XXL', 'ratio_pct': 5.0, 'quantity': 480}),
+        ]"/>
+    </record>
+
+    <record id="shipment_tee_1" model="garment.order.shipment">
+        <field name="order_id" ref="order_tee"/>
+        <field name="sequence">10</field>
+        <field name="planned_date">2026-06-10</field>
+        <field name="shipment_qty">24000</field>
+        <field name="shipped_qty">0</field>
+        <field name="status">planned</field>
+        <field name="port_of_loading">Chattogram Sea Port, Bangladesh</field>
+        <field name="port_of_destination">Felixstowe, UK</field>
+        <field name="shipment_mode">sea</field>
+        <field name="remarks">Single shipment window covering the full 24,000-pc order, per Northwind SS26 Core
+Basics delivery schedule.</field>
+    </record>
+
+    <!-- =================================================================
+         Order — order_polo (Northwind, Classic Pique Polo, 18,000 pcs, GBP)
+         ================================================================= -->
+
+    <record id="order_polo" model="garment.order">
+        <field name="name">ORD-NSG-PL-2602</field>
+        <field name="buyer_po_number">NW-PO-2026-1102</field>
+        <field name="po_date">2026-03-14</field>
+        <field name="buyer_reference">NW-SS26-CoreBasics-Polo</field>
+        <field name="buyer_id" ref="buyer_northwind"/>
+        <field name="brand">Northwind</field>
+        <field name="buying_house">Northwind Apparel Sourcing Ltd</field>
+        <field name="season">Spring/Summer 2026</field>
+        <field name="collection">Core Basics</field>
+        <field name="merch_order_confirmation_id" ref="order_confirmation_polo"/>
+        <field name="style_id" ref="style_polo"/>
+        <field name="bom_id" ref="bom_polo"/>
+        <field name="costing_id" ref="costing_polo"/>
+        <field name="order_date">2026-03-18</field>
+        <field name="delivery_date">2026-06-22</field>
+        <field name="shipment_date">2026-06-17</field>
+        <field name="factory">Nelsis Apparel Ltd. — Ashulia Unit 1</field>
+        <field name="production_unit">Unit 1</field>
+        <field name="merchandiser_id" ref="base.user_admin"/>
+        <field name="currency_id" ref="base.GBP"/>
+        <field name="payment_term_id" ref="account.account_payment_term_30days"/>
+        <field name="shipment_term">fob</field>
+        <field name="delivery_location">Felixstowe, UK</field>
+        <field name="port_of_loading">Chattogram Sea Port, Bangladesh</field>
+        <field name="port_of_destination">Felixstowe, UK</field>
+        <field name="buyer_country_id" ref="base.uk"/>
+        <field name="hs_code">6105.10</field>
+        <field name="export_category">RMG - Knitwear</field>
+        <field name="shipment_mode">sea</field>
+        <field name="forwarder_details">Kuehne+Nagel Bangladesh Ltd.</field>
+        <field name="state">confirmed</field>
+        <field name="is_locked" eval="True"/>
+        <field name="locked_date">2026-03-18 11:15:00</field>
+        <field name="sample_approval_done" eval="True"/>
+        <field name="fabric_consumption_per_pc">0.95</field>
+        <field name="material_status">partial</field>
+        <field name="risk_level">low</field>
+    </record>
+
+    <record id="line_polo_bottle_green" model="garment.order.line">
+        <field name="order_id" ref="order_polo"/>
+        <field name="sequence">10</field>
+        <field name="style_id" ref="style_polo"/>
+        <field name="product_name">Pique Polo Shirt</field>
+        <field name="color">Bottle Green</field>
+        <field name="size_set_id" ref="garment_style_library.size_set_international"/>
+        <field name="size_range">S-XXL</field>
+        <field name="quantity">10800</field>
+        <field name="unit_price">3.45</field>
+        <field name="delivery_date">2026-06-22</field>
+        <field name="color_ids" eval="[(0, 0, {
+            'color_name': 'Bottle Green', 'buyer_color_code': 'BTG', 'factory_color_code': 'Bottle Green',
+            'pantone_number': '19-5917 TPX', 'shade_group': 'Core', 'lab_dip_reference': 'LD-BTG-01',
+            'approval_status': 'approved', 'approval_date': '2026-02-14',
+        })]"/>
+        <field name="size_ids" eval="[
+            (0, 0, {'sequence': 10, 'size_code': 'S', 'ratio_pct': 15.0, 'quantity': 1620}),
+            (0, 0, {'sequence': 20, 'size_code': 'M', 'ratio_pct': 30.0, 'quantity': 3240}),
+            (0, 0, {'sequence': 30, 'size_code': 'L', 'ratio_pct': 30.0, 'quantity': 3240}),
+            (0, 0, {'sequence': 40, 'size_code': 'XL', 'ratio_pct': 20.0, 'quantity': 2160}),
+            (0, 0, {'sequence': 50, 'size_code': 'XXL', 'ratio_pct': 5.0, 'quantity': 540}),
+        ]"/>
+    </record>
+
+    <record id="line_polo_white" model="garment.order.line">
+        <field name="order_id" ref="order_polo"/>
+        <field name="sequence">20</field>
+        <field name="style_id" ref="style_polo"/>
+        <field name="product_name">Pique Polo Shirt</field>
+        <field name="color">White</field>
+        <field name="size_set_id" ref="garment_style_library.size_set_international"/>
+        <field name="size_range">S-XXL</field>
+        <field name="quantity">7200</field>
+        <field name="unit_price">3.45</field>
+        <field name="delivery_date">2026-06-22</field>
+        <field name="color_ids" eval="[(0, 0, {
+            'color_name': 'White', 'buyer_color_code': 'WHT', 'factory_color_code': 'White',
+            'pantone_number': '11-0601 TPX', 'shade_group': 'Core', 'lab_dip_reference': 'LD-WHT-02',
+            'approval_status': 'approved', 'approval_date': '2026-02-14',
+        })]"/>
+        <field name="size_ids" eval="[
+            (0, 0, {'sequence': 10, 'size_code': 'S', 'ratio_pct': 15.0, 'quantity': 1080}),
+            (0, 0, {'sequence': 20, 'size_code': 'M', 'ratio_pct': 30.0, 'quantity': 2160}),
+            (0, 0, {'sequence': 30, 'size_code': 'L', 'ratio_pct': 30.0, 'quantity': 2160}),
+            (0, 0, {'sequence': 40, 'size_code': 'XL', 'ratio_pct': 20.0, 'quantity': 1440}),
+            (0, 0, {'sequence': 50, 'size_code': 'XXL', 'ratio_pct': 5.0, 'quantity': 360}),
+        ]"/>
+    </record>
+
+    <record id="shipment_polo_1" model="garment.order.shipment">
+        <field name="order_id" ref="order_polo"/>
+        <field name="sequence">10</field>
+        <field name="planned_date">2026-06-17</field>
+        <field name="shipment_qty">18000</field>
+        <field name="shipped_qty">0</field>
+        <field name="status">planned</field>
+        <field name="port_of_loading">Chattogram Sea Port, Bangladesh</field>
+        <field name="port_of_destination">Felixstowe, UK</field>
+        <field name="shipment_mode">sea</field>
+        <field name="remarks">Single shipment window covering the full 18,000-pc order, per Northwind SS26 Core
+Basics delivery schedule.</field>
+    </record>
+
+    <!-- =================================================================
+         Order — order_hoodie (BalticHaus, Fleece Zip Hoodie, 12,000 pcs, EUR)
+         ================================================================= -->
+
+    <record id="order_hoodie" model="garment.order">
+        <field name="name">ORD-NSG-HD-2603</field>
+        <field name="buyer_po_number">BH-PO-2026-2201</field>
+        <field name="po_date">2026-03-21</field>
+        <field name="buyer_reference">BH-AW26-UrbanFleece-Hoodie</field>
+        <field name="buyer_id" ref="buyer_baltichaus"/>
+        <field name="brand">BalticHaus</field>
+        <field name="season">Autumn/Winter 2026</field>
+        <field name="collection">Urban Fleece</field>
+        <field name="merch_order_confirmation_id" ref="order_confirmation_hoodie"/>
+        <field name="style_id" ref="style_hoodie"/>
+        <field name="bom_id" ref="bom_hoodie"/>
+        <field name="costing_id" ref="costing_hoodie"/>
+        <field name="order_date">2026-03-23</field>
+        <field name="delivery_date">2026-07-20</field>
+        <field name="shipment_date">2026-07-13</field>
+        <field name="factory">Nelsis Apparel Ltd. — Ashulia Unit 1</field>
+        <field name="production_unit">Unit 1</field>
+        <field name="merchandiser_id" ref="base.user_admin"/>
+        <field name="currency_id" ref="base.EUR"/>
+        <field name="payment_term_id" ref="account.account_payment_term_45days"/>
+        <field name="shipment_term">cif</field>
+        <field name="delivery_location">Hamburg, Germany</field>
+        <field name="port_of_loading">Chattogram Sea Port, Bangladesh</field>
+        <field name="port_of_destination">Hamburg, Germany</field>
+        <field name="buyer_country_id" ref="base.de"/>
+        <field name="hs_code">6110.20</field>
+        <field name="export_category">RMG - Knit/Fleece</field>
+        <field name="shipment_mode">sea</field>
+        <field name="forwarder_details">DB Schenker Bangladesh Ltd.</field>
+        <field name="state">confirmed</field>
+        <field name="is_locked" eval="True"/>
+        <field name="locked_date">2026-03-23 09:45:00</field>
+        <field name="sample_approval_done" eval="True"/>
+        <field name="fabric_consumption_per_pc">1.65</field>
+        <field name="material_status">shortage</field>
+        <field name="risk_level">medium</field>
+    </record>
+
+    <record id="line_hoodie_charcoal" model="garment.order.line">
+        <field name="order_id" ref="order_hoodie"/>
+        <field name="sequence">10</field>
+        <field name="style_id" ref="style_hoodie"/>
+        <field name="product_name">Full-Zip Fleece Hoodie</field>
+        <field name="color">Charcoal</field>
+        <field name="size_set_id" ref="garment_style_library.size_set_international"/>
+        <field name="size_range">XS-XXL</field>
+        <field name="quantity">7200</field>
+        <field name="unit_price">7.95</field>
+        <field name="delivery_date">2026-07-20</field>
+        <field name="color_ids" eval="[(0, 0, {
+            'color_name': 'Charcoal', 'buyer_color_code': 'CHR', 'factory_color_code': 'Charcoal Grey',
+            'pantone_number': '19-4007 TPX', 'shade_group': 'Earth Tones', 'lab_dip_reference': 'LD-CHR-01',
+            'approval_status': 'approved', 'approval_date': '2026-02-20',
+        })]"/>
+        <field name="size_ids" eval="[
+            (0, 0, {'sequence': 10, 'size_code': 'XS', 'ratio_pct': 10.0, 'quantity': 720}),
+            (0, 0, {'sequence': 20, 'size_code': 'S', 'ratio_pct': 20.0, 'quantity': 1440}),
+            (0, 0, {'sequence': 30, 'size_code': 'M', 'ratio_pct': 30.0, 'quantity': 2160}),
+            (0, 0, {'sequence': 40, 'size_code': 'L', 'ratio_pct': 25.0, 'quantity': 1800}),
+            (0, 0, {'sequence': 50, 'size_code': 'XL', 'ratio_pct': 10.0, 'quantity': 720}),
+            (0, 0, {'sequence': 60, 'size_code': 'XXL', 'ratio_pct': 5.0, 'quantity': 360}),
+        ]"/>
+    </record>
+
+    <record id="line_hoodie_olive" model="garment.order.line">
+        <field name="order_id" ref="order_hoodie"/>
+        <field name="sequence">20</field>
+        <field name="style_id" ref="style_hoodie"/>
+        <field name="product_name">Full-Zip Fleece Hoodie</field>
+        <field name="color">Olive</field>
+        <field name="size_set_id" ref="garment_style_library.size_set_international"/>
+        <field name="size_range">XS-XXL</field>
+        <field name="quantity">4800</field>
+        <field name="unit_price">7.95</field>
+        <field name="delivery_date">2026-07-20</field>
+        <field name="color_ids" eval="[(0, 0, {
+            'color_name': 'Olive', 'buyer_color_code': 'OLV', 'factory_color_code': 'Olive Green',
+            'pantone_number': '18-0316 TPX', 'shade_group': 'Earth Tones', 'lab_dip_reference': 'LD-OLV-01',
+            'approval_status': 'approved', 'approval_date': '2026-02-20',
+        })]"/>
+        <field name="size_ids" eval="[
+            (0, 0, {'sequence': 10, 'size_code': 'XS', 'ratio_pct': 10.0, 'quantity': 480}),
+            (0, 0, {'sequence': 20, 'size_code': 'S', 'ratio_pct': 20.0, 'quantity': 960}),
+            (0, 0, {'sequence': 30, 'size_code': 'M', 'ratio_pct': 30.0, 'quantity': 1440}),
+            (0, 0, {'sequence': 40, 'size_code': 'L', 'ratio_pct': 25.0, 'quantity': 1200}),
+            (0, 0, {'sequence': 50, 'size_code': 'XL', 'ratio_pct': 10.0, 'quantity': 480}),
+            (0, 0, {'sequence': 60, 'size_code': 'XXL', 'ratio_pct': 5.0, 'quantity': 240}),
+        ]"/>
+    </record>
+
+    <record id="shipment_hoodie_1" model="garment.order.shipment">
+        <field name="order_id" ref="order_hoodie"/>
+        <field name="sequence">10</field>
+        <field name="planned_date">2026-07-13</field>
+        <field name="shipment_qty">12000</field>
+        <field name="shipped_qty">0</field>
+        <field name="status">planned</field>
+        <field name="port_of_loading">Chattogram Sea Port, Bangladesh</field>
+        <field name="port_of_destination">Hamburg, Germany</field>
+        <field name="shipment_mode">sea</field>
+        <field name="remarks">Single shipment window covering the full 12,000-pc order, per BalticHaus AW26 Urban
+Fleece delivery schedule.</field>
+    </record>
+
+</data>
+</odoo>

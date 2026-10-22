@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_report_garment_sample" model="ir.actions.report">
+        <field name="name">Sample Tracking Sheet</field>
+        <field name="model">garment.sample</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">garment_sample_management.report_garment_sample</field>
+        <field name="report_file">garment_sample_management.report_garment_sample</field>
+        <field name="binding_model_id" ref="model_garment_sample"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'Sample - %s' % (object.sample_number)</field>
+    </record>
+
+    <template id="report_garment_sample">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Sample <span t-field="o.sample_number"/></h2>
+                        <p class="text-muted">
+                            Style: <span t-field="o.style_id.style_name"/> | Buyer: <span t-field="o.buyer_id.name"/>
+                            | Type: <span t-field="o.sample_type_id.name"/> | Status: <span t-field="o.status"/>
+                        </p>
+
+                        <h4>Development Plan</h4>
+                        <table class="table table-sm">
+                            <thead><tr><th>Activity</th><th>Responsible</th><th>Start</th><th>End</th><th>Status</th></tr></thead>
+                            <tbody>
+                                <tr t-foreach="o.activity_line_ids" t-as="act">
+                                    <td><span t-field="act.activity_type"/></td>
+                                    <td><span t-field="act.responsible_person_id.name"/></td>
+                                    <td><span t-field="act.start_date"/></td>
+                                    <td><span t-field="act.end_date"/></td>
+                                    <td><span t-field="act.status"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4>Quality Check Summary</h4>
+                        <table class="table table-sm">
+                            <thead><tr><th>Date</th><th>Checked By</th><th>Result</th></tr></thead>
+                            <tbody>
+                                <tr t-foreach="o.qc_ids" t-as="qc">
+                                    <td><span t-field="qc.qc_date"/></td>
+                                    <td><span t-field="qc.qc_by_id.name"/></td>
+                                    <td><span t-field="qc.result"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4>Cost Summary</h4>
+                        <table class="table table-sm">
+                            <tr t-foreach="o.cost_ids" t-as="cost">
+                                <td>Total Sample Cost: <span t-field="cost.total_cost"/></td>
+                                <td>Status: <span t-field="cost.state"/></td>
+                            </tr>
+                        </table>
+
+                        <h4>Buyer Comments</h4>
+                        <table class="table table-sm">
+                            <thead><tr><th>Date</th><th>Comment</th><th>Status</th></tr></thead>
+                            <tbody>
+                                <tr t-foreach="o.comment_ids" t-as="cm">
+                                    <td><span t-field="cm.comment_date"/></td>
+                                    <td><span t-field="cm.comment_description"/></td>
+                                    <td><span t-field="cm.completion_status"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!-- Sample Submission Form (SRS section 43): Sample Details, Courier Information,
+         Buyer Information, Approval Reference. -->
+    <record id="action_report_garment_sample_submission" model="ir.actions.report">
+        <field name="name">Sample Submission Form</field>
+        <field name="model">garment.sample.courier</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">garment_sample_management.report_garment_sample_submission</field>
+        <field name="report_file">garment_sample_management.report_garment_sample_submission</field>
+        <field name="binding_model_id" ref="model_garment_sample_courier"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'Submission - %s' % (object.courier_number)</field>
+    </record>
+
+    <template id="report_garment_sample_submission">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Sample Submission Form <span t-field="o.courier_number"/></h2>
+                        <h4>Sample Details</h4>
+                        <table class="table table-sm">
+                            <tr><td>Sample Number</td><td><span t-field="o.sample_id.sample_number"/></td></tr>
+                            <tr><td>Style</td><td><span t-field="o.sample_id.style_id.style_name"/></td></tr>
+                            <tr><td>Sample Type</td><td><span t-field="o.sample_id.sample_type_id.name"/></td></tr>
+                        </table>
+                        <h4>Buyer Information</h4>
+                        <table class="table table-sm">
+                            <tr><td>Buyer</td><td><span t-field="o.buyer_id.name"/></td></tr>
+                            <tr><td>Destination Country</td><td><span t-field="o.destination_country_id.name"/></td></tr>
+                            <tr><td>Buyer Address</td><td><span t-field="o.buyer_address"/></td></tr>
+                        </table>
+                        <h4>Courier Information</h4>
+                        <table class="table table-sm">
+                            <tr><td>Courier Company</td><td><span t-field="o.courier_company"/></td></tr>
+                            <tr><td>Tracking Number</td><td><span t-field="o.tracking_number"/></td></tr>
+                            <tr><td>Dispatch Date</td><td><span t-field="o.dispatch_date"/></td></tr>
+                            <tr><td>Expected Delivery Date</td><td><span t-field="o.expected_delivery_date"/></td></tr>
+                            <tr><td>Submitted By</td><td><span t-field="o.submitted_by_id.name"/></td></tr>
+                        </table>
+                        <h4>Approval Reference</h4>
+                        <table class="table table-sm">
+                            <thead><tr><th>Stage</th><th>Type</th><th>Approver</th><th>Status</th></tr></thead>
+                            <tbody>
+                                <tr t-foreach="o.sample_id.approval_ids" t-as="ap">
+                                    <td><span t-field="ap.approval_stage"/></td>
+                                    <td><span t-field="ap.approval_type"/></td>
+                                    <td><span t-field="ap.approver_id.name"/></td>
+                                    <td><span t-field="ap.status"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!-- Sample Approval Certificate (SRS section 43): Style, Sample Type, Version,
+         Approval Signature, Date. -->
+    <record id="action_report_garment_sample_approval_certificate" model="ir.actions.report">
+        <field name="name">Sample Approval Certificate</field>
+        <field name="model">garment.sample</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">garment_sample_management.report_garment_sample_approval_certificate</field>
+        <field name="report_file">garment_sample_management.report_garment_sample_approval_certificate</field>
+        <field name="binding_model_id" ref="model_garment_sample"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'Approval Certificate - %s' % (object.sample_number)</field>
+    </record>
+
+    <template id="report_garment_sample_approval_certificate">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Sample Approval Certificate</h2>
+                        <table class="table table-sm">
+                            <tr><td>Sample Number</td><td><span t-field="o.sample_number"/></td></tr>
+                            <tr><td>Style</td><td><span t-field="o.style_id.style_name"/></td></tr>
+                            <tr><td>Sample Type</td><td><span t-field="o.sample_type_id.name"/></td></tr>
+                            <tr><td>Buyer</td><td><span t-field="o.buyer_id.name"/></td></tr>
+                            <tr><td>Pattern Version</td><td><span t-field="o.pattern_version"/></td></tr>
+                            <tr><td>Buyer Approval State</td><td><span t-field="o.approval_state"/></td></tr>
+                        </table>
+                        <h4>Approval Signatures</h4>
+                        <table class="table table-sm">
+                            <thead><tr><th>Approval Type</th><th>Approver</th><th>Date</th><th>Decision</th></tr></thead>
+                            <tbody>
+                                <tr t-foreach="o.approval_ids.filtered(lambda a: a.status == 'approved')" t-as="ap">
+                                    <td><span t-field="ap.approval_type"/></td>
+                                    <td><span t-field="ap.approver_id.name"/></td>
+                                    <td><span t-field="ap.approval_date"/></td>
+                                    <td><span t-field="ap.status"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

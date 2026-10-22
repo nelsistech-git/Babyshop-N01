@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Part of Smart Complete Garment Software. Copyright (c) Nelsis Tech (www.nelsistech.com) -->
+<!--
+     Sample development (garment_sample_management). Sample Type masters already
+     ship as seed data in garment_sample_management (data/garment_sample_type_data.xml),
+     so they are reused by ref here rather than duplicated.
+
+     Note on person references: garment.sample.approval.approver_id and
+     garment.sample.activity.responsible_person_id are Many2one('res.users'), and
+     garment.sample.comment.buyer_user_id / responsible_person_id are also
+     Many2one('res.users') — none of these accept a garment.hr.employee or
+     garment.buyer.contact id (no res.users demo records exist for
+     emp_qc_inspector or the buyer contacts in this batch, and this module does
+     not create any). Rather than writing a mismatched ref into a res.users
+     field, the QC inspector (Shirin Sultana) and buyer contacts are named in
+     the free-text comments/notes fields, which is where this narrative belongs.
+-->
+<odoo>
+<data noupdate="1">
+
+    <!-- =================================================================
+         style_tee — revision story: Proto sample rejected on internal QC
+         and buyer comment, revised, then a separate Fit sample approved.
+         ================================================================= -->
+
+    <record id="sample_tee_proto" model="garment.sample">
+        <field name="style_id" ref="style_tee"/>
+        <field name="buyer_id" ref="buyer_northwind"/>
+        <field name="sample_type_id" ref="garment_sample_management.sample_type_proto"/>
+        <field name="pattern_id" ref="pattern_style_tee"/>
+        <field name="priority">2</field>
+        <field name="garment_process">knit</field>
+        <field name="required_date">2026-02-01</field>
+        <field name="submission_date">2026-02-04</field>
+        <field name="status">rejected</field>
+        <field name="approval_state">rejected</field>
+        <field name="pattern_created_date">2026-01-26</field>
+        <field name="pattern_version">1.0</field>
+        <field name="pattern_approval_status">approved</field>
+    </record>
+
+    <record id="sample_tee_proto_act_pattern" model="garment.sample.activity">
+        <field name="sample_id" ref="sample_tee_proto"/>
+        <field name="sequence">10</field>
+        <field name="activity_type">pattern_preparation</field>
+        <field name="sample_room">Pattern &amp; CAD Room, Ashulia</field>
+        <field name="start_date">2026-01-24</field>
+        <field name="end_date">2026-01-26</field>
+        <field name="status">completed</field>
+        <field name="progress">100.0</field>
+    </record>
+
+    <record id="sample_tee_proto_act_sewing" model="garment.sample.activity">
+        <field name="sample_id" ref="sample_tee_proto"/>
+        <field name="sequence">20</field>
+        <field name="activity_type">sewing</field>
+        <field name="sample_room">Sample Room 1, Ashulia</field>
+        <field name="machine">Single Needle Lock Stitch / Overlock</field>
+        <field name="sewing_start">2026-01-28 09:00:00</field>
+        <field name="sewing_complete">2026-01-29 16:00:00</field>
+        <field name="status">completed</field>
+        <field name="progress">100.0</field>
+    </record>
+
+    <record id="sample_tee_proto_approval_qc" model="garment.sample.approval">
+        <field name="sample_id" ref="sample_tee_proto"/>
+        <field name="sequence">10</field>
+        <field name="approval_stage">sample_qc</field>
+        <field name="approval_type">design</field>
+        <field name="status">rejected</field>
+        <field name="approval_date">2026-02-03 14:00:00</field>
+        <field name="comments">Internal QC by Shirin Sultana (QC Inspector): neck rib puckering on 2 of 4 pieces
+and chest width running 1.2cm over the approved measurement chart tolerance. Held back from buyer submission
+pending pattern correction — see revision on this sample.</field>
+    </record>
+
+    <record id="sample_tee_proto_comment_buyer" model="garment.sample.comment">
+        <field name="sample_id" ref="sample_tee_proto"/>
+        <field name="comment_date">2026-02-09</field>
+        <field name="comment_description">James Carter (Quality Assurance Manager, Northwind Apparel Sourcing):
+"Proto sample shows collar/neck rib fullness and chest measurement out of tolerance versus the approved chart.
+Please correct pattern and resubmit as Fit sample before proceeding."</field>
+        <field name="action_required">Re-grade neck rib tension, recheck chest width points, resubmit as Fit sample.</field>
+        <field name="completion_status">completed</field>
+    </record>
+
+    <record id="sample_tee_proto_revision_1" model="garment.sample.revision">
+        <field name="sample_id" ref="sample_tee_proto"/>
+        <field name="revision_number">1</field>
+        <field name="comment_id" ref="sample_tee_proto_comment_buyer"/>
+        <field name="previous_issue">Neck rib puckering and chest width 1.2cm over tolerance against the approved
+measurement chart, flagged by internal QC and confirmed by the buyer's QA Manager.</field>
+        <field name="correction_action">Pattern Master (Mizanur Rahman) re-graded the neck rib tension setting and
+rechecked the chest width control points; corrected pattern released for a new Fit sample cut and sew.</field>
+        <field name="responsible_department">pattern</field>
+        <field name="new_sample_date">2026-02-20</field>
+        <field name="approval_status">approved</field>
+    </record>
+
+    <record id="sample_tee_fit" model="garment.sample">
+        <field name="style_id" ref="style_tee"/>
+        <field name="buyer_id" ref="buyer_northwind"/>
+        <field name="sample_type_id" ref="garment_sample_management.sample_type_fit"/>
+        <field name="pattern_id" ref="pattern_style_tee"/>
+        <field name="priority">2</field>
+        <field name="garment_process">knit</field>
+        <field name="required_date">2026-02-20</field>
+        <field name="submission_date">2026-02-24</field>
+        <field name="status">approved</field>
+        <field name="approval_state">approved</field>
+        <field name="is_locked" eval="True"/>
+        <field name="pattern_created_date">2026-02-18</field>
+        <field name="pattern_version">1.1</field>
+        <field name="pattern_approval_status">approved</field>
+    </record>
+
+    <record id="sample_tee_fit_act_finishing" model="garment.sample.activity">
+        <field name="sample_id" ref="sample_tee_fit"/>
+        <field name="sequence">10</field>
+        <field name="activity_type">finishing</field>
+        <field name="sample_room">Sample Room 1, Ashulia</field>
+        <field name="start_date">2026-02-21</field>
+        <field name="end_date">2026-02-22</field>
+        <field name="status">completed</field>
+        <field name="progress">100.0</field>
+        <field name="ironing_done" eval="True"/>
+        <field name="trimming_done" eval="True"/>
+        <field name="packing_done" eval="True"/>
+    </record>
+
+    <record id="sample_tee_fit_act_inspection" model="garment.sample.activity">
+        <field name="sample_id" ref="sample_tee_fit"/>
+        <field name="sequence">20</field>
+        <field name="activity_type">inspection</field>
+        <field name="sample_room">QA Lab, Ashulia</field>
+        <field name="start_date">2026-02-23</field>
+        <field name="end_date">2026-02-23</field>
+        <field name="status">completed</field>
+        <field name="progress">100.0</field>
+    </record>
+
+    <record id="sample_tee_fit_approval_qc" model="garment.sample.approval">
+        <field name="sample_id" ref="sample_tee_fit"/>
+        <field name="sequence">10</field>
+        <field name="approval_stage">sample_qc</field>
+        <field name="approval_type">fit</field>
+        <field name="status">approved</field>
+        <field name="approval_date">2026-02-23 15:30:00</field>
+        <field name="comments">Internal QC by Shirin Sultana (QC Inspector): neck rib and chest width now within
+tolerance against the approved measurement chart. Cleared for buyer submission.</field>
+    </record>
+
+    <record id="sample_tee_fit_approval_buyer" model="garment.sample.approval">
+        <field name="sample_id" ref="sample_tee_fit"/>
+        <field name="sequence">20</field>
+        <field name="approval_stage">buyer_approved</field>
+        <field name="approval_type">fit</field>
+        <field name="status">approved</field>
+        <field name="approval_date">2026-02-27 11:00:00</field>
+        <field name="comments">Approved by Emma Whitfield (Senior Merchandiser, Northwind Apparel Sourcing) —
+fit, chest width and neck rib now match the approved measurement chart. Cleared to proceed to PP stage.</field>
+    </record>
+
+    <!-- =================================================================
+         style_polo — 1 approved PP (Pre-Production) sample
+         ================================================================= -->
+
+    <record id="sample_polo_pp" model="garment.sample">
+        <field name="style_id" ref="style_polo"/>
+        <field name="buyer_id" ref="buyer_northwind"/>
+        <field name="sample_type_id" ref="garment_sample_management.sample_type_pp"/>
+        <field name="pattern_id" ref="pattern_style_polo"/>
+        <field name="priority">1</field>
+        <field name="garment_process">knit</field>
+        <field name="required_date">2026-02-24</field>
+        <field name="submission_date">2026-02-27</field>
+        <field name="status">approved</field>
+        <field name="approval_state">approved</field>
+        <field name="is_locked" eval="True"/>
+        <field name="sealed_sample" eval="True"/>
+        <field name="sealed_sample_reference">SEAL-NW-PL-2602-001</field>
+        <field name="pattern_approval_status">approved</field>
+    </record>
+
+    <record id="sample_polo_pp_act_fabric" model="garment.sample.activity">
+        <field name="sample_id" ref="sample_polo_pp"/>
+        <field name="sequence">10</field>
+        <field name="activity_type">fabric_allocation</field>
+        <field name="sample_room">Sample Room 1, Ashulia</field>
+        <field name="fabric_used">100% Cotton Pique Knit, Bottle Green, 220 GSM</field>
+        <field name="start_date">2026-02-21</field>
+        <field name="end_date">2026-02-21</field>
+        <field name="status">completed</field>
+        <field name="progress">100.0</field>
+    </record>
+
+    <record id="sample_polo_pp_act_submission" model="garment.sample.activity">
+        <field name="sample_id" ref="sample_polo_pp"/>
+        <field name="sequence">30</field>
+        <field name="activity_type">submission</field>
+        <field name="sample_room">Sample Room 1, Ashulia</field>
+        <field name="start_date">2026-02-27</field>
+        <field name="end_date">2026-02-27</field>
+        <field name="status">completed</field>
+        <field name="progress">100.0</field>
+    </record>
+
+    <record id="sample_polo_pp_approval_qc" model="garment.sample.approval">
+        <field name="sample_id" ref="sample_polo_pp"/>
+        <field name="sequence">10</field>
+        <field name="approval_stage">sample_qc</field>
+        <field name="approval_type">pp</field>
+        <field name="status">approved</field>
+        <field name="approval_date">2026-02-26 16:00:00</field>
+        <field name="comments">Internal QC by Shirin Sultana (QC Inspector): pique knit fabric, embroidery
+placement and 3-button placket construction match the approved tech pack and measurement chart.</field>
+    </record>
+
+    <record id="sample_polo_pp_approval_buyer" model="garment.sample.approval">
+        <field name="sample_id" ref="sample_polo_pp"/>
+        <field name="sequence">20</field>
+        <field name="approval_stage">buyer_approved</field>
+        <field name="approval_type">pp</field>
+        <field name="status">approved</field>
+        <field name="approval_date">2026-03-02 10:15:00</field>
+        <field name="comments">Approved by Emma Whitfield (Senior Merchandiser, Northwind Apparel Sourcing) —
+PP sample sealed as the bulk production reference for Classic Pique Polo, Bottle Green colorway.</field>
+    </record>
+
+    <!-- =================================================================
+         style_hoodie — 1 approved PP (Pre-Production) sample
+         ================================================================= -->
+
+    <record id="sample_hoodie_pp" model="garment.sample">
+        <field name="style_id" ref="style_hoodie"/>
+        <field name="buyer_id" ref="buyer_baltichaus"/>
+        <field name="sample_type_id" ref="garment_sample_management.sample_type_pp"/>
+        <field name="pattern_id" ref="pattern_style_hoodie"/>
+        <field name="priority">2</field>
+        <field name="garment_process">knit</field>
+        <field name="required_date">2026-03-06</field>
+        <field name="submission_date">2026-03-10</field>
+        <field name="status">approved</field>
+        <field name="approval_state">approved</field>
+        <field name="is_locked" eval="True"/>
+        <field name="sealed_sample" eval="True"/>
+        <field name="sealed_sample_reference">SEAL-BH-HD-2603-001</field>
+        <field name="shade_approval_status">approved</field>
+        <field name="pattern_approval_status">approved</field>
+    </record>
+
+    <record id="sample_hoodie_pp_act_cutting" model="garment.sample.activity">
+        <field name="sample_id" ref="sample_hoodie_pp"/>
+        <field name="sequence">10</field>
+        <field name="activity_type">cutting</field>
+        <field name="sample_room">Sample Room 1, Ashulia</field>
+        <field name="fabric_used">80/20 Cotton-Poly Brushed Fleece, Charcoal, 340 GSM</field>
+        <field name="panel_status">checked</field>
+        <field name="start_date">2026-03-04</field>
+        <field name="end_date">2026-03-05</field>
+        <field name="status">completed</field>
+        <field name="progress">100.0</field>
+    </record>
+
+    <record id="sample_hoodie_pp_act_packing" model="garment.sample.activity">
+        <field name="sample_id" ref="sample_hoodie_pp"/>
+        <field name="sequence">40</field>
+        <field name="activity_type">packing</field>
+        <field name="sample_room">Sample Room 1, Ashulia</field>
+        <field name="start_date">2026-03-09</field>
+        <field name="end_date">2026-03-09</field>
+        <field name="status">completed</field>
+        <field name="progress">100.0</field>
+        <field name="packing_done" eval="True"/>
+    </record>
+
+    <record id="sample_hoodie_pp_approval_qc" model="garment.sample.approval">
+        <field name="sample_id" ref="sample_hoodie_pp"/>
+        <field name="sequence">10</field>
+        <field name="approval_stage">sample_qc</field>
+        <field name="approval_type">pp</field>
+        <field name="status">approved</field>
+        <field name="approval_date">2026-03-09 15:00:00</field>
+        <field name="comments">Internal QC by Shirin Sultana (QC Inspector): brushed fleece shade, YKK zip
+function, kangaroo pocket bartacking and hood construction match the approved tech pack.</field>
+    </record>
+
+    <record id="sample_hoodie_pp_approval_buyer" model="garment.sample.approval">
+        <field name="sample_id" ref="sample_hoodie_pp"/>
+        <field name="sequence">20</field>
+        <field name="approval_stage">buyer_approved</field>
+        <field name="approval_type">pp</field>
+        <field name="status">approved</field>
+        <field name="approval_date">2026-03-13 09:45:00</field>
+        <field name="comments">Approved by Markus Weber (Technical Designer, BalticHaus Fashion GmbH) — PP sample
+sealed as the bulk production reference for the Fleece Zip Hoodie, Charcoal colorway; first Bangladesh-sourced
+sample approval for BalticHaus.</field>
+    </record>
+
+</data>
+</odoo>

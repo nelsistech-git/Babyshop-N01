@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_document_approval_workflow_tree" model="ir.ui.view">
+        <field name="name">garment.document.approval.workflow.tree</field>
+        <field name="model">garment.document.approval.workflow</field>
+        <field name="arch" type="xml">
+            <tree string="Approval Workflows">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="approval_type"/>
+                <field name="category_id"/>
+                <field name="applies_to_model_id"/>
+                <field name="step_count"/>
+                <field name="active" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_document_approval_workflow_form" model="ir.ui.view">
+        <field name="name">garment.document.approval.workflow.form</field>
+        <field name="model">garment.document.approval.workflow</field>
+        <field name="arch" type="xml">
+            <form string="Approval Workflow">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="sequence"/>
+                            <field name="approval_type"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="category_id"/>
+                            <field name="applies_to_model_id"/>
+                            <field name="requires_signature"/>
+                        </group>
+                    </group>
+                    <group string="Dynamic Amount-Based Rule (SRS section 28)">
+                        <group>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="min_amount"/>
+                            <field name="max_amount"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Approval Steps">
+                            <field name="step_ids">
+                                <tree editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="approver_group_id"/>
+                                    <field name="approver_user_id"/>
+                                    <field name="requires_signature"/>
+                                    <field name="is_mandatory"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Description">
+                            <field name="description" nolabel="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_document_approval_workflow_search" model="ir.ui.view">
+        <field name="name">garment.document.approval.workflow.search</field>
+        <field name="model">garment.document.approval.workflow</field>
+        <field name="arch" type="xml">
+            <search string="Search Workflows">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="category_id"/>
+                <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Approval Type" name="group_type" context="{'group_by': 'approval_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_document_approval_workflow" model="ir.actions.act_window">
+        <field name="name">Approval Workflows</field>
+        <field name="res_model">garment.document.approval.workflow</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first approval workflow template.</p>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_supplier_rating_tree" model="ir.ui.view">
+        <field name="name">garment.supplier.rating.tree</field>
+        <field name="model">garment.supplier.rating</field>
+        <field name="arch" type="xml">
+            <tree string="Supplier Ratings">
+                <field name="supplier_id"/>
+                <field name="rating_date"/>
+                <field name="final_score"/>
+                <field name="star_rating"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_supplier_rating_form" model="ir.ui.view">
+        <field name="name">garment.supplier.rating.form</field>
+        <field name="model">garment.supplier.rating</field>
+        <field name="arch" type="xml">
+            <form string="Supplier Rating">
+                <sheet>
+                    <group>
+                        <field name="supplier_id"/>
+                        <field name="rating_date"/>
+                        <field name="rated_by_id"/>
+                    </group>
+                    <group string="Quality Performance (40%)">
+                        <field name="rejection_rate_pct"/>
+                        <field name="defect_rate_pct"/>
+                        <field name="quality_score"/>
+                    </group>
+                    <group string="Delivery Performance (30%)">
+                        <field name="on_time_delivery_pct"/>
+                        <field name="avg_delay_days"/>
+                        <field name="lead_time_accuracy_pct"/>
+                        <field name="delivery_score"/>
+                    </group>
+                    <group string="Cost Performance (20%)">
+                        <field name="price_stability_score"/>
+                        <field name="cost_competitiveness_score"/>
+                        <field name="cost_score" readonly="1"/>
+                    </group>
+                    <group string="Compliance Performance (10%)">
+                        <field name="compliance_score"/>
+                    </group>
+                    <group>
+                        <field name="final_score" readonly="1"/>
+                        <field name="star_rating" readonly="1"/>
+                    </group>
+                    <field name="notes"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_supplier_rating" model="ir.actions.act_window">
+        <field name="name">Supplier Ratings</field>
+        <field name="res_model">garment.supplier.rating</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

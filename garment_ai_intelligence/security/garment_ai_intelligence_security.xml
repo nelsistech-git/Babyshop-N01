@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <record id="module_category_garment_ai_intelligence" model="ir.module.category">
+            <field name="name">Smart Garment ERP - AI Intelligence Platform</field>
+            <field name="sequence">25</field>
+        </record>
+
+        <record id="group_ai_user" model="res.groups">
+            <field name="name">AI Business User (View Insights &amp; Forecasts)</field>
+            <field name="category_id" ref="module_category_garment_ai_intelligence"/>
+        </record>
+
+        <record id="group_ai_analyst" model="res.groups">
+            <field name="name">AI Analyst (Generate Forecasts, Review Insights)</field>
+            <field name="category_id" ref="module_category_garment_ai_intelligence"/>
+            <field name="implied_ids" eval="[(4, ref('group_ai_user'))]"/>
+        </record>
+
+        <record id="group_ai_admin" model="res.groups">
+            <field name="name">AI Administrator (Provider Config, Prompt Templates, Full Access)</field>
+            <field name="category_id" ref="module_category_garment_ai_intelligence"/>
+            <field name="implied_ids" eval="[(4, ref('group_ai_analyst'))]"/>
+        </record>
+
+    </data>
+</odoo>

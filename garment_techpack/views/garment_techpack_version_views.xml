@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_techpack_version_tree" model="ir.ui.view">
+        <field name="name">garment.techpack.version.tree</field>
+        <field name="model">garment.techpack.version</field>
+        <field name="arch" type="xml">
+            <tree string="Versions">
+                <field name="techpack_id"/>
+                <field name="version_number"/>
+                <field name="revision_type"/>
+                <field name="revision_date"/>
+                <field name="changed_by_id"/>
+                <field name="is_current"/>
+                <field name="approval_status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_techpack_version_form" model="ir.ui.view">
+        <field name="name">garment.techpack.version.form</field>
+        <field name="model">garment.techpack.version</field>
+        <field name="arch" type="xml">
+            <form string="Tech Pack Version">
+                <header>
+                    <field name="approval_status" widget="statusbar"/>
+                    <button name="action_approve" type="object" string="Approve" class="btn-primary"
+                            invisible="approval_status == 'approved'"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="techpack_id"/>
+                            <field name="version_number"/>
+                            <field name="revision_type"/>
+                            <field name="impact_level"/>
+                            <field name="previous_version_id"/>
+                            <field name="is_current"/>
+                        </group>
+                        <group>
+                            <field name="revision_date"/>
+                            <field name="changed_by_id"/>
+                            <field name="buyer_reference"/>
+                            <field name="effective_date"/>
+                        </group>
+                    </group>
+                    <field name="change_reason"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_techpack_version" model="ir.actions.act_window">
+        <field name="name">Versions</field>
+        <field name="res_model">garment.techpack.version</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

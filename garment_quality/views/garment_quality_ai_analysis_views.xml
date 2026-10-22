@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_quality_ai_analysis_form" model="ir.ui.view">
+        <field name="name">garment.quality.ai.analysis.form</field>
+        <field name="model">garment.quality.ai.analysis</field>
+        <field name="arch" type="xml">
+            <form string="AI Quality Insight">
+                <header>
+                    <field name="status" widget="statusbar" statusbar_visible="new,reviewed,action_taken"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="analysis_type"/>
+                            <field name="style_id"/>
+                            <field name="supplier_id"/>
+                            <field name="sewing_line"/>
+                            <field name="production_order_id"/>
+                        </group>
+                        <group>
+                            <field name="risk_level"/>
+                            <field name="probability"/>
+                            <field name="confidence"/>
+                            <field name="analysis_date"/>
+                        </group>
+                    </group>
+                    <group string="Prediction">
+                        <field name="predicted_issue"/>
+                        <field name="recommendation" nolabel="1"/>
+                    </group>
+                    <group string="Analyzed Data">
+                        <field name="source_data_summary" nolabel="1"/>
+                    </group>
+                    <group string="Follow-Up">
+                        <field name="linked_inspection_id"/>
+                        <field name="linked_capa_id"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_quality_ai_analysis_tree" model="ir.ui.view">
+        <field name="name">garment.quality.ai.analysis.tree</field>
+        <field name="model">garment.quality.ai.analysis</field>
+        <field name="arch" type="xml">
+            <tree string="AI Quality Insights" decoration-danger="risk_level == 'high'" decoration-warning="risk_level == 'medium'">
+                <field name="name"/>
+                <field name="analysis_type"/>
+                <field name="style_id"/>
+                <field name="risk_level"/>
+                <field name="predicted_issue"/>
+                <field name="probability"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_quality_ai_analysis_search" model="ir.ui.view">
+        <field name="name">garment.quality.ai.analysis.search</field>
+        <field name="model">garment.quality.ai.analysis</field>
+        <field name="arch" type="xml">
+            <search string="Search AI Insights">
+                <field name="name"/>
+                <field name="style_id"/>
+                <field name="supplier_id"/>
+                <filter string="High Risk" name="filter_high" domain="[('risk_level', '=', 'high')]"/>
+                <filter string="New" name="filter_new" domain="[('status', '=', 'new')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Analysis Type" name="group_type" context="{'group_by': 'analysis_type'}"/>
+                    <filter string="Risk Level" name="group_risk" context="{'group_by': 'risk_level'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_quality_ai_analysis" model="ir.actions.act_window">
+        <field name="name">AI Quality Insights</field>
+        <field name="res_model">garment.quality.ai.analysis</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Log your first AI quality insight.</p>
+        </field>
+    </record>
+
+</odoo>

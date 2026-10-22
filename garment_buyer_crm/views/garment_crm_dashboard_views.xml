@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Opportunity Dashboard: pipeline value, conversion, top buyers/merchandisers -->
+    <record id="view_garment_opportunity_graph" model="ir.ui.view">
+        <field name="name">garment.opportunity.graph</field>
+        <field name="model">garment.opportunity</field>
+        <field name="arch" type="xml">
+            <graph string="Opportunity Pipeline" type="bar">
+                <field name="stage_id"/>
+                <field name="expected_revenue" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_garment_opportunity_pivot" model="ir.ui.view">
+        <field name="name">garment.opportunity.pivot</field>
+        <field name="model">garment.opportunity</field>
+        <field name="arch" type="xml">
+            <pivot string="Opportunity Analysis">
+                <field name="assigned_merchandiser_id" type="row"/>
+                <field name="stage_id" type="col"/>
+                <field name="expected_revenue" type="measure"/>
+                <field name="estimated_order_value" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_garment_crm_dashboard" model="ir.actions.act_window">
+        <field name="name">CRM Dashboard</field>
+        <field name="res_model">garment.opportunity</field>
+        <field name="view_mode">graph,pivot,kanban,tree</field>
+        <field name="context">{'search_default_filter_open': 1}</field>
+    </record>
+
+    <record id="view_garment_buyer_graph" model="ir.ui.view">
+        <field name="name">garment.buyer.graph</field>
+        <field name="model">garment.buyer</field>
+        <field name="arch" type="xml">
+            <graph string="Buyer Performance" type="bar">
+                <field name="buyer_category"/>
+                <field name="annual_purchase_volume" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_garment_buyer_pivot" model="ir.ui.view">
+        <field name="name">garment.buyer.pivot</field>
+        <field name="model">garment.buyer</field>
+        <field name="arch" type="xml">
+            <pivot string="Buyer Analysis">
+                <field name="lead_source_id" type="row"/>
+                <field name="buyer_status" type="col"/>
+                <field name="annual_purchase_volume" type="measure"/>
+                <field name="ai_lead_score" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_garment_buyer_analytics" model="ir.actions.act_window">
+        <field name="name">Buyer Analytics</field>
+        <field name="res_model">garment.buyer</field>
+        <field name="view_mode">graph,pivot</field>
+    </record>
+
+    <!-- AI Bulk Scoring wizard -->
+    <record id="view_garment_ai_bulk_scoring_wizard_form" model="ir.ui.view">
+        <field name="name">garment.ai.bulk.scoring.wizard.form</field>
+        <field name="model">garment.ai.bulk.scoring.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Run AI Lead Scoring">
+                <group>
+                    <field name="buyer_ids" widget="many2many_tags"/>
+                    <field name="only_active_leads"/>
+                </group>
+                <footer>
+                    <button name="action_run" type="object" string="Run AI Scoring" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_ai_bulk_scoring_wizard" model="ir.actions.act_window">
+        <field name="name">Run AI Lead Scoring</field>
+        <field name="res_model">garment.ai.bulk.scoring.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

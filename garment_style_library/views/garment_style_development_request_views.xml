@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_style_development_request_tree" model="ir.ui.view">
+        <field name="name">garment.style.development.request.tree</field>
+        <field name="model">garment.style.development.request</field>
+        <field name="arch" type="xml">
+            <tree string="Development Requests">
+                <field name="request_number"/>
+                <field name="request_date"/>
+                <field name="buyer_id"/>
+                <field name="merchandiser_id"/>
+                <field name="designer_id"/>
+                <field name="priority" widget="priority"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_style_development_request_form" model="ir.ui.view">
+        <field name="name">garment.style.development.request.form</field>
+        <field name="model">garment.style.development.request</field>
+        <field name="arch" type="xml">
+            <form string="Development Request">
+                <header>
+                    <field name="state" widget="statusbar"/>
+                    <button name="action_convert_to_style" type="object" string="Convert to Style"
+                            class="btn-primary" invisible="state != 'new'"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="request_number" readonly="1"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="request_date"/>
+                            <field name="buyer_id"/>
+                            <field name="rfq_id"/>
+                            <field name="style_category_id"/>
+                        </group>
+                        <group>
+                            <field name="merchandiser_id"/>
+                            <field name="designer_id"/>
+                            <field name="priority" widget="priority"/>
+                            <field name="required_completion_date"/>
+                            <field name="style_id" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Attachments" col="4">
+                        <field name="buyer_image" filename="'Buyer Image'"/>
+                        <field name="sketch" filename="'Sketch'"/>
+                        <field name="reference_sample_image" filename="'Reference Sample'"/>
+                        <field name="mood_board" filename="'Mood Board'"/>
+                        <field name="buyer_tech_pack" filename="'Buyer Tech Pack'"/>
+                        <field name="video" filename="'Video'"/>
+                        <field name="fabric_reference" filename="'Fabric Reference'"/>
+                    </group>
+                    <field name="remarks"/>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_style_development_request_search" model="ir.ui.view">
+        <field name="name">garment.style.development.request.search</field>
+        <field name="model">garment.style.development.request</field>
+        <field name="arch" type="xml">
+            <search string="Search Development Requests">
+                <field name="request_number"/>
+                <field name="buyer_id"/>
+                <field name="merchandiser_id"/>
+                <field name="designer_id"/>
+                <filter string="New" name="filter_new" domain="[('state', '=', 'new')]"/>
+                <filter string="In Progress" name="filter_in_progress" domain="[('state', '=', 'in_progress')]"/>
+                <filter string="Converted" name="filter_converted" domain="[('state', '=', 'converted')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Buyer" name="group_buyer" context="{'group_by': 'buyer_id'}"/>
+                    <filter string="Merchandiser" name="group_merchandiser" context="{'group_by': 'merchandiser_id'}"/>
+                    <filter string="Priority" name="group_priority" context="{'group_by': 'priority'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_style_development_request" model="ir.actions.act_window">
+        <field name="name">Product Development Requests</field>
+        <field name="res_model">garment.style.development.request</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

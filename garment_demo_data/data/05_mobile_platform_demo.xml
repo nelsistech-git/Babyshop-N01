@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- garment_mobile_platform demo: a couple of registered devices for the
+     HR employees who already exist in 01_hr_demo.xml (emp_merchandiser,
+     emp_qc_inspector), plus push notifications sent to them. device_code /
+     api_key / notification_number are left unset so the model's own create()
+     auto-generates them via ir.sequence, same as production would. user_id
+     on garment.mobile.device / garment.mobile.push.notification is a
+     required Many2one('res.users') — no res.users demo records exist for
+     the HR employees (see the note already carried in 02_techpack_demo.xml /
+     03_merchandising_demo.xml), so, following that established pattern,
+     these point at base.user_admin as well; employee_id links the actual
+     garment.hr.employee. -->
+<odoo>
+<data noupdate="1">
+
+    <!-- ================================================================ -->
+    <!-- Devices (garment.mobile.device)                                  -->
+    <!-- ================================================================ -->
+
+    <record id="mobile_device_merchandiser" model="garment.mobile.device">
+        <field name="name">Farhana Akter - Merchandising App (Galaxy A54)</field>
+        <field name="user_id" ref="base.user_admin"/>
+        <field name="employee_id" ref="emp_merchandiser"/>
+        <field name="app_type">merchandising</field>
+        <field name="platform">android</field>
+        <field name="device_identifier">a1b2c3d4-e5f6-4a11-9c22-100merch0001</field>
+        <field name="device_model">Samsung Galaxy A54</field>
+        <field name="os_version">Android 14</field>
+        <field name="app_version">2.3.1</field>
+        <field name="push_token">fcm_demo_tok_merch_farhana_0001</field>
+        <field name="status">active</field>
+        <field name="registered_date">2026-03-02 09:10:00</field>
+        <field name="last_login">2026-05-04 08:45:00</field>
+        <field name="last_seen">2026-05-04 17:30:00</field>
+        <field name="last_ip">103.94.20.11</field>
+    </record>
+
+    <record id="mobile_device_qc_tablet" model="garment.mobile.device">
+        <field name="name">Shirin Sultana - QC Inspector Tablet (Lenovo Tab M10)</field>
+        <field name="user_id" ref="base.user_admin"/>
+        <field name="employee_id" ref="emp_qc_inspector"/>
+        <field name="app_type">quality</field>
+        <field name="platform">android</field>
+        <field name="device_identifier">a1b2c3d4-e5f6-4a11-9c22-100qcinsp002</field>
+        <field name="device_model">Lenovo Tab M10 Plus</field>
+        <field name="os_version">Android 13</field>
+        <field name="app_version">2.3.1</field>
+        <field name="push_token">fcm_demo_tok_qc_shirin_0002</field>
+        <field name="status">active</field>
+        <field name="registered_date">2026-03-15 08:20:00</field>
+        <field name="last_login">2026-05-04 08:05:00</field>
+        <field name="last_seen">2026-05-04 14:20:00</field>
+        <field name="last_ip">103.94.20.34</field>
+    </record>
+
+    <record id="mobile_device_qc_phone" model="garment.mobile.device">
+        <field name="name">Shirin Sultana - QC Alerts Phone (Galaxy A34)</field>
+        <field name="user_id" ref="base.user_admin"/>
+        <field name="employee_id" ref="emp_qc_inspector"/>
+        <field name="app_type">quality</field>
+        <field name="platform">android</field>
+        <field name="device_identifier">a1b2c3d4-e5f6-4a11-9c22-100qcinsp003</field>
+        <field name="device_model">Samsung Galaxy A34</field>
+        <field name="os_version">Android 13</field>
+        <field name="app_version">2.3.0</field>
+        <field name="push_token">fcm_demo_tok_qc_shirin_0003</field>
+        <field name="status">active</field>
+        <field name="registered_date">2026-03-15 08:25:00</field>
+        <field name="last_login">2026-05-03 07:55:00</field>
+        <field name="last_seen">2026-05-04 09:15:00</field>
+        <field name="last_ip">103.94.20.35</field>
+    </record>
+
+    <!-- ================================================================ -->
+    <!-- Push Notifications (garment.mobile.push.notification)            -->
+    <!-- ================================================================ -->
+
+    <record id="mobile_notif_capa_qc" model="garment.mobile.push.notification">
+        <field name="device_id" ref="mobile_device_qc_tablet"/>
+        <field name="user_id" ref="base.user_admin"/>
+        <field name="notification_type">quality_alert</field>
+        <field name="title">Recurring Open-Seam Defect Escalated to CAPA</field>
+        <field name="body">Two open-seam incidents on Sewing Line 1 (style_tee) within a two-week window have
+been escalated to a CAPA for root-cause analysis. Please review capa_recurring_open_seam_tee.</field>
+        <field name="related_model">garment.quality.capa</field>
+        <field name="related_res_id" eval="ref('capa_recurring_open_seam_tee')"/>
+        <field name="push_provider">fcm</field>
+        <field name="state">sent</field>
+        <field name="scheduled_date">2026-05-04 11:15:00</field>
+        <field name="sent_date">2026-05-04 11:15:30</field>
+    </record>
+
+    <record id="mobile_notif_shipment_merch" model="garment.mobile.push.notification">
+        <field name="device_id" ref="mobile_device_merchandiser"/>
+        <field name="user_id" ref="base.user_admin"/>
+        <field name="notification_type">tna</field>
+        <field name="title">Shipment Booked — NSG-TS-2601 / Northwind</field>
+        <field name="body">Container booking confirmed for order_tee (24,000 pcs, Northwind Apparel Sourcing).
+Check the shipment record for the container and B/L details.</field>
+        <field name="related_model">garment.order</field>
+        <field name="related_res_id" eval="ref('order_tee')"/>
+        <field name="push_provider">fcm</field>
+        <field name="state">read</field>
+        <field name="scheduled_date">2026-06-08 09:00:00</field>
+        <field name="sent_date">2026-06-08 09:00:20</field>
+        <field name="read_date">2026-06-08 10:12:00</field>
+    </record>
+
+</data>
+</odoo>

@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_style_form" model="ir.ui.view">
+        <field name="name">garment.style.form</field>
+        <field name="model">garment.style</field>
+        <field name="arch" type="xml">
+            <form string="Style">
+                <field name="has_missing_assets" invisible="1"/>
+                <header>
+                    <field name="status" widget="statusbar"
+                            statusbar_visible="draft,development,internal_review,sample_development,buyer_review,approved,production_ready"/>
+                    <button name="action_run_ai_similarity" type="object" string="Find Similar Styles (AI)"
+                            class="btn-secondary" icon="fa-magic"/>
+                    <button name="action_create_revision" type="object" string="New Revision" class="btn-secondary"
+                            invisible="not is_locked"/>
+                    <button name="action_lock_style" type="object" string="Lock" class="btn-secondary"
+                            invisible="is_locked"/>
+                    <button name="action_unlock_style" type="object" string="Unlock" class="btn-secondary"
+                            invisible="not is_locked"
+                            groups="garment_style_library.group_style_design_manager"/>
+                    <button name="action_generate_approvals_from_rules" type="object"
+                            string="Generate Approval Steps" class="btn-secondary"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Locked" bg_color="bg-danger"
+                            invisible="not is_locked"/>
+                    <div class="alert alert-warning" role="alert" invisible="not has_missing_assets">
+                        <field name="missing_assets_warning"/>
+                    </div>
+                    <field name="front_view_image" widget="image" class="oe_avatar"/>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_patterns" type="object" class="oe_stat_button" icon="fa-scissors">
+                            <field name="pattern_count" widget="statinfo" string="Patterns"/>
+                        </button>
+                        <button name="action_view_revisions" type="object" class="oe_stat_button" icon="fa-history">
+                            <field name="revision_count" widget="statinfo" string="Revisions"/>
+                        </button>
+                        <button name="action_view_ecrs" type="object" class="oe_stat_button" icon="fa-exchange">
+                            <field name="ecr_count" widget="statinfo" string="ECRs"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="style_name"/>
+                        <h1><field name="style_name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="style_number" readonly="1"/>
+                            <field name="buyer_style_number"/>
+                            <field name="factory_style_number"/>
+                            <field name="buyer_id"/>
+                            <field name="style_category_id"/>
+                            <field name="product_type"/>
+                            <field name="brand"/>
+                            <field name="collection"/>
+                            <field name="season"/>
+                        </group>
+                        <group>
+                            <field name="gender"/>
+                            <field name="age_group"/>
+                            <field name="market"/>
+                            <field name="country_id"/>
+                            <field name="currency_id"/>
+                            <field name="lifecycle_stage"/>
+                            <field name="designer_id"/>
+                            <field name="pattern_master_id"/>
+                            <field name="is_locked" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Export &amp; Packaging">
+                        <group>
+                            <field name="export_documentation_ref"/>
+                            <field name="port_destination"/>
+                        </group>
+                        <group>
+                            <field name="packaging_instructions"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Product Attributes">
+                            <group col="4">
+                                <field name="sleeve_type"/>
+                                <field name="neck_type"/>
+                                <field name="collar_type"/>
+                                <field name="hood_type"/>
+                                <field name="pocket_type"/>
+                                <field name="waist_type"/>
+                                <field name="bottom_type"/>
+                                <field name="closure_type"/>
+                                <field name="fit_type"/>
+                                <field name="construction_type"/>
+                                <field name="stitch_type"/>
+                            </group>
+                        </page>
+                        <page string="Design &amp; Decoration">
+                            <group>
+                                <group>
+                                    <field name="back_view_image" widget="image"/>
+                                    <field name="side_view_image" widget="image"/>
+                                    <field name="inside_view_image" widget="image"/>
+                                </group>
+                                <group>
+                                    <field name="label_position"/>
+                                    <field name="logo_placement"/>
+                                    <field name="decoration_type_ids"/>
+                                    <field name="decoration_notes"/>
+                                </group>
+                            </group>
+                            <separator string="Design Elements"/>
+                            <group col="4">
+                                <field name="collar_design"/>
+                                <field name="sleeve_design"/>
+                                <field name="pocket_design"/>
+                                <field name="hood_design"/>
+                                <field name="waist_design"/>
+                                <field name="bottom_design"/>
+                                <field name="hem_design"/>
+                                <field name="cuff_design"/>
+                            </group>
+                            <separator string="Decoration Methods"/>
+                            <group col="4">
+                                <field name="decoration_printing"/>
+                                <field name="decoration_embroidery"/>
+                                <field name="decoration_applique"/>
+                                <field name="decoration_heat_transfer"/>
+                                <field name="decoration_sublimation"/>
+                                <field name="decoration_silicone_patch"/>
+                                <field name="decoration_leather_patch"/>
+                                <field name="decoration_rubber_patch"/>
+                                <field name="decoration_reflective_print"/>
+                            </group>
+                        </page>
+                        <page string="Fabric Details">
+                            <field name="fabric_line_ids">
+                                <tree editable="bottom">
+                                    <field name="fabric_role"/>
+                                    <field name="composition"/>
+                                    <field name="gsm"/>
+                                    <field name="width"/>
+                                    <field name="weight"/>
+                                    <field name="supplier_id"/>
+                                    <field name="mill"/>
+                                    <field name="country_of_origin_id"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Trim Details">
+                            <field name="trim_line_ids">
+                                <tree editable="bottom">
+                                    <field name="trim_type"/>
+                                    <field name="description"/>
+                                    <field name="supplier_id"/>
+                                    <field name="color"/>
+                                    <field name="size_spec"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Colorways">
+                            <field name="color_ids">
+                                <tree editable="bottom">
+                                    <field name="colorway_code"/>
+                                    <field name="colorway_name"/>
+                                    <field name="pantone_number"/>
+                                    <field name="buyer_color_name"/>
+                                    <field name="status"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Image Gallery">
+                            <field name="image_ids">
+                                <tree editable="bottom">
+                                    <field name="image_category"/>
+                                    <field name="image" widget="image" options="{'size': [40,40]}"/>
+                                    <field name="image_version"/>
+                                    <field name="approval_status"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Digital Assets">
+                            <field name="document_ids">
+                                <tree editable="bottom">
+                                    <field name="name"/>
+                                    <field name="asset_category"/>
+                                    <field name="document_type_id"/>
+                                    <field name="file" filename="filename"/>
+                                    <field name="filename" invisible="1"/>
+                                    <field name="version"/>
+                                    <field name="tag_ids" widget="many2many_tags"/>
+                                    <field name="download_permission"/>
+                                    <field name="approval_status"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Measurement Charts">
+                            <field name="measurement_chart_ids">
+                                <tree>
+                                    <field name="chart_number"/>
+                                    <field name="version"/>
+                                    <field name="unit"/>
+                                    <field name="status"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Approvals">
+                            <field name="approval_ids">
+                                <tree editable="bottom">
+                                    <field name="approval_step"/>
+                                    <field name="approver_id"/>
+                                    <field name="status"/>
+                                    <field name="signed_date"/>
+                                    <field name="comments"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="AI Similarity">
+                            <field name="ai_last_run" readonly="1"/>
+                            <field name="ai_last_insight" readonly="1" nolabel="1"/>
+                            <separator string="Suggested Similar Styles"/>
+                            <field name="ai_similar_style_ids" readonly="1">
+                                <tree>
+                                    <field name="style_number"/>
+                                    <field name="style_name"/>
+                                    <field name="buyer_id"/>
+                                    <field name="status"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_style_tree" model="ir.ui.view">
+        <field name="name">garment.style.tree</field>
+        <field name="model">garment.style</field>
+        <field name="arch" type="xml">
+            <tree string="Styles" decoration-muted="status == 'archived'">
+                <field name="style_number"/>
+                <field name="style_name"/>
+                <field name="buyer_id"/>
+                <field name="style_category_id"/>
+                <field name="season"/>
+                <field name="designer_id"/>
+                <field name="status" widget="badge" decoration-success="status in ('approved','production_ready')"/>
+                <field name="is_locked"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_style_kanban" model="ir.ui.view">
+        <field name="name">garment.style.kanban</field>
+        <field name="model">garment.style</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="status" class="o_kanban_small_column">
+                <field name="style_name"/>
+                <field name="front_view_image"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click oe_kanban_card">
+                            <img t-if="record.front_view_image.raw_value"
+                                 t-att-src="kanban_image('garment.style', 'front_view_image', record.id.raw_value)"
+                                 t-att-alt="record.style_name.value"
+                                 class="o_kanban_image" style="max-height:60px;"/>
+                            <div class="o_kanban_record_top">
+                                <strong><field name="style_name"/></strong>
+                            </div>
+                            <div><field name="buyer_id"/></div>
+                            <div class="text-muted"><field name="style_number"/></div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_garment_style_search" model="ir.ui.view">
+        <field name="name">garment.style.search</field>
+        <field name="model">garment.style</field>
+        <field name="arch" type="xml">
+            <search string="Search Styles">
+                <field name="style_name"/>
+                <field name="style_number"/>
+                <field name="buyer_style_number"/>
+                <field name="buyer_id"/>
+                <field name="brand"/>
+                <field name="season"/>
+                <field name="style_category_id"/>
+                <field name="product_type"/>
+                <filter string="My Styles" name="filter_my" domain="[('designer_id', '=', uid)]"/>
+                <filter string="Draft" name="filter_draft" domain="[('status', '=', 'draft')]"/>
+                <filter string="In Development" name="filter_development" domain="[('status', '=', 'development')]"/>
+                <filter string="Buyer Review Pending" name="filter_buyer_review" domain="[('status', '=', 'buyer_review')]"/>
+                <filter string="Approved" name="filter_approved" domain="[('status', '=', 'approved')]"/>
+                <filter string="Production Ready" name="filter_production_ready" domain="[('status', '=', 'production_ready')]"/>
+                <filter string="Archived" name="filter_archived" domain="[('status', '=', 'archived')]"/>
+                <separator/>
+                <filter string="Locked" name="filter_locked" domain="[('is_locked', '=', True)]"/>
+                <filter string="Missing Required Assets" name="filter_missing_assets"
+                        domain="[('has_missing_assets', '=', True)]"/>
+                <filter string="No CAD File" name="filter_no_cad" domain="[('cad_file_ids', '=', False)]"/>
+                <filter string="No Pattern" name="filter_no_pattern" domain="[('pattern_ids', '=', False)]"/>
+                <separator/>
+                <filter string="Export Market" name="filter_export" domain="[('market', '=', 'export')]"/>
+                <filter string="Domestic Market" name="filter_domestic" domain="[('market', '=', 'domestic')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                    <filter string="Buyer" name="group_buyer" context="{'group_by': 'buyer_id'}"/>
+                    <filter string="Category" name="group_category" context="{'group_by': 'style_category_id'}"/>
+                    <filter string="Product Type" name="group_product_type" context="{'group_by': 'product_type'}"/>
+                    <filter string="Brand" name="group_brand" context="{'group_by': 'brand'}"/>
+                    <filter string="Season" name="group_season" context="{'group_by': 'season'}"/>
+                    <filter string="Country" name="group_country" context="{'group_by': 'country_id'}"/>
+                    <filter string="Gender" name="group_gender" context="{'group_by': 'gender'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_style" model="ir.actions.act_window">
+        <field name="name">Styles</field>
+        <field name="res_model">garment.style</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first style.</p>
+        </field>
+    </record>
+
+</odoo>

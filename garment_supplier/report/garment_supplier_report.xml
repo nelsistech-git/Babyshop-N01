@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_report_garment_supplier" model="ir.actions.report">
+        <field name="name">Supplier Profile</field>
+        <field name="model">garment.supplier</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">garment_supplier.report_garment_supplier</field>
+        <field name="report_file">garment_supplier.report_garment_supplier</field>
+        <field name="binding_model_id" ref="model_garment_supplier"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'Supplier - %s' % (object.name)</field>
+    </record>
+
+    <template id="report_garment_supplier">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2><span t-field="o.name"/></h2>
+                        <p class="text-muted">
+                            Code: <span t-field="o.supplier_code"/> | Type: <span t-field="o.supplier_type"/>
+                            | Classification: <span t-field="o.classification"/> | Ranking: <span t-field="o.ranking"/>
+                        </p>
+
+                        <h4>Latest Performance</h4>
+                        <table class="table table-sm">
+                            <tr><td>Overall Score</td><td><span t-field="o.rating"/>%</td></tr>
+                            <tr><td>On-Time Delivery</td><td><span t-field="o.on_time_delivery_pct"/>%</td></tr>
+                            <tr><td>Risk Level</td><td><span t-field="o.risk_level"/></td></tr>
+                            <tr><td>Compliance Status</td><td><span t-field="o.compliance_status"/></td></tr>
+                        </table>
+
+                        <h4>Product Catalog</h4>
+                        <table class="table table-sm">
+                            <thead><tr><th>Product</th><th>Specification</th><th>Price</th><th>MOQ</th></tr></thead>
+                            <tbody>
+                                <tr t-foreach="o.product_ids" t-as="p">
+                                    <td><span t-field="p.product_name"/></td>
+                                    <td><span t-field="p.specification"/></td>
+                                    <td><span t-field="p.unit_price"/></td>
+                                    <td><span t-field="p.moq"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4>Open Risks</h4>
+                        <table class="table table-sm">
+                            <tr t-foreach="o.risk_ids.filtered(lambda r: r.status != 'closed')" t-as="r">
+                                <td><span t-field="r.risk_factor"/></td>
+                                <td><span t-field="r.risk_level"/></td>
+                            </tr>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!-- ====================================================================
+         Supplier Purchase Report (SRS section 33) — Purchase Value,
+         Quantity, Material per supplier, read from Module 9's Purchase
+         Order lines (no duplicate transactional data stored here).
+         ==================================================================== -->
+    <record id="action_report_garment_supplier_purchase" model="ir.actions.report">
+        <field name="name">Supplier Purchase Report</field>
+        <field name="model">garment.supplier</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">garment_supplier.report_garment_supplier_purchase</field>
+        <field name="report_file">garment_supplier.report_garment_supplier_purchase</field>
+        <field name="binding_model_id" ref="model_garment_supplier"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'Supplier Purchase Report - %s' % (object.name)</field>
+    </record>
+
+    <template id="report_garment_supplier_purchase">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Supplier Purchase Report</h2>
+                        <p class="text-muted"><span t-field="o.name"/> (<span t-field="o.supplier_code"/>)</p>
+                        <table class="table table-sm">
+                            <thead><tr><th>PO Number</th><th>Order Date</th><th>Total Value</th><th>Status</th></tr></thead>
+                            <tbody>
+                                <tr t-foreach="request.env['garment.purchase.order'].sudo().search([('supplier_id', '=', o.partner_id.id)])"
+                                    t-as="po">
+                                    <td><span t-field="po.po_number"/></td>
+                                    <td><span t-field="po.order_date"/></td>
+                                    <td><span t-field="po.total_value"/></td>
+                                    <td><span t-field="po.status"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!-- ====================================================================
+         Supplier Delay Report (SRS section 33) — Delayed Deliveries, Delay
+         Reason, Impact, read from Module 9's Purchase Delivery records.
+         ==================================================================== -->
+    <record id="action_report_garment_supplier_delay" model="ir.actions.report">
+        <field name="name">Supplier Delay Report</field>
+        <field name="model">garment.supplier</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">garment_supplier.report_garment_supplier_delay</field>
+        <field name="report_file">garment_supplier.report_garment_supplier_delay</field>
+        <field name="binding_model_id" ref="model_garment_supplier"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'Supplier Delay Report - %s' % (object.name)</field>
+    </record>
+
+    <template id="report_garment_supplier_delay">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Supplier Delay Report</h2>
+                        <p class="text-muted"><span t-field="o.name"/> (<span t-field="o.supplier_code"/>)</p>
+                        <table class="table table-sm">
+                            <thead><tr><th>GRN</th><th>Expected Date</th><th>Actual Date</th><th>Delay (Days)</th><th>Return Reason</th></tr></thead>
+                            <tbody>
+                                <tr t-foreach="request.env['garment.purchase.delivery'].sudo().search([('supplier_id', '=', o.partner_id.id), ('delay_days', '&gt;', 0)])"
+                                    t-as="d">
+                                    <td><span t-field="d.grn_number"/></td>
+                                    <td><span t-field="d.expected_date"/></td>
+                                    <td><span t-field="d.actual_date"/></td>
+                                    <td><span t-field="d.delay_days"/></td>
+                                    <td><span t-field="d.return_reason"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

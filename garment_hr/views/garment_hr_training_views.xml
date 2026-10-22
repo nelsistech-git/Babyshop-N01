@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_garment_hr_training_tree" model="ir.ui.view">
+        <field name="name">garment.hr.training.tree</field>
+        <field name="model">garment.hr.training</field>
+        <field name="arch" type="xml">
+            <tree string="Training" decoration-success="status == 'completed'">
+                <field name="employee_id"/>
+                <field name="training_name"/>
+                <field name="training_type"/>
+                <field name="scheduled_date"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_hr_training_form" model="ir.ui.view">
+        <field name="name">garment.hr.training.form</field>
+        <field name="model">garment.hr.training</field>
+        <field name="arch" type="xml">
+            <form string="Training">
+                <header>
+                    <field name="status" widget="statusbar"/>
+                    <button name="action_mark_completed" type="object" string="Mark Completed" class="btn-primary"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="employee_id"/>
+                            <field name="training_name"/>
+                            <field name="training_type"/>
+                            <field name="trainer"/>
+                        </group>
+                        <group>
+                            <field name="scheduled_date"/>
+                            <field name="duration_hours"/>
+                            <field name="evaluation_score"/>
+                        </group>
+                    </group>
+                    <field name="evaluation_notes"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_garment_hr_training" model="ir.actions.act_window">
+        <field name="name">Training</field>
+        <field name="res_model">garment.hr.training</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Schedule your first training.</p>
+        </field>
+    </record>
+</odoo>

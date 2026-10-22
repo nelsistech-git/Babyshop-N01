@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_garment_quality_complaint_form" model="ir.ui.view">
+        <field name="name">garment.quality.complaint.form</field>
+        <field name="model">garment.quality.complaint</field>
+        <field name="arch" type="xml">
+            <form string="Buyer Quality Complaint">
+                <header>
+                    <button name="action_create_capa" type="object" string="Raise CAPA" class="btn-secondary"
+                            invisible="capa_id"/>
+                    <button name="action_resolve" type="object" string="Mark Resolved" class="btn-primary"
+                            invisible="status in ('resolved', 'closed')"/>
+                    <field name="status" widget="statusbar"
+                           statusbar_visible="new,investigating,rca,corrective_plan,resolved,closed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="complaint_no"/>
+                        <h1><field name="complaint_no" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="buyer_id"/>
+                            <field name="style_id"/>
+                            <field name="order_reference"/>
+                            <field name="shipment_reference"/>
+                        </group>
+                        <group>
+                            <field name="complaint_type"/>
+                            <field name="severity"/>
+                            <field name="complaint_date"/>
+                            <field name="resolution_date"/>
+                            <field name="capa_id"/>
+                        </group>
+                    </group>
+                    <group string="Description">
+                        <field name="description" nolabel="1"/>
+                    </group>
+                    <group string="Root Cause &amp; Action">
+                        <field name="root_cause" nolabel="1" placeholder="Root Cause..."/>
+                        <field name="action_taken" nolabel="1" placeholder="Action Taken..."/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_garment_quality_complaint_tree" model="ir.ui.view">
+        <field name="name">garment.quality.complaint.tree</field>
+        <field name="model">garment.quality.complaint</field>
+        <field name="arch" type="xml">
+            <tree string="Buyer Complaints" decoration-danger="severity == 'critical'" decoration-success="status in ('resolved', 'closed')">
+                <field name="complaint_no"/>
+                <field name="buyer_id"/>
+                <field name="style_id"/>
+                <field name="complaint_type"/>
+                <field name="severity"/>
+                <field name="complaint_date"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_garment_quality_complaint_search" model="ir.ui.view">
+        <field name="name">garment.quality.complaint.search</field>
+        <field name="model">garment.quality.complaint</field>
+        <field name="arch" type="xml">
+            <search string="Search Complaints">
+                <field name="complaint_no"/>
+                <field name="buyer_id"/>
+                <field name="style_id"/>
+                <filter string="Open" name="filter_open" domain="[('status', 'not in', ['resolved', 'closed'])]"/>
+                <filter string="Critical" name="filter_critical" domain="[('severity', '=', 'critical')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Buyer" name="group_buyer" context="{'group_by': 'buyer_id'}"/>
+                    <filter string="Complaint Type" name="group_type" context="{'group_by': 'complaint_type'}"/>
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_garment_quality_complaint" model="ir.actions.act_window">
+        <field name="name">Buyer Complaints</field>
+        <field name="res_model">garment.quality.complaint</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Log your first buyer quality complaint.</p>
+        </field>
+    </record>
+
+</odoo>
