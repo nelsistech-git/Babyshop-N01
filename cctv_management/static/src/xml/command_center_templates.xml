@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+<t t-name="cctv_management.CommandCenter" owl="1">
+    <div class="cctv-dash">
+        <div t-if="!dash.state.allowed" class="alert alert-warning m-3">
+            You don't have access to this dashboard. Ask an administrator to add your group under
+            CCTV &gt; Configuration &gt; Dashboard Access.
+        </div>
+        <div t-elif="dash.state.missing.length" class="alert alert-warning m-3">
+            Your account can't read: <t t-esc="dash.state.missing.join(', ')"/>.
+            Ask an administrator to grant that access, or to remove your group from this dashboard.
+        </div>
+        <t t-else="">
+
+            <!-- ============ header ============ -->
+            <header class="cctv-dash-head">
+                <div class="cctv-dash-title">
+                    <span class="cctv-3d cctv-3d--lg cctv-3d--indigo"><i class="fa fa-shield"/></span>
+                    <div>
+                        <h1>Command Center</h1>
+                        <p>Smart CCTV &#183; live security overview</p>
+                    </div>
+                </div>
+                <div class="cctv-dash-head-right">
+                    <span class="cctv-live-pill"><i/>LIVE</span>
+                    <span t-if="dash.state.lastUpdated" class="cctv-updated">
+                        Updated <t t-esc="dash.state.lastUpdated"/>
+                        <t t-if="dash.state.refreshSeconds"> &#183; every <t t-esc="dash.state.refreshSeconds"/> s</t>
+                    </span>
+                    <button type="button" class="cctv-btn3d cctv-btn3d--violet" t-on-click="() => this.dash.refresh()">
+                        <i class="fa fa-refresh"/> Refresh
+                    </button>
+                </div>
+            </header>
+
+            <!-- ============ KPI cards ============ -->
+            <div t-if="state.loading" class="cctv-kpis">
+                <div class="cctv-skel" t-foreach="[1,2,3,4,5,6]" t-as="n" t-key="n"/>
+            </div>
+            <div t-else="" class="cctv-kpis">
+                <div t-foreach="kpis" t-as="kpi" t-key="kpi.key"
+                     t-attf-class="cctv-kpi tone-#{kpi.tone}" t-on-click="kpi.open">
+                    <span t-attf-class="cctv-3d cctv-3d--#{kpi.tone}"><i t-attf-class="fa #{kpi.icon}"/></span>
+                    <div class="cctv-kpi-body">
+                        <div class="cctv-kpi-value">
+                            <t t-esc="kpi.value"/>
+                            <small t-if="kpi.suffix"> <t t-esc="kpi.suffix"/></small>
+                        </div>
+                        <div class="cctv-kpi-label"><t t-esc="kpi.label"/></div>
+                        <div class="cctv-kpi-sub"><t t-esc="kpi.sub"/></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============ activity + camera health ============ -->
+            <div class="cctv-grid-2">
+                <div class="cctv-card">
+                    <h3 class="cctv-card-title">
+                        <span>AI events by hour</span>
+                        <span class="cctv-card-sub">today &#183; your local time</span>
+                    </h3>
+                    <div class="cctv-bars">
+                        <div t-foreach="bars" t-as="bar" t-key="bar.hour" class="cctv-bar-col"
+                             t-att-title="bar.count + ' events at ' + bar.hour + ':00'">
+                            <div class="cctv-bar-val"><t t-if="bar.count" t-esc="bar.count"/></div>
+                            <div t-attf-class="cctv-bar #{bar.empty ? 'is-empty' : ''} #{bar.now ? 'is-now' : ''}" t-att-style="bar.style"/>
+                            <div class="cctv-bar-hour"><t t-if="bar.showHour" t-esc="bar.hour"/></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cctv-card">
+                    <h3 class="cctv-card-title">
+                        <span>Camera health</span>
+                        <span class="cctv-card-sub"><t t-esc="state.cameras.total"/> cameras</span>
+                    </h3>
+                    <div class="cctv-donut-wrap">
+                        <div class="cctv-donut" t-att-style="donutStyle">
+                            <div class="cctv-donut-label">
+                                <b><t t-esc="state.cameras.online"/></b>
+                                <span>online</span>
+                            </div>
+                        </div>
+                        <div class="cctv-legend">
+                            <div t-foreach="healthRows" t-as="row" t-key="row.key" class="cctv-legend-row">
+                                <span class="cctv-swatch" t-att-style="'background:' + row.color"/>
+                                <span t-esc="row.label"/>
+                                <span class="cctv-legend-num" t-esc="row.count"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============ severity + detections ============ -->
+            <div class="cctv-grid-2">
+                <div class="cctv-card">
+                    <h3 class="cctv-card-title">
+                        <span>Open alerts by severity</span>
+                        <span class="cctv-card-sub">new + acknowledged</span>
+                    </h3>
+                    <div t-foreach="severityRows" t-as="row" t-key="row.key" class="cctv-meter">
+                        <div class="cctv-meter-head"><span t-esc="row.label"/><span t-esc="row.count"/></div>
+                        <div class="cctv-meter-track"><div class="cctv-meter-fill" t-att-style="row.style"/></div>
+                    </div>
+                </div>
+
+                <div class="cctv-card">
+                    <h3 class="cctv-card-title">
+                        <span>Top detections today</span>
+                        <span class="cctv-card-sub">by type</span>
+                    </h3>
+                    <div t-if="!typeBars.length" class="cctv-empty-note">No AI detections yet today.</div>
+                    <div t-foreach="typeBars" t-as="row" t-key="row.key" class="cctv-meter">
+                        <div class="cctv-meter-head"><span t-esc="row.label"/><span t-esc="row.count"/></div>
+                        <div class="cctv-meter-track">
+                            <div t-attf-class="cctv-meter-fill cctv-fill-#{row.tone}" t-att-style="row.style + ';background:' + toneGradient(row.tone)"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============ recent alerts ============ -->
+            <div class="cctv-card mb-4">
+                <h3 class="cctv-card-title">
+                    <span>Latest open alerts</span>
+                    <button type="button" class="cctv-btn3d cctv-btn3d--indigo"
+                            t-on-click="() => this.openAction('cctv_management.action_cctv_alert')">
+                        View all <i class="fa fa-arrow-right"/>
+                    </button>
+                </h3>
+                <div t-if="!state.recentAlerts.length" class="cctv-empty-note">
+                    <i class="fa fa-check-circle fa-2x text-success d-block mb-2"/>
+                    All clear &#8211; no open alerts.
+                </div>
+                <div class="cctv-alert-list">
+                    <div t-foreach="state.recentAlerts" t-as="a" t-key="a.id" class="cctv-alert-row" t-on-click="() => this.openAlert(a)">
+                        <span t-attf-class="cctv-3d cctv-3d--sm cctv-3d--#{alertTone(a)}"><i class="fa fa-bell"/></span>
+                        <div class="cctv-alert-main">
+                            <div class="cctv-alert-name" t-esc="a.name"/>
+                            <div class="cctv-alert-meta">
+                                <t t-if="a.camera_id"><i class="fa fa-video-camera"/> <t t-esc="a.camera_id[1]"/></t>
+                                <t t-if="a.office_id"> &#183; <t t-esc="a.office_id[1]"/></t>
+                                <t t-if="alertAge(a)"> &#183; <t t-esc="alertAge(a)"/></t>
+                            </div>
+                        </div>
+                        <span t-attf-class="cctv-sev sev-#{a.severity}" t-esc="a.severity"/>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============ quick launch ============ -->
+            <div class="cctv-card">
+                <h3 class="cctv-card-title"><span>Quick launch</span></h3>
+                <div class="cctv-launch-grid">
+                    <div t-foreach="launch" t-as="item" t-key="item.label" class="cctv-launch"
+                         t-on-click="() => this.openAction(item.action)">
+                        <span t-attf-class="cctv-3d cctv-3d--md cctv-3d--#{item.tone}"><i t-attf-class="fa #{item.icon}"/></span>
+                        <div>
+                            <b t-esc="item.label"/>
+                            <span class="cctv-launch-sub" t-esc="item.sub"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </div>
+</t>
+</templates>

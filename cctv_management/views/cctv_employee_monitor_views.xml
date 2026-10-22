@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_cctv_employee_monitor_tree" model="ir.ui.view">
+        <field name="name">cctv.employee.monitor.tree</field>
+        <field name="model">cctv.employee.monitor</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom" class="cctv-ui">
+                <field name="employee_id"/>
+                <field name="person_id"/>
+                <field name="department_id"/>
+                <field name="shift_start" widget="float_time"/>
+                <field name="shift_end" widget="float_time"/>
+                <field name="grace_minutes"/>
+                <field name="idle_alert_minutes"/>
+                <field name="break_start" widget="float_time" optional="hide"/>
+                <field name="break_end" widget="float_time" optional="hide"/>
+                <field name="gap_scope" optional="hide"/>
+                <field name="effective_tz" optional="show"/>
+                <field name="monitoring_active"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_cctv_employee_monitor_form" model="ir.ui.view">
+        <field name="name">cctv.employee.monitor.form</field>
+        <field name="model">cctv.employee.monitor</field>
+        <field name="arch" type="xml">
+            <form class="cctv-ui">
+                <header>
+                    <button name="action_rebuild_summary" type="object" string="Rebuild Today's Summary"
+                            class="btn-secondary"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="employee_id"/>
+                            <field name="person_id"/>
+                            <field name="department_id"/>
+                            <field name="camera_ids" widget="many2many_tags"/>
+                        </group>
+                        <group>
+                            <field name="shift_start" widget="float_time"/>
+                            <field name="shift_end" widget="float_time"/>
+                            <field name="effective_tz"/>
+                            <field name="grace_minutes"/>
+                            <field name="monitoring_active"/>
+                        </group>
+                    </group>
+                    <group string="Gap Detection">
+                        <group>
+                            <field name="idle_alert_minutes"/>
+                            <field name="gap_scope"/>
+                            <field name="alert_cooldown_minutes"/>
+                            <field name="early_leave_tolerance"/>
+                        </group>
+                        <group>
+                            <field name="break_start" widget="float_time"/>
+                            <field name="break_end" widget="float_time"/>
+                            <field name="skip_on_leave"/>
+                        </group>
+                    </group>
+                    <group string="Working Days">
+                        <group>
+                            <field name="work_mon"/><field name="work_tue"/><field name="work_wed"/><field name="work_thu"/>
+                        </group>
+                        <group>
+                            <field name="work_fri"/><field name="work_sat"/><field name="work_sun"/>
+                        </group>
+                    </group>
+                    <field name="notes" placeholder="Any notes on this monitoring assignment..."/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_cctv_employee_monitor" model="ir.actions.act_window">
+        <field name="name">Employee Monitoring Assignments</field>
+        <field name="res_model">cctv.employee.monitor</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Assign employees to a zone/shift so the system can detect late arrivals,
+                early departures, and unexplained absence from their workstation.
+            </p>
+        </field>
+    </record>
+
+    <record id="view_cctv_employee_daily_summary_tree" model="ir.ui.view">
+        <field name="name">cctv.employee.daily.summary.tree</field>
+        <field name="model">cctv.employee.daily.summary</field>
+        <field name="arch" type="xml">
+            <tree decoration-danger="total_violation_count &gt; 3" decoration-warning="total_violation_count &gt; 0" class="cctv-ui">
+                <field name="date"/>
+                <field name="employee_id"/>
+                <field name="first_seen"/>
+                <field name="last_seen"/>
+                <field name="idle_event_count"/>
+                <field name="phone_usage_count"/>
+                <field name="unauthorized_break_count"/>
+                <field name="left_station_count"/>
+                <field name="late_arrival"/>
+                <field name="early_departure"/>
+                <field name="unprofessional_conduct_count"/>
+                <field name="late_minutes" optional="show"/>
+                <field name="gap_count" optional="show"/>
+                <field name="total_gap_minutes" optional="show"/>
+                <field name="longest_gap_minutes" optional="hide"/>
+                <field name="presence_rate" optional="show"/>
+                <field name="total_violation_count"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_cctv_employee_daily_summary_form" model="ir.ui.view">
+        <field name="name">cctv.employee.daily.summary.form</field>
+        <field name="model">cctv.employee.daily.summary</field>
+        <field name="arch" type="xml">
+            <form class="cctv-ui">
+                <sheet>
+                    <group>
+                        <group string="Attendance">
+                            <field name="employee_id"/>
+                            <field name="date"/>
+                            <field name="first_seen"/>
+                            <field name="last_seen"/>
+                            <field name="late_arrival"/>
+                            <field name="late_minutes"/>
+                            <field name="early_departure"/>
+                            <field name="early_departure_minutes"/>
+                        </group>
+                        <group string="Presence &amp; Gaps">
+                            <field name="scheduled_minutes"/>
+                            <field name="presence_minutes"/>
+                            <field name="presence_rate"/>
+                            <field name="gap_count"/>
+                            <field name="total_gap_minutes"/>
+                            <field name="longest_gap_minutes"/>
+                        </group>
+                    </group>
+                    <group string="Gap Detail (local time, breaks excluded)">
+                        <field name="gap_detail" nolabel="1" colspan="2"/>
+                    </group>
+                    <group string="Behaviour Events">
+                        <group>
+                            <field name="idle_event_count"/>
+                            <field name="phone_usage_count"/>
+                            <field name="unauthorized_break_count"/>
+                        </group>
+                        <group>
+                            <field name="left_station_count"/>
+                            <field name="unprofessional_conduct_count"/>
+                            <field name="total_violation_count"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_cctv_employee_daily_summary_search" model="ir.ui.view">
+        <field name="name">cctv.employee.daily.summary.search</field>
+        <field name="model">cctv.employee.daily.summary</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="employee_id"/>
+                <field name="date"/>
+                <filter string="Has Violations" name="has_violations" domain="[('total_violation_count','&gt;',0)]"/>
+                <filter string="Late" name="f_late" domain="[('late_arrival','=',True)]"/>
+                <filter string="Left Early" name="f_early" domain="[('early_departure','=',True)]"/>
+                <filter string="Has Gaps" name="f_gaps" domain="[('gap_count','&gt;',0)]"/>
+                <filter string="Presence under 80%" name="f_low_presence" domain="[('presence_rate','&lt;',80)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Employee" name="group_employee" context="{'group_by':'employee_id'}"/>
+                    <filter string="Date" name="group_date" context="{'group_by':'date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_cctv_employee_daily_summary" model="ir.actions.act_window">
+        <field name="name">Employee Daily Activity Summary</field>
+        <field name="res_model">cctv.employee.daily.summary</field>
+        <field name="view_mode">tree,form,pivot,graph</field>
+        <field name="context">{'search_default_group_employee': 1}</field>
+    </record>
+
+    <record id="view_project_task_form_cctv" model="ir.ui.view">
+        <field name="name">project.task.form.cctv</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_form2"/>
+        <!-- Targets <notebook> rather than a specific field like date_deadline,
+             since the notebook tag is far more stable across Odoo point-releases
+             than any single field's exact position. If your project.task form
+             has no <notebook> at all (unlikely, but possible in a heavily
+             customized install), this view simply won't apply - it won't break
+             the install, it just won't show the field, and you can add it
+             manually via Settings > Technical > User Interface > Views. -->
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="CCTV Monitoring" name="cctv_monitoring">
+                    <group>
+                        <field name="cctv_zone_id"/>
+                        <field name="cctv_task_delay_flagged" readonly="1"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>
+

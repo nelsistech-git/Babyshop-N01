@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_cctv_violation_rule_tree" model="ir.ui.view">
+        <field name="name">cctv.violation.rule.tree</field>
+        <field name="model">cctv.violation.rule</field>
+        <field name="arch" type="xml">
+            <tree class="cctv-ui">
+                <field name="name"/>
+                <field name="category"/>
+                <field name="violation_type"/>
+                <field name="office_id"/>
+                <field name="department_id"/>
+                <field name="job_id"/>
+                <field name="score_category"/>
+                <field name="score_points"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_cctv_violation_rule_form" model="ir.ui.view">
+        <field name="name">cctv.violation.rule.form</field>
+        <field name="model">cctv.violation.rule</field>
+        <field name="arch" type="xml">
+            <form class="cctv-ui">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="category"/>
+                            <field name="violation_type"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="company_id"/>
+                            <field name="office_id"/>
+                            <field name="department_id"/>
+                            <field name="job_id"/>
+                        </group>
+                    </group>
+                    <group string="Scoring">
+                        <field name="score_category"/>
+                        <field name="score_points"/>
+                        <field name="reset_period_months"/>
+                    </group>
+                    <notebook>
+                        <page string="Offense Tiers (1st, 2nd, 3rd, 4th+...)">
+                            <field name="tier_ids">
+                                <tree editable="bottom">
+                                    <field name="sequence"/>
+                                    <field name="action_type"/>
+                                    <field name="fine_amount"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                    <field name="notes"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_cctv_violation_rule" model="ir.actions.act_window">
+        <field name="name">Violation Rules (Fine &amp; Discipline Matrix)</field>
+        <field name="res_model">cctv.violation.rule</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Define what counts as a violation, how it's scoped (branch/department/designation),
+                and what happens on the 1st, 2nd, 3rd, and 4th+ occurrence.
+            </p>
+        </field>
+    </record>
+</odoo>

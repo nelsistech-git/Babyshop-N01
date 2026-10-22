@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="seq_cctv_camera" model="ir.sequence">
+            <field name="name">CCTV Camera</field>
+            <field name="code">cctv.camera</field>
+            <field name="prefix">CAM-</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="cron_cctv_offline_check" model="ir.cron">
+            <field name="name">CCTV: Check Offline Cameras</field>
+            <field name="model_id" ref="model_cctv_camera"/>
+            <field name="state">code</field>
+            <field name="code">model.cron_check_offline_cameras()</field>
+            <field name="interval_number">5</field>
+            <field name="interval_type">minutes</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="cron_cctv_late_arrivals" model="ir.cron">
+            <field name="name">CCTV: Check Employee Late Arrivals</field>
+            <field name="model_id" ref="model_cctv_employee_monitor"/>
+            <field name="state">code</field>
+            <field name="code">model.cron_check_late_arrivals()</field>
+            <field name="interval_number">15</field>
+            <field name="interval_type">minutes</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="cron_cctv_early_departures" model="ir.cron">
+            <field name="name">CCTV: Check Employee Early Departures</field>
+            <field name="model_id" ref="model_cctv_employee_monitor"/>
+            <field name="state">code</field>
+            <field name="code">model.cron_check_early_departures()</field>
+            <field name="interval_number">15</field>
+            <field name="interval_type">minutes</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="cron_cctv_left_station" model="ir.cron">
+            <field name="name">CCTV: Check Employee Left Workstation</field>
+            <field name="model_id" ref="model_cctv_employee_monitor"/>
+            <field name="state">code</field>
+            <field name="code">model.cron_check_left_station()</field>
+            <field name="interval_number">15</field>
+            <field name="interval_type">minutes</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="cron_cctv_daily_summary" model="ir.cron">
+            <field name="name">CCTV: Build Employee Daily Activity Summaries</field>
+            <field name="model_id" ref="model_cctv_employee_daily_summary"/>
+            <field name="state">code</field>
+            <field name="code">model.cron_build_daily_summaries()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">hours</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="cron_cctv_task_delay" model="ir.cron">
+            <field name="name">CCTV: Check Task Delay vs Camera Presence</field>
+            <field name="model_id" ref="model_project_task"/>
+            <field name="state">code</field>
+            <field name="code">model.cron_check_task_delay()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">hours</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="cron_cctv_monthly_score" model="ir.cron">
+            <field name="name">CCTV: Build Employee Monthly Discipline/Safety/Attendance/Compliance Scores</field>
+            <field name="model_id" ref="model_cctv_employee_monthly_score"/>
+            <field name="state">code</field>
+            <field name="code">model.cron_build_monthly_scores()</field>
+            <field name="interval_number">6</field>
+            <field name="interval_type">hours</field>
+            <field name="active">True</field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,501 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ================= PEOPLE (Face Database) ================= -->
+    <record id="view_cctv_person_search" model="ir.ui.view">
+        <field name="name">cctv.person.search</field>
+        <field name="model">cctv.person</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="id_number"/>
+                <field name="phone"/>
+                <filter string="On Site Now" name="on_site" domain="[('on_site','=',True)]"/>
+                <separator/>
+                <filter string="Employees" name="f_employee" domain="[('person_type','=','employee')]"/>
+                <filter string="Visitors" name="f_visitor" domain="[('person_type','=','visitor')]"/>
+                <filter string="Vendors" name="f_vendor" domain="[('person_type','=','vendor')]"/>
+                <filter string="VIP" name="f_vip" domain="[('person_type','=','vip')]"/>
+                <filter string="Blacklisted" name="f_black" domain="[('person_type','=','blacklisted')]"/>
+                <separator/>
+                <filter string="No Biometric Consent" name="f_no_consent" domain="[('biometric_consent','=',False)]"/>
+                <filter string="Archived" name="inactive" domain="[('active','=',False)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Type" name="g_type" context="{'group_by':'person_type'}"/>
+                    <filter string="Last Seen Camera" name="g_cam" context="{'group_by':'last_camera_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_cctv_person_kanban" model="ir.ui.view">
+        <field name="name">cctv.person.kanban</field>
+        <field name="model">cctv.person</field>
+        <field name="arch" type="xml">
+            <kanban class="cctv-ui">
+                <field name="id"/>
+                <field name="on_site"/>
+                <field name="last_seen"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click d-flex">
+                            <div class="o_kanban_image me-3">
+                                <img t-att-src="kanban_image('cctv.person', 'photo', record.id.raw_value)"
+                                     class="o_image_64_cover" alt="Photo"/>
+                            </div>
+                            <div>
+                                <strong><field name="name"/></strong>
+                                <div>
+                                    <field name="person_type" widget="badge"/>
+                                    <span t-if="record.on_site.raw_value" class="badge text-bg-success ms-1">On site</span>
+                                </div>
+                                <div class="text-muted" t-if="record.last_seen.raw_value">
+                                    Last seen <field name="last_seen"/>
+                                </div>
+                                <div class="text-muted">Visits: <field name="visit_count"/></div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_cctv_person_tree_tracking" model="ir.ui.view">
+        <field name="name">cctv.person.tree.tracking</field>
+        <field name="model">cctv.person</field>
+        <field name="inherit_id" ref="view_cctv_person_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='visit_count']" position="after">
+                <field name="on_site" optional="show"/>
+                <field name="last_seen" optional="show"/>
+                <field name="last_camera_id" optional="hide"/>
+                <field name="max_stay_minutes" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_cctv_person_form_tracking" model="ir.ui.view">
+        <field name="name">cctv.person.form.tracking</field>
+        <field name="model">cctv.person</field>
+        <field name="inherit_id" ref="view_cctv_person_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('oe_button_box')]" position="inside">
+                <button name="action_open_face_logs" type="object" class="oe_stat_button" icon="fa-camera">
+                    <field name="face_log_count" widget="statinfo" string="Sightings"/>
+                </button>
+            </xpath>
+            <xpath expr="//field[@name='face_embedding_ref']" position="after">
+                <field name="max_stay_minutes" invisible="person_type == 'employee'"/>
+                <field name="on_site"/>
+                <field name="last_seen"/>
+                <field name="last_camera_id"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_cctv_watchlist" model="ir.actions.act_window">
+        <field name="name">Watchlist (Blacklist &amp; VIP)</field>
+        <field name="res_model">cctv.person</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="domain">[('person_type','in',('blacklisted','vip'))]</field>
+        <field name="context">{'default_person_type': 'blacklisted'}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Nobody on the watchlist yet.</p>
+            <p>A blacklisted person seen by any camera raises a critical alert; a VIP raises a heads-up alert.</p>
+        </field>
+    </record>
+
+    <!-- ================= VISITS / ROUTES ================= -->
+    <record id="view_cctv_visit_form" model="ir.ui.view">
+        <field name="name">cctv.visit.form</field>
+        <field name="model">cctv.visit</field>
+        <field name="arch" type="xml">
+            <form class="cctv-ui">
+                <header>
+                    <button name="action_check_out" type="object" string="Check Out" class="btn-primary"
+                            invisible="exit_time"/>
+                    <field name="state" widget="statusbar" statusbar_visible="on_site,left"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="person_id"/>
+                            <field name="person_type"/>
+                            <field name="office_id"/>
+                            <field name="department_visited_id"/>
+                            <field name="source"/>
+                        </group>
+                        <group>
+                            <field name="entry_time"/>
+                            <field name="exit_time"/>
+                            <field name="duration_minutes"/>
+                            <field name="last_seen"/>
+                            <field name="entry_camera_id"/>
+                            <field name="exit_camera_id"/>
+                            <field name="auto_closed"/>
+                            <field name="is_overstay"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="route_summary"/>
+                    </group>
+                    <notebook>
+                        <page string="Route (camera to camera)" name="route">
+                            <field name="route_event_ids" readonly="1">
+                                <tree>
+                                    <field name="event_time"/>
+                                    <field name="camera_id"/>
+                                    <field name="department_id"/>
+                                    <field name="detection_type"/>
+                                    <field name="behavior_type"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Vehicles" name="vehicles">
+                            <field name="vehicle_log_ids" readonly="1">
+                                <tree>
+                                    <field name="license_plate"/>
+                                    <field name="vehicle_type"/>
+                                    <field name="entry_time"/>
+                                    <field name="exit_time"/>
+                                    <field name="parking_minutes"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_cctv_visit_tree_tracking" model="ir.ui.view">
+        <field name="name">cctv.visit.tree.tracking</field>
+        <field name="model">cctv.visit</field>
+        <field name="inherit_id" ref="view_cctv_visit_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="attributes">
+                <attribute name="decoration-danger">is_overstay</attribute>
+                <attribute name="decoration-success">state == 'on_site' and not is_overstay</attribute>
+            </xpath>
+            <xpath expr="//field[@name='person_id']" position="before">
+                <field name="is_overstay" column_invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='person_id']" position="after">
+                <field name="person_type" optional="show"/>
+            </xpath>
+            <xpath expr="//field[@name='duration_minutes']" position="after">
+                <field name="state" optional="show"/>
+                <field name="source" optional="hide"/>
+                <field name="route_summary" optional="show"/>
+                <field name="last_seen" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_cctv_visit_search_tracking" model="ir.ui.view">
+        <field name="name">cctv.visit.search.tracking</field>
+        <field name="model">cctv.visit</field>
+        <field name="inherit_id" ref="view_cctv_visit_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='office_id']" position="after">
+                <field name="department_visited_id"/>
+                <filter string="On Site Now" name="on_site" domain="[('exit_time','=',False)]"/>
+                <filter string="Overstayed" name="overstay" domain="[('is_overstay','=',True)]"/>
+                <filter string="Auto-closed" name="auto_closed" domain="[('auto_closed','=',True)]"/>
+                <filter string="Last 24 Hours" name="last24"
+                        domain="[('entry_time','&gt;=',(datetime.datetime.now()-datetime.timedelta(hours=24)).strftime('%Y-%m-%d %H:%M:%S'))]"/>
+                <separator/>
+                <filter string="Visitors" name="f_visitor" domain="[('person_type','=','visitor')]"/>
+                <filter string="Vendors" name="f_vendor" domain="[('person_type','=','vendor')]"/>
+                <filter string="VIP" name="f_vip" domain="[('person_type','=','vip')]"/>
+                <filter string="Blacklisted" name="f_black" domain="[('person_type','=','blacklisted')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Person" name="g_person" context="{'group_by':'person_id'}"/>
+                    <filter string="Site" name="g_office" context="{'group_by':'office_id'}"/>
+                    <filter string="Department" name="g_dept" context="{'group_by':'department_visited_id'}"/>
+                    <filter string="Person Type" name="g_ptype" context="{'group_by':'person_type'}"/>
+                    <filter string="Source" name="g_source" context="{'group_by':'source'}"/>
+                    <filter string="Day" name="g_day" context="{'group_by':'entry_time:day'}"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_cctv_visit_pivot" model="ir.ui.view">
+        <field name="name">cctv.visit.pivot</field>
+        <field name="model">cctv.visit</field>
+        <field name="arch" type="xml">
+            <pivot string="Visits">
+                <field name="office_id" type="row"/>
+                <field name="entry_time" interval="day" type="col"/>
+                <field name="duration_minutes" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_cctv_visit_graph" model="ir.ui.view">
+        <field name="name">cctv.visit.graph</field>
+        <field name="model">cctv.visit</field>
+        <field name="arch" type="xml">
+            <graph string="Visits per Day" type="bar">
+                <field name="entry_time" interval="day"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_cctv_on_site_now" model="ir.actions.act_window">
+        <field name="name">On Site Now</field>
+        <field name="res_model">cctv.visit</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('exit_time','=',False)]</field>
+        <field name="context">{'search_default_g_office': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Nobody is checked in right now.</p>
+            <p>Visits open automatically when a registered visitor, vendor or VIP is recognised on camera
+               (or their registered vehicle enters), and close at the exit gate or after a period without sightings.</p>
+        </field>
+    </record>
+
+    <record id="action_server_visit_check_out" model="ir.actions.server">
+        <field name="name">Check Out Selected</field>
+        <field name="model_id" ref="model_cctv_visit"/>
+        <field name="binding_model_id" ref="model_cctv_visit"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">records.action_check_out()</field>
+    </record>
+
+    <!-- ================= FACE RECOGNITION LOG ================= -->
+    <record id="view_cctv_face_log_search" model="ir.ui.view">
+        <field name="name">cctv.face.log.search</field>
+        <field name="model">cctv.face.log</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="person_id"/>
+                <field name="camera_id"/>
+                <field name="office_id"/>
+                <filter string="To Review (Unknown)" name="to_review"
+                        domain="[('is_unknown','=',True),('reviewed','=',False)]"/>
+                <filter string="Unknown Faces" name="unknown" domain="[('is_unknown','=',True)]"/>
+                <filter string="Matched" name="matched" domain="[('person_id','!=',False)]"/>
+                <filter string="Low Confidence (&lt;70%)" name="low_conf"
+                        domain="[('person_id','!=',False),('match_confidence','&lt;',70)]"/>
+                <separator/>
+                <filter string="Last 24 Hours" name="last24"
+                        domain="[('detected_at','&gt;=',(datetime.datetime.now()-datetime.timedelta(hours=24)).strftime('%Y-%m-%d %H:%M:%S'))]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Person" name="g_person" context="{'group_by':'person_id'}"/>
+                    <filter string="Camera" name="g_camera" context="{'group_by':'camera_id'}"/>
+                    <filter string="Site" name="g_office" context="{'group_by':'office_id'}"/>
+                    <filter string="Day" name="g_day" context="{'group_by':'detected_at:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_cctv_face_log_tree_tracking" model="ir.ui.view">
+        <field name="name">cctv.face.log.tree.tracking</field>
+        <field name="model">cctv.face.log</field>
+        <field name="inherit_id" ref="view_cctv_face_log_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='match_confidence']" position="after">
+                <field name="reviewed" optional="show"/>
+                <field name="note" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_cctv_face_log_form" model="ir.ui.view">
+        <field name="name">cctv.face.log.form</field>
+        <field name="model">cctv.face.log</field>
+        <field name="arch" type="xml">
+            <form class="cctv-ui">
+                <header>
+                    <button name="action_enroll_person" type="object" string="Enroll as Person" class="btn-primary"
+                            invisible="person_id or not is_unknown"/>
+                    <button name="action_mark_reviewed" type="object" string="Mark Reviewed" invisible="reviewed"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="detected_at"/>
+                            <field name="camera_id"/>
+                            <field name="office_id"/>
+                            <field name="person_id"/>
+                            <field name="is_unknown"/>
+                            <field name="match_confidence"/>
+                        </group>
+                        <group>
+                            <field name="reviewed"/>
+                            <field name="reviewed_by"/>
+                            <field name="reviewed_on"/>
+                            <field name="linked_to_attendance"/>
+                            <field name="note"/>
+                        </group>
+                    </group>
+                    <field name="snapshot" widget="image" options="{'size': [0, 300]}"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_cctv_face_log_graph" model="ir.ui.view">
+        <field name="name">cctv.face.log.graph</field>
+        <field name="model">cctv.face.log</field>
+        <field name="arch" type="xml">
+            <graph string="Face Sightings per Day" type="bar">
+                <field name="detected_at" interval="day"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_cctv_unknown_faces" model="ir.actions.act_window">
+        <field name="name">Unknown Faces (To Review)</field>
+        <field name="res_model">cctv.face.log</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('is_unknown','=',True),('reviewed','=',False)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No unknown faces waiting for review.</p>
+            <p>Open a face and use <b>Enroll as Person</b> to add it to the Face Database, or <b>Mark Reviewed</b> to dismiss it.</p>
+        </field>
+    </record>
+
+    <record id="action_server_face_log_reviewed" model="ir.actions.server">
+        <field name="name">Mark Reviewed</field>
+        <field name="model_id" ref="model_cctv_face_log"/>
+        <field name="binding_model_id" ref="model_cctv_face_log"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">records.action_mark_reviewed()</field>
+    </record>
+
+    <!-- ================= VEHICLE LOGS ================= -->
+    <record id="view_cctv_vehicle_log_search" model="ir.ui.view">
+        <field name="name">cctv.vehicle.log.search</field>
+        <field name="model">cctv.vehicle.log</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="license_plate" filter_domain="[('plate_key','ilike',self)]"/>
+                <field name="person_id"/>
+                <field name="camera_id"/>
+                <field name="office_id"/>
+                <filter string="Parked Now" name="parked" domain="[('exit_time','=',False)]"/>
+                <filter string="Unauthorized" name="unauth" domain="[('is_authorized','=',False)]"/>
+                <filter string="Unknown Owner" name="no_owner" domain="[('person_id','=',False)]"/>
+                <filter string="Last 24 Hours" name="last24"
+                        domain="[('entry_time','&gt;=',(datetime.datetime.now()-datetime.timedelta(hours=24)).strftime('%Y-%m-%d %H:%M:%S'))]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Site" name="g_office" context="{'group_by':'office_id'}"/>
+                    <filter string="Vehicle Type" name="g_type" context="{'group_by':'vehicle_type'}"/>
+                    <filter string="Owner" name="g_owner" context="{'group_by':'person_id'}"/>
+                    <filter string="Status" name="g_state" context="{'group_by':'state'}"/>
+                    <filter string="Day" name="g_day" context="{'group_by':'entry_time:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_cctv_vehicle_log_tree_tracking" model="ir.ui.view">
+        <field name="name">cctv.vehicle.log.tree.tracking</field>
+        <field name="model">cctv.vehicle.log</field>
+        <field name="inherit_id" ref="view_cctv_vehicle_log_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='is_authorized']" position="after">
+                <field name="state" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_cctv_vehicle_log_form" model="ir.ui.view">
+        <field name="name">cctv.vehicle.log.form</field>
+        <field name="model">cctv.vehicle.log</field>
+        <field name="arch" type="xml">
+            <form class="cctv-ui">
+                <header>
+                    <button name="action_check_out" type="object" string="Check Out" class="btn-primary"
+                            invisible="exit_time"/>
+                    <field name="state" widget="statusbar" statusbar_visible="parked,left"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="license_plate"/>
+                            <field name="vehicle_type"/>
+                            <field name="person_id"/>
+                            <field name="visit_id"/>
+                            <field name="is_authorized"/>
+                        </group>
+                        <group>
+                            <field name="camera_id"/>
+                            <field name="office_id"/>
+                            <field name="entry_time"/>
+                            <field name="exit_time"/>
+                            <field name="last_seen"/>
+                            <field name="parking_minutes"/>
+                            <field name="speed_kph"/>
+                        </group>
+                    </group>
+                    <field name="snapshot" widget="image" options="{'size': [0, 300]}"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_cctv_vehicle_log_graph" model="ir.ui.view">
+        <field name="name">cctv.vehicle.log.graph</field>
+        <field name="model">cctv.vehicle.log</field>
+        <field name="arch" type="xml">
+            <graph string="Vehicles per Day" type="bar">
+                <field name="entry_time" interval="day"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_server_vehicle_check_out" model="ir.actions.server">
+        <field name="name">Check Out Selected</field>
+        <field name="model_id" ref="model_cctv_vehicle_log"/>
+        <field name="binding_model_id" ref="model_cctv_vehicle_log"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">records.action_check_out()</field>
+    </record>
+
+    <!-- ================= REGISTERED VEHICLES ================= -->
+    <record id="view_cctv_person_vehicle_tree" model="ir.ui.view">
+        <field name="name">cctv.person.vehicle.tree</field>
+        <field name="model">cctv.person.vehicle</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom" class="cctv-ui">
+                <field name="license_plate"/>
+                <field name="vehicle_type"/>
+                <field name="person_id"/>
+                <field name="notes"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_cctv_person_vehicle_search" model="ir.ui.view">
+        <field name="name">cctv.person.vehicle.search</field>
+        <field name="model">cctv.person.vehicle</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="license_plate" filter_domain="[('plate_key','ilike',self)]"/>
+                <field name="person_id"/>
+                <group expand="0" string="Group By">
+                    <filter string="Owner" name="g_owner" context="{'group_by':'person_id'}"/>
+                    <filter string="Vehicle Type" name="g_type" context="{'group_by':'vehicle_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_cctv_person_vehicle" model="ir.actions.act_window">
+        <field name="name">Registered Vehicles</field>
+        <field name="res_model">cctv.person.vehicle</field>
+        <field name="view_mode">tree</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Register vehicles of employees, visitors and vendors.</p>
+            <p>When a registered plate is read at a gate, the log is linked to its owner and a visit is opened for visitors.</p>
+        </field>
+    </record>
+</odoo>

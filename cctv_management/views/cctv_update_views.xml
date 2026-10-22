@@ -1,0 +1,361 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ===== Site: default map position for its cameras ===== -->
+    <record id="view_cctv_office_form_geo" model="ir.ui.view">
+        <field name="name">cctv.office.form.geo</field>
+        <field name="model">cctv.office</field>
+        <field name="inherit_id" ref="view_cctv_office_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='address']" position="after">
+                <field name="latitude"/>
+                <field name="longitude"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ===== Camera tree: AI / sync columns ===== -->
+    <record id="view_cctv_camera_tree_sync" model="ir.ui.view">
+        <field name="name">cctv.camera.tree.sync</field>
+        <field name="model">cctv.camera</field>
+        <field name="inherit_id" ref="view_cctv_camera_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='recording_mode']" position="before">
+                <field name="bitrate_kbps" optional="hide"/>
+                <field name="ai_capability_labels" optional="show"/>
+                <field name="ai_state" widget="badge" optional="show"
+                       decoration-success="ai_state == 'running'" decoration-warning="ai_state == 'stale'"
+                       decoration-muted="ai_state == 'off'"/>
+                <field name="sync_state" widget="badge" optional="hide"
+                       decoration-success="sync_state == 'ok'" decoration-danger="sync_state == 'failed'"/>
+            </xpath>
+            <xpath expr="//tree" position="inside">
+                <header>
+                    <button name="action_sync_from_camera" type="object" string="Sync from Camera"/>
+                </header>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ===== Event: review + Drive links ===== -->
+    <record id="view_cctv_event_form_drive" model="ir.ui.view">
+        <field name="name">cctv.event.form.drive</field>
+        <field name="model">cctv.event</field>
+        <field name="inherit_id" ref="view_cctv_event_form"/>
+        <field name="arch" type="xml">
+            <!-- joins the header created by view_cctv_event_form_v4 (loaded earlier, same priority) -->
+            <xpath expr="//header" position="inside">
+                <button name="action_review_confirm" type="object" string="Correct detection"
+                        class="btn-secondary" icon="fa-check" invisible="review_state != 'pending'"/>
+                <button name="action_review_false_positive" type="object" string="False alarm"
+                        class="btn-secondary" icon="fa-times" invisible="review_state != 'pending'"/>
+                <field name="review_state" widget="statusbar" statusbar_visible="pending,confirmed,false_positive"/>
+            </xpath>
+            <xpath expr="//group[@string='Raw Data']" position="before">
+                <group string="Google Drive">
+                    <field name="drive_snapshot_link" widget="url" readonly="1"/>
+                    <field name="drive_clip_link" widget="url" readonly="1"/>
+                    <field name="reviewed_by" invisible="not reviewed_by"/>
+                    <field name="reviewed_on" invisible="not reviewed_on"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_cctv_event_tree_drive" model="ir.ui.view">
+        <field name="name">cctv.event.tree.drive</field>
+        <field name="model">cctv.event</field>
+        <field name="inherit_id" ref="view_cctv_event_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='incident_id']" position="after">
+                <field name="review_state" widget="badge" optional="show"
+                       decoration-success="review_state == 'confirmed'"
+                       decoration-danger="review_state == 'false_positive'"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_cctv_event_search_drive" model="ir.ui.view">
+        <field name="name">cctv.event.search.drive</field>
+        <field name="model">cctv.event</field>
+        <field name="inherit_id" ref="view_cctv_event_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='today']" position="after">
+                <filter string="Not reviewed" name="not_reviewed" domain="[('review_state','=','pending')]"/>
+                <filter string="False alarms" name="false_alarm" domain="[('review_state','=','false_positive')]"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_server_cctv_event_confirm" model="ir.actions.server">
+        <field name="name">Mark as correct detection</field>
+        <field name="model_id" ref="model_cctv_event"/>
+        <field name="binding_model_id" ref="model_cctv_event"/>
+        <field name="state">code</field>
+        <field name="code">records.action_review_confirm()</field>
+    </record>
+    <record id="action_server_cctv_event_false" model="ir.actions.server">
+        <field name="name">Mark as false alarm</field>
+        <field name="model_id" ref="model_cctv_event"/>
+        <field name="binding_model_id" ref="model_cctv_event"/>
+        <field name="state">code</field>
+        <field name="code">records.action_review_false_positive()</field>
+    </record>
+
+    <!-- ===== Drive upload log ===== -->
+    <record id="view_cctv_drive_upload_tree" model="ir.ui.view">
+        <field name="name">cctv.drive.upload.tree</field>
+        <field name="model">cctv.drive.upload</field>
+        <field name="arch" type="xml">
+            <tree decoration-danger="state == 'failed'" decoration-muted="state == 'skipped'"
+                  decoration-success="state == 'done'" class="cctv-ui">
+                <field name="create_date"/>
+                <field name="kind"/>
+                <field name="name"/>
+                <field name="camera_id"/>
+                <field name="state" widget="badge"/>
+                <field name="attempts"/>
+                <field name="size" optional="show"/>
+                <field name="web_link" widget="url" optional="show"/>
+                <field name="expires_on" optional="hide"/>
+                <field name="error" optional="show"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_cctv_drive_upload_form" model="ir.ui.view">
+        <field name="name">cctv.drive.upload.form</field>
+        <field name="model">cctv.drive.upload</field>
+        <field name="arch" type="xml">
+            <form create="0" class="cctv-ui">
+                <header>
+                    <button name="action_retry" type="object" string="Retry" class="btn-primary"
+                            invisible="state not in ('failed', 'skipped')"/>
+                    <field name="state" widget="statusbar" statusbar_visible="pending,done"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="kind"/>
+                            <field name="camera_id"/>
+                            <field name="event_id"/>
+                            <field name="label" invisible="not label"/>
+                        </group>
+                        <group>
+                            <field name="folder_path"/>
+                            <field name="web_link" widget="url"/>
+                            <field name="size"/>
+                            <field name="attempts"/>
+                            <field name="next_try"/>
+                            <field name="uploaded_on"/>
+                            <field name="expires_on"/>
+                            <field name="deleted_on"/>
+                        </group>
+                    </group>
+                    <field name="error" invisible="not error"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_cctv_drive_upload_search" model="ir.ui.view">
+        <field name="name">cctv.drive.upload.search</field>
+        <field name="model">cctv.drive.upload</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="camera_id"/>
+                <filter string="Failed" name="failed" domain="[('state','=','failed')]"/>
+                <filter string="Queued" name="pending" domain="[('state','=','pending')]"/>
+                <filter string="Uploaded" name="done" domain="[('state','=','done')]"/>
+                <separator/>
+                <filter string="Snapshots" name="snap" domain="[('kind','=','snapshot')]"/>
+                <filter string="Clips" name="clip" domain="[('kind','=','clip')]"/>
+                <filter string="Logs / Backups" name="logbk" domain="[('kind','in',['log','backup'])]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="g_state" context="{'group_by':'state'}"/>
+                    <filter string="Type" name="g_kind" context="{'group_by':'kind'}"/>
+                    <filter string="Camera" name="g_cam" context="{'group_by':'camera_id'}"/>
+                    <filter string="Day" name="g_day" context="{'group_by':'create_date:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_cctv_drive_upload" model="ir.actions.act_window">
+        <field name="name">Google Drive Upload Log</field>
+        <field name="res_model">cctv.drive.upload</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- ===== AI models ===== -->
+    <record id="view_cctv_ai_model_tree" model="ir.ui.view">
+        <field name="name">cctv.ai.model.tree</field>
+        <field name="model">cctv.ai.model</field>
+        <field name="arch" type="xml">
+            <tree decoration-success="state == 'active'" decoration-muted="state == 'archived'" class="cctv-ui">
+                <field name="name"/>
+                <field name="kind"/>
+                <field name="weights_file"/>
+                <field name="trained_on"/>
+                <field name="map50"/>
+                <field name="sample_confirmed"/>
+                <field name="sample_false"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_cctv_ai_model_form" model="ir.ui.view">
+        <field name="name">cctv.ai.model.form</field>
+        <field name="model">cctv.ai.model</field>
+        <field name="arch" type="xml">
+            <form class="cctv-ui">
+                <header>
+                    <button name="action_activate" type="object" string="Activate (send to AI service)"
+                            class="btn-primary" invisible="state == 'active'"/>
+                    <button name="action_archive_model" type="object" string="Archive" invisible="state == 'archived'"/>
+                    <button name="action_export_samples" type="object" string="Export reviewed samples to Drive"
+                            icon="fa-cloud-upload"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,active"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="kind"/>
+                            <field name="weights_file"/>
+                            <field name="classes"/>
+                        </group>
+                        <group>
+                            <field name="trained_on"/>
+                            <field name="map50"/>
+                            <field name="sample_confirmed"/>
+                            <field name="sample_false"/>
+                        </group>
+                    </group>
+                    <field name="note" placeholder="Training notes, dataset version, known weaknesses..."/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_cctv_ai_model" model="ir.actions.act_window">
+        <field name="name">AI Models &amp; Training</field>
+        <field name="res_model">cctv.ai.model</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- ===== Module settings ===== -->
+    <record id="view_cctv_config_settings" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.cctv</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app data-string="Smart CCTV" string="Smart CCTV" name="cctv_management"
+                     groups="base.group_system">
+
+                    <block title="Camera Sync" name="cctv_sync_block">
+                        <setting string="Re-read camera settings" help="Bitrate, FPS, resolution and model are read from the camera / NVR when its connection details change, then again every N hours.">
+                            <field name="cctv_sync_interval_hours"/>
+                        </setting>
+                        <setting string="Auto Floor / Zone" help="A new camera with a Site but no Floor / Department gets the site's only floor and zone, or a 'Main Floor' / 'General Area' is created.">
+                            <field name="cctv_auto_default_zone"/>
+                        </setting>
+                        <setting string="Recording playback server" help="MediaMTX playback URL as seen from the Odoo server, e.g. http://192.168.1.50:9996. Needed to copy event clips to Google Drive.">
+                            <field name="cctv_playback_base_url" placeholder="http://192.168.1.50:9996"/>
+                        </setting>
+                    </block>
+
+                    <block title="AI Service" name="cctv_ai_block">
+                        <setting string="AI service address" help="The AI service pulls its camera list, capabilities and models from Odoo every minute. These buttons check it / make it reload immediately.">
+                            <field name="cctv_ai_service_url" placeholder="http://127.0.0.1:8000"/>
+                            <div class="mt8">
+                                <button name="action_cctv_ai_test" type="object" string="Test connection" class="btn-secondary"/>
+                                <button name="action_cctv_ai_apply" type="object" string="Apply now" class="btn-secondary ms-2"/>
+                                <button name="%(action_cctv_ai_model)d" type="action" string="AI Models &amp; Training" class="btn-link ms-2"/>
+                            </div>
+                        </setting>
+                        <setting string="Readiness" help="What the AI service will receive right now.">
+                            <field name="cctv_ai_readiness" nolabel="1" readonly="1"/>
+                        </setting>
+                        <setting string="Detection" help="Confidence 0-1 (higher = fewer false alarms); process every Nth frame (higher = lighter on CPU).">
+                            <div class="row mt8"><label for="cctv_ai_confidence" class="col-lg-5"/><field name="cctv_ai_confidence"/></div>
+                            <div class="row"><label for="cctv_ai_frame_skip" class="col-lg-5"/><field name="cctv_ai_frame_skip"/></div>
+                            <div class="row"><label for="cctv_ai_tracking_max_age" class="col-lg-5"/><field name="cctv_ai_tracking_max_age"/></div>
+                            <div class="row"><label for="cctv_ai_frame_width" class="col-lg-5"/><field name="cctv_ai_frame_width"/></div>
+                            <div class="row"><label for="cctv_ai_frame_height" class="col-lg-5"/><field name="cctv_ai_frame_height"/></div>
+                        </setting>
+                        <setting string="Face / plate recognition" help="Turned on automatically when any camera has the capability ticked.">
+                            <div class="row mt8"><label for="cctv_ai_face_threshold" class="col-lg-5"/><field name="cctv_ai_face_threshold"/></div>
+                            <div class="row"><label for="cctv_ai_anpr_confidence" class="col-lg-5"/><field name="cctv_ai_anpr_confidence"/></div>
+                        </setting>
+                        <setting string="Retail rules" help="Used by queue monitoring and theft / after-hours detection.">
+                            <div class="row mt8"><label for="cctv_queue_threshold" class="col-lg-5"/><field name="cctv_queue_threshold"/></div>
+                            <div class="row"><label for="cctv_store_open_hour" class="col-lg-5"/><field name="cctv_store_open_hour"/></div>
+                            <div class="row"><label for="cctv_store_close_hour" class="col-lg-5"/><field name="cctv_store_close_hour"/></div>
+                        </setting>
+                    </block>
+
+                    <block title="Google Drive Storage" name="cctv_gdrive_block">
+                        <setting string="Connection" help="Sign in once with the Gmail account that should hold the footage. Google's own page asks for the password; Odoo never sees it.">
+                            <field name="cctv_gdrive_status" readonly="1"/>
+                            <div class="mt8">
+                                <button name="action_cctv_gdrive_connect" type="object" string="Connect Google Drive" class="btn-primary"/>
+                                <button name="action_cctv_gdrive_test" type="object" string="Test" class="btn-secondary ms-2"/>
+                                <button name="action_cctv_gdrive_disconnect" type="object" string="Disconnect" class="btn-secondary ms-2"
+                                        confirm="Stop saving to Google Drive? Files already in Drive stay there."/>
+                            </div>
+                        </setting>
+                        <setting string="Google OAuth app" help="Create once in Google Cloud Console (APIs &amp; Services > Credentials > OAuth client ID > Web application), enable the Google Drive API, and add the redirect URI below. Save before pressing Connect.">
+                            <div class="row mt8"><label for="cctv_gdrive_client_id" class="col-lg-4"/><field name="cctv_gdrive_client_id"/></div>
+                            <div class="row"><label for="cctv_gdrive_client_secret" class="col-lg-4"/><field name="cctv_gdrive_client_secret" password="True"/></div>
+                            <div class="row"><label for="cctv_gdrive_redirect_uri" class="col-lg-4"/><field name="cctv_gdrive_redirect_uri" readonly="1"/></div>
+                        </setting>
+                        <setting string="What goes to Drive" help="Only flagged events (alerts, fire, tamper...) - never the constant 'person walking' detections.">
+                            <div class="row mt8"><label for="cctv_gdrive_root_name" class="col-lg-5"/><field name="cctv_gdrive_root_name"/></div>
+                            <div class="row"><label for="cctv_drive_upload_snapshots" class="col-lg-5"/><field name="cctv_drive_upload_snapshots"/></div>
+                            <div class="row"><label for="cctv_drive_upload_clips" class="col-lg-5"/><field name="cctv_drive_upload_clips"/></div>
+                            <div class="row"><label for="cctv_drive_clip_min_severity" class="col-lg-5"/><field name="cctv_drive_clip_min_severity"/></div>
+                            <div class="row"><label for="cctv_drive_dedupe_seconds" class="col-lg-5"/><field name="cctv_drive_dedupe_seconds"/></div>
+                            <div class="row"><label for="cctv_drive_training_export" class="col-lg-5"/><field name="cctv_drive_training_export"/></div>
+                        </setting>
+                        <setting string="Logs &amp; backups" help="Every night yesterday's events and the upload log are saved as CSV and the camera configuration as JSON (no passwords). Database backup needs pg_dump on the Odoo server and can take long on big databases.">
+                            <div class="row mt8"><label for="cctv_drive_daily_log" class="col-lg-5"/><field name="cctv_drive_daily_log"/></div>
+                            <div class="row"><label for="cctv_drive_log_retention_days" class="col-lg-5"/><field name="cctv_drive_log_retention_days"/></div>
+                            <div class="row"><label for="cctv_drive_db_backup" class="col-lg-5"/><field name="cctv_drive_db_backup"/></div>
+                            <div class="row"><label for="cctv_drive_backup_keep" class="col-lg-5"/><field name="cctv_drive_backup_keep"/></div>
+                            <div class="mt8">
+                                <button name="action_cctv_gdrive_backup_now" type="object" string="Back up database now" class="btn-secondary"/>
+                            </div>
+                        </setting>
+                        <setting string="Upload queue" help="Uploads run in the background every 2 minutes and retry automatically.">
+                            <field name="cctv_gdrive_queue" readonly="1"/>
+                            <div class="mt8">
+                                <button name="action_cctv_gdrive_run_queue" type="object" string="Upload now" class="btn-secondary"/>
+                                <button name="%(action_cctv_drive_upload)d" type="action" string="Open upload log" class="btn-link ms-2"/>
+                            </div>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_cctv_settings" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module': 'cctv_management', 'bin_size': False}</field>
+    </record>
+
+    <!-- ===== Menus ===== -->
+    <menuitem id="menu_cctv_config_settings" name="Settings" parent="menu_cctv_config"
+              action="action_cctv_settings" sequence="0" groups="base.group_system"/>
+    <menuitem id="menu_cctv_config_ai_model" name="AI Models &amp; Training" parent="menu_cctv_config"
+              action="action_cctv_ai_model" sequence="9" groups="cctv_management.group_cctv_security_manager"/>
+    <menuitem id="menu_cctv_config_drive_log" name="Google Drive Upload Log" parent="menu_cctv_config"
+              action="action_cctv_drive_upload" sequence="10" groups="cctv_management.group_cctv_security_manager"/>
+</odoo>

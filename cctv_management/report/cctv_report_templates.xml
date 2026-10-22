@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_cctv_incident_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Security Incident Report</h2>
+                        <table class="table table-sm">
+                            <tr><td><strong>Incident</strong></td><td><span t-field="o.name"/></td></tr>
+                            <tr><td><strong>Type</strong></td><td><span t-field="o.incident_type"/></td></tr>
+                            <tr><td><strong>Site</strong></td><td><span t-field="o.office_id"/></td></tr>
+                            <tr><td><strong>Camera</strong></td><td><span t-field="o.camera_id"/></td></tr>
+                            <tr><td><strong>Status</strong></td><td><span t-field="o.state"/></td></tr>
+                            <tr><td><strong>Assigned To</strong></td><td><span t-field="o.assigned_to"/></td></tr>
+                            <tr><td><strong>Closed On</strong></td><td><span t-field="o.closed_date"/></td></tr>
+                        </table>
+                        <h4>Description</h4>
+                        <p><span t-field="o.description"/></p>
+                        <h4>Resolution Notes</h4>
+                        <p><span t-field="o.resolution_notes"/></p>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <template id="report_cctv_camera_health_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Camera Health Report</h2>
+                        <table class="table table-sm">
+                            <tr><td><strong>Camera</strong></td><td><span t-field="o.name"/> (<span t-field="o.camera_code"/>)</td></tr>
+                            <tr><td><strong>Site</strong></td><td><span t-field="o.office_id"/></td></tr>
+                            <tr><td><strong>Brand / Model</strong></td><td><span t-field="o.brand"/> <span t-field="o.model"/></td></tr>
+                            <tr><td><strong>Status</strong></td><td><span t-field="o.health_status"/></td></tr>
+                            <tr><td><strong>Last Heartbeat</strong></td><td><span t-field="o.last_seen"/></td></tr>
+                            <tr><td><strong>Recording Mode</strong></td><td><span t-field="o.recording_mode"/></td></tr>
+                            <tr><td><strong>Retention</strong></td><td><span t-field="o.retention_days"/> days</td></tr>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

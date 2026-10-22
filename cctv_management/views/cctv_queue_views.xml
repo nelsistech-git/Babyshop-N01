@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_cctv_queue_tree" model="ir.ui.view">
+        <field name="name">cctv.queue.status.tree</field>
+        <field name="model">cctv.queue.status</field>
+        <field name="arch" type="xml">
+            <tree decoration-danger="is_overcrowded" class="cctv-ui">
+                <field name="reading_time"/>
+                <field name="camera_id"/>
+                <field name="office_id"/>
+                <field name="person_count"/>
+                <field name="avg_wait_seconds"/>
+                <field name="threshold_used"/>
+                <field name="is_overcrowded"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_cctv_queue_graph" model="ir.ui.view">
+        <field name="name">cctv.queue.status.graph</field>
+        <field name="model">cctv.queue.status</field>
+        <field name="arch" type="xml">
+            <graph string="Queue Length" type="line">
+                <field name="reading_time" interval="day"/>
+                <field name="person_count" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_cctv_queue" model="ir.actions.act_window">
+        <field name="name">Queue Monitoring</field>
+        <field name="res_model">cctv.queue.status</field>
+        <field name="view_mode">graph,tree</field>
+    </record>
+</odoo>

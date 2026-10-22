@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_cctv_pos_link_tree" model="ir.ui.view">
+        <field name="name">cctv.pos.link.tree</field>
+        <field name="model">cctv.pos.link</field>
+        <field name="arch" type="xml">
+            <tree decoration-danger="mismatch_flagged" class="cctv-ui">
+                <field name="order_time"/>
+                <field name="pos_order_id"/>
+                <field name="camera_id"/>
+                <field name="cashier_id"/>
+                <field name="amount_total"/>
+                <field name="mismatch_flagged"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_cctv_pos_link_form" model="ir.ui.view">
+        <field name="name">cctv.pos.link.form</field>
+        <field name="model">cctv.pos.link</field>
+        <field name="arch" type="xml">
+            <form class="cctv-ui">
+                <header>
+                    <button name="action_view_camera_events" type="object"
+                            string="View Camera Events Around This Sale" class="btn-secondary"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="pos_order_id"/>
+                            <field name="camera_id"/>
+                            <field name="cashier_id"/>
+                            <field name="order_time"/>
+                            <field name="amount_total"/>
+                        </group>
+                        <group>
+                            <field name="mismatch_flagged"/>
+                            <field name="event_id"/>
+                            <field name="review_notes"/>
+                        </group>
+                    </group>
+                    <group string="Counter Snapshot">
+                        <field name="snapshot" widget="image"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_cctv_pos_link" model="ir.actions.act_window">
+        <field name="name">POS &#8596; CCTV Links</field>
+        <field name="res_model">cctv.pos.link</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

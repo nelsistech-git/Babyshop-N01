@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_cctv_violation_appeal_tree" model="ir.ui.view">
+        <field name="name">cctv.violation.appeal.tree</field>
+        <field name="model">cctv.violation.appeal</field>
+        <field name="arch" type="xml">
+            <tree class="cctv-ui">
+                <field name="create_date"/>
+                <field name="employee_id"/>
+                <field name="violation_id"/>
+                <field name="state" widget="badge"/>
+                <field name="decision"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_cctv_violation_appeal_form" model="ir.ui.view">
+        <field name="name">cctv.violation.appeal.form</field>
+        <field name="model">cctv.violation.appeal</field>
+        <field name="arch" type="xml">
+            <form class="cctv-ui">
+                <header>
+                    <button name="action_move_to_supervisor_review" type="object" string="Move to Supervisor Review"
+                            invisible="state != 'submitted'"/>
+                    <button name="action_move_to_hr_decision" type="object" string="Move to HR Decision"
+                            invisible="state != 'supervisor_review'"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <group>
+                        <field name="violation_id"/>
+                        <field name="employee_id"/>
+                        <field name="supervisor_id"/>
+                        <field name="hr_decision_maker_id"/>
+                        <field name="decision"/>
+                    </group>
+                    <field name="employee_explanation" placeholder="Employee's explanation..."/>
+                    <field name="supporting_document" filename="supporting_document_name"/>
+                    <field name="supporting_document_name" invisible="1"/>
+                    <field name="supervisor_notes" placeholder="Supervisor notes..."/>
+                    <field name="decision_notes" placeholder="HR decision notes..."/>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_cctv_violation_appeal" model="ir.actions.act_window">
+        <field name="name">Violation Appeals</field>
+        <field name="res_model">cctv.violation.appeal</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="view_cctv_employee_monthly_score_tree" model="ir.ui.view">
+        <field name="name">cctv.employee.monthly.score.tree</field>
+        <field name="model">cctv.employee.monthly.score</field>
+        <field name="arch" type="xml">
+            <tree decoration-success="compliance_score &gt;= 90" decoration-danger="compliance_score &lt; 70" class="cctv-ui">
+                <field name="period_label"/>
+                <field name="employee_id"/>
+                <field name="discipline_score"/>
+                <field name="safety_score"/>
+                <field name="attendance_score"/>
+                <field name="compliance_score"/>
+                <field name="total_violations"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_cctv_employee_monthly_score" model="ir.actions.act_window">
+        <field name="name">Monthly Discipline &amp; Compliance Leaderboard</field>
+        <field name="res_model">cctv.employee.monthly.score</field>
+        <field name="view_mode">tree,pivot,graph</field>
+        <field name="context">{'search_default_group_by_period': 1}</field>
+    </record>
+</odoo>

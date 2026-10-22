@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_cctv_footfall_tree" model="ir.ui.view">
+        <field name="name">cctv.footfall.count.tree</field>
+        <field name="model">cctv.footfall.count</field>
+        <field name="arch" type="xml">
+            <tree class="cctv-ui">
+                <field name="interval_start"/>
+                <field name="interval_end"/>
+                <field name="camera_id"/>
+                <field name="office_id"/>
+                <field name="entry_count" sum="Total In"/>
+                <field name="exit_count" sum="Total Out"/>
+                <field name="net_inside"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_cctv_footfall_pivot" model="ir.ui.view">
+        <field name="name">cctv.footfall.count.pivot</field>
+        <field name="model">cctv.footfall.count</field>
+        <field name="arch" type="xml">
+            <pivot string="Footfall">
+                <field name="office_id" type="row"/>
+                <field name="interval_start" interval="day" type="col"/>
+                <field name="entry_count" type="measure"/>
+                <field name="exit_count" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_cctv_footfall_graph" model="ir.ui.view">
+        <field name="name">cctv.footfall.count.graph</field>
+        <field name="model">cctv.footfall.count</field>
+        <field name="arch" type="xml">
+            <graph string="Footfall" type="line">
+                <field name="interval_start" interval="day"/>
+                <field name="entry_count" type="measure"/>
+                <field name="exit_count" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_cctv_footfall" model="ir.actions.act_window">
+        <field name="name">People Counting (Footfall)</field>
+        <field name="res_model">cctv.footfall.count</field>
+        <field name="view_mode">graph,pivot,tree</field>
+    </record>
+</odoo>

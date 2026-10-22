@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+<t t-name="cctv_management.HeatMap" owl="1">
+    <div class="cctv-heatmap">
+        <div t-if="!dash.state.allowed" class="alert alert-warning m-3">
+            You don't have access to this dashboard. Ask an administrator to add your group under
+            CCTV &gt; Configuration &gt; Dashboard Access.
+        </div>
+        <div t-elif="dash.state.missing.length" class="alert alert-warning m-3">
+            Your account can't read: <t t-esc="dash.state.missing.join(', ')"/>.
+            Ask an administrator to grant that access, or to remove your group from this dashboard.
+        </div>
+        <t t-else="">
+        <div class="cctv-toolbar">
+            <t t-foreach="state.offices" t-as="office" t-key="office.id">
+                <button type="button"
+                        t-attf-class="btn btn-sm me-1 #{state.activeOfficeId === office.id ? 'btn-primary' : 'btn-outline-secondary'}"
+                        t-on-click="() => this.selectOffice(office.id)">
+                    <t t-esc="office.name"/>
+                </button>
+            </t>
+        </div>
+
+        <div class="cctv-refresh-info text-muted small">
+            <t t-if="dash.state.refreshSeconds">Auto-refresh every <t t-esc="dash.state.refreshSeconds"/> s</t>
+            <t t-else="">Auto-refresh off</t>
+            <t t-if="dash.state.lastUpdated"> &#183; updated <t t-esc="dash.state.lastUpdated"/></t>
+            <button type="button" class="btn btn-sm btn-link" t-on-click="() => this.dash.refresh()">
+                <i class="fa fa-refresh"/> Refresh now
+            </button>
+        </div>
+
+        <div t-if="state.loading" class="cctv-loading">Loading...</div>
+
+        <table t-else="" class="cctv-heatmap-table">
+            <thead>
+                <tr>
+                    <th>Department / Zone</th>
+                    <th t-foreach="hours" t-as="h" t-key="h"><t t-esc="h"/>h</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr t-foreach="state.departments" t-as="dept" t-key="dept.id">
+                    <td><t t-esc="dept.name"/></td>
+                    <td t-foreach="hours" t-as="h" t-key="h">
+                        <div class="cctv-heat-cell"
+                             t-attf-style="background-color: rgba(220,53,69,#{this.cellOpacity(dept.id, h)});"
+                             t-att-title="this.cellCount(dept.id, h) + ' events'">
+                            <t t-esc="this.cellCount(dept.id, h) or ''"/>
+                        </div>
+                    </td>
+                </tr>
+                <tr t-if="!state.departments.length">
+                    <td colspan="25" class="text-muted">No departments/zones configured for this site.</td>
+                </tr>
+            </tbody>
+        </table>
+        <p class="text-muted small mt-2">
+            Darker cells = more AI-detected events (all types) in that department during that hour-of-day, across all recorded history for this site.
+        </p>
+        </t>
+    </div>
+</t>
+</templates>

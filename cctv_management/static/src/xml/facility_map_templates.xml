@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+<t t-name="cctv_management.FacilityMap" owl="1">
+    <div class="cctv-facility-map">
+        <div t-if="!dash.state.allowed" class="alert alert-warning m-3">
+            You don't have access to this dashboard. Ask an administrator to add your group under
+            CCTV &gt; Configuration &gt; Dashboard Access.
+        </div>
+        <div t-elif="dash.state.missing.length" class="alert alert-warning m-3">
+            Your account can't read: <t t-esc="dash.state.missing.join(', ')"/>.
+            Ask an administrator to grant that access, or to remove your group from this dashboard.
+        </div>
+        <t t-else="">
+        <div class="cctv-toolbar">
+            <t t-foreach="state.offices" t-as="office" t-key="office.id">
+                <button type="button"
+                        t-attf-class="btn btn-sm me-1 #{state.activeOfficeId === office.id ? 'btn-primary' : 'btn-outline-secondary'}"
+                        t-on-click="() => this.selectOffice(office.id)">
+                    <t t-esc="office.name"/>
+                </button>
+            </t>
+            <span t-if="!state.offices.length" class="text-muted">
+                No sites configured yet. Create one under CCTV &gt; Configuration &gt; Sites.
+            </span>
+        </div>
+
+        <div class="cctv-refresh-info text-muted small">
+            <t t-if="dash.state.refreshSeconds">Auto-refresh every <t t-esc="dash.state.refreshSeconds"/> s</t>
+            <t t-else="">Auto-refresh off</t>
+            <t t-if="dash.state.lastUpdated"> &#183; updated <t t-esc="dash.state.lastUpdated"/></t>
+            <button type="button" class="btn btn-sm btn-link" t-on-click="() => this.dash.refresh()">
+                <i class="fa fa-refresh"/> Refresh now
+            </button>
+        </div>
+
+        <div t-if="state.loading" class="cctv-loading">Loading map...</div>
+
+        <div t-else="" class="cctv-map-canvas">
+            <img t-if="state.mapImageUrl" t-att-src="state.mapImageUrl" class="cctv-map-image"
+                 t-on-error="(ev) => ev.target.classList.add('cctv-map-image-missing')"/>
+            <div t-else="" class="cctv-map-placeholder">
+                No site map image uploaded for this site (CCTV &gt; Configuration &gt; Sites &gt; Site Map).
+                Pins are still listed below.
+            </div>
+
+            <t t-foreach="state.cameras" t-as="cam" t-key="cam.id">
+                <div t-if="cam.has_position"
+                     class="cctv-pin"
+                     t-attf-style="left: #{cam.map_x}%; top: #{cam.map_y}%;"
+                     t-att-title="cam.name"
+                     t-on-click="() => this.openCamera(cam.id)">
+                    <span t-attf-class="cctv-pin-dot #{cam.health_status === 'online' ? 'cctv-pin-online' : 'cctv-pin-offline'}"/>
+                    <span t-if="cam.alert_count" class="cctv-pin-badge" t-esc="cam.alert_count"/>
+                </div>
+            </t>
+        </div>
+
+        <div class="cctv-pin-legend">
+            <span><span class="cctv-pin-dot cctv-pin-online"/> Online</span>
+            <span><span class="cctv-pin-dot cctv-pin-offline"/> Offline</span>
+            <span><span class="cctv-pin-badge">N</span> Unresolved alerts</span>
+        </div>
+
+        <table class="cctv-map-camera-list table table-sm">
+            <thead><tr><th>Camera</th><th>Status</th><th>Alerts</th><th>Positioned?</th></tr></thead>
+            <tbody>
+                <tr t-foreach="state.cameras" t-as="cam" t-key="cam.id" t-on-click="() => this.openCamera(cam.id)" style="cursor:pointer">
+                    <td t-esc="cam.name"/>
+                    <td t-esc="cam.health_status"/>
+                    <td t-esc="cam.alert_count"/>
+                    <td t-esc="cam.has_position ? 'Yes' : 'Set map_x/map_y on the camera'"/>
+                </tr>
+            </tbody>
+        </table>
+        </t>
+    </div>
+</t>
+</templates>

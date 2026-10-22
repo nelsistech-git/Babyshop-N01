@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_cctv_dashboard_access_tree" model="ir.ui.view">
+        <field name="name">cctv.dashboard.access.tree</field>
+        <field name="model">cctv.dashboard.access</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom" create="false" delete="false" class="cctv-ui">
+                <field name="sequence" widget="handle"/>
+                <field name="name" readonly="1"/>
+                <field name="group_ids" widget="many2many_tags"
+                       domain="[('category_id', '=', %(cctv_management.module_category_cctv)d)]"
+                       options="{'no_create': True}"/>
+                <field name="is_map" column_invisible="1"/>
+                <field name="refresh_seconds" readonly="not is_map"/>
+                <field name="required_data"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_cctv_dashboard_access_form" model="ir.ui.view">
+        <field name="name">cctv.dashboard.access.form</field>
+        <field name="model">cctv.dashboard.access</field>
+        <field name="arch" type="xml">
+            <form create="false" delete="false" class="cctv-ui">
+                <sheet>
+                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <group>
+                        <field name="key"/>
+                        <field name="group_ids" widget="many2many_tags"
+                               domain="[('category_id', '=', %(cctv_management.module_category_cctv)d)]"
+                               options="{'no_create': True}"/>
+                        <field name="is_map" invisible="1"/>
+                        <field name="refresh_seconds" invisible="not is_map"/>
+                        <field name="required_data"/>
+                    </group>
+                    <p class="text-muted">
+                        Super Administrators always see every dashboard. Users in the groups above get the menu entry;
+                        everyone else does not. This controls who can open the dashboard - what they can read inside it is
+                        still decided by their access rights on the data listed under "Reads data from", so add only groups
+                        that can read that data.
+                    </p>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_cctv_dashboard_access" model="ir.actions.act_window">
+        <field name="name">Dashboard Access</field>
+        <field name="res_model">cctv.dashboard.access</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_cctv_config_dashboard_access" name="Dashboard Access" parent="menu_cctv_config"
+              action="action_cctv_dashboard_access" sequence="9"
+              groups="cctv_management.group_cctv_admin"/>
+</odoo>

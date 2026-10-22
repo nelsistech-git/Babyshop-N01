@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_cctv_camera_tree" model="ir.ui.view">
+        <field name="name">cctv.camera.tree</field>
+        <field name="model">cctv.camera</field>
+        <field name="arch" type="xml">
+            <tree decoration-danger="health_status == 'offline'" decoration-success="health_status == 'online'" class="cctv-ui">
+                <field name="camera_code"/>
+                <field name="name"/>
+                <field name="office_id"/>
+                <field name="floor_id"/>
+                <field name="department_id"/>
+                <field name="brand"/>
+                <field name="connection_type"/>
+                <field name="health_status" widget="badge"/>
+                <field name="recording_mode"/>
+                <field name="event_count"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_cctv_camera_form" model="ir.ui.view">
+        <field name="name">cctv.camera.form</field>
+        <field name="model">cctv.camera</field>
+        <field name="arch" type="xml">
+            <form class="cctv-ui">
+                <header>
+                    <button name="action_mark_online" type="object" string="Mark Online" class="btn-secondary"/>
+                    <button name="action_mark_offline" type="object" string="Mark Offline" class="btn-secondary"/>
+                    <button name="action_sync_from_camera" type="object" string="Sync from Camera"
+                            class="btn-primary" icon="fa-refresh"
+                            help="Read bitrate, FPS, resolution and model from the camera / NVR now"/>
+                    <button name="action_open_map" type="object" string="Open Map" class="btn-secondary"
+                            icon="fa-map-marker" invisible="not latitude and not longitude"/>
+                    <field name="health_status" widget="statusbar" statusbar_visible="online,offline"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_events" type="object" class="oe_stat_button" icon="fa-bolt">
+                            <field name="event_count" widget="statinfo" string="AI Events"/>
+                        </button>
+                        <button name="action_view_drive_uploads" type="object" class="oe_stat_button" icon="fa-cloud-upload"
+                                invisible="drive_upload_count == 0">
+                            <field name="drive_upload_count" widget="statinfo" string="Drive Files"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Camera Name"/>
+                        </h1>
+                        <field name="camera_code" readonly="1"/>
+                    </div>
+                    <group>
+                        <group string="Location">
+                            <field name="office_id"/>
+                            <field name="floor_id" domain="[('office_id','=',office_id)]"/>
+                            <field name="department_id" domain="[('floor_id','=',floor_id)]"/>
+                            <field name="latitude"/>
+                            <field name="longitude"/>
+                            <field name="map_x"/>
+                            <field name="map_y"/>
+                        </group>
+                        <group string="Device">
+                            <field name="brand"/>
+                            <field name="model"/>
+                            <field name="connection_type"/>
+                            <field name="resolution"/>
+                            <field name="fps"/>
+                            <field name="bitrate_kbps"/>
+                            <field name="auto_sync_device"/>
+                            <field name="sync_state" widget="badge" decoration-success="sync_state == 'ok'"
+                                   decoration-danger="sync_state == 'failed'" invisible="not auto_sync_device"/>
+                            <field name="last_sync" invisible="not last_sync"/>
+                            <field name="sync_message" invisible="not sync_message"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Connection">
+                            <field name="ip_address"/>
+                            <field name="port"/>
+                            <field name="rtsp_url"/>
+                            <field name="onvif_port"/>
+                            <field name="username"/>
+                            <field name="password" password="True" groups="cctv_management.group_cctv_admin"/>
+                            <field name="stream_bridge_url"/>
+                        </group>
+                        <group string="Capabilities">
+                            <field name="ptz_supported"/>
+                            <field name="night_mode_supported"/>
+                            <field name="audio_supported"/>
+                            <field name="ai_human_detection"/>
+                            <field name="ai_vehicle_detection"/>
+                            <field name="ai_face_recognition"/>
+                            <field name="ai_anpr"/>
+                            <field name="ai_ppe_detection"/>
+                            <field name="ai_fire_smoke_detection"/>
+                            <field name="ai_people_counting"/>
+                            <field name="is_entry_exit_camera" invisible="not ai_people_counting"/>
+                            <field name="ai_heatmap_analytics"/>
+                            <field name="ai_queue_monitoring"/>
+                            <field name="ai_theft_detection"/>
+                            <field name="ai_tamper_detection"/>
+                            <field name="ai_mask_helmet_detection"/>
+                            <field name="ai_state" widget="badge" decoration-success="ai_state == 'running'"
+                                   decoration-warning="ai_state == 'stale'" decoration-muted="ai_state == 'off'"/>
+                            <field name="ai_worker_status" invisible="not ai_worker_status"/>
+                        </group>
+                    </group>
+                    <group string="AI Tuning (sent to the AI service automatically)"
+                           invisible="not ai_people_counting and not is_entry_exit_camera">
+                        <field name="counting_line_y_pct"/>
+                        <field name="counting_in_direction"/>
+                    </group>
+                    <group string="Recording">
+                        <field name="recording_mode"/>
+                        <field name="recording_schedule_id"/>
+                        <field name="retention_days"/>
+                        <field name="storage_location"/>
+                        <field name="drive_enabled"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_cctv_camera_kanban" model="ir.ui.view">
+        <field name="name">cctv.camera.kanban</field>
+        <field name="model">cctv.camera</field>
+        <field name="arch" type="xml">
+            <kanban class="cctv-ui">
+                <field name="health_status"/>
+                <field name="camera_code"/>
+                <field name="brand"/>
+                <field name="resolution"/>
+                <field name="ptz_supported"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_card oe_kanban_global_click cctv-cam-card is-#{record.health_status.raw_value}">
+                            <span t-attf-class="cctv-3d cctv-3d--md cctv-3d--#{record.health_status.raw_value == 'online' ? 'green' : (record.health_status.raw_value == 'offline' ? 'red' : 'slate')}">
+                                <i t-attf-class="fa #{record.ptz_supported.raw_value ? 'fa-video-camera' : 'fa-camera'}"/>
+                            </span>
+                            <div class="cctv-cam-main">
+                                <div class="cctv-cam-name"><field name="name"/></div>
+                                <div class="cctv-cam-meta">
+                                    <field name="camera_code"/> &#183; <field name="brand"/> &#183; <field name="resolution"/>
+                                </div>
+                                <span class="cctv-cam-status"><i/><field name="health_status"/></span>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_cctv_camera_search" model="ir.ui.view">
+        <field name="name">cctv.camera.search</field>
+        <field name="model">cctv.camera</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="camera_code"/>
+                <field name="office_id"/>
+                <field name="floor_id"/>
+                <field name="department_id"/>
+                <field name="brand"/>
+                <filter string="Online" name="online" domain="[('health_status','=','online')]"/>
+                <filter string="Offline" name="offline" domain="[('health_status','=','offline')]"/>
+                <filter string="Unknown" name="unknown" domain="[('health_status','=','unknown')]"/>
+                <separator/>
+                <filter string="Archived" name="inactive" domain="[('active','=',False)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Health" name="group_health" context="{'group_by':'health_status'}"/>
+                    <filter string="Site" name="group_office" context="{'group_by':'office_id'}"/>
+                    <filter string="Brand" name="group_brand" context="{'group_by':'brand'}"/>
+                    <filter string="Connection" name="group_connection" context="{'group_by':'connection_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_cctv_camera" model="ir.actions.act_window">
+        <field name="name">Cameras</field>
+        <field name="res_model">cctv.camera</field>
+        <field name="view_mode">tree,kanban,form</field>
+    </record>
+
+    <record id="action_cctv_camera_group" model="ir.actions.act_window">
+        <field name="name">Live Monitor Grids</field>
+        <field name="res_model">cctv.camera.group</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="view_cctv_camera_group_form" model="ir.ui.view">
+        <field name="name">cctv.camera.group.form</field>
+        <field name="model">cctv.camera.group</field>
+        <field name="arch" type="xml">
+            <form class="cctv-ui">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="layout"/>
+                        <field name="is_default"/>
+                    </group>
+                    <field name="camera_ids"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_cctv_recording_schedule_form" model="ir.ui.view">
+        <field name="name">cctv.recording.schedule.form</field>
+        <field name="model">cctv.recording.schedule</field>
+        <field name="arch" type="xml">
+            <form class="cctv-ui">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="start_time" widget="float_time"/>
+                        <field name="end_time" widget="float_time"/>
+                    </group>
+                    <group string="Active Days">
+                        <field name="monday"/>
+                        <field name="tuesday"/>
+                        <field name="wednesday"/>
+                        <field name="thursday"/>
+                        <field name="friday"/>
+                        <field name="saturday"/>
+                        <field name="sunday"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_cctv_recording_schedule" model="ir.actions.act_window">
+        <field name="name">Recording Schedules</field>
+        <field name="res_model">cctv.recording.schedule</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

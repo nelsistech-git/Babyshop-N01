@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_cctv_heatmap_tree" model="ir.ui.view">
+        <field name="name">cctv.heatmap.snapshot.tree</field>
+        <field name="model">cctv.heatmap.snapshot</field>
+        <field name="arch" type="xml">
+            <tree class="cctv-ui">
+                <field name="period_start"/>
+                <field name="period_end"/>
+                <field name="camera_id"/>
+                <field name="office_id"/>
+                <field name="hottest_zone"/>
+                <field name="total_detections"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_cctv_heatmap_form" model="ir.ui.view">
+        <field name="name">cctv.heatmap.snapshot.form</field>
+        <field name="model">cctv.heatmap.snapshot</field>
+        <field name="arch" type="xml">
+            <form class="cctv-ui">
+                <sheet>
+                    <group>
+                        <field name="camera_id"/>
+                        <field name="office_id"/>
+                        <field name="period_start"/>
+                        <field name="period_end"/>
+                        <field name="hottest_zone"/>
+                        <field name="total_detections"/>
+                    </group>
+                    <group string="Heatmap Overlay">
+                        <field name="heatmap_image" widget="image"/>
+                    </group>
+                    <group string="Reference Frame">
+                        <field name="reference_frame" widget="image"/>
+                    </group>
+                    <group string="Zone Stats (raw JSON)">
+                        <field name="zone_stats_json"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_cctv_heatmap" model="ir.actions.act_window">
+        <field name="name">Heatmap Analytics</field>
+        <field name="res_model">cctv.heatmap.snapshot</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

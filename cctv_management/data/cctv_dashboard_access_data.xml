@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Default access per dashboard. noupdate: your later changes in Configuration > Dashboard Access survive upgrades.
+         Super Administrators are always allowed in addition to the groups listed here. -->
+    <data noupdate="1">
+        <record id="dashboard_access_command_center" model="cctv.dashboard.access">
+            <field name="key">command_center</field>
+            <field name="name">Command Center</field>
+            <field name="sequence">0</field>
+            <field name="refresh_seconds">30</field>
+            <field name="group_ids" eval="[(6, 0, [ref('group_cctv_security_director'), ref('group_cctv_security_manager'), ref('group_cctv_operator'), ref('group_cctv_branch_manager'), ref('group_cctv_factory_manager'), ref('group_cctv_hr_manager'), ref('group_cctv_auditor')])]"/>
+        </record>
+        <record id="dashboard_access_executive" model="cctv.dashboard.access">
+            <field name="key">executive</field>
+            <field name="name">Executive - Today's Incidents &amp; Alerts</field>
+            <field name="sequence">1</field>
+            <field name="refresh_seconds">0</field>
+            <field name="group_ids" eval="[(6, 0, [ref('group_cctv_security_manager'), ref('group_cctv_branch_manager'), ref('group_cctv_factory_manager'), ref('group_cctv_auditor')])]"/>
+        </record>
+        <record id="dashboard_access_operations" model="cctv.dashboard.access">
+            <field name="key">operations</field>
+            <field name="name">Operations - Camera Health</field>
+            <field name="sequence">2</field>
+            <field name="refresh_seconds">0</field>
+            <field name="group_ids" eval="[(6, 0, [ref('group_cctv_operator'), ref('group_cctv_branch_manager'), ref('group_cctv_factory_manager'), ref('group_cctv_auditor')])]"/>
+        </record>
+        <record id="dashboard_access_analytics" model="cctv.dashboard.access">
+            <field name="key">analytics</field>
+            <field name="name">Analytics - AI Detection Trends</field>
+            <field name="sequence">3</field>
+            <field name="refresh_seconds">0</field>
+            <field name="group_ids" eval="[(6, 0, [ref('group_cctv_security_manager'), ref('group_cctv_hr_manager'), ref('group_cctv_branch_manager'), ref('group_cctv_factory_manager'), ref('group_cctv_auditor')])]"/>
+        </record>
+        <record id="dashboard_access_facility_map" model="cctv.dashboard.access">
+            <field name="key">facility_map</field>
+            <field name="name">Facility Map</field>
+            <field name="sequence">4</field>
+            <field name="refresh_seconds">30</field>
+            <field name="group_ids" eval="[(6, 0, [ref('group_cctv_operator'), ref('group_cctv_branch_manager'), ref('group_cctv_factory_manager'), ref('group_cctv_auditor')])]"/>
+        </record>
+        <record id="dashboard_access_heat_map" model="cctv.dashboard.access">
+            <field name="key">heat_map</field>
+            <field name="name">Heat Map</field>
+            <field name="sequence">5</field>
+            <field name="refresh_seconds">60</field>
+            <field name="group_ids" eval="[(6, 0, [ref('group_cctv_operator'), ref('group_cctv_branch_manager'), ref('group_cctv_factory_manager'), ref('group_cctv_auditor')])]"/>
+        </record>
+        <record id="dashboard_access_hr" model="cctv.dashboard.access">
+            <field name="key">hr</field>
+            <field name="name">HR Dashboard (Violations)</field>
+            <field name="sequence">6</field>
+            <field name="refresh_seconds">0</field>
+            <field name="group_ids" eval="[(6, 0, [ref('group_cctv_hr_manager'), ref('group_cctv_security_manager'), ref('group_cctv_auditor')])]"/>
+        </record>
+        <record id="dashboard_access_factory" model="cctv.dashboard.access">
+            <field name="key">factory</field>
+            <field name="name">Factory Dashboard</field>
+            <field name="sequence">7</field>
+            <field name="refresh_seconds">0</field>
+            <field name="group_ids" eval="[(6, 0, [ref('group_cctv_factory_manager'), ref('group_cctv_security_manager'), ref('group_cctv_hr_manager'), ref('group_cctv_auditor')])]"/>
+        </record>
+        <record id="dashboard_access_management" model="cctv.dashboard.access">
+            <field name="key">management</field>
+            <field name="name">Management Dashboard</field>
+            <field name="sequence">8</field>
+            <field name="refresh_seconds">0</field>
+            <field name="group_ids" eval="[(6, 0, [ref('group_cctv_security_director'), ref('group_cctv_branch_manager'), ref('group_cctv_factory_manager'), ref('group_cctv_hr_manager'), ref('group_cctv_auditor')])]"/>
+        </record>
+    </data>
+
+    <!-- Outside noupdate: re-apply the saved groups to the menus after every module update. -->
+    <function model="cctv.dashboard.access" name="_sync_all"/>
+</odoo>

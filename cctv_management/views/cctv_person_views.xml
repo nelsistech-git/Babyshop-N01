@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ✅ ACTIONS FIRST — they must exist before any view references them -->
+    <record id="action_cctv_person" model="ir.actions.act_window">
+        <field name="name">Face Database (People)</field>
+        <field name="res_model">cctv.person</field>
+        <field name="view_mode">kanban,tree,form</field>
+    </record>
+
+    <record id="action_cctv_visit" model="ir.actions.act_window">
+        <field name="name">Visit / Route Tracking</field>
+        <field name="res_model">cctv.visit</field>
+        <field name="view_mode">tree,form,pivot,graph</field>
+    </record>
+
+    <!-- VIEWS AFTER — now %(action_cctv_visit)d can resolve -->
+    <record id="view_cctv_person_tree" model="ir.ui.view">
+        <field name="name">cctv.person.tree</field>
+        <field name="model">cctv.person</field>
+        <field name="arch" type="xml">
+            <tree decoration-danger="person_type == 'blacklisted'" class="cctv-ui">
+                <field name="name"/>
+                <field name="person_type"/>
+                <field name="employee_id"/>
+                <field name="phone"/>
+                <field name="visit_count"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_cctv_person_form" model="ir.ui.view">
+        <field name="name">cctv.person.form</field>
+        <field name="model">cctv.person</field>
+        <field name="arch" type="xml">
+            <form class="cctv-ui">
+                <sheet>
+                    <div class="oe_button_box">
+                        <button name="%(action_cctv_visit)d" type="action"
+                                class="oe_stat_button" icon="fa-history"
+                                context="{'search_default_person_id': id}">
+                            <field name="visit_count" widget="statinfo" string="Visits"/>
+                        </button>
+                    </div>
+                    <field name="photo" widget="image" class="oe_avatar"/>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="person_type"/>
+                            <field name="employee_id" invisible="person_type != 'employee'"/>
+                            <field name="phone"/>
+                            <field name="id_number"/>
+                        </group>
+                        <group>
+                            <field name="face_embedding_ref"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <field name="blacklist_reason" invisible="person_type != 'blacklisted'"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_cctv_visit_tree" model="ir.ui.view">
+        <field name="name">cctv.visit.tree</field>
+        <field name="model">cctv.visit</field>
+        <field name="arch" type="xml">
+            <tree class="cctv-ui">
+                <field name="person_id"/>
+                <field name="office_id"/>
+                <field name="department_visited_id"/>
+                <field name="entry_time"/>
+                <field name="exit_time"/>
+                <field name="duration_minutes"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_cctv_visit_search" model="ir.ui.view">
+        <field name="name">cctv.visit.search</field>
+        <field name="model">cctv.visit</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="person_id"/>
+                <field name="office_id"/>
+            </search>
+        </field>
+    </record>
+</odoo>

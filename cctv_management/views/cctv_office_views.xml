@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_cctv_office_tree" model="ir.ui.view">
+        <field name="name">cctv.office.tree</field>
+        <field name="model">cctv.office</field>
+        <field name="arch" type="xml">
+            <tree class="cctv-ui">
+                <field name="name"/>
+                <field name="site_type"/>
+                <field name="manager_id"/>
+                <field name="camera_count"/>
+                <field name="camera_online_count"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_cctv_office_form" model="ir.ui.view">
+        <field name="name">cctv.office.form</field>
+        <field name="model">cctv.office</field>
+        <field name="arch" type="xml">
+            <form class="cctv-ui">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_events" type="object" class="oe_stat_button" icon="fa-video-camera"
+                                title="View Events" invisible="1"/>
+                    </div>
+                    <field name="map_image" widget="image" class="oe_avatar"/>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="site_type"/>
+                            <field name="company_id"/>
+                            <field name="manager_id"/>
+                        </group>
+                        <group>
+                            <field name="camera_count"/>
+                            <field name="camera_online_count"/>
+                            <field name="address"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Floors">
+                            <field name="floor_ids">
+                                <tree editable="bottom">
+                                    <field name="name"/>
+                                    <field name="sequence" widget="handle"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Cameras">
+                            <field name="camera_ids">
+                                <tree>
+                                    <field name="camera_code"/>
+                                    <field name="name"/>
+                                    <field name="brand"/>
+                                    <field name="health_status" widget="badge"
+                                           decoration-success="health_status == 'online'"
+                                           decoration-danger="health_status == 'offline'"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_cctv_office" model="ir.actions.act_window">
+        <field name="name">Sites (Offices/Factories/Warehouses)</field>
+        <field name="res_model">cctv.office</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="view_cctv_floor_tree" model="ir.ui.view">
+        <field name="name">cctv.floor.tree</field>
+        <field name="model">cctv.floor</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom" class="cctv-ui">
+                <field name="office_id"/>
+                <field name="name"/>
+                <field name="sequence" widget="handle"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_cctv_floor" model="ir.actions.act_window">
+        <field name="name">Floors</field>
+        <field name="res_model">cctv.floor</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="view_cctv_department_tree" model="ir.ui.view">
+        <field name="name">cctv.department.tree</field>
+        <field name="model">cctv.department</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom" class="cctv-ui">
+                <field name="floor_id"/>
+                <field name="name"/>
+                <field name="hr_department_id"/>
+                <field name="is_restricted_area"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_cctv_department" model="ir.actions.act_window">
+        <field name="name">Departments / Zones</field>
+        <field name="res_model">cctv.department</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

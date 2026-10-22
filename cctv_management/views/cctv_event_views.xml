@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_cctv_event_tree" model="ir.ui.view">
+        <field name="name">cctv.event.tree</field>
+        <field name="model">cctv.event</field>
+        <field name="arch" type="xml">
+            <tree class="cctv-ui">
+                <field name="event_time"/>
+                <field name="camera_id"/>
+                <field name="office_id"/>
+                <field name="detection_type"/>
+                <field name="behavior_type"/>
+                <field name="confidence"/>
+                <field name="person_id"/>
+                <field name="alert_id"/>
+                <field name="incident_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_cctv_event_form" model="ir.ui.view">
+        <field name="name">cctv.event.form</field>
+        <field name="model">cctv.event</field>
+        <field name="arch" type="xml">
+            <form class="cctv-ui">
+                <sheet>
+                    <field name="snapshot" widget="image" class="oe_avatar"/>
+                    <group>
+                        <group>
+                            <field name="camera_id"/>
+                            <field name="office_id"/>
+                            <field name="department_id"/>
+                            <field name="event_time"/>
+                        </group>
+                        <group>
+                            <field name="detection_type"/>
+                            <field name="behavior_type"/>
+                            <field name="confidence"/>
+                            <field name="source_service"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="person_id"/>
+                        <field name="visit_id"/>
+                        <field name="vehicle_log_id"/>
+                        <field name="alert_id"/>
+                        <field name="incident_id"/>
+                    </group>
+                    <group string="Raw Data">
+                        <field name="bounding_box"/>
+                        <field name="raw_payload"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_cctv_event_search" model="ir.ui.view">
+        <field name="name">cctv.event.search</field>
+        <field name="model">cctv.event</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="camera_id"/>
+                <field name="office_id"/>
+                <field name="person_id"/>
+                <filter string="Human" name="human" domain="[('detection_type','=','human')]"/>
+                <filter string="Vehicle" name="vehicle" domain="[('detection_type','=','vehicle')]"/>
+                <filter string="Face" name="face" domain="[('detection_type','=','face')]"/>
+                <filter string="Fire/Smoke" name="fire_smoke" domain="[('detection_type','in',['fire','smoke'])]"/>
+                <separator/>
+                <filter string="Today" name="today"
+                        domain="[('event_time','&gt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Camera" name="group_camera" context="{'group_by':'camera_id'}"/>
+                    <filter string="Office" name="group_office" context="{'group_by':'office_id'}"/>
+                    <filter string="Detection Type" name="group_detection" context="{'group_by':'detection_type'}"/>
+                    <filter string="Behavior" name="group_behavior" context="{'group_by':'behavior_type'}"/>
+                    <filter string="Day" name="group_day" context="{'group_by':'event_time:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_cctv_event" model="ir.actions.act_window">
+        <field name="name">AI Detection Events</field>
+        <field name="res_model">cctv.event</field>
+        <field name="view_mode">tree,form,pivot,graph</field>
+        <field name="context">{'search_default_today': 1}</field>
+    </record>
+</odoo>

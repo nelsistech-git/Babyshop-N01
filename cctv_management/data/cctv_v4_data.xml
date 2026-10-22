@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Sends pending alert notifications (also triggered immediately when an alert is created) -->
+        <record id="cron_cctv_send_notifications" model="ir.cron">
+            <field name="name">CCTV: Send Pending Alert Notifications</field>
+            <field name="model_id" ref="model_cctv_alert_delivery"/>
+            <field name="state">code</field>
+            <field name="code">model.cron_send_pending()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">minutes</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="cron_cctv_escalate_alerts" model="ir.cron">
+            <field name="name">CCTV: Escalate Unacknowledged Alerts</field>
+            <field name="model_id" ref="model_cctv_alert_delivery"/>
+            <field name="state">code</field>
+            <field name="code">model.cron_escalate_alerts()</field>
+            <field name="interval_number">5</field>
+            <field name="interval_type">minutes</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="cron_cctv_forecast_generate" model="ir.cron">
+            <field name="name">CCTV: Generate Visitor Forecast</field>
+            <field name="model_id" ref="model_cctv_forecast"/>
+            <field name="state">code</field>
+            <field name="code">model.cron_generate_forecasts()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="cron_cctv_forecast_actuals" model="ir.cron">
+            <field name="name">CCTV: Update Forecast Accuracy</field>
+            <field name="model_id" ref="model_cctv_forecast"/>
+            <field name="state">code</field>
+            <field name="code">model.cron_update_actuals()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">hours</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="cron_cctv_insights_generate" model="ir.cron">
+            <field name="name">CCTV: Generate AI Insights</field>
+            <field name="model_id" ref="model_cctv_insight"/>
+            <field name="state">code</field>
+            <field name="code">model.cron_generate_insights()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="cron_cctv_reconcile_movements" model="ir.cron">
+            <field name="name">CCTV: Match Goods Movements to Stock Transfers</field>
+            <field name="model_id" ref="model_cctv_stock_link"/>
+            <field name="state">code</field>
+            <field name="code">model.cron_reconcile_movements()</field>
+            <field name="interval_number">15</field>
+            <field name="interval_type">minutes</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="cron_cctv_biometric_purge" model="ir.cron">
+            <field name="name">CCTV: Enforce Biometric Data Retention</field>
+            <field name="model_id" ref="model_cctv_person"/>
+            <field name="state">code</field>
+            <field name="code">model.cron_purge_biometric_data()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="active">True</field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,517 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- =====================================================================
+         v4.0: alert channels, forecasting & insights, ERP link, playback,
+         vehicle/visitor link, biometric controls
+         ===================================================================== -->
+
+    <!-- ===== Alert channels ===== -->
+    <record id="view_cctv_alert_channel_tree" model="ir.ui.view">
+        <field name="name">cctv.alert.channel.tree</field>
+        <field name="model">cctv.alert.channel</field>
+        <field name="arch" type="xml">
+            <tree class="cctv-ui">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="channel_type"/>
+                <field name="min_severity"/>
+                <field name="scope"/>
+                <field name="escalation_level"/>
+                <field name="escalate_after_minutes"/>
+                <field name="active" widget="boolean_toggle"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_cctv_alert_channel_form" model="ir.ui.view">
+        <field name="name">cctv.alert.channel.form</field>
+        <field name="model">cctv.alert.channel</field>
+        <field name="arch" type="xml">
+            <form class="cctv-ui">
+                <header>
+                    <button name="action_send_test" type="object" string="Send Test Message" class="btn-primary"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name" placeholder="e.g. Security WhatsApp group"/></h1></div>
+                    <group>
+                        <group string="What to send, to whom">
+                            <field name="channel_type"/>
+                            <field name="min_severity"/>
+                            <field name="scope"/>
+                            <field name="office_ids" widget="many2many_tags"/>
+                            <field name="cooldown_minutes"/>
+                            <field name="active"/>
+                        </group>
+                        <group string="Escalation">
+                            <field name="escalation_level"/>
+                            <field name="escalate_after_minutes" invisible="escalation_level == 0"/>
+                        </group>
+                    </group>
+                    <group string="Recipients" invisible="channel_type in ('webhook', 'siren')">
+                        <field name="recipients" nolabel="1" placeholder="One per line: chat id or phone number with country code"/>
+                    </group>
+                    <group string="Connection">
+                        <field name="endpoint_url" invisible="channel_type == 'telegram'"/>
+                        <field name="auth_token" password="True"/>
+                        <field name="provider_ref" invisible="channel_type != 'whatsapp'"/>
+                        <field name="whatsapp_template" invisible="channel_type != 'whatsapp'"/>
+                        <field name="whatsapp_lang" invisible="channel_type != 'whatsapp'"/>
+                        <field name="http_method" invisible="channel_type not in ('sms', 'webhook', 'siren')"/>
+                        <field name="auth_header" invisible="channel_type not in ('sms', 'webhook', 'siren')"/>
+                        <field name="body_format" invisible="channel_type not in ('sms', 'webhook', 'siren')"/>
+                        <field name="body_template" invisible="channel_type not in ('sms', 'webhook', 'siren')"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_cctv_alert_channel" model="ir.actions.act_window">
+        <field name="name">Alert Channels</field>
+        <field name="res_model">cctv.alert.channel</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="view_cctv_alert_delivery_tree" model="ir.ui.view">
+        <field name="name">cctv.alert.delivery.tree</field>
+        <field name="model">cctv.alert.delivery</field>
+        <field name="arch" type="xml">
+            <tree decoration-danger="state == 'failed'" decoration-success="state == 'sent'" create="0" class="cctv-ui">
+                <field name="create_date"/>
+                <field name="alert_id"/>
+                <field name="channel_id"/>
+                <field name="recipient"/>
+                <field name="escalation_level"/>
+                <field name="state" widget="badge"/>
+                <field name="attempts"/>
+                <field name="sent_at"/>
+                <field name="error"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_cctv_alert_delivery_form" model="ir.ui.view">
+        <field name="name">cctv.alert.delivery.form</field>
+        <field name="model">cctv.alert.delivery</field>
+        <field name="arch" type="xml">
+            <form create="0" class="cctv-ui">
+                <sheet>
+                    <group>
+                        <field name="alert_id"/>
+                        <field name="channel_id"/>
+                        <field name="recipient"/>
+                        <field name="escalation_level"/>
+                        <field name="state"/>
+                        <field name="attempts"/>
+                        <field name="sent_at"/>
+                        <field name="response"/>
+                        <field name="error"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_cctv_alert_delivery" model="ir.actions.act_window">
+        <field name="name">Notification Log</field>
+        <field name="res_model">cctv.alert.delivery</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Alert form: show who was notified and escalation state -->
+    <record id="view_cctv_alert_form_v4" model="ir.ui.view">
+        <field name="name">cctv.alert.form.v4</field>
+        <field name="model">cctv.alert</field>
+        <field name="inherit_id" ref="view_cctv_alert_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <group string="Notifications &amp; Escalation">
+                    <field name="escalation_level" readonly="1"/>
+                    <field name="last_escalated_at" readonly="1"/>
+                    <field name="acknowledged_by" readonly="1"/>
+                    <field name="acknowledged_at" readonly="1"/>
+                    <field name="delivery_ids" nolabel="1" readonly="1" colspan="2">
+                        <tree>
+                            <field name="channel_id"/>
+                            <field name="recipient"/>
+                            <field name="escalation_level"/>
+                            <field name="state"/>
+                            <field name="sent_at"/>
+                        </tree>
+                    </field>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ===== Forecast ===== -->
+    <record id="view_cctv_forecast_tree" model="ir.ui.view">
+        <field name="name">cctv.forecast.tree</field>
+        <field name="model">cctv.forecast</field>
+        <field name="arch" type="xml">
+            <tree create="0" edit="0" class="cctv-ui">
+                <field name="office_id"/>
+                <field name="target_local"/>
+                <field name="predicted_entries" sum="Total"/>
+                <field name="lower_bound"/>
+                <field name="upper_bound"/>
+                <field name="confidence" widget="progressbar"/>
+                <field name="sample_count"/>
+                <field name="actual_entries"/>
+                <field name="abs_error_pct"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_cctv_forecast_form" model="ir.ui.view">
+        <field name="name">cctv.forecast.form</field>
+        <field name="model">cctv.forecast</field>
+        <field name="arch" type="xml">
+            <form create="0" edit="0" class="cctv-ui">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="office_id"/>
+                            <field name="target_local"/>
+                            <field name="method"/>
+                            <field name="generated_at"/>
+                        </group>
+                        <group>
+                            <field name="predicted_entries"/>
+                            <field name="lower_bound"/>
+                            <field name="upper_bound"/>
+                            <field name="confidence"/>
+                            <field name="actual_entries" invisible="not actual_known"/>
+                            <field name="abs_error_pct" invisible="not actual_known"/>
+                            <field name="actual_known" invisible="1"/>
+                        </group>
+                    </group>
+                    <group string="Why this forecast (evidence)">
+                        <field name="evidence" nolabel="1" colspan="2"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_cctv_forecast_graph" model="ir.ui.view">
+        <field name="name">cctv.forecast.graph</field>
+        <field name="model">cctv.forecast</field>
+        <field name="arch" type="xml">
+            <graph string="Forecast vs Actual" type="line">
+                <field name="target_time" interval="day"/>
+                <field name="predicted_entries" type="measure"/>
+                <field name="actual_entries" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_cctv_forecast_pivot" model="ir.ui.view">
+        <field name="name">cctv.forecast.pivot</field>
+        <field name="model">cctv.forecast</field>
+        <field name="arch" type="xml">
+            <pivot string="Forecast">
+                <field name="office_id" type="row"/>
+                <field name="target_time" interval="day" type="col"/>
+                <field name="predicted_entries" type="measure"/>
+                <field name="actual_entries" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_cctv_forecast_search" model="ir.ui.view">
+        <field name="name">cctv.forecast.search</field>
+        <field name="model">cctv.forecast</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="office_id"/>
+                <filter string="Upcoming" name="upcoming" domain="[('actual_known', '=', False)]"/>
+                <filter string="Past (with actuals)" name="past" domain="[('actual_known', '=', True)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Site" name="g_office" context="{'group_by': 'office_id'}"/>
+                    <filter string="Day" name="g_day" context="{'group_by': 'target_time:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_cctv_forecast" model="ir.actions.act_window">
+        <field name="name">Visitor Forecast</field>
+        <field name="res_model">cctv.forecast</field>
+        <field name="view_mode">graph,pivot,tree,form</field>
+        <field name="context">{'search_default_upcoming': 1}</field>
+    </record>
+
+    <!-- ===== Insights ===== -->
+    <record id="view_cctv_insight_tree" model="ir.ui.view">
+        <field name="name">cctv.insight.tree</field>
+        <field name="model">cctv.insight</field>
+        <field name="arch" type="xml">
+            <tree decoration-warning="severity == 'warning'" decoration-info="severity == 'notice'" class="cctv-ui">
+                <field name="generated_at"/>
+                <field name="name"/>
+                <field name="insight_type"/>
+                <field name="office_id"/>
+                <field name="summary"/>
+                <field name="confidence" widget="progressbar"/>
+                <field name="severity" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_cctv_insight_form" model="ir.ui.view">
+        <field name="name">cctv.insight.form</field>
+        <field name="model">cctv.insight</field>
+        <field name="arch" type="xml">
+            <form class="cctv-ui">
+                <sheet>
+                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="insight_type"/>
+                            <field name="severity"/>
+                            <field name="office_id"/>
+                            <field name="camera_id"/>
+                        </group>
+                        <group>
+                            <field name="confidence"/>
+                            <field name="period_start"/>
+                            <field name="period_end"/>
+                            <field name="generated_at"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <group string="Finding"><field name="summary" nolabel="1" colspan="2"/></group>
+                    <group string="Evidence (how this was derived)"><field name="evidence" nolabel="1" colspan="2"/></group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_cctv_insight_search" model="ir.ui.view">
+        <field name="name">cctv.insight.search</field>
+        <field name="model">cctv.insight</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="office_id"/>
+                <filter string="Warnings" name="warn" domain="[('severity', '=', 'warning')]"/>
+                <filter string="Archived (older runs)" name="archived" domain="[('active', '=', False)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Type" name="g_type" context="{'group_by': 'insight_type'}"/>
+                    <filter string="Site" name="g_office" context="{'group_by': 'office_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_cctv_insight" model="ir.actions.act_window">
+        <field name="name">AI Insights</field>
+        <field name="res_model">cctv.insight</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="action_server_cctv_refresh_insights" model="ir.actions.server">
+        <field name="name">Refresh Forecast &amp; Insights</field>
+        <field name="model_id" ref="model_cctv_insight"/>
+        <field name="state">code</field>
+        <field name="code">
+env['cctv.forecast'].sudo().cron_update_actuals()
+env['cctv.forecast'].sudo().cron_generate_forecasts()
+model.sudo().cron_generate_insights()
+action = env.ref('cctv_management.action_cctv_insight').sudo().read()[0]
+        </field>
+    </record>
+
+    <!-- ===== ERP / stock link ===== -->
+    <record id="view_cctv_stock_link_tree" model="ir.ui.view">
+        <field name="name">cctv.stock.link.tree</field>
+        <field name="model">cctv.stock.link</field>
+        <field name="arch" type="xml">
+            <tree decoration-danger="match_state == 'unmatched'" decoration-muted="reviewed" class="cctv-ui">
+                <field name="event_time"/>
+                <field name="camera_id"/>
+                <field name="warehouse_id"/>
+                <field name="link_type"/>
+                <field name="picking_id"/>
+                <field name="match_state" widget="badge"/>
+                <field name="reviewed"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_cctv_stock_link_form" model="ir.ui.view">
+        <field name="name">cctv.stock.link.form</field>
+        <field name="model">cctv.stock.link</field>
+        <field name="arch" type="xml">
+            <form class="cctv-ui">
+                <header>
+                    <button name="action_mark_reviewed" type="object" string="Mark Reviewed" invisible="reviewed"/>
+                </header>
+                <sheet>
+                    <field name="snapshot" widget="image" class="oe_avatar"/>
+                    <group>
+                        <group>
+                            <field name="camera_id"/>
+                            <field name="warehouse_id"/>
+                            <field name="event_time"/>
+                            <field name="link_type"/>
+                        </group>
+                        <group>
+                            <field name="match_state"/>
+                            <field name="picking_id"/>
+                            <field name="event_id"/>
+                            <field name="reviewed"/>
+                        </group>
+                    </group>
+                    <field name="notes" placeholder="Review notes..."/>
+                </sheet>
+                <div class="oe_chatter"><field name="message_ids"/></div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_cctv_stock_link_search" model="ir.ui.view">
+        <field name="name">cctv.stock.link.search</field>
+        <field name="model">cctv.stock.link</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="camera_id"/>
+                <field name="picking_id"/>
+                <filter string="No matching transfer" name="unmatched" domain="[('match_state', '=', 'unmatched')]"/>
+                <filter string="Waiting" name="pending" domain="[('match_state', '=', 'pending')]"/>
+                <filter string="Not reviewed" name="unreviewed" domain="[('reviewed', '=', False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_cctv_stock_link" model="ir.actions.act_window">
+        <field name="name">Goods Movement / ERP Links</field>
+        <field name="res_model">cctv.stock.link</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_unreviewed': 1}</field>
+    </record>
+
+    <record id="view_picking_form_cctv" model="ir.ui.view">
+        <field name="name">stock.picking.form.cctv</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_cctv_links" type="object" class="oe_stat_button"
+                        icon="fa-video-camera" invisible="cctv_link_count == 0">
+                    <field name="cctv_link_count" widget="statinfo" string="CCTV"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ===== Camera: playback + loading bay + gate direction ===== -->
+    <record id="view_cctv_camera_form_v4" model="ir.ui.view">
+        <field name="name">cctv.camera.form.v4</field>
+        <field name="model">cctv.camera</field>
+        <field name="inherit_id" ref="view_cctv_camera_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='storage_location']" position="after">
+                <field name="playback_url_template"/>
+                <field name="playback_stream_path"/>
+                <field name="playback_preroll_seconds"/>
+                <field name="playback_clip_seconds"/>
+            </xpath>
+            <xpath expr="//sheet" position="inside">
+                <group string="Warehouse (ERP link) and Vehicle Gate">
+                    <group>
+                        <field name="is_loading_bay_camera"/>
+                        <field name="warehouse_id" invisible="not is_loading_bay_camera"/>
+                    </group>
+                    <group>
+                        <field name="vehicle_direction"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ===== Event: open recording ===== -->
+    <record id="view_cctv_event_form_v4" model="ir.ui.view">
+        <field name="name">cctv.event.form.v4</field>
+        <field name="model">cctv.event</field>
+        <field name="inherit_id" ref="view_cctv_event_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="before">
+                <header>
+                    <button name="action_open_recording" type="object" string="Open Recording Clip"
+                            class="btn-primary" icon="fa-play-circle"/>
+                </header>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ===== Vehicle log: owner / visit ===== -->
+    <record id="view_cctv_vehicle_log_tree_v4" model="ir.ui.view">
+        <field name="name">cctv.vehicle.log.tree.v4</field>
+        <field name="model">cctv.vehicle.log</field>
+        <field name="inherit_id" ref="view_cctv_vehicle_log_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='license_plate']" position="after">
+                <field name="person_id"/>
+                <field name="visit_id" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ===== Person: vehicles + biometric controls ===== -->
+    <record id="view_cctv_person_form_v4" model="ir.ui.view">
+        <field name="name">cctv.person.form.v4</field>
+        <field name="model">cctv.person</field>
+        <field name="inherit_id" ref="view_cctv_person_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="before">
+                <header>
+                    <button name="action_purge_biometrics" type="object" string="Erase Biometric Data"
+                            invisible="biometric_purged"
+                            confirm="This permanently erases the photo, face reference and face logs of this person. Continue?"/>
+                </header>
+            </xpath>
+            <xpath expr="//sheet" position="inside">
+                <notebook>
+                    <page string="Vehicles (parking / visitor link)">
+                        <field name="vehicle_ids">
+                            <tree editable="bottom">
+                                <field name="license_plate"/>
+                                <field name="vehicle_type"/>
+                                <field name="notes"/>
+                            </tree>
+                        </field>
+                    </page>
+                    <page string="Biometric Data Controls">
+                        <group>
+                            <field name="biometric_consent"/>
+                            <field name="biometric_consent_date" invisible="not biometric_consent"/>
+                            <field name="biometric_retention_until"/>
+                            <field name="biometric_purged"/>
+                        </group>
+                    </page>
+                </notebook>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ===== Menus ===== -->
+    <menuitem id="menu_cctv_insights_root" name="AI Insights" parent="menu_cctv_root" sequence="7"/>
+    <menuitem id="menu_cctv_insights" name="Insights" parent="menu_cctv_insights_root"
+              action="action_cctv_insight" sequence="1"/>
+    <menuitem id="menu_cctv_forecast" name="Visitor Forecast" parent="menu_cctv_insights_root"
+              action="action_cctv_forecast" sequence="2"/>
+    <menuitem id="menu_cctv_insights_refresh" name="Refresh Forecast &amp; Insights" parent="menu_cctv_insights_root"
+              action="action_server_cctv_refresh_insights" sequence="3"
+              groups="cctv_management.group_cctv_security_manager"/>
+
+    <menuitem id="menu_cctv_stock_link" name="Goods Movement / ERP Links" parent="menu_cctv_security"
+              action="action_cctv_stock_link" sequence="4"/>
+
+    <menuitem id="menu_cctv_config_channels" name="Alert Channels (SMS / WhatsApp / Telegram / Siren)"
+              parent="menu_cctv_config" action="action_cctv_alert_channel" sequence="7"/>
+    <menuitem id="menu_cctv_config_delivery" name="Notification Log" parent="menu_cctv_config"
+              action="action_cctv_alert_delivery" sequence="8"/>
+</odoo>

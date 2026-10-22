@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+<!-- Tracking boxes drawn over a camera picture. Needs: cam, labels (bool) -->
+<t t-name="cctv_management.TrackBoxes" owl="1">
+    <t t-foreach="trackOf(cam).tracks" t-as="tr" t-key="tr.id + '-' + tr.det">
+        <div t-attf-class="cctv-box cctv-box-#{tr.color}" t-att-style="boxStyle(cam, tr)">
+            <span t-if="labels" class="cctv-box-tag">
+                <t t-if="tr.det === 'human'">#<t t-esc="tr.id"/> </t>
+                <t t-esc="tr.label"/>
+                <t t-if="tr.conf"> <t t-esc="tr.conf"/>%</t>
+            </span>
+        </div>
+    </t>
+</t>
+
+<!-- Smart tracking info panel, top-left corner of a monitor. Needs: cam, expanded (bool) -->
+<t t-name="cctv_management.TrackPanel" owl="1">
+    <t t-set="m" t-value="panelModel(cam)"/>
+    <div t-attf-class="cctv-panel cctv-panel-#{m.status} #{expanded ? 'is-expanded' : ''}">
+        <div class="cctv-panel-row">
+            <span class="cctv-chip cctv-chip-green" title="Tracked, behaving normally">
+                <i class="cctv-dot"/><t t-esc="m.green"/>
+            </span>
+            <span class="cctv-chip cctv-chip-red" title="Tracked, flagged (alert behaviour)">
+                <i class="cctv-dot"/><t t-esc="m.red"/>
+            </span>
+            <span t-if="m.aiState === 'off'" class="cctv-chip cctv-chip-muted"
+                  title="No AI capability is ticked on this camera (Camera > Capabilities)">AI off</span>
+            <span t-elif="m.aiState === 'stale'" class="cctv-chip cctv-chip-warn"
+                  title="AI is enabled for this camera but the AI service has not reported for 3 minutes">
+                <i class="fa fa-exclamation-circle"/> AI offline
+            </span>
+            <span t-elif="m.status === 'idle'" class="cctv-chip cctv-chip-muted">no tracking</span>
+            <span t-elif="expanded" class="cctv-chip cctv-chip-muted">
+                <i class="fa fa-user"/> <t t-esc="m.people"/>
+            </span>
+        </div>
+        <div t-if="expanded and m.caps.length" class="cctv-panel-meta cctv-panel-caps">
+            <i class="fa fa-magic"/> <t t-esc="m.caps.join(' · ')"/>
+            <span t-if="m.drive" title="Events are saved to Google Drive"> · <i class="fa fa-cloud-upload"/></span>
+        </div>
+        <div t-if="m.alerts.length" class="cctv-panel-alerts">
+            <div t-foreach="expanded ? m.alerts : m.alerts.slice(0, 1)" t-as="a" t-key="a_index" class="cctv-alert-line">
+                <i class="fa fa-exclamation-triangle"/>
+                <span class="cctv-alert-label" t-esc="a.label"/>
+                <span class="cctv-alert-age" t-esc="fmtAge(a.age)"/>
+            </div>
+        </div>
+        <div t-if="m.queue" t-attf-class="cctv-panel-meta #{m.queue.over ? 'is-red' : ''}">
+            <i class="fa fa-users"/> Queue <b t-esc="m.queue.count"/>
+            <span t-if="m.queue.wait"> · ~<t t-esc="fmtWait(m.queue.wait)"/></span>
+        </div>
+        <div t-if="m.footfall" class="cctv-panel-meta">
+            <i class="fa fa-exchange"/> In <b t-esc="m.footfall.in"/> · Out <b t-esc="m.footfall.out"/>
+            <span t-if="expanded"> · Inside <b t-esc="m.footfall.inside"/></span>
+        </div>
+    </div>
+</t>
+
+<t t-name="cctv_management.LiveMonitor" owl="1">
+    <div class="cctv-live-monitor" t-ref="root" t-att-style="rootStyle">
+
+        <!-- ============ toolbar ============ -->
+        <div class="cctv-toolbar">
+            <div class="cctv-toolbar-groups">
+                <t t-foreach="state.groups" t-as="group" t-key="group.id">
+                    <button type="button"
+                            t-attf-class="btn btn-sm #{state.activeGroupId === group.id ? 'btn-primary' : 'btn-outline-secondary'}"
+                            t-on-click="() => this.selectGroup(group.id)">
+                        <t t-esc="group.name"/> (<t t-esc="group.camera_ids.length"/>)
+                    </button>
+                </t>
+                <span t-if="!state.groups.length" class="text-muted">
+                    No Live Monitor Grids configured yet. Create one under CCTV &gt; Configuration &gt; Live Monitor Grids.
+                </span>
+            </div>
+            <div class="cctv-toolbar-stats" t-if="state.cameras.length">
+                <span class="cctv-stat" title="Cameras online">
+                    <i class="fa fa-video-camera"/> <t t-esc="totals.online"/>/<t t-esc="totals.cameras"/>
+                </span>
+                <span class="cctv-stat cctv-stat-green" title="Tracked, normal">
+                    <i class="cctv-dot"/> <t t-esc="totals.green"/>
+                </span>
+                <span t-attf-class="cctv-stat cctv-stat-red #{totals.red ? 'is-active' : ''}" title="Tracked, flagged">
+                    <i class="cctv-dot"/> <t t-esc="totals.red"/>
+                </span>
+                <button type="button" t-attf-class="btn btn-sm #{state.showOverlay ? 'btn-secondary' : 'btn-outline-secondary'}"
+                        title="Show / hide tracking boxes and info panels" t-on-click="toggleOverlay">
+                    <i t-attf-class="fa #{state.showOverlay ? 'fa-eye' : 'fa-eye-slash'}"/> Tracking
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" title="Show the whole grid in full screen"
+                        t-on-click="toggleWall">
+                    <i t-attf-class="fa #{state.wall ? 'fa-compress' : 'fa-expand'}"/> Wall
+                </button>
+            </div>
+        </div>
+
+        <!-- ============ auto-fit grid (all cameras on one screen) ============ -->
+        <div class="cctv-stage" t-ref="stage">
+            <div t-if="state.loading" class="cctv-loading">Loading cameras...</div>
+            <div t-elif="!state.cameras.length" class="cctv-empty text-muted">
+                This grid has no cameras assigned yet.
+            </div>
+            <div t-else="" class="cctv-grid" t-att-style="gridStyle">
+                <div t-foreach="state.cameras" t-as="cam" t-key="cam.id"
+                     t-att-class="tileClass(cam)" t-att-style="tileStyle(cam_index)">
+                    <div class="cctv-tile-header">
+                        <span class="cctv-tile-name" t-esc="cam.name"/>
+                        <span class="cctv-tile-actions">
+                            <button type="button" class="cctv-icon-btn" title="Camera settings"
+                                    t-on-click.stop="() => this.openCameraForm(cam.id)">
+                                <i class="fa fa-cog"/>
+                            </button>
+                            <span t-attf-class="badge #{cam.health_status === 'online' ? 'text-bg-success' : 'text-bg-danger'}">
+                                <t t-esc="cam.health_status"/>
+                            </span>
+                        </span>
+                    </div>
+                    <div class="cctv-tile-body" title="Click for full screen"
+                         t-on-click="() => this.openFullscreen(cam.id)">
+                        <t t-if="cam.stream_bridge_url and isMjpeg(cam.stream_bridge_url)">
+                            <div class="cctv-frame" t-attf-style="--ar: #{frameAr(cam)}">
+                                <img t-att-src="streamSrc(cam)" class="cctv-stream" draggable="false"
+                                     t-on-load="(ev) => this.onStreamLoad(cam, ev)"
+                                     t-on-error="() => this.onStreamError(cam)"/>
+                                <t t-if="state.showOverlay">
+                                    <t t-set="labels" t-value="false"/>
+                                    <t t-call="cctv_management.TrackBoxes"/>
+                                </t>
+                            </div>
+                        </t>
+                        <t t-elif="cam.stream_bridge_url">
+                            <a t-att-href="cam.stream_bridge_url" target="_blank" class="cctv-hls-link"
+                               t-on-click.stop="noop">
+                                HLS Stream (opens in new tab) - embed with hls.js for in-grid playback
+                            </a>
+                        </t>
+                        <t t-else="">
+                            <div class="cctv-no-stream">No browser stream URL configured for this camera.</div>
+                        </t>
+                        <t t-if="state.showOverlay">
+                            <t t-set="expanded" t-value="false"/>
+                            <t t-call="cctv_management.TrackPanel"/>
+                        </t>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ single camera full screen + zoom ============ -->
+        <div t-if="state.fsId and fsCamera" class="cctv-fs" t-ref="fs" tabindex="-1">
+            <t t-set="cam" t-value="fsCamera"/>
+            <div class="cctv-fs-bar">
+                <div class="cctv-fs-title">
+                    <button type="button" class="cctv-fs-btn" title="Previous camera (←)" t-on-click="() => this.stepFullscreen(-1)">
+                        <i class="fa fa-chevron-left"/>
+                    </button>
+                    <span class="cctv-fs-name" t-esc="cam.name"/>
+                    <span t-attf-class="badge #{cam.health_status === 'online' ? 'text-bg-success' : 'text-bg-danger'}">
+                        <t t-esc="cam.health_status"/>
+                    </span>
+                    <button type="button" class="cctv-fs-btn" title="Next camera (→)" t-on-click="() => this.stepFullscreen(1)">
+                        <i class="fa fa-chevron-right"/>
+                    </button>
+                </div>
+                <div class="cctv-fs-tools">
+                    <button type="button" class="cctv-fs-btn" title="Zoom out (-)" t-on-click="() => this.zoomBy(1 / 1.4)">
+                        <i class="fa fa-search-minus"/>
+                    </button>
+                    <span class="cctv-fs-zoom" t-esc="zoomPct + '%'"/>
+                    <button type="button" class="cctv-fs-btn" title="Zoom in (+)" t-on-click="() => this.zoomBy(1.4)">
+                        <i class="fa fa-search-plus"/>
+                    </button>
+                    <button type="button" class="cctv-fs-btn" title="Reset zoom (0)" t-on-click="resetZoom">
+                        <i class="fa fa-compress"/> Fit
+                    </button>
+                    <button type="button" t-attf-class="cctv-fs-btn #{state.showOverlay ? 'is-on' : ''}"
+                            title="Show / hide tracking" t-on-click="toggleOverlay">
+                        <i class="fa fa-crosshairs"/> Tracking
+                    </button>
+                    <button type="button" class="cctv-fs-btn cctv-fs-close" title="Close (Esc)" t-on-click="() => this.closeFullscreen()">
+                        <i class="fa fa-times"/>
+                    </button>
+                </div>
+            </div>
+
+            <div t-attf-class="cctv-fs-view #{state.zoom.s > 1 ? 'is-zoomed' : ''} #{state.dragging ? 'is-dragging' : ''}"
+                 t-ref="fsView"
+                 t-on-wheel="onWheel" t-on-dblclick="onDblClick"
+                 t-on-pointerdown="onPointerDown" t-on-pointermove="onPointerMove"
+                 t-on-pointerup="onPointerUp" t-on-pointercancel="onPointerUp">
+                <div class="cctv-fs-content" t-att-style="zoomStyle">
+                    <t t-if="cam.stream_bridge_url and isMjpeg(cam.stream_bridge_url)">
+                        <div class="cctv-frame" t-attf-style="--ar: #{frameAr(cam)}">
+                            <img t-att-src="streamSrc(cam)" class="cctv-stream" draggable="false"
+                                 t-on-load="(ev) => this.onStreamLoad(cam, ev)"
+                                 t-on-error="() => this.onStreamError(cam)"/>
+                            <t t-if="state.showOverlay">
+                                <t t-set="labels" t-value="true"/>
+                                <t t-call="cctv_management.TrackBoxes"/>
+                            </t>
+                        </div>
+                    </t>
+                    <div t-else="" class="cctv-no-stream">
+                        <t t-if="cam.stream_bridge_url">
+                            <a t-att-href="cam.stream_bridge_url" target="_blank" class="cctv-hls-link">Open HLS stream in a new tab</a>
+                        </t>
+                        <t t-else="">No browser stream URL configured for this camera.</t>
+                    </div>
+                </div>
+                <t t-if="state.showOverlay">
+                    <t t-set="expanded" t-value="true"/>
+                    <t t-call="cctv_management.TrackPanel"/>
+                </t>
+                <div class="cctv-fs-hint">
+                    Scroll / pinch to zoom · drag to move · double-click = 2.5× · ← → switch camera · Esc close
+                </div>
+            </div>
+        </div>
+    </div>
+</t>
+</templates>

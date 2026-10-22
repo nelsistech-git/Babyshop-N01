@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_cctv_event_graph" model="ir.ui.view">
+        <field name="name">cctv.event.graph</field>
+        <field name="model">cctv.event</field>
+        <field name="arch" type="xml">
+            <graph string="AI Detection Trends" type="bar">
+                <field name="event_time" interval="day"/>
+                <field name="detection_type"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_cctv_event_pivot" model="ir.ui.view">
+        <field name="name">cctv.event.pivot</field>
+        <field name="model">cctv.event</field>
+        <field name="arch" type="xml">
+            <pivot string="Detection Trends">
+                <field name="office_id" type="row"/>
+                <field name="detection_type" type="col"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_cctv_analytics_dashboard" model="ir.actions.act_window">
+        <field name="name">Analytics Dashboard (AI Detection Trends)</field>
+        <field name="res_model">cctv.event</field>
+        <field name="view_mode">graph,pivot,tree</field>
+    </record>
+
+    <record id="action_cctv_operations_dashboard" model="ir.actions.act_window">
+        <field name="name">Camera Health</field>
+        <field name="res_model">cctv.camera</field>
+        <field name="view_mode">kanban,tree</field>
+        <field name="context">{'search_default_group_health': 1}</field>
+    </record>
+
+    <record id="action_cctv_executive_dashboard" model="ir.actions.act_window">
+        <field name="name">Today's Incidents &amp; Alerts</field>
+        <field name="res_model">cctv.alert</field>
+        <field name="view_mode">tree,form,graph</field>
+        <field name="context">{'search_default_today': 1}</field>
+    </record>
+
+    <record id="action_cctv_hr_violation_dashboard" model="ir.actions.act_window">
+        <field name="name">HR Dashboard - Violations</field>
+        <field name="res_model">cctv.violation</field>
+        <field name="view_mode">pivot,graph,tree</field>
+        <field name="context">{'search_default_group_employee': 1}</field>
+    </record>
+
+    <record id="action_cctv_factory_violation_dashboard" model="ir.actions.act_window">
+        <field name="name">Factory Dashboard - Safety &amp; Production Violations</field>
+        <field name="res_model">cctv.violation</field>
+        <field name="view_mode">pivot,graph,tree</field>
+        <field name="domain">[('category','in',['safety','production'])]</field>
+        <field name="context">{'search_default_group_office': 1}</field>
+    </record>
+
+    <record id="action_cctv_management_violation_dashboard" model="ir.actions.act_window">
+        <field name="name">Management Dashboard - Fines &amp; Branch Comparison</field>
+        <field name="res_model">cctv.violation</field>
+        <field name="view_mode">pivot,graph,tree</field>
+        <field name="context">{'search_default_group_office': 1}</field>
+    </record>
+</odoo>

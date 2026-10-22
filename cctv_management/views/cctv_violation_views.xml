@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_cctv_violation_tree" model="ir.ui.view">
+        <field name="name">cctv.violation.tree</field>
+        <field name="model">cctv.violation</field>
+        <field name="arch" type="xml">
+            <tree decoration-danger="state in ('manager_review','hr_review')" decoration-muted="state in ('manager_rejected','hr_rejected','closed')" class="cctv-ui">
+                <field name="occurred_at"/>
+                <field name="employee_id"/>
+                <field name="category"/>
+                <field name="violation_type"/>
+                <field name="offense_number"/>
+                <field name="action_type"/>
+                <field name="proposed_fine"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_cctv_violation_kanban" model="ir.ui.view">
+        <field name="name">cctv.violation.kanban</field>
+        <field name="model">cctv.violation</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" class="cctv-ui">
+                <field name="state"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click p-2">
+                            <strong><field name="employee_id"/></strong>
+                            <div><field name="violation_type"/> - offense #<field name="offense_number"/></div>
+                            <div><field name="action_type"/> <field name="proposed_fine"/></div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_cctv_violation_form" model="ir.ui.view">
+        <field name="name">cctv.violation.form</field>
+        <field name="model">cctv.violation</field>
+        <field name="arch" type="xml">
+            <form class="cctv-ui">
+                <header>
+                    <button name="action_manager_approve" type="object" string="Manager: Approve" class="btn-primary"
+                            invisible="state != 'manager_review'"/>
+                    <button name="action_manager_reject" type="object" string="Manager: Reject"
+                            invisible="state != 'manager_review'"/>
+                    <button name="action_hr_approve" type="object" string="HR: Approve" class="btn-primary"
+                            invisible="state != 'hr_review'"/>
+                    <button name="action_hr_reject" type="object" string="HR: Reject"
+                            invisible="state != 'hr_review'"/>
+                    <button name="action_mark_processed" type="object" string="Mark Action Taken/Processed"
+                            class="btn-primary" invisible="state != 'approved'"/>
+                    <button name="action_close" type="object" string="Close"
+                            invisible="state in ('closed','manager_rejected','hr_rejected')"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="new,manager_review,hr_review,approved,processed"/>
+                </header>
+                <sheet>
+                    <field name="snapshot" widget="image" class="oe_avatar"/>
+                    <div class="oe_title"><h1><field name="employee_id"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="category"/>
+                            <field name="violation_type"/>
+                            <field name="office_id"/>
+                            <field name="department_id"/>
+                            <field name="occurred_at"/>
+                            <field name="event_id"/>
+                            <field name="ai_confidence"/>
+                        </group>
+                        <group>
+                            <field name="rule_id"/>
+                            <field name="offense_number"/>
+                            <field name="action_type"/>
+                            <field name="proposed_fine"/>
+                            <field name="approved_fine"/>
+                            <field name="deduction_method"/>
+                            <field name="installment_months" invisible="deduction_method != 'installment'"/>
+                        </group>
+                    </group>
+                    <field name="witness_ids" widget="many2many_tags"/>
+                    <group string="Notes">
+                        <field name="manager_notes" placeholder="Manager review notes..."/>
+                        <field name="hr_notes" placeholder="HR review notes..."/>
+                    </group>
+                    <field name="appeal_id" invisible="not appeal_id"/>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_cctv_violation_search" model="ir.ui.view">
+        <field name="name">cctv.violation.search</field>
+        <field name="model">cctv.violation</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="employee_id"/>
+                <field name="violation_type"/>
+                <field name="office_id"/>
+                <filter string="Awaiting Manager" name="awaiting_manager" domain="[('state','=','manager_review')]"/>
+                <filter string="Awaiting HR" name="awaiting_hr" domain="[('state','=','hr_review')]"/>
+                <filter string="Under Appeal" name="appealed" domain="[('state','=','appealed')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Employee" name="group_employee" context="{'group_by':'employee_id'}"/>
+                    <filter string="Category" name="group_category" context="{'group_by':'category'}"/>
+                    <filter string="Branch" name="group_office" context="{'group_by':'office_id'}"/>
+                    <filter string="State" name="group_state" context="{'group_by':'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_cctv_violation" model="ir.actions.act_window">
+        <field name="name">Employee Violations</field>
+        <field name="res_model">cctv.violation</field>
+        <field name="view_mode">kanban,tree,form,pivot,graph</field>
+        <field name="context">{'search_default_awaiting_manager': 0}</field>
+    </record>
+
+    <record id="action_cctv_violation_pending_approval" model="ir.actions.act_window">
+        <field name="name">Pending Approvals</field>
+        <field name="res_model">cctv.violation</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('state','in',['manager_review','hr_review'])]</field>
+    </record>
+</odoo>
