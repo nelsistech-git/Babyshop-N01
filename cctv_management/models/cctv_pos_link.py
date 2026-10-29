@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import datetime
 from odoo import models, fields, api
 
 
@@ -11,7 +12,7 @@ class CctvPosLink(models.Model):
     theft/suspicious cctv.event correlated by the AI service around the
     same timestamp."""
     _name = 'cctv.pos.link'
-    _description = 'CCTV \u2194 POS Transaction Link'
+    _description = 'CCTV ↔ POS Transaction Link'
     _order = 'order_time desc'
     _rec_name = 'display_name'
 
@@ -21,24 +22,43 @@ class CctvPosLink(models.Model):
     office_id = fields.Many2one(related='camera_id.office_id', store=True)
     cashier_id = fields.Many2one('res.users', string='Cashier')
     order_time = fields.Datetime(required=True, index=True)
-    amount_total = fields.Monetary(related='pos_order_id.amount_total', store=True)
-    currency_id = fields.Many2one(related='pos_order_id.currency_id', store=True)
+
+    # 1. currency_id অবশ্যই amount_total এর আগে থাকবে
+    currency_id = fields.Many2one(
+        related='pos_order_id.currency_id',
+        string='Currency',
+        store=True,
+        readonly=True
+    )
+
+    # 2. currency_field প্যারামিটার স্পষ্টভাবে উল্লেখ করুন
+    amount_total = fields.Float(
+        related='pos_order_id.amount_total',
+        currency_field='currency_id',
+        string='Total Amount',
+        store=True,
+        readonly=True
+    )
+
     snapshot = fields.Binary(string='Counter Snapshot at Sale', attachment=True)
-    event_id = fields.Many2one('cctv.event', string='Correlated Suspicious Event',
-                                help='Auto-filled if the AI service raised a theft_suspected/'
-                                     'item_concealment event on this camera within the '
-                                     'correlation window around this transaction.')
+    event_id = fields.Many2one(
+        'cctv.event', string='Correlated Suspicious Event',
+        help='Auto-filled if the AI service raised a theft_suspected/'
+             'item_concealment event on this camera within the '
+             'correlation window around this transaction.'
+    )
     mismatch_flagged = fields.Boolean(
         string='Flagged for Review',
         help='Set automatically when a correlated suspicious event exists, or manually '
-             'by a reviewer who spots a mismatch between the footage and the receipt.')
+             'by a reviewer who spots a mismatch between the footage and the receipt.'
+    )
     review_notes = fields.Text()
 
     @api.depends('pos_order_id', 'order_time')
     def _compute_display_name(self):
         for rec in self:
             rec.display_name = f"POS {rec.pos_order_id.name or ''} @ {rec.camera_id.name or ''} " \
-                                f"({rec.order_time or ''})"
+                               f"({rec.order_time or ''})"
 
     def action_view_camera_events(self):
         self.ensure_one()
@@ -50,8 +70,8 @@ class CctvPosLink(models.Model):
             'domain': [
                 ('camera_id', '=', self.camera_id.id),
                 ('event_time', '>=', fields.Datetime.to_string(
-                    self.order_time - __import__('datetime').timedelta(minutes=5))),
+                    self.order_time - datetime.timedelta(minutes=5))),
                 ('event_time', '<=', fields.Datetime.to_string(
-                    self.order_time + __import__('datetime').timedelta(minutes=5))),
+                    self.order_time + datetime.timedelta(minutes=5))),
             ],
         }

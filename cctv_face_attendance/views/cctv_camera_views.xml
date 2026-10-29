@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_cctv_camera_form_attendance" model="ir.ui.view">
+        <field name="name">cctv.camera.form.attendance</field>
+        <field name="model">cctv.camera</field>
+        <field name="inherit_id" ref="cctv_management.view_cctv_camera_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='ai_mask_helmet_detection']" position="after">
+                <field name="ai_attendance"/>
+                <field name="attendance_direction" invisible="not ai_attendance" required="ai_attendance"/>
+                <field name="attendance_stream_url" invisible="not ai_attendance"/>
+                <field name="attendance_usb_index" invisible="not ai_attendance or connection_type != 'usb'"/>
+                <field name="attendance_state" widget="badge" invisible="not ai_attendance"
+                       decoration-success="attendance_state == 'running'"
+                       decoration-warning="attendance_state == 'stale'"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_cctv_camera_tree_attendance" model="ir.ui.view">
+        <field name="name">cctv.camera.tree.attendance</field>
+        <field name="model">cctv.camera</field>
+        <field name="inherit_id" ref="cctv_management.view_cctv_camera_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='department_id']" position="after">
+                <field name="ai_attendance" optional="show"/>
+                <field name="attendance_direction" optional="show" string="Attendance Role"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_cctv_camera_search_attendance" model="ir.ui.view">
+        <field name="name">cctv.camera.search.attendance</field>
+        <field name="model">cctv.camera</field>
+        <field name="inherit_id" ref="cctv_management.view_cctv_camera_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <filter name="attendance_cameras" string="Face Attendance Cameras" domain="[('ai_attendance', '=', True)]"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_cctv_attendance_cameras" model="ir.actions.act_window">
+        <field name="name">Attendance Cameras</field>
+        <field name="res_model">cctv.camera</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('ai_attendance', '=', True)]</field>
+        <field name="context">{'default_ai_attendance': True}</field>
+    </record>
+
+    <record id="server_action_mark_attendance_camera" model="ir.actions.server">
+        <field name="name">Use for Face Attendance</field>
+        <field name="model_id" ref="cctv_management.model_cctv_camera"/>
+        <field name="binding_model_id" ref="cctv_management.model_cctv_camera"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">records.action_mark_attendance_camera()</field>
+    </record>
+</odoo>

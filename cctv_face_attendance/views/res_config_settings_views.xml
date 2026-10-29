@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_cctv_config_settings_attendance" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.cctv.attendance</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="cctv_management.view_cctv_config_settings"/>
+        <field name="arch" type="xml">
+            <xpath expr="//block[@name='cctv_gdrive_block']" position="after">
+                <block title="Face Attendance" name="cctv_attendance_block">
+                    <setting string="Readiness" help="What face attendance can do right now.">
+                        <field name="cctv_att_readiness" nolabel="1" readonly="1"/>
+                        <div class="mt8"><button name="action_cctv_att_enroll_all" type="object" class="btn-link"
+                                icon="fa-arrow-right" string="Enrol all employees"/></div>
+                    </setting>
+                    <setting string="When to punch automatically" help="Match % = how similar the face is to the enrolled photos. At or above the first value a punch is made; between the two values HR must approve it; below, nothing happens.">
+                        <div class="row mt8"><label for="cctv_att_min_confidence" class="col-lg-5"/><field name="cctv_att_min_confidence"/></div>
+                        <div class="row"><label for="cctv_att_review_confidence" class="col-lg-5"/><field name="cctv_att_review_confidence"/></div>
+                    </setting>
+                    <setting string="Recognition strictness (face service)" help="The service only reports a person when several frames agree, the face is large and sharp enough, and the best match is clearly ahead of the second best.">
+                        <div class="row mt8"><label for="cctv_att_confirm_frames" class="col-lg-5"/><field name="cctv_att_confirm_frames"/></div>
+                        <div class="row"><label for="cctv_att_confirm_seconds" class="col-lg-5"/><field name="cctv_att_confirm_seconds"/></div>
+                        <div class="row"><label for="cctv_att_margin" class="col-lg-5"/><field name="cctv_att_margin"/></div>
+                        <div class="row"><label for="cctv_att_min_face_px" class="col-lg-5"/><field name="cctv_att_min_face_px"/></div>
+                        <div class="row"><label for="cctv_att_min_det_score" class="col-lg-5"/><field name="cctv_att_min_det_score"/></div>
+                        <div class="row"><label for="cctv_att_min_sharpness" class="col-lg-5"/><field name="cctv_att_min_sharpness"/></div>
+                        <div class="row"><label for="cctv_att_cooldown_seconds" class="col-lg-5"/><field name="cctv_att_cooldown_seconds"/></div>
+                    </setting>
+                    <setting string="Attendance rules" help="Entry cameras only check in, exit cameras only check out, single-door cameras toggle. These limits stop one walk past a camera becoming several punches.">
+                        <div class="row mt8"><label for="cctv_att_min_gap_seconds" class="col-lg-5"/><field name="cctv_att_min_gap_seconds"/></div>
+                        <div class="row"><label for="cctv_att_min_stay_minutes" class="col-lg-5"/><field name="cctv_att_min_stay_minutes"/></div>
+                        <div class="row"><label for="cctv_att_both_gap_minutes" class="col-lg-5"/><field name="cctv_att_both_gap_minutes"/></div>
+                        <div class="row"><label for="cctv_att_stale_open_hours" class="col-lg-5"/><field name="cctv_att_stale_open_hours"/></div>
+                        <div class="row"><label for="cctv_att_max_age_minutes" class="col-lg-5"/><field name="cctv_att_max_age_minutes"/></div>
+                    </setting>
+                    <setting string="Privacy" help="Face photos and snapshots are biometric data. Check the law and your employment contracts (consent, notice, retention).">
+                        <div class="row mt8"><label for="cctv_att_require_consent" class="col-lg-5"/><field name="cctv_att_require_consent"/></div>
+                        <div class="row"><label for="cctv_att_snapshot_retention_days" class="col-lg-5"/><field name="cctv_att_snapshot_retention_days"/></div>
+                        <div class="row"><label for="cctv_att_skip_employee_photo" class="col-lg-5"/><field name="cctv_att_skip_employee_photo"/></div>
+                    </setting>
+                    <setting string="Other" help="Faces reported by the existing AI service (/cctv/api/event) on attendance cameras can also drive attendance when several frames agree.">
+                        <div class="row mt8"><label for="cctv_att_disable_event_api" class="col-lg-5"/><field name="cctv_att_disable_event_api"/></div>
+                        <div class="row"><label for="cctv_att_event_confirm_count" class="col-lg-5"/><field name="cctv_att_event_confirm_count"/></div>
+                        <div class="row"><label for="cctv_att_event_confirm_seconds" class="col-lg-5"/><field name="cctv_att_event_confirm_seconds"/></div>
+                        <div class="row"><label for="cctv_att_log_ignored" class="col-lg-5"/><field name="cctv_att_log_ignored"/></div>
+                        <div class="row"><label for="cctv_att_alert_unknown" class="col-lg-5"/><field name="cctv_att_alert_unknown"/></div>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>

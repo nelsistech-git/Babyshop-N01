@@ -50,8 +50,10 @@
                         class="btn-secondary" icon="fa-times" invisible="review_state != 'pending'"/>
                 <field name="review_state" widget="statusbar" statusbar_visible="pending,confirmed,false_positive"/>
             </xpath>
-            <xpath expr="//group[@string='Raw Data']" position="before">
-                <group string="Google Drive">
+
+            <!-- @string সরানো হয়েছে: sheet এর ভেতরের শেষ group এর আগে Google Drive সেকশন যুক্ত করা হলো -->
+            <xpath expr="//sheet//group[last()]" position="before">
+                <group string="Google Drive" name="group_google_drive">
                     <field name="drive_snapshot_link" widget="url" readonly="1"/>
                     <field name="drive_clip_link" widget="url" readonly="1"/>
                     <field name="reviewed_by" invisible="not reviewed_by"/>

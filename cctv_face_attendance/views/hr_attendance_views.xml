@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hr_attendance_view_form_cctv_face" model="ir.ui.view">
+        <field name="name">hr.attendance.form.cctv.face</field>
+        <field name="model">hr.attendance</field>
+        <field name="inherit_id" ref="hr_attendance.hr_attendance_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <group string="Face Attendance (CCTV)" invisible="in_mode != 'cctv_face' and out_mode != 'cctv_face'">
+                    <group>
+                        <field name="cctv_in_camera_id"/>
+                        <field name="cctv_in_confidence"/>
+                        <field name="cctv_in_snapshot" widget="image" options="{'size': [128, 128]}"/>
+                        <field name="cctv_late_minutes"/>
+                        <field name="cctv_is_late"/>
+                    </group>
+                    <group>
+                        <field name="cctv_out_camera_id"/>
+                        <field name="cctv_out_confidence"/>
+                        <field name="cctv_out_snapshot" widget="image" options="{'size': [128, 128]}"/>
+                        <field name="cctv_auto_closed"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="hr_attendance_view_filter_cctv_face" model="ir.ui.view">
+        <field name="name">hr.attendance.search.cctv.face</field>
+        <field name="model">hr.attendance</field>
+        <field name="inherit_id" ref="hr_attendance.hr_attendance_view_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <filter name="cctv_face" string="Face (CCTV)" domain="['|', ('in_mode', '=', 'cctv_face'), ('out_mode', '=', 'cctv_face')]"/>
+                <filter name="cctv_late" string="Late (CCTV)" domain="[('cctv_is_late', '=', True)]"/>
+                <filter name="cctv_auto_closed" string="Closed Automatically" domain="[('cctv_auto_closed', '=', True)]"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="hr_attendance_view_pivot_cctv_face" model="ir.ui.view">
+        <field name="name">hr.attendance.pivot.cctv.face</field>
+        <field name="model">hr.attendance</field>
+        <field name="arch" type="xml">
+            <pivot string="Face Attendance Report">
+                <field name="employee_id" type="row"/>
+                <field name="check_in" interval="month" type="col"/>
+                <field name="worked_hours" type="measure"/>
+                <field name="overtime_hours" type="measure"/>
+                <field name="cctv_late_minutes" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_cctv_face_attendance_report" model="ir.actions.act_window">
+        <field name="name">Face Attendance Report</field>
+        <field name="res_model">hr.attendance</field>
+        <field name="view_mode">pivot,tree,form</field>
+        <field name="view_ids" eval="[(5, 0, 0), (0, 0, {'view_mode': 'pivot', 'view_id': ref('hr_attendance_view_pivot_cctv_face')}), (0, 0, {'view_mode': 'tree'}), (0, 0, {'view_mode': 'form'})]"/>
+        <field name="context">{'search_default_cctv_face': 1}</field>
+    </record>
+</odoo>

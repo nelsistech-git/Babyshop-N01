@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_cctv_person_form_attendance" model="ir.ui.view">
+        <field name="name">cctv.person.form.attendance</field>
+        <field name="model">cctv.person</field>
+        <field name="inherit_id" ref="cctv_management.view_cctv_person_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('oe_button_box')]" position="inside">
+                <button name="action_open_attendance_punches" type="object" class="oe_stat_button"
+                        icon="fa-clock-o" invisible="person_type != 'employee'">
+                    <field name="attendance_punch_count" widget="statinfo" string="Face Punches"/>
+                </button>
+            </xpath>
+            <xpath expr="//field[@name='blacklist_reason']" position="after">
+                <notebook invisible="person_type != 'employee'">
+                    <page string="Face Attendance" name="face_attendance">
+                        <group>
+                            <group>
+                                <field name="attendance_enabled"/>
+                                <field name="attendance_photo_count"/>
+                            </group>
+                            <group>
+                                <field name="attendance_enroll_state" widget="badge"
+                                       decoration-success="attendance_enroll_state == 'ok'"
+                                       decoration-danger="attendance_enroll_state in ('no_face', 'multiple', 'no_photo')"
+                                       decoration-warning="attendance_enroll_state == 'low_quality'"/>
+                                <field name="attendance_enroll_note"/>
+                                <field name="attendance_enroll_checked"/>
+                            </group>
+                        </group>
+                        <div class="text-muted">
+                            Recognition uses this person's photo, the extra photos below and the employee
+                            profile photo. More angles (straight, slightly left / right, with and without
+                            glasses) make recognition more reliable. One clear face per photo.
+                        </div>
+                        <field name="face_image_ids">
+                            <tree editable="bottom">
+                                <field name="sequence" widget="handle"/>
+                                <field name="name"/>
+                                <field name="image" widget="image" options="{'size': [64, 64]}"/>
+                                <field name="active"/>
+                            </tree>
+                        </field>
+                    </page>
+                </notebook>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_cctv_person_enrollment_tree" model="ir.ui.view">
+        <field name="name">cctv.person.enrollment.tree</field>
+        <field name="model">cctv.person</field>
+        <field name="arch" type="xml">
+            <tree decoration-danger="attendance_enroll_state in ('no_face', 'multiple', 'no_photo')"
+                  decoration-warning="attendance_enroll_state == 'low_quality'"
+                  decoration-success="attendance_enroll_state == 'ok'" create="0">
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="attendance_enabled"/>
+                <field name="attendance_photo_count"/>
+                <field name="attendance_enroll_state" widget="badge"/>
+                <field name="attendance_enroll_note"/>
+                <field name="attendance_enroll_checked"/>
+                <field name="biometric_consent"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_cctv_enrollment_status" model="ir.actions.act_window">
+        <field name="name">Enrolment Status</field>
+        <field name="res_model">cctv.person</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_ids" eval="[(5, 0, 0), (0, 0, {'view_mode': 'tree', 'view_id': ref('view_cctv_person_enrollment_tree')}), (0, 0, {'view_mode': 'form'})]"/>
+        <field name="domain">[('person_type', '=', 'employee')]</field>
+    </record>
+</odoo>
