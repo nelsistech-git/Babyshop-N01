@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_real_estate_project_tree" model="ir.ui.view">
+        <field name="name">real.estate.project.tree</field>
+        <field name="model">real.estate.project</field>
+        <field name="arch" type="xml">
+            <tree string="Projects" decoration-success="state in ('ready','completed')" decoration-muted="state in ('closed','cancelled')">
+                <field name="name"/>
+                <field name="project_name"/>
+                <field name="project_type"/>
+                <field name="project_manager_id"/>
+                <field name="unit_count"/>
+                <field name="building_count"/>
+                <field name="state" widget="badge"
+                       decoration-success="state in ('ready','completed')"
+                       decoration-warning="state in ('draft','planning')"
+                       decoration-info="state in ('approved','construction','qc')"
+                       decoration-muted="state in ('closed','cancelled')"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_real_estate_project_kanban" model="ir.ui.view">
+        <field name="name">real.estate.project.kanban</field>
+        <field name="model">real.estate.project</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile">
+                <field name="project_name"/>
+                <field name="state"/>
+                <field name="project_type"/>
+                <field name="unit_count"/>
+                <field name="unit_available_count"/>
+                <field name="unit_sold_count"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click p-2">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <strong><t t-esc="record.project_name.value"/></strong>
+                                <!-- COMMENTED-OUT 2026-08-15 by agent: `X in ('a','b')` is invalid JS in t-attf (comma-operator => TypeError "Cannot use 'in' operator to search for 'a' in b"). Replaced with array .includes(). -->
+                                <!-- <span t-attf-class="badge rounded-pill #{record.state.raw_value in ('ready','completed') ? 'text-bg-success' : record.state.raw_value in ('closed','cancelled') ? 'text-bg-secondary' : 'text-bg-warning'}"> -->
+                                <span t-attf-class="badge rounded-pill #{['ready','completed'].includes(record.state.raw_value) ? 'text-bg-success' : ['closed','cancelled'].includes(record.state.raw_value) ? 'text-bg-secondary' : 'text-bg-warning'}">
+                                    <t t-esc="record.state.value"/>
+                                </span>
+                            </div>
+                            <div class="text-muted"><t t-esc="record.project_type.value"/></div>
+                            <div class="mt-1">
+                                <i class="fa fa-building-o"/> <t t-esc="record.unit_count.value"/> Units &#8226;
+                                <span class="text-success"> <t t-esc="record.unit_available_count.value"/> Available</span> &#8226;
+                                <span class="text-danger"> <t t-esc="record.unit_sold_count.value"/> Sold</span>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_real_estate_project_form" model="ir.ui.view">
+        <field name="name">real.estate.project.form</field>
+        <field name="model">real.estate.project</field>
+        <field name="arch" type="xml">
+            <form string="Project">
+                <header>
+                    <button name="action_start_planning" type="object" string="Start Planning"
+                            class="oe_highlight" invisible="state != 'draft'"/>
+                    <button name="action_approve" type="object" string="Approve"
+                            class="oe_highlight" invisible="state != 'planning'"/>
+                    <button name="action_start_construction" type="object" string="Start Construction"
+                            class="oe_highlight" invisible="state != 'approved'"/>
+                    <button name="action_move_to_qc" type="object" string="Move to QC"
+                            class="oe_highlight" invisible="state != 'construction'"/>
+                    <button name="action_mark_ready" type="object" string="Mark Ready"
+                            class="oe_highlight" invisible="state != 'qc'"/>
+                    <button name="action_complete" type="object" string="Complete"
+                            class="oe_highlight" invisible="state != 'ready'"/>
+                    <button name="action_close" type="object" string="Close"
+                            invisible="state != 'completed'"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                            invisible="state not in ('draft','planning','approved')"/>
+                    <button name="action_reset_to_draft" type="object" string="Reset to Draft"
+                            invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,planning,approved,construction,qc,ready,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_buildings" type="object" class="oe_stat_button" icon="fa-building-o">
+                            <field name="building_count" widget="statinfo" string="Buildings"/>
+                        </button>
+                        <button name="action_view_units" type="object" class="oe_stat_button" icon="fa-home">
+                            <field name="unit_count" widget="statinfo" string="Units"/>
+                        </button>
+                        <button name="action_view_budgets" type="object" class="oe_stat_button" icon="fa-money">
+                            <field name="budget_count" widget="statinfo" string="Budgets"/>
+                        </button>
+                        <button name="action_view_work_packages" type="object" class="oe_stat_button" icon="fa-cogs">
+                            <field name="work_package_count" widget="statinfo" string="Work Packages"/>
+                        </button>
+                        <button name="action_view_boqs" type="object" class="oe_stat_button" icon="fa-list-alt">
+                            <field name="boq_count" widget="statinfo" string="BOQ"/>
+                        </button>
+                        <button name="action_view_requisitions" type="object" class="oe_stat_button" icon="fa-shopping-cart">
+                            <field name="requisition_count" widget="statinfo" string="Requisitions"/>
+                        </button>
+                        <button name="action_view_site_reports" type="object" class="oe_stat_button" icon="fa-clipboard">
+                            <field name="site_report_count" widget="statinfo" string="Site Reports"/>
+                        </button>
+                        <button name="action_view_qc_inspections" type="object" class="oe_stat_button" icon="fa-check-square-o">
+                            <field name="qc_inspection_count" widget="statinfo" string="QC Inspections"/>
+                        </button>
+                        <button name="action_view_defects" type="object" class="oe_stat_button" icon="fa-exclamation-triangle">
+                            <field name="defect_count" widget="statinfo" string="Defects"/>
+                        </button>
+                        <button name="action_view_project_bookings" type="object" class="oe_stat_button" icon="fa-bookmark">
+                            <field name="booking_count" widget="statinfo" string="Bookings"/>
+                        </button>
+                        <button name="action_view_project_sale_agreements" type="object" class="oe_stat_button" icon="fa-handshake-o">
+                            <field name="sale_agreement_count" widget="statinfo" string="Sales"/>
+                        </button>
+                        <button name="%(action_real_estate_installment_plan)d" type="action"
+                                class="oe_stat_button" icon="fa-calendar-check-o"
+                                context="{'search_default_group_project': 1}">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Installment Plans</span>
+                            </div>
+                        </button>
+                        <button name="%(action_real_estate_collection)d" type="action"
+                                class="oe_stat_button" icon="fa-money"
+                                context="{'search_default_group_project': 1}">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Collections</span>
+                            </div>
+                        </button>
+                        <button name="action_view_handovers" type="object" class="oe_stat_button" icon="fa-key">
+                            <field name="handover_count" widget="statinfo" string="Handovers"/>
+                        </button>
+                        <button name="%(action_real_estate_warranty)d" type="action"
+                                class="oe_stat_button" icon="fa-wrench"
+                                context="{'search_default_group_project': 1}">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Warranty Claims</span>
+                            </div>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" readonly="1"/></h1>
+                        <h2><field name="project_name" placeholder="e.g. ABC Residence"/></h2>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="project_type"/>
+                            <field name="project_manager_id"/>
+                            <field name="land_id"/>
+                            <field name="land_agreement_id"/>
+                            <field name="location"/>
+                        </group>
+                        <group>
+                            <field name="start_date"/>
+                            <field name="planned_completion_date"/>
+                            <field name="actual_completion_date" readonly="1"/>
+                            <field name="analytic_account_id"/>
+                            <field name="total_sales_value" readonly="1"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Area &amp; Address">
+                            <group>
+                                <group>
+                                    <field name="address"/>
+                                </group>
+                                <group>
+                                    <field name="total_land_area" readonly="1"/>
+                                    <field name="construction_area"/>
+                                    <field name="saleable_area"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Description">
+                            <field name="description"/>
+                        </page>
+                        <page string="Readiness Checklist">
+                            <group>
+                                <field name="open_critical_defect_count" readonly="1"/>
+                                <field name="readiness_utilities_completed"/>
+                                <field name="readiness_documentation_completed"/>
+                                <field name="readiness_safety_completed"/>
+                            </group>
+                            <div class="text-muted">
+                                All three checkboxes must be ticked, no QC inspection may be
+                                Failed, and no critical defect may remain open, before this
+                                project can be moved to "Ready".
+                            </div>
+                        </page>
+                        <page string="Documents">
+                            <field name="attachment_ids" widget="many2many_binary"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_real_estate_project_search" model="ir.ui.view">
+        <field name="name">real.estate.project.search</field>
+        <field name="model">real.estate.project</field>
+        <field name="arch" type="xml">
+            <search string="Search Projects">
+                <field name="name"/>
+                <field name="project_name"/>
+                <field name="project_manager_id"/>
+                <filter string="Draft" name="filter_draft" domain="[('state','=','draft')]"/>
+                <filter string="Construction" name="filter_construction" domain="[('state','=','construction')]"/>
+                <filter string="Ready" name="filter_ready" domain="[('state','=','ready')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Project Type" name="group_type" context="{'group_by': 'project_type'}"/>
+                    <filter string="Project Manager" name="group_pm" context="{'group_by': 'project_manager_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_real_estate_project" model="ir.actions.act_window">
+        <field name="name">Projects</field>
+        <field name="res_model">real.estate.project</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="search_view_id" ref="view_real_estate_project_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first Project
+            </p>
+            <p>Projects sit above Buildings, Blocks, Floors and Units - the full physical structure being developed.</p>
+        </field>
+    </record>
+
+</odoo>

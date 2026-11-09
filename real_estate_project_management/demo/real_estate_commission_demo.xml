@@ -1,0 +1,514 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <!-- =====================================================================
+             PHASE 11 DEMO: customer & agent roles, 2-layer commission, agent CRM
+
+             Referral chain used in the demo
+               Agent Sabbir  brought  Kamal Hossain (customer, bought A-101)
+               Kamal Hossain sold to  Tanvir Rahman (new buyer of A-301)
+
+             Sale of A-301 therefore pays
+               Level 1 -> Kamal Hossain (the seller)       2.0 percent = 246,000
+               Level 2 -> Agent Sabbir  (referred Kamal)   0.5 percent =  61,500
+
+             Demo logins (User ID / Password):
+               customer1 / customer1   Kamal Hossain  (buyer + referral commission)
+               customer2 / customer2   Nasrin Akter
+               customer3 / customer3   Tanvir Rahman
+               agent1    / agent1      Sabbir Ahmed   (Level 1 + Level 2 commission)
+               agent2    / agent2      Mitu Akter
+             ===================================================================== -->
+
+        <record id="demo_commission_rule_l1" model="real.estate.commission.rule">
+            <field name="level">1</field>
+            <field name="calc_type">percentage</field>
+            <field name="value">2.0</field>
+            <field name="notes">Level 1: 2 percent of net price to whoever made the sale.</field>
+        </record>
+        <record id="demo_commission_rule_l2" model="real.estate.commission.rule">
+            <field name="level">2</field>
+            <field name="calc_type">percentage</field>
+            <field name="value">0.5</field>
+            <field name="notes">Level 2: 0.5 percent of net price to whoever referred the seller.</field>
+        </record>
+
+        <record id="demo_agent_1" model="res.partner">
+            <field name="name">Sabbir Ahmed</field>
+            <field name="is_agent" eval="True"/>
+            <field name="agent_code">AG-001</field>
+            <field name="street">Level 5, Banani Tower, Kemal Ataturk Ave</field>
+            <field name="city">Dhaka</field>
+            <field name="mobile">+8801711000111</field>
+            <field name="email">sabbir.ahmed@example.com</field>
+            <field name="customer_type">individual</field>
+        </record>
+        <record id="demo_agent_2" model="res.partner">
+            <field name="name">Mitu Akter</field>
+            <field name="is_agent" eval="True"/>
+            <field name="agent_code">AG-002</field>
+            <field name="street">House 12, Road 4, Dhanmondi</field>
+            <field name="city">Dhaka</field>
+            <field name="mobile">+8801811000222</field>
+            <field name="email">mitu.akter@example.com</field>
+            <field name="customer_type">individual</field>
+        </record>
+
+        <record id="demo_customer_1" model="res.partner">
+            <field name="referred_by_id" ref="demo_agent_1"/>
+        </record>
+        <record id="demo_customer_2" model="res.partner">
+            <field name="referred_by_id" ref="demo_agent_2"/>
+        </record>
+        <record id="demo_customer_3" model="res.partner">
+            <field name="name">Tanvir Rahman</field>
+            <field name="street">House 5, Road 11, Banani</field>
+            <field name="city">Dhaka</field>
+            <field name="mobile">+8801911334400</field>
+            <field name="email">tanvir.rahman@example.com</field>
+            <field name="customer_type">individual</field>
+            <field name="profession">Software Engineer</field>
+            <field name="referred_by_id" ref="demo_customer_1"/>
+        </record>
+
+        <record id="demo_sale_agreement_1" model="real.estate.sale.agreement">
+            <field name="agent_id" ref="demo_agent_1"/>
+        </record>
+        <record id="demo_collection_booking_1" model="real.estate.collection">
+            <field name="customer_id" ref="demo_customer_1"/>
+            <field name="sale_agreement_id" ref="demo_sale_agreement_1"/>
+            <field name="payment_date" eval="'2024-06-05'"/>
+            <field name="amount">1000000</field>
+            <field name="payment_method">bank</field>
+            <field name="bank">Dutch-Bangla Bank Ltd.</field>
+            <field name="reference">A-101 Booking amount</field>
+            <field name="collector_id" ref="base.user_admin"/>
+            <field name="state">confirmed</field>
+        </record>
+        <record id="demo_collection_down_1" model="real.estate.collection">
+            <field name="customer_id" ref="demo_customer_1"/>
+            <field name="sale_agreement_id" ref="demo_sale_agreement_1"/>
+            <field name="payment_date" eval="'2024-06-25'"/>
+            <field name="amount">2000000</field>
+            <field name="payment_method">bank</field>
+            <field name="bank">Dutch-Bangla Bank Ltd.</field>
+            <field name="reference">A-101 Down payment</field>
+            <field name="collector_id" ref="base.user_admin"/>
+            <field name="state">confirmed</field>
+        </record>
+
+        <record id="demo_sale_agreement_2" model="real.estate.sale.agreement">
+            <field name="customer_id" ref="demo_customer_2"/>
+            <field name="unit_id" ref="demo_unit_a_201"/>
+            <field name="booking_id" ref="demo_booking_2"/>
+            <field name="agent_id" ref="demo_agent_2"/>
+            <field name="agreement_date" eval="(DateTime.today() + timedelta(days=-150)).strftime('%Y-%m-%d')"/>
+            <field name="total_price">12150000</field>
+            <field name="booking_amount">500000</field>
+            <field name="down_payment">1500000</field>
+            <field name="installment_amount">2030000</field>
+            <field name="number_of_installments">5</field>
+            <field name="frequency">quarterly</field>
+            <field name="handover_date" eval="(DateTime.today() + timedelta(days=500)).strftime('%Y-%m-%d')"/>
+            <field name="state">active</field>
+        </record>
+        <record id="demo_unit_a_201" model="real.estate.unit">
+            <field name="status">sold</field>
+        </record>
+        <record id="demo_installment_plan_2" model="real.estate.installment.plan">
+            <field name="sale_agreement_id" ref="demo_sale_agreement_2"/>
+            <field name="plan_type">equal</field>
+            <field name="frequency">quarterly</field>
+            <field name="number_of_installments">5</field>
+            <field name="start_date" eval="(DateTime.today() + timedelta(days=-120)).strftime('%Y-%m-%d')"/>
+            <field name="grace_period_days">5</field>
+            <field name="late_fee_type">percentage</field>
+            <field name="late_fee_value">2.0</field>
+            <field name="state">active</field>
+        </record>
+        <record id="demo_installment_2_1" model="real.estate.installment">
+            <field name="plan_id" ref="demo_installment_plan_2"/>
+            <field name="installment_number">1</field>
+            <field name="due_date" eval="(DateTime.today() + timedelta(days=-120)).strftime('%Y-%m-%d')"/>
+            <field name="amount">2030000</field>
+            <field name="status">paid</field>
+        </record>
+        <record id="demo_installment_2_2" model="real.estate.installment">
+            <field name="plan_id" ref="demo_installment_plan_2"/>
+            <field name="installment_number">2</field>
+            <field name="due_date" eval="(DateTime.today() + timedelta(days=-30)).strftime('%Y-%m-%d')"/>
+            <field name="amount">2030000</field>
+            <field name="status">partially_paid</field>
+        </record>
+        <record id="demo_installment_2_3" model="real.estate.installment">
+            <field name="plan_id" ref="demo_installment_plan_2"/>
+            <field name="installment_number">3</field>
+            <field name="due_date" eval="(DateTime.today() + timedelta(days=60)).strftime('%Y-%m-%d')"/>
+            <field name="amount">2030000</field>
+            <field name="status">upcoming</field>
+        </record>
+        <record id="demo_installment_2_4" model="real.estate.installment">
+            <field name="plan_id" ref="demo_installment_plan_2"/>
+            <field name="installment_number">4</field>
+            <field name="due_date" eval="(DateTime.today() + timedelta(days=150)).strftime('%Y-%m-%d')"/>
+            <field name="amount">2030000</field>
+            <field name="status">upcoming</field>
+        </record>
+        <record id="demo_installment_2_5" model="real.estate.installment">
+            <field name="plan_id" ref="demo_installment_plan_2"/>
+            <field name="installment_number">5</field>
+            <field name="due_date" eval="(DateTime.today() + timedelta(days=240)).strftime('%Y-%m-%d')"/>
+            <field name="amount">2030000</field>
+            <field name="status">upcoming</field>
+        </record>
+        <record id="demo_collection_2_booking" model="real.estate.collection">
+            <field name="customer_id" ref="demo_customer_2"/>
+            <field name="sale_agreement_id" ref="demo_sale_agreement_2"/>
+            <field name="payment_date" eval="(DateTime.today() + timedelta(days=-150)).strftime('%Y-%m-%d')"/>
+            <field name="amount">500000</field>
+            <field name="payment_method">bank</field>
+            <field name="bank">Brac Bank Ltd.</field>
+            <field name="reference">A-201 Booking amount</field>
+            <field name="collector_id" ref="base.user_admin"/>
+            <field name="state">confirmed</field>
+        </record>
+        <record id="demo_collection_2_down" model="real.estate.collection">
+            <field name="customer_id" ref="demo_customer_2"/>
+            <field name="sale_agreement_id" ref="demo_sale_agreement_2"/>
+            <field name="payment_date" eval="(DateTime.today() + timedelta(days=-145)).strftime('%Y-%m-%d')"/>
+            <field name="amount">1500000</field>
+            <field name="payment_method">bank</field>
+            <field name="bank">Brac Bank Ltd.</field>
+            <field name="reference">A-201 Down payment</field>
+            <field name="collector_id" ref="base.user_admin"/>
+            <field name="state">confirmed</field>
+        </record>
+        <record id="demo_collection_2_inst1" model="real.estate.collection">
+            <field name="customer_id" ref="demo_customer_2"/>
+            <field name="sale_agreement_id" ref="demo_sale_agreement_2"/>
+            <field name="installment_id" ref="demo_installment_2_1"/>
+            <field name="payment_date" eval="(DateTime.today() + timedelta(days=-118)).strftime('%Y-%m-%d')"/>
+            <field name="amount">2030000</field>
+            <field name="payment_method">bank</field>
+            <field name="bank">Brac Bank Ltd.</field>
+            <field name="reference">A-201 Installment 1</field>
+            <field name="collector_id" ref="base.user_admin"/>
+            <field name="state">confirmed</field>
+        </record>
+        <record id="demo_collection_2_inst2" model="real.estate.collection">
+            <field name="customer_id" ref="demo_customer_2"/>
+            <field name="sale_agreement_id" ref="demo_sale_agreement_2"/>
+            <field name="installment_id" ref="demo_installment_2_2"/>
+            <field name="payment_date" eval="(DateTime.today() + timedelta(days=-25)).strftime('%Y-%m-%d')"/>
+            <field name="amount">1000000</field>
+            <field name="payment_method">bank</field>
+            <field name="bank">Brac Bank Ltd.</field>
+            <field name="reference">A-201 Installment 2 (part payment)</field>
+            <field name="collector_id" ref="base.user_admin"/>
+            <field name="state">confirmed</field>
+        </record>
+
+        <record id="demo_sale_agreement_3" model="real.estate.sale.agreement">
+            <field name="customer_id" ref="demo_customer_3"/>
+            <field name="unit_id" ref="demo_unit_a_301"/>
+            <field name="agent_id" ref="demo_customer_1"/>
+            <field name="agreement_date" eval="(DateTime.today() + timedelta(days=-100)).strftime('%Y-%m-%d')"/>
+            <field name="total_price">12300000</field>
+            <field name="booking_amount">600000</field>
+            <field name="down_payment">2400000</field>
+            <field name="installment_amount">1550000</field>
+            <field name="number_of_installments">6</field>
+            <field name="frequency">monthly</field>
+            <field name="handover_date" eval="(DateTime.today() + timedelta(days=600)).strftime('%Y-%m-%d')"/>
+            <field name="state">active</field>
+        </record>
+        <record id="demo_unit_a_301" model="real.estate.unit">
+            <field name="status">sold</field>
+        </record>
+        <record id="demo_installment_plan_3" model="real.estate.installment.plan">
+            <field name="sale_agreement_id" ref="demo_sale_agreement_3"/>
+            <field name="plan_type">equal</field>
+            <field name="frequency">monthly</field>
+            <field name="number_of_installments">6</field>
+            <field name="start_date" eval="(DateTime.today() + timedelta(days=-70)).strftime('%Y-%m-%d')"/>
+            <field name="grace_period_days">5</field>
+            <field name="late_fee_type">percentage</field>
+            <field name="late_fee_value">2.0</field>
+            <field name="state">active</field>
+        </record>
+        <record id="demo_installment_3_1" model="real.estate.installment">
+            <field name="plan_id" ref="demo_installment_plan_3"/>
+            <field name="installment_number">1</field>
+            <field name="due_date" eval="(DateTime.today() + timedelta(days=-70)).strftime('%Y-%m-%d')"/>
+            <field name="amount">1550000</field>
+            <field name="status">paid</field>
+        </record>
+        <record id="demo_installment_3_2" model="real.estate.installment">
+            <field name="plan_id" ref="demo_installment_plan_3"/>
+            <field name="installment_number">2</field>
+            <field name="due_date" eval="(DateTime.today() + timedelta(days=-40)).strftime('%Y-%m-%d')"/>
+            <field name="amount">1550000</field>
+            <field name="status">paid</field>
+        </record>
+        <record id="demo_installment_3_3" model="real.estate.installment">
+            <field name="plan_id" ref="demo_installment_plan_3"/>
+            <field name="installment_number">3</field>
+            <field name="due_date" eval="(DateTime.today() + timedelta(days=-10)).strftime('%Y-%m-%d')"/>
+            <field name="amount">1550000</field>
+            <field name="status">overdue</field>
+        </record>
+        <record id="demo_installment_3_4" model="real.estate.installment">
+            <field name="plan_id" ref="demo_installment_plan_3"/>
+            <field name="installment_number">4</field>
+            <field name="due_date" eval="(DateTime.today() + timedelta(days=20)).strftime('%Y-%m-%d')"/>
+            <field name="amount">1550000</field>
+            <field name="status">upcoming</field>
+        </record>
+        <record id="demo_installment_3_5" model="real.estate.installment">
+            <field name="plan_id" ref="demo_installment_plan_3"/>
+            <field name="installment_number">5</field>
+            <field name="due_date" eval="(DateTime.today() + timedelta(days=50)).strftime('%Y-%m-%d')"/>
+            <field name="amount">1550000</field>
+            <field name="status">upcoming</field>
+        </record>
+        <record id="demo_installment_3_6" model="real.estate.installment">
+            <field name="plan_id" ref="demo_installment_plan_3"/>
+            <field name="installment_number">6</field>
+            <field name="due_date" eval="(DateTime.today() + timedelta(days=80)).strftime('%Y-%m-%d')"/>
+            <field name="amount">1550000</field>
+            <field name="status">upcoming</field>
+        </record>
+        <record id="demo_collection_3_booking" model="real.estate.collection">
+            <field name="customer_id" ref="demo_customer_3"/>
+            <field name="sale_agreement_id" ref="demo_sale_agreement_3"/>
+            <field name="payment_date" eval="(DateTime.today() + timedelta(days=-100)).strftime('%Y-%m-%d')"/>
+            <field name="amount">600000</field>
+            <field name="payment_method">bank</field>
+            <field name="bank">Brac Bank Ltd.</field>
+            <field name="reference">A-301 Booking amount</field>
+            <field name="collector_id" ref="base.user_admin"/>
+            <field name="state">confirmed</field>
+        </record>
+        <record id="demo_collection_3_down" model="real.estate.collection">
+            <field name="customer_id" ref="demo_customer_3"/>
+            <field name="sale_agreement_id" ref="demo_sale_agreement_3"/>
+            <field name="payment_date" eval="(DateTime.today() + timedelta(days=-95)).strftime('%Y-%m-%d')"/>
+            <field name="amount">2400000</field>
+            <field name="payment_method">bank</field>
+            <field name="bank">Brac Bank Ltd.</field>
+            <field name="reference">A-301 Down payment</field>
+            <field name="collector_id" ref="base.user_admin"/>
+            <field name="state">confirmed</field>
+        </record>
+        <record id="demo_collection_3_inst1" model="real.estate.collection">
+            <field name="customer_id" ref="demo_customer_3"/>
+            <field name="sale_agreement_id" ref="demo_sale_agreement_3"/>
+            <field name="installment_id" ref="demo_installment_3_1"/>
+            <field name="payment_date" eval="(DateTime.today() + timedelta(days=-68)).strftime('%Y-%m-%d')"/>
+            <field name="amount">1550000</field>
+            <field name="payment_method">bank</field>
+            <field name="bank">Brac Bank Ltd.</field>
+            <field name="reference">A-301 Installment 1</field>
+            <field name="collector_id" ref="base.user_admin"/>
+            <field name="state">confirmed</field>
+        </record>
+        <record id="demo_collection_3_inst2" model="real.estate.collection">
+            <field name="customer_id" ref="demo_customer_3"/>
+            <field name="sale_agreement_id" ref="demo_sale_agreement_3"/>
+            <field name="installment_id" ref="demo_installment_3_2"/>
+            <field name="payment_date" eval="(DateTime.today() + timedelta(days=-38)).strftime('%Y-%m-%d')"/>
+            <field name="amount">1550000</field>
+            <field name="payment_method">bank</field>
+            <field name="bank">Brac Bank Ltd.</field>
+            <field name="reference">A-301 Installment 2</field>
+            <field name="collector_id" ref="base.user_admin"/>
+            <field name="state">confirmed</field>
+        </record>
+
+        <!-- Commissions: what the rules generate on activation -->
+        <record id="demo_commission_1" model="real.estate.commission">
+            <field name="sale_agreement_id" ref="demo_sale_agreement_1"/>
+            <field name="level">1</field>
+            <field name="beneficiary_id" ref="demo_agent_1"/>
+            <field name="calc_type">percentage</field>
+            <field name="rate_value">2.0</field>
+            <field name="state">paid</field>
+            <field name="approved_date" eval="'2024-07-10'"/>
+            <field name="payment_date" eval="'2024-07-15'"/>
+            <field name="payment_reference">CHQ-100245</field>
+        </record>
+        <record id="demo_commission_2" model="real.estate.commission">
+            <field name="sale_agreement_id" ref="demo_sale_agreement_2"/>
+            <field name="level">1</field>
+            <field name="beneficiary_id" ref="demo_agent_2"/>
+            <field name="calc_type">percentage</field>
+            <field name="rate_value">2.0</field>
+            <field name="state">approved</field>
+            <field name="approved_date" eval="(DateTime.today() + timedelta(days=-120)).strftime('%Y-%m-%d')"/>
+        </record>
+        <record id="demo_commission_3" model="real.estate.commission">
+            <field name="sale_agreement_id" ref="demo_sale_agreement_3"/>
+            <field name="level">1</field>
+            <field name="beneficiary_id" ref="demo_customer_1"/>
+            <field name="calc_type">percentage</field>
+            <field name="rate_value">2.0</field>
+            <field name="state">approved</field>
+            <field name="approved_date" eval="(DateTime.today() + timedelta(days=-90)).strftime('%Y-%m-%d')"/>
+        </record>
+        <record id="demo_commission_4" model="real.estate.commission">
+            <field name="sale_agreement_id" ref="demo_sale_agreement_3"/>
+            <field name="level">2</field>
+            <field name="beneficiary_id" ref="demo_agent_1"/>
+            <field name="calc_type">percentage</field>
+            <field name="rate_value">0.5</field>
+            <field name="state">draft</field>
+        </record>
+
+        <!-- Agent CRM leads -->
+        <record id="demo_lead_1" model="real.estate.agent.lead">
+            <field name="name">Mr. Jamal - 3 bed flat</field>
+            <field name="agent_id" ref="demo_agent_1"/>
+            <field name="contact_name">Jamal Uddin</field>
+            <field name="phone">+8801712345001</field>
+            <field name="stage">contacted</field>
+            <field name="priority">2</field>
+            <field name="source">referral</field>
+            <field name="expected_value">11070000</field>
+            <field name="project_id" ref="demo_project_1"/>
+            <field name="unit_id" ref="demo_unit_a_302"/>
+            <field name="next_followup_date" eval="(DateTime.today() + timedelta(days=2)).strftime('%Y-%m-%d')"/>
+            <field name="notes">&lt;p&gt;Wants 3 bedrooms, south facing. Prefers monthly installments.&lt;/p&gt;</field>
+        </record>
+        <record id="demo_lead_2" model="real.estate.agent.lead">
+            <field name="name">Ms. Shirin - ground floor shop</field>
+            <field name="agent_id" ref="demo_agent_1"/>
+            <field name="contact_name">Shirin Sultana</field>
+            <field name="phone">+8801712345002</field>
+            <field name="stage">site_visit</field>
+            <field name="priority">1</field>
+            <field name="source">facebook</field>
+            <field name="expected_value">9000000</field>
+            <field name="project_id" ref="demo_project_1"/>
+            <field name="unit_id" ref="demo_unit_a_g01"/>
+            <field name="next_followup_date" eval="(DateTime.today() + timedelta(days=-3)).strftime('%Y-%m-%d')"/>
+            <field name="notes">&lt;p&gt;Visited the site. Asked about parking and service charge.&lt;/p&gt;</field>
+        </record>
+        <record id="demo_lead_3" model="real.estate.agent.lead">
+            <field name="name">Kamal Hossain - second flat enquiry</field>
+            <field name="agent_id" ref="demo_agent_1"/>
+            <field name="contact_name">Kamal Hossain</field>
+            <field name="phone">+8801911223344</field>
+            <field name="stage">negotiation</field>
+            <field name="priority">3</field>
+            <field name="source">referral</field>
+            <field name="expected_value">12000000</field>
+            <field name="project_id" ref="demo_project_1"/>
+            <field name="partner_id" ref="demo_customer_1"/>
+            <field name="next_followup_date" eval="(DateTime.today() + timedelta(days=0)).strftime('%Y-%m-%d')"/>
+            <field name="notes">&lt;p&gt;Existing customer; interested in a second unit for his son.&lt;/p&gt;</field>
+        </record>
+        <record id="demo_lead_4" model="real.estate.agent.lead">
+            <field name="name">Tanvir Rahman - A-301 purchase</field>
+            <field name="agent_id" ref="demo_agent_1"/>
+            <field name="contact_name">Tanvir Rahman</field>
+            <field name="phone">+8801911334400</field>
+            <field name="stage">won</field>
+            <field name="priority">0</field>
+            <field name="source">referral</field>
+            <field name="expected_value">12300000</field>
+            <field name="project_id" ref="demo_project_1"/>
+            <field name="unit_id" ref="demo_unit_a_301"/>
+            <field name="partner_id" ref="demo_customer_3"/>
+            <field name="notes">&lt;p&gt;Introduced by Kamal Hossain. Converted to customer.&lt;/p&gt;</field>
+        </record>
+        <record id="demo_lead_5" model="real.estate.agent.lead">
+            <field name="name">Mr. Anis - office space</field>
+            <field name="agent_id" ref="demo_agent_2"/>
+            <field name="contact_name">Anis Chowdhury</field>
+            <field name="phone">+8801812345003</field>
+            <field name="stage">new</field>
+            <field name="priority">1</field>
+            <field name="source">walk_in</field>
+            <field name="expected_value">8500000</field>
+            <field name="project_id" ref="demo_project_1"/>
+            <field name="next_followup_date" eval="(DateTime.today() + timedelta(days=1)).strftime('%Y-%m-%d')"/>
+        </record>
+        <record id="demo_lead_6" model="real.estate.agent.lead">
+            <field name="name">Dr. Rubina - 2 bed flat</field>
+            <field name="agent_id" ref="demo_agent_2"/>
+            <field name="contact_name">Rubina Haque</field>
+            <field name="phone">+8801812345004</field>
+            <field name="stage">contacted</field>
+            <field name="priority">2</field>
+            <field name="source">phone</field>
+            <field name="expected_value">9800000</field>
+            <field name="project_id" ref="demo_project_1"/>
+            <field name="next_followup_date" eval="(DateTime.today() + timedelta(days=4)).strftime('%Y-%m-%d')"/>
+        </record>
+
+        <record id="demo_lead_log_1" model="real.estate.agent.lead.log">
+            <field name="lead_id" ref="demo_lead_1"/>
+            <field name="interaction_type">call</field>
+            <field name="note">First call. Interested in A-302; asked for the payment schedule.</field>
+        </record>
+        <record id="demo_lead_log_2" model="real.estate.agent.lead.log">
+            <field name="lead_id" ref="demo_lead_2"/>
+            <field name="interaction_type">site_visit</field>
+            <field name="note">Showed the ground-floor shops. Needs to discuss with her partner.</field>
+        </record>
+        <record id="demo_lead_log_3" model="real.estate.agent.lead.log">
+            <field name="lead_id" ref="demo_lead_3"/>
+            <field name="interaction_type">meeting</field>
+            <field name="note">Met at office. Discussed a second unit and a repeat-purchase discount.</field>
+        </record>
+
+        <!-- Demo logins -->
+        <record id="demo_user_customer_1" model="res.users">
+            <field name="login">customer1</field>
+            <field name="password">customer1</field>
+            <field name="partner_id" ref="demo_customer_1"/>
+            <field name="company_id" ref="base.main_company"/>
+            <field name="company_ids" eval="[(6, 0, [ref('base.main_company')])]"/>
+            <field name="groups_id" eval="[(6, 0, [ref('base.group_user'), ref('group_real_estate_customer_portal')])]"/>
+            <field name="notification_type">inbox</field>
+        </record>
+        <record id="demo_user_customer_2" model="res.users">
+            <field name="login">customer2</field>
+            <field name="password">customer2</field>
+            <field name="partner_id" ref="demo_customer_2"/>
+            <field name="company_id" ref="base.main_company"/>
+            <field name="company_ids" eval="[(6, 0, [ref('base.main_company')])]"/>
+            <field name="groups_id" eval="[(6, 0, [ref('base.group_user'), ref('group_real_estate_customer_portal')])]"/>
+            <field name="notification_type">inbox</field>
+        </record>
+        <record id="demo_user_customer_3" model="res.users">
+            <field name="login">customer3</field>
+            <field name="password">customer3</field>
+            <field name="partner_id" ref="demo_customer_3"/>
+            <field name="company_id" ref="base.main_company"/>
+            <field name="company_ids" eval="[(6, 0, [ref('base.main_company')])]"/>
+            <field name="groups_id" eval="[(6, 0, [ref('base.group_user'), ref('group_real_estate_customer_portal')])]"/>
+            <field name="notification_type">inbox</field>
+        </record>
+        <record id="demo_user_agent_1" model="res.users">
+            <field name="login">agent1</field>
+            <field name="password">agent1</field>
+            <field name="partner_id" ref="demo_agent_1"/>
+            <field name="company_id" ref="base.main_company"/>
+            <field name="company_ids" eval="[(6, 0, [ref('base.main_company')])]"/>
+            <field name="groups_id" eval="[(6, 0, [ref('base.group_user'), ref('group_real_estate_agent')])]"/>
+            <field name="notification_type">inbox</field>
+        </record>
+        <record id="demo_user_agent_2" model="res.users">
+            <field name="login">agent2</field>
+            <field name="password">agent2</field>
+            <field name="partner_id" ref="demo_agent_2"/>
+            <field name="company_id" ref="base.main_company"/>
+            <field name="company_ids" eval="[(6, 0, [ref('base.main_company')])]"/>
+            <field name="groups_id" eval="[(6, 0, [ref('base.group_user'), ref('group_real_estate_agent')])]"/>
+            <field name="notification_type">inbox</field>
+        </record>
+
+    </data>
+</odoo>

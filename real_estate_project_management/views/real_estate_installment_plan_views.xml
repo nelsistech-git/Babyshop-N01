@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_real_estate_installment_plan_tree" model="ir.ui.view">
+        <field name="name">real.estate.installment.plan.tree</field>
+        <field name="model">real.estate.installment.plan</field>
+        <field name="arch" type="xml">
+            <tree string="Installment Plans" decoration-success="state=='active'" decoration-muted="state=='cancelled'" decoration-danger="overdue_count &gt; 0">
+                <field name="name"/>
+                <field name="customer_id"/>
+                <field name="unit_id"/>
+                <field name="plan_type"/>
+                <field name="total_scheduled"/>
+                <field name="total_paid"/>
+                <field name="total_outstanding"/>
+                <field name="overdue_count"/>
+                <field name="state" widget="badge"
+                       decoration-success="state=='active'"
+                       decoration-warning="state=='draft'"
+                       decoration-muted="state in ('completed','cancelled')"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_real_estate_installment_plan_form" model="ir.ui.view">
+        <field name="name">real.estate.installment.plan.form</field>
+        <field name="model">real.estate.installment.plan</field>
+        <field name="arch" type="xml">
+            <form string="Installment Plan">
+                <header>
+                    <button name="action_generate_schedule" type="object" string="Generate Schedule"
+                            class="oe_highlight" invisible="state != 'draft' or plan_type != 'equal'"/>
+                    <button name="action_activate" type="object" string="Activate" class="oe_highlight"
+                            invisible="state != 'draft'"/>
+                    <button name="action_complete" type="object" string="Complete" class="oe_highlight"
+                            invisible="state != 'active'"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                            invisible="state in ('cancelled','completed')"/>
+                    <button name="action_reset_to_draft" type="object" string="Reset to Draft"
+                            invisible="state in ('draft','cancelled')"/>
+                    <button name="action_recompute_statuses" type="object" string="Recompute Statuses"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,active,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="sale_agreement_id" required="1"/>
+                            <field name="customer_id" readonly="1"/>
+                            <field name="unit_id" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="total_amount" readonly="1"/>
+                            <field name="down_payment" readonly="1"/>
+                            <field name="booking_amount" readonly="1"/>
+                            <field name="financeable_amount" readonly="1" class="fw-bold"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="plan_type"/>
+                            <field name="frequency" invisible="plan_type != 'equal'"/>
+                            <field name="custom_interval_days" invisible="plan_type != 'equal' or frequency != 'custom'"/>
+                            <field name="number_of_installments" invisible="plan_type != 'equal'"/>
+                            <field name="start_date"/>
+                        </group>
+                        <group>
+                            <field name="total_scheduled" readonly="1"/>
+                            <field name="total_paid" readonly="1"/>
+                            <field name="total_outstanding" readonly="1"/>
+                            <field name="overdue_count" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Installments">
+                            <field name="installment_ids">
+                                <tree editable="bottom" decoration-danger="status=='overdue'" decoration-success="status=='paid'">
+                                    <field name="installment_number"/>
+                                    <field name="milestone_name" invisible="not milestone_name and parent.plan_type != 'milestone'"/>
+                                    <field name="milestone_percentage" invisible="parent.plan_type != 'milestone'"/>
+                                    <field name="due_date"/>
+                                    <field name="amount"/>
+                                    <field name="paid_amount" readonly="1"/>
+                                    <field name="due_amount" readonly="1"/>
+                                    <field name="late_fee_amount" readonly="1"/>
+                                    <field name="status" widget="badge"
+                                           decoration-success="status=='paid'"
+                                           decoration-danger="status=='overdue'"
+                                           decoration-warning="status in ('due_today','partially_paid')"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Late Fee Rules">
+                            <group>
+                                <group>
+                                    <field name="grace_period_days"/>
+                                </group>
+                                <group>
+                                    <field name="late_fee_type"/>
+                                    <field name="late_fee_value" invisible="late_fee_type == 'none'"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_real_estate_installment_plan_search" model="ir.ui.view">
+        <field name="name">real.estate.installment.plan.search</field>
+        <field name="model">real.estate.installment.plan</field>
+        <field name="arch" type="xml">
+            <search string="Search Installment Plans">
+                <field name="name"/>
+                <field name="customer_id"/>
+                <field name="unit_id"/>
+                <filter string="Overdue" name="filter_overdue" domain="[('overdue_count', '&gt;', 0)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Project" name="group_project" context="{'group_by': 'project_id'}"/>
+                    <filter string="State" name="group_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_real_estate_installment_plan" model="ir.actions.act_window">
+        <field name="name">Installment Plans</field>
+        <field name="res_model">real.estate.installment.plan</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_real_estate_installment_plan_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first Installment Plan</p>
+        </field>
+    </record>
+
+    <record id="view_real_estate_installment_tree" model="ir.ui.view">
+        <field name="name">real.estate.installment.tree</field>
+        <field name="model">real.estate.installment</field>
+        <field name="arch" type="xml">
+            <tree string="Installments" decoration-danger="status=='overdue'" decoration-success="status=='paid'">
+                <field name="display_name"/>
+                <field name="customer_id"/>
+                <field name="unit_id"/>
+                <field name="due_date"/>
+                <field name="amount"/>
+                <field name="paid_amount"/>
+                <field name="due_amount"/>
+                <field name="status" widget="badge"
+                       decoration-success="status=='paid'"
+                       decoration-danger="status=='overdue'"
+                       decoration-warning="status in ('due_today','partially_paid')"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_real_estate_installment_search" model="ir.ui.view">
+        <field name="name">real.estate.installment.search</field>
+        <field name="model">real.estate.installment</field>
+        <field name="arch" type="xml">
+            <search string="Search Installments">
+                <field name="customer_id"/>
+                <field name="unit_id"/>
+                <filter string="Overdue" name="filter_overdue" domain="[('status','=','overdue')]"/>
+                <filter string="Due Today" name="filter_due_today" domain="[('status','=','due_today')]"/>
+                <filter string="Upcoming" name="filter_upcoming" domain="[('status','=','upcoming')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                    <filter string="Customer" name="group_customer" context="{'group_by': 'customer_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_real_estate_installment" model="ir.actions.act_window">
+        <field name="name">Installments (Due/Overdue)</field>
+        <field name="res_model">real.estate.installment</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_filter_overdue': 1}</field>
+        <field name="search_view_id" ref="view_real_estate_installment_search"/>
+    </record>
+
+</odoo>

@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_real_estate_requisition_tree" model="ir.ui.view">
+        <field name="name">real.estate.requisition.tree</field>
+        <field name="model">real.estate.requisition</field>
+        <field name="arch" type="xml">
+            <tree string="Material Requisitions" decoration-danger="priority=='urgent'">
+                <field name="name"/>
+                <field name="project_id"/>
+                <field name="requester_id"/>
+                <field name="request_date"/>
+                <field name="priority"/>
+                <field name="estimated_cost"/>
+                <field name="state" widget="badge"
+                       decoration-success="state in ('completed','received')"
+                       decoration-warning="state in ('draft','submitted','pm_approval','budget_approval')"
+                       decoration-info="state in ('procurement','purchase')"
+                       decoration-danger="state=='rejected'"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_real_estate_requisition_form" model="ir.ui.view">
+        <field name="name">real.estate.requisition.form</field>
+        <field name="model">real.estate.requisition</field>
+        <field name="arch" type="xml">
+            <form string="Material Requisition">
+                <header>
+                    <button name="action_submit" type="object" string="Submit" class="oe_highlight"
+                            invisible="state != 'draft'"/>
+                    <button name="action_pm_approve" type="object" string="PM Approve" class="oe_highlight"
+                            invisible="state != 'submitted'"/>
+                    <button name="action_budget_approve" type="object" string="Budget Approve" class="oe_highlight"
+                            invisible="state != 'pm_approval'"/>
+                    <button name="action_send_to_procurement" type="object" string="Send to Procurement" class="oe_highlight"
+                            invisible="state != 'budget_approval'"/>
+                    <button name="action_mark_purchased" type="object" string="Mark Purchased" class="oe_highlight"
+                            invisible="state != 'procurement'"/>
+                    <button name="action_mark_received" type="object" string="Mark Received" class="oe_highlight"
+                            invisible="state != 'purchase'"/>
+                    <button name="action_complete" type="object" string="Complete" class="oe_highlight"
+                            invisible="state != 'received'"/>
+                    <button name="action_reject" type="object" string="Reject"
+                            invisible="state in ('completed','rejected')"/>
+                    <button name="action_reset_to_draft" type="object" string="Reset to Draft"
+                            invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,submitted,pm_approval,budget_approval,procurement,purchase,received,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="project_id" required="1"/>
+                            <field name="building_id"/>
+                            <field name="work_package_id"/>
+                            <field name="site"/>
+                            <field name="budget_allocation_id"/>
+                        </group>
+                        <group>
+                            <field name="requester_id"/>
+                            <field name="request_date"/>
+                            <field name="required_date"/>
+                            <field name="priority"/>
+                            <field name="estimated_cost" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Items">
+                            <field name="line_ids">
+                                <tree editable="bottom">
+                                    <field name="product_id"/>
+                                    <field name="description"/>
+                                    <field name="quantity"/>
+                                    <field name="uom_id"/>
+                                    <field name="estimated_rate"/>
+                                    <field name="estimated_amount" readonly="1"/>
+                                    <field name="available_stock"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Reason">
+                            <field name="reason"/>
+                        </page>
+                        <page string="Attachments">
+                            <field name="attachment_ids" widget="many2many_binary"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_real_estate_requisition_search" model="ir.ui.view">
+        <field name="name">real.estate.requisition.search</field>
+        <field name="model">real.estate.requisition</field>
+        <field name="arch" type="xml">
+            <search string="Search Requisitions">
+                <field name="name"/>
+                <field name="project_id"/>
+                <field name="requester_id"/>
+                <group expand="0" string="Group By">
+                    <filter string="Project" name="group_project" context="{'group_by': 'project_id'}"/>
+                    <filter string="State" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Priority" name="group_priority" context="{'group_by': 'priority'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_real_estate_requisition" model="ir.actions.act_window">
+        <field name="name">Material Requisitions</field>
+        <field name="res_model">real.estate.requisition</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_real_estate_requisition_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first Material Requisition</p>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_real_estate_land_owner_tree" model="ir.ui.view">
+        <field name="name">real.estate.land.owner.tree</field>
+        <field name="model">real.estate.land.owner</field>
+        <field name="arch" type="xml">
+            <tree string="Land Owners" decoration-muted="status=='inactive'">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="mobile"/>
+                <field name="email"/>
+                <field name="ownership_type"/>
+                <field name="land_count"/>
+                <field name="status" widget="badge"
+                       decoration-success="status=='active'"
+                       decoration-warning="status=='draft'"
+                       decoration-muted="status=='inactive'"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_real_estate_land_owner_kanban" model="ir.ui.view">
+        <field name="name">real.estate.land.owner.kanban</field>
+        <field name="model">real.estate.land.owner</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile">
+                <field name="display_name"/>
+                <field name="status"/>
+                <field name="ownership_type"/>
+                <field name="land_count"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click o_kanban_record_has_image_fill p-2">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <strong><t t-esc="record.display_name.value"/></strong>
+                                <span t-attf-class="badge rounded-pill #{record.status.raw_value == 'active' ? 'text-bg-success' : record.status.raw_value == 'inactive' ? 'text-bg-secondary' : 'text-bg-warning'}">
+                                    <t t-esc="record.status.value"/>
+                                </span>
+                            </div>
+                            <div class="text-muted"><t t-esc="record.ownership_type.value"/></div>
+                            <div><i class="fa fa-map-o"/> <t t-esc="record.land_count.value"/> Land(s)</div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_real_estate_land_owner_form" model="ir.ui.view">
+        <field name="name">real.estate.land.owner.form</field>
+        <field name="model">real.estate.land.owner</field>
+        <field name="arch" type="xml">
+            <form string="Land Owner">
+                <header>
+                    <button name="action_activate" type="object" string="Activate"
+                            class="oe_highlight" invisible="status == 'active'"/>
+                    <button name="action_deactivate" type="object" string="Deactivate"
+                            invisible="status != 'active'"/>
+                    <field name="status" widget="statusbar" statusbar_visible="draft,active"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_lands" type="object" class="oe_stat_button" icon="fa-map-o">
+                            <field name="land_count" widget="statinfo" string="Lands"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Auto-generated"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="partner_id" required="1"
+                                   context="{'default_is_company': ownership_type == 'company'}"/>
+                            <field name="ownership_type"/>
+                            <field name="nid_passport"/>
+                            <field name="tax_id_number"/>
+                        </group>
+                        <group>
+                            <field name="phone"/>
+                            <field name="mobile"/>
+                            <field name="email"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Bank Information">
+                            <group>
+                                <group>
+                                    <field name="bank_name"/>
+                                    <field name="bank_branch"/>
+                                </group>
+                                <group>
+                                    <field name="bank_account_name"/>
+                                    <field name="bank_account_number"/>
+                                    <field name="bank_routing_number"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Land Ownerships">
+                            <field name="land_ownership_ids" readonly="1">
+                                <tree>
+                                    <field name="land_id"/>
+                                    <field name="ownership_percentage"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Documents">
+                            <field name="attachment_ids" widget="many2many_binary"/>
+                        </page>
+                        <page string="Notes">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_real_estate_land_owner_search" model="ir.ui.view">
+        <field name="name">real.estate.land.owner.search</field>
+        <field name="model">real.estate.land.owner</field>
+        <field name="arch" type="xml">
+            <search string="Search Land Owners">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="nid_passport"/>
+                <filter string="Active" name="filter_active" domain="[('status','=','active')]"/>
+                <filter string="Draft" name="filter_draft" domain="[('status','=','draft')]"/>
+                <separator/>
+                <filter string="Individual" name="filter_individual" domain="[('ownership_type','=','individual')]"/>
+                <filter string="Company" name="filter_company" domain="[('ownership_type','=','company')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                    <filter string="Ownership Type" name="group_type" context="{'group_by': 'ownership_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_real_estate_land_owner" model="ir.actions.act_window">
+        <field name="name">Land Owners</field>
+        <field name="res_model">real.estate.land.owner</field>
+        <field name="view_mode">tree,kanban,form</field>
+        <field name="search_view_id" ref="view_real_estate_land_owner_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first Land Owner
+            </p>
+            <p>Land owners are linked to a Contact and can own shares of one or more lands.</p>
+        </field>
+    </record>
+
+</odoo>

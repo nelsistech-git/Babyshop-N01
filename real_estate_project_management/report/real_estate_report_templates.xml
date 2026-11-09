@@ -1,0 +1,455 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ==================== PROJECT SUMMARY ==================== -->
+    <template id="report_real_estate_project_summary_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2 class="text-center">Project Summary</h2>
+                        <p class="text-center text-muted">
+                            <span t-field="o.name"/> &#8226; <span t-field="o.project_name"/>
+                        </p>
+                        <hr/>
+                        <table class="table table-sm">
+                            <tbody>
+                                <tr>
+                                    <td><strong>Project Type</strong></td>
+                                    <td><span t-field="o.project_type"/></td>
+                                    <td><strong>Status</strong></td>
+                                    <td><span t-field="o.state"/></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Project Manager</strong></td>
+                                    <td><span t-field="o.project_manager_id.name"/></td>
+                                    <td><strong>Location</strong></td>
+                                    <td><span t-field="o.location"/></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Start Date</strong></td>
+                                    <td><span t-field="o.start_date"/></td>
+                                    <td><strong>Planned Completion</strong></td>
+                                    <td><span t-field="o.planned_completion_date"/></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Total Land Area</strong></td>
+                                    <td><span t-field="o.total_land_area"/></td>
+                                    <td><strong>Saleable Area</strong></td>
+                                    <td><span t-field="o.saleable_area"/></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Buildings</strong></td>
+                                    <td><span t-field="o.building_count"/></td>
+                                    <td><strong>Total Units</strong></td>
+                                    <td><span t-field="o.unit_count"/></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Available Units</strong></td>
+                                    <td><span t-field="o.unit_available_count"/></td>
+                                    <td><strong>Sold Units</strong></td>
+                                    <td><span t-field="o.unit_sold_count"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!-- ==================== BUDGET VS ACTUAL ==================== -->
+    <template id="report_real_estate_budget_vs_actual_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2 class="text-center">Budget vs Actual</h2>
+                        <p class="text-center text-muted">
+                            <span t-field="o.name"/> &#8226; <span t-field="o.project_id.project_name"/>
+                        </p>
+                        <hr/>
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Budget Head</th>
+                                    <th class="text-end">Allocated</th>
+                                    <th class="text-end">Committed</th>
+                                    <th class="text-end">Actual</th>
+                                    <th class="text-end">Remaining</th>
+                                    <th class="text-end">Utilization %</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="o.allocation_ids" t-as="line">
+                                    <td><span t-field="line.budget_head"/></td>
+                                    <td class="text-end"><span t-field="line.allocated_amount"/></td>
+                                    <td class="text-end"><span t-field="line.committed_amount"/></td>
+                                    <td class="text-end"><span t-field="line.actual_amount"/></td>
+                                    <td class="text-end"><span t-field="line.remaining_amount"/></td>
+                                    <td class="text-end"><span t-field="line.utilization_percentage"/></td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr class="fw-bold">
+                                    <td>Total</td>
+                                    <td class="text-end"><span t-field="o.total_budget"/></td>
+                                    <td class="text-end"><span t-field="o.total_committed"/></td>
+                                    <td class="text-end"><span t-field="o.total_actual"/></td>
+                                    <td class="text-end"><span t-field="o.total_remaining"/></td>
+                                    <td class="text-end"><span t-field="o.utilization_percentage"/></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!-- ==================== SALE AGREEMENT ==================== -->
+    <template id="report_real_estate_sale_agreement_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2 class="text-center">Property Sale Agreement</h2>
+                        <p class="text-center text-muted"><span t-field="o.name"/></p>
+                        <hr/>
+                        <div class="row">
+                            <div class="col-6">
+                                <strong>Customer</strong>
+                                <p><span t-field="o.customer_id.name"/><br/>
+                                   <span t-field="o.customer_id.mobile"/></p>
+                            </div>
+                            <div class="col-6">
+                                <strong>Unit</strong>
+                                <p><span t-field="o.unit_id.name"/>, <span t-field="o.project_id.project_name"/></p>
+                            </div>
+                        </div>
+                        <table class="table table-sm mt-3">
+                            <tbody>
+                                <tr>
+                                    <td><strong>Agreement Date</strong></td>
+                                    <td><span t-field="o.agreement_date"/></td>
+                                    <td><strong>Expected Handover</strong></td>
+                                    <td><span t-field="o.handover_date"/></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Total Price</strong></td>
+                                    <td><span t-field="o.total_price"/></td>
+                                    <td><strong>Discount</strong></td>
+                                    <td><span t-field="o.discount"/></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Net Price</strong></td>
+                                    <td><span t-field="o.net_price"/></td>
+                                    <td><strong>Down Payment</strong></td>
+                                    <td><span t-field="o.down_payment"/></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Number of Installments</strong></td>
+                                    <td><span t-field="o.number_of_installments"/></td>
+                                    <td><strong>Frequency</strong></td>
+                                    <td><span t-field="o.frequency"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div t-field="o.terms"/>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!-- ==================== INSTALLMENT SCHEDULE ==================== -->
+    <template id="report_real_estate_installment_schedule_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2 class="text-center">Installment Schedule</h2>
+                        <p class="text-center text-muted">
+                            <span t-field="o.name"/> &#8226; <span t-field="o.customer_id.name"/> &#8226;
+                            <span t-field="o.unit_id.name"/>
+                        </p>
+                        <hr/>
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Milestone</th>
+                                    <th>Due Date</th>
+                                    <th class="text-end">Amount</th>
+                                    <th class="text-end">Paid</th>
+                                    <th class="text-end">Outstanding</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="o.installment_ids.sorted(lambda i: i.installment_number)" t-as="line">
+                                    <td><span t-field="line.installment_number"/></td>
+                                    <td><span t-field="line.milestone_name"/></td>
+                                    <td><span t-field="line.due_date"/></td>
+                                    <td class="text-end"><span t-field="line.amount"/></td>
+                                    <td class="text-end"><span t-field="line.paid_amount"/></td>
+                                    <td class="text-end"><span t-field="line.due_amount"/></td>
+                                    <td><span t-field="line.status"/></td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr class="fw-bold">
+                                    <td colspan="3">Total</td>
+                                    <td class="text-end"><span t-field="o.total_scheduled"/></td>
+                                    <td class="text-end"><span t-field="o.total_paid"/></td>
+                                    <td class="text-end"><span t-field="o.total_outstanding"/></td>
+                                    <td/>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!-- ==================== PAYMENT RECEIPT ==================== -->
+    <template id="report_real_estate_payment_receipt_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2 class="text-center">Payment Receipt</h2>
+                        <p class="text-center text-muted"><span t-field="o.name"/></p>
+                        <hr/>
+                        <table class="table table-sm">
+                            <tbody>
+                                <tr>
+                                    <td><strong>Customer</strong></td>
+                                    <td><span t-field="o.customer_id.name"/></td>
+                                    <td><strong>Payment Date</strong></td>
+                                    <td><span t-field="o.payment_date"/></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Project</strong></td>
+                                    <td><span t-field="o.project_id.project_name"/></td>
+                                    <td><strong>Unit</strong></td>
+                                    <td><span t-field="o.unit_id.name"/></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Amount</strong></td>
+                                    <td class="fw-bold"><span t-field="o.amount"/></td>
+                                    <td><strong>Payment Method</strong></td>
+                                    <td><span t-field="o.payment_method"/></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Reference</strong></td>
+                                    <td><span t-field="o.reference"/></td>
+                                    <td><strong>Collector</strong></td>
+                                    <td><span t-field="o.collector_id.name"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <p class="text-muted">This receipt is computer-generated and confirms payment
+                            has been recorded against the referenced account.</p>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!-- ==================== CUSTOMER LEDGER ==================== -->
+    <template id="report_real_estate_customer_ledger_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2 class="text-center">Customer Ledger</h2>
+                        <p class="text-center text-muted"><span t-field="o.name"/></p>
+                        <hr/>
+                        <table class="table table-sm">
+                            <tbody>
+                                <tr>
+                                    <td><strong>Total Agreement Value</strong></td>
+                                    <td class="text-end"><span t-field="o.ledger_total_agreement_value"/></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Total Paid</strong></td>
+                                    <td class="text-end"><span t-field="o.ledger_total_paid"/></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Total Due</strong></td>
+                                    <td class="text-end"><span t-field="o.ledger_total_due"/></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Overdue</strong></td>
+                                    <td class="text-end"><span t-field="o.ledger_overdue_amount"/></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Next Due Date</strong></td>
+                                    <td class="text-end"><span t-field="o.ledger_next_due_date"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <h4 class="mt-4">Installment History</h4>
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Installment</th>
+                                    <th>Due Date</th>
+                                    <th class="text-end">Amount</th>
+                                    <th class="text-end">Paid</th>
+                                    <th class="text-end">Outstanding</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="o.installment_ids" t-as="line">
+                                    <td><span t-field="line.display_name"/></td>
+                                    <td><span t-field="line.due_date"/></td>
+                                    <td class="text-end"><span t-field="line.amount"/></td>
+                                    <td class="text-end"><span t-field="line.paid_amount"/></td>
+                                    <td class="text-end"><span t-field="line.due_amount"/></td>
+                                    <td><span t-field="line.status"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!-- ==================== RENTAL AGREEMENT ==================== -->
+    <template id="report_real_estate_rental_agreement_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2 class="text-center">Rental Agreement</h2>
+                        <p class="text-center text-muted"><span t-field="o.name"/></p>
+                        <hr/>
+                        <div class="row">
+                            <div class="col-6">
+                                <strong>Tenant</strong>
+                                <p><span t-field="o.tenant_id.name"/><br/>
+                                   <span t-field="o.tenant_id.mobile"/></p>
+                            </div>
+                            <div class="col-6">
+                                <strong>Unit</strong>
+                                <p><span t-field="o.unit_id.name"/>, <span t-field="o.project_id.project_name"/></p>
+                            </div>
+                        </div>
+                        <table class="table table-sm mt-3">
+                            <tbody>
+                                <tr>
+                                    <td><strong>Start Date</strong></td>
+                                    <td><span t-field="o.start_date"/></td>
+                                    <td><strong>End Date</strong></td>
+                                    <td><span t-field="o.end_date"/></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Monthly Rent</strong></td>
+                                    <td><span t-field="o.monthly_rent"/></td>
+                                    <td><strong>Service Charge</strong></td>
+                                    <td><span t-field="o.service_charge"/></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Utility Charge</strong></td>
+                                    <td><span t-field="o.utility_charge"/></td>
+                                    <td><strong>Security Deposit</strong></td>
+                                    <td><span t-field="o.security_deposit"/></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Payment Day</strong></td>
+                                    <td><span t-field="o.payment_day"/></td>
+                                    <td><strong>Monthly Total</strong></td>
+                                    <td class="fw-bold"><span t-field="o.monthly_total"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div t-field="o.renewal_terms"/>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!-- ==================== PROJECT PROFITABILITY ==================== -->
+    <template id="report_real_estate_project_profitability_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2 class="text-center">Project Profitability</h2>
+                        <p class="text-center text-muted">
+                            <span t-field="o.name"/> &#8226; <span t-field="o.project_name"/>
+                        </p>
+                        <hr/>
+                        <h4>Revenue</h4>
+                        <table class="table table-sm">
+                            <tbody>
+                                <tr>
+                                    <td>Property Sales</td>
+                                    <td class="text-end"><span t-field="o.total_sales_value"/></td>
+                                </tr>
+                                <tr>
+                                    <td>Rental Income</td>
+                                    <td class="text-end"><span t-field="o.rental_income"/></td>
+                                </tr>
+                                <tr class="fw-bold">
+                                    <td>Total Revenue</td>
+                                    <td class="text-end"><span t-field="o.total_revenue"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <h4 class="mt-3">Cost</h4>
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Budget</th>
+                                    <th class="text-end">Budgeted</th>
+                                    <th class="text-end">Actual</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="o.budget_ids" t-as="b">
+                                    <td><span t-field="b.name"/></td>
+                                    <td class="text-end"><span t-field="b.total_budget"/></td>
+                                    <td class="text-end"><span t-field="b.total_actual"/></td>
+                                </tr>
+                                <tr class="fw-bold">
+                                    <td>Total Actual Cost</td>
+                                    <td/>
+                                    <td class="text-end"><span t-field="o.total_actual_cost"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <h4 class="mt-3">Summary</h4>
+                        <table class="table table-sm">
+                            <tbody>
+                                <tr>
+                                    <td>Total Revenue</td>
+                                    <td class="text-end"><span t-field="o.total_revenue"/></td>
+                                </tr>
+                                <tr>
+                                    <td>Total Actual Cost</td>
+                                    <td class="text-end"><span t-field="o.total_actual_cost"/></td>
+                                </tr>
+                                <tr class="fw-bold">
+                                    <td>Gross Profit</td>
+                                    <td class="text-end"><span t-field="o.gross_profit"/></td>
+                                </tr>
+                                <tr class="fw-bold">
+                                    <td>Profit Margin %</td>
+                                    <td class="text-end"><span t-field="o.profit_margin_percentage"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_real_estate_agent_lead_tree" model="ir.ui.view">
+        <field name="name">real.estate.agent.lead.tree</field>
+        <field name="model">real.estate.agent.lead</field>
+        <field name="arch" type="xml">
+            <tree string="CRM Leads" decoration-danger="is_overdue" decoration-success="stage=='won'"
+                  decoration-muted="stage=='lost'">
+                <field name="priority" widget="priority" optional="show"/>
+                <field name="name"/>
+                <field name="contact_name"/>
+                <field name="phone"/>
+                <field name="agent_id" optional="show"/>
+                <field name="project_id" optional="show"/>
+                <field name="unit_id" optional="hide"/>
+                <field name="expected_value" optional="show"/>
+                <field name="next_followup_date"/>
+                <field name="is_overdue" column_invisible="1"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="stage" widget="badge"
+                       decoration-success="stage=='won'"
+                       decoration-info="stage in ('contacted','site_visit')"
+                       decoration-warning="stage=='negotiation'"
+                       decoration-muted="stage=='lost'"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_real_estate_agent_lead_form" model="ir.ui.view">
+        <field name="name">real.estate.agent.lead.form</field>
+        <field name="model">real.estate.agent.lead</field>
+        <field name="arch" type="xml">
+            <form string="CRM Lead">
+                <header>
+                    <button name="action_convert_to_customer" type="object" string="Convert to Customer"
+                            class="oe_highlight" invisible="partner_id or stage == 'lost'"/>
+                    <button name="action_set_contacted" type="object" string="Contacted" invisible="stage != 'new'"/>
+                    <button name="action_set_site_visit" type="object" string="Site Visit"
+                            invisible="stage not in ('new','contacted')"/>
+                    <button name="action_set_negotiation" type="object" string="Negotiation"
+                            invisible="stage not in ('contacted','site_visit')"/>
+                    <button name="action_set_won" type="object" string="Mark Won" class="btn-success"
+                            invisible="stage in ('won','lost')"/>
+                    <button name="action_set_lost" type="object" string="Mark Lost"
+                            invisible="stage in ('won','lost')"/>
+                    <button name="action_reopen" type="object" string="Re-open"
+                            invisible="stage not in ('won','lost')"/>
+                    <button name="action_create_booking" type="object" string="Create Booking"
+                            invisible="stage == 'lost' or not unit_id"
+                            groups="real_estate_project_management.group_real_estate_salesperson"/>
+                    <field name="stage" widget="statusbar"
+                           statusbar_visible="new,contacted,site_visit,negotiation,won"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <field name="active" invisible="1"/>
+                    <field name="is_agent_user" invisible="1"/>
+                    <field name="currency_id" invisible="1"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="e.g. Mr. Rahim - 3 bed flat"/></h1>
+                    </div>
+                    <group>
+                        <group string="Contact">
+                            <field name="agent_id" readonly="is_agent_user"/>
+                            <field name="partner_id"/>
+                            <field name="contact_name"/>
+                            <field name="phone" widget="phone"/>
+                            <field name="email" widget="email"/>
+                            <field name="source"/>
+                        </group>
+                        <group string="Opportunity">
+                            <field name="project_id"/>
+                            <field name="unit_id"/>
+                            <field name="expected_value"/>
+                            <field name="priority" widget="priority"/>
+                            <field name="next_followup_date"/>
+                            <field name="last_contact_date"/>
+                            <field name="lost_reason" invisible="stage != 'lost'"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Interaction Log" name="log">
+                            <field name="log_ids">
+                                <tree editable="bottom">
+                                    <field name="date"/>
+                                    <field name="interaction_type"/>
+                                    <field name="note"/>
+                                    <field name="user_id" optional="hide"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Notes" name="notes">
+                            <field name="notes" placeholder="Budget, preferred floor, family size, objections..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_real_estate_agent_lead_kanban" model="ir.ui.view">
+        <field name="name">real.estate.agent.lead.kanban</field>
+        <field name="model">real.estate.agent.lead</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="stage" class="o_kanban_small_column" quick_create="false">
+                <field name="name"/>
+                <field name="contact_name"/>
+                <field name="phone"/>
+                <field name="project_id"/>
+                <field name="expected_value"/>
+                <field name="next_followup_date"/>
+                <field name="is_overdue"/>
+                <field name="priority"/>
+                <field name="currency_id"/>
+                <field name="color"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_card oe_kanban_global_click #{kanban_color(record.color.raw_value)}">
+                            <div class="oe_kanban_details">
+                                <strong><field name="name"/></strong>
+                                <div class="text-muted"><field name="contact_name"/> <field name="phone"/></div>
+                                <div t-if="record.project_id.raw_value"><i class="fa fa-building-o"/> <field name="project_id"/></div>
+                                <div t-if="record.expected_value.raw_value"><field name="expected_value" widget="monetary"/></div>
+                                <div t-if="record.next_followup_date.raw_value"
+                                     t-attf-class="#{record.is_overdue.raw_value ? 'text-danger fw-bold' : 'text-muted'}">
+                                    <i class="fa fa-calendar"/> <field name="next_followup_date"/>
+                                </div>
+                            </div>
+                            <div class="oe_kanban_bottom_right">
+                                <field name="priority" widget="priority"/>
+                                <field name="activity_ids" widget="kanban_activity"/>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_real_estate_agent_lead_search" model="ir.ui.view">
+        <field name="name">real.estate.agent.lead.search</field>
+        <field name="model">real.estate.agent.lead</field>
+        <field name="arch" type="xml">
+            <search string="Search Leads">
+                <field name="name"/>
+                <field name="contact_name"/>
+                <field name="phone"/>
+                <field name="agent_id"/>
+                <field name="project_id"/>
+                <filter string="Open" name="f_open" domain="[('stage','not in',('won','lost'))]"/>
+                <filter string="Follow-up Due / Overdue" name="f_due"
+                        domain="[('next_followup_date','!=',False),('next_followup_date','&lt;=',context_today().strftime('%Y-%m-%d')),('stage','not in',('won','lost'))]"/>
+                <filter string="Won" name="f_won" domain="[('stage','=','won')]"/>
+                <filter string="Lost" name="f_lost" domain="[('stage','=','lost')]"/>
+                <filter string="Archived" name="f_archived" domain="[('active','=',False)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Stage" name="group_stage" context="{'group_by': 'stage'}"/>
+                    <filter string="Agent" name="group_agent" context="{'group_by': 'agent_id'}"/>
+                    <filter string="Project" name="group_project" context="{'group_by': 'project_id'}"/>
+                    <filter string="Source" name="group_source" context="{'group_by': 'source'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_real_estate_agent_lead" model="ir.actions.act_window">
+        <field name="name">CRM Leads</field>
+        <field name="res_model">real.estate.agent.lead</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="search_view_id" ref="view_real_estate_agent_lead_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Add your first lead or customer follow-up</p>
+            <p>Track prospects and your existing customers: stage, follow-up date, call and visit notes.
+            Convert a lead to a customer when he is ready to buy.</p>
+        </field>
+    </record>
+
+    <record id="action_real_estate_agent_lead_new" model="ir.actions.act_window">
+        <field name="name">New Lead</field>
+        <field name="res_model">real.estate.agent.lead</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+    </record>
+
+</odoo>

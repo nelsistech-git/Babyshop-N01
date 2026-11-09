@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- MOVED here (2026-08-15): must load BEFORE view_real_estate_dashboard_form,
+         which references it via %(action_real_estate_unit_inventory_dashboard)d
+         (was defined later in this file -> install failed with 'External ID not
+         found'). Unit Inventory Dashboard: reuses the Phase 2 Unit Kanban,
+         grouped by Building for a visual, drill-down-able floor/status view
+         (spec section 52) without introducing a custom OWL grid. -->
+    <record id="action_real_estate_unit_inventory_dashboard" model="ir.actions.act_window">
+        <field name="name">Unit Inventory Dashboard</field>
+        <field name="res_model">real.estate.unit</field>
+        <field name="view_mode">kanban,tree,graph,pivot</field>
+        <field name="context">{'search_default_group_status': 0, 'group_by': ['building_id']}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No units yet</p>
+        </field>
+    </record>
+
+    <record id="view_real_estate_dashboard_form" model="ir.ui.view">
+        <field name="name">real.estate.dashboard.form</field>
+        <field name="model">real.estate.dashboard</field>
+        <field name="arch" type="xml">
+            <form string="Management Dashboard" create="false" edit="false" delete="false">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>Management Dashboard</h1>
+                    </div>
+
+                    <h3 class="mt-3">Projects</h3>
+                    <div class="row text-center mb-3">
+                        <div class="col-4">
+                            <button name="%(action_real_estate_project)d" type="action" class="btn btn-link">
+                                <h2><field name="total_projects" readonly="1"/></h2>
+                                <div>Total Projects</div>
+                            </button>
+                        </div>
+                        <div class="col-4">
+                            <h2><field name="active_projects" readonly="1"/></h2>
+                            <div>Active Projects</div>
+                        </div>
+                        <div class="col-4">
+                            <h2><field name="completed_projects" readonly="1"/></h2>
+                            <div>Completed Projects</div>
+                        </div>
+                    </div>
+
+                    <h3>Unit Inventory</h3>
+                    <div class="row text-center mb-3">
+                        <div class="col-2">
+                            <button name="%(action_real_estate_unit_inventory_dashboard)d" type="action" class="btn btn-link">
+                                <h2><field name="total_units" readonly="1"/></h2>
+                                <div>Total Units</div>
+                            </button>
+                        </div>
+                        <div class="col-2">
+                            <h2 class="text-success"><field name="available_units" readonly="1"/></h2>
+                            <div>Available</div>
+                        </div>
+                        <div class="col-2">
+                            <h2 class="text-warning"><field name="booked_units" readonly="1"/></h2>
+                            <div>Booked</div>
+                        </div>
+                        <div class="col-2">
+                            <h2 class="text-danger"><field name="sold_units" readonly="1"/></h2>
+                            <div>Sold</div>
+                        </div>
+                        <div class="col-2">
+                            <h2 class="text-info"><field name="rented_units" readonly="1"/></h2>
+                            <div>Rented</div>
+                        </div>
+                    </div>
+
+                    <h3>Budget &amp; Cost</h3>
+                    <div class="row text-center mb-3">
+                        <div class="col-4">
+                            <button name="%(action_real_estate_project_budget)d" type="action" class="btn btn-link">
+                                <h2><field name="total_budget" readonly="1" widget="monetary"/></h2>
+                                <div>Total Budget</div>
+                            </button>
+                        </div>
+                        <div class="col-4">
+                            <h2><field name="actual_cost" readonly="1" widget="monetary"/></h2>
+                            <div>Actual Cost</div>
+                        </div>
+                        <div class="col-4">
+                            <h2><field name="budget_utilization_percentage" readonly="1" widget="percentage"/></h2>
+                            <div>Utilization</div>
+                        </div>
+                    </div>
+
+                    <h3>Sales &amp; Collection</h3>
+                    <div class="row text-center mb-3">
+                        <div class="col-3">
+                            <button name="%(action_real_estate_sale_agreement)d" type="action" class="btn btn-link">
+                                <h2><field name="total_sales" readonly="1" widget="monetary"/></h2>
+                                <div>Total Sales</div>
+                            </button>
+                        </div>
+                        <div class="col-3">
+                            <button name="%(action_real_estate_collection)d" type="action" class="btn btn-link">
+                                <h2><field name="total_collection" readonly="1" widget="monetary"/></h2>
+                                <div>Total Collection</div>
+                            </button>
+                        </div>
+                        <div class="col-3">
+                            <h2><field name="total_receivable" readonly="1" widget="monetary"/></h2>
+                            <div>Receivable</div>
+                        </div>
+                        <div class="col-3">
+                            <button name="%(action_real_estate_installment)d" type="action" class="btn btn-link">
+                                <h2 class="text-danger"><field name="total_overdue" readonly="1" widget="monetary"/></h2>
+                                <div>Overdue</div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <h3>Profitability</h3>
+                    <div class="row text-center mb-3">
+                        <div class="col-12">
+                            <h2><field name="estimated_profit" readonly="1" widget="monetary"/></h2>
+                            <div>Estimated Profit (Total Sales - Actual Cost)</div>
+                        </div>
+                    </div>
+
+                    <field name="company_id" invisible="1"/>
+                    <field name="currency_id" invisible="1"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_real_estate_dashboard" model="ir.actions.act_window">
+        <field name="name">Management Dashboard</field>
+        <field name="res_model">real.estate.dashboard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_real_estate_dashboard_form"/>
+        <field name="target">current</field>
+        <field name="context">{}</field>
+    </record>
+
+    <!-- Unit Inventory Dashboard record MOVED to the top of this file
+         (2026-08-15): the dashboard form view references
+         %(action_real_estate_unit_inventory_dashboard)d but the action was
+         defined AFTER the form in this file, which failed installation with
+         'External ID not found in the system:
+         real_estate_project_management.action_real_estate_unit_inventory_dashboard'. -->
+
+    <!-- Graph/Pivot reporting views reused across several dashboard KPIs -->
+    <record id="view_real_estate_unit_graph" model="ir.ui.view">
+        <field name="name">real.estate.unit.graph</field>
+        <field name="model">real.estate.unit</field>
+        <field name="arch" type="xml">
+            <graph string="Unit Status" type="bar">
+                <field name="status"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_real_estate_unit_pivot" model="ir.ui.view">
+        <field name="name">real.estate.unit.pivot</field>
+        <field name="model">real.estate.unit</field>
+        <field name="arch" type="xml">
+            <pivot string="Unit Inventory">
+                <field name="project_id" type="row"/>
+                <field name="status" type="col"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_real_estate_budget_allocation_graph" model="ir.ui.view">
+        <field name="name">real.estate.budget.allocation.graph</field>
+        <field name="model">real.estate.budget.allocation</field>
+        <field name="arch" type="xml">
+            <graph string="Budget vs Actual" type="bar">
+                <field name="budget_head"/>
+                <field name="allocated_amount" type="measure"/>
+                <field name="actual_amount" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_real_estate_budget_vs_actual" model="ir.actions.act_window">
+        <field name="name">Budget vs Actual</field>
+        <field name="res_model">real.estate.budget.allocation</field>
+        <field name="view_mode">graph,pivot,tree</field>
+    </record>
+
+    <record id="view_real_estate_sale_agreement_graph" model="ir.ui.view">
+        <field name="name">real.estate.sale.agreement.graph</field>
+        <field name="model">real.estate.sale.agreement</field>
+        <field name="arch" type="xml">
+            <graph string="Sales by Project" type="bar">
+                <field name="project_id"/>
+                <field name="net_price" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_real_estate_sales_by_project" model="ir.actions.act_window">
+        <field name="name">Sales by Project</field>
+        <field name="res_model">real.estate.sale.agreement</field>
+        <field name="view_mode">graph,pivot,tree</field>
+        <field name="domain">[('state', 'in', ('active', 'completed'))]</field>
+    </record>
+
+    <record id="view_real_estate_collection_graph" model="ir.ui.view">
+        <field name="name">real.estate.collection.graph</field>
+        <field name="model">real.estate.collection</field>
+        <field name="arch" type="xml">
+            <graph string="Collection by Month" type="line">
+                <field name="payment_date" interval="month"/>
+                <field name="amount" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_real_estate_collection_by_month" model="ir.actions.act_window">
+        <field name="name">Collection by Month</field>
+        <field name="res_model">real.estate.collection</field>
+        <field name="view_mode">graph,pivot,tree</field>
+        <field name="domain">[('state', '=', 'confirmed')]</field>
+    </record>
+
+    <record id="view_real_estate_installment_graph" model="ir.ui.view">
+        <field name="name">real.estate.installment.graph</field>
+        <field name="model">real.estate.installment</field>
+        <field name="arch" type="xml">
+            <graph string="Outstanding Receivable" type="bar">
+                <field name="customer_id"/>
+                <field name="due_amount" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_real_estate_outstanding_receivable" model="ir.actions.act_window">
+        <field name="name">Outstanding Receivable</field>
+        <field name="res_model">real.estate.installment</field>
+        <field name="view_mode">graph,pivot,tree</field>
+        <field name="domain">[('due_amount', '&gt;', 0)]</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,351 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ===================== COMMISSION RULES (2 layers) ===================== -->
+    <record id="view_real_estate_commission_rule_tree" model="ir.ui.view">
+        <field name="name">real.estate.commission.rule.tree</field>
+        <field name="model">real.estate.commission.rule</field>
+        <field name="arch" type="xml">
+            <tree string="Commission Rules">
+                <field name="level"/>
+                <field name="calc_type"/>
+                <field name="value"/>
+                <field name="project_id" placeholder="All Projects"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_real_estate_commission_rule_form" model="ir.ui.view">
+        <field name="name">real.estate.commission.rule.form</field>
+        <field name="model">real.estate.commission.rule</field>
+        <field name="arch" type="xml">
+            <form string="Commission Rule">
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <field name="active" invisible="1"/>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group string="Rule">
+                            <field name="level" widget="radio"/>
+                            <field name="calc_type" widget="radio"/>
+                            <field name="value"/>
+                        </group>
+                        <group string="Scope">
+                            <field name="project_id" placeholder="All Projects"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <div class="text-muted">
+                        <p><b>Level 1</b> is paid to whoever made the sale (an agent, or a customer who
+                        sold a property to a new buyer).</p>
+                        <p><b>Level 2</b> is paid to the person who originally referred that Level 1
+                        person (e.g. the agent who brought the selling customer).</p>
+                        <p>A project-specific rule overrides the "All Projects" rule for that project.</p>
+                    </div>
+                    <group string="Notes"><field name="notes" nolabel="1"/></group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_real_estate_commission_rule" model="ir.actions.act_window">
+        <field name="name">Commission Rules</field>
+        <field name="res_model">real.estate.commission.rule</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Define the 2-layer commission</p>
+            <p>Create one rule for Level 1 and one for Level 2, as a percentage or a fixed amount.</p>
+        </field>
+    </record>
+
+    <!-- ===================== COMMISSIONS ===================== -->
+    <record id="view_real_estate_commission_tree" model="ir.ui.view">
+        <field name="name">real.estate.commission.tree</field>
+        <field name="model">real.estate.commission</field>
+        <field name="arch" type="xml">
+            <tree string="Commissions" decoration-success="state=='paid'" decoration-muted="state=='cancelled'"
+                  decoration-info="state=='approved'">
+                <field name="name"/>
+                <field name="sale_agreement_id"/>
+                <field name="customer_id" string="Buyer"/>
+                <field name="project_id"/>
+                <field name="agent_id"/>
+                <field name="level"/>
+                <field name="beneficiary_id"/>
+                <field name="base_amount" optional="show"/>
+                <field name="calc_type" optional="hide"/>
+                <field name="rate_value" optional="show"/>
+                <field name="amount" sum="Total"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="state" widget="badge"
+                       decoration-success="state=='paid'"
+                       decoration-info="state=='approved'"
+                       decoration-warning="state=='draft'"
+                       decoration-muted="state=='cancelled'"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_real_estate_commission_form" model="ir.ui.view">
+        <field name="name">real.estate.commission.form</field>
+        <field name="model">real.estate.commission</field>
+        <field name="arch" type="xml">
+            <form string="Commission">
+                <header>
+                    <button name="action_approve" type="object" string="Approve" class="oe_highlight"
+                            invisible="state != 'draft'" groups="real_estate_project_management.group_real_estate_accounts_manager,real_estate_project_management.group_real_estate_sales_manager"/>
+                    <button name="action_mark_paid" type="object" string="Mark as Paid" class="oe_highlight"
+                            invisible="state != 'approved'" groups="real_estate_project_management.group_real_estate_accounts_manager"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                            invisible="state not in ('draft','approved')"/>
+                    <button name="action_reset_to_draft" type="object" string="Reset to Draft"
+                            invisible="state not in ('approved','cancelled')"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,approved,paid"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group string="Who gets it">
+                            <field name="beneficiary_id" readonly="state != 'draft'"/>
+                            <field name="beneficiary_type"/>
+                            <field name="level" readonly="state != 'draft'"/>
+                            <field name="agent_id"/>
+                        </group>
+                        <group string="Sale">
+                            <field name="sale_agreement_id" readonly="state != 'draft'"/>
+                            <field name="customer_id" string="Buyer"/>
+                            <field name="project_id"/>
+                            <field name="unit_id"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Calculation">
+                            <field name="calc_type" readonly="state != 'draft'" widget="radio"/>
+                            <field name="rate_value" readonly="state != 'draft'"/>
+                            <field name="base_amount" readonly="state != 'draft'"/>
+                            <field name="amount" readonly="state != 'draft'" class="fw-bold"/>
+                        </group>
+                        <group string="Payment">
+                            <field name="approved_date"/>
+                            <field name="payment_date"/>
+                            <field name="payment_reference" readonly="state == 'paid'"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <group string="Notes"><field name="notes" nolabel="1"/></group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_real_estate_commission_search" model="ir.ui.view">
+        <field name="name">real.estate.commission.search</field>
+        <field name="model">real.estate.commission</field>
+        <field name="arch" type="xml">
+            <search string="Search Commissions">
+                <field name="name"/>
+                <field name="beneficiary_id"/>
+                <field name="customer_id" string="Buyer"/>
+                <field name="agent_id"/>
+                <field name="sale_agreement_id"/>
+                <field name="project_id"/>
+                <filter string="Pending Approval" name="f_draft" domain="[('state','=','draft')]"/>
+                <filter string="Approved (unpaid)" name="f_approved" domain="[('state','=','approved')]"/>
+                <filter string="Paid" name="f_paid" domain="[('state','=','paid')]"/>
+                <separator/>
+                <filter string="Level 1" name="f_l1" domain="[('level','=','1')]"/>
+                <filter string="Level 2" name="f_l2" domain="[('level','=','2')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Beneficiary" name="group_beneficiary" context="{'group_by': 'beneficiary_id'}"/>
+                    <filter string="Layer" name="group_level" context="{'group_by': 'level'}"/>
+                    <filter string="Project" name="group_project" context="{'group_by': 'project_id'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_real_estate_commission_pivot" model="ir.ui.view">
+        <field name="name">real.estate.commission.pivot</field>
+        <field name="model">real.estate.commission</field>
+        <field name="arch" type="xml">
+            <pivot string="Commission Analysis">
+                <field name="beneficiary_id" type="row"/>
+                <field name="level" type="col"/>
+                <field name="amount" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_real_estate_commission" model="ir.actions.act_window">
+        <field name="name">Commissions</field>
+        <field name="res_model">real.estate.commission</field>
+        <field name="view_mode">tree,form,pivot</field>
+        <field name="search_view_id" ref="view_real_estate_commission_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No commissions yet</p>
+            <p>Commissions are generated automatically when a Sale Agreement with a
+            "Sold By" agent / referrer is activated.</p>
+        </field>
+    </record>
+
+    <!-- ===================== SALE AGREEMENT: seller + commission ===================== -->
+    <record id="view_real_estate_sale_agreement_form_commission" model="ir.ui.view">
+        <field name="name">real.estate.sale.agreement.form.commission</field>
+        <field name="model">real.estate.sale.agreement</field>
+        <field name="inherit_id" ref="view_real_estate_sale_agreement_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_reset_to_draft']" position="after">
+                <button name="action_generate_commissions" type="object" string="Generate Commissions"
+                        invisible="state not in ('active','completed') or not agent_id"/>
+            </xpath>
+            <xpath expr="//field[@name='booking_id']" position="after">
+                <field name="agent_id" placeholder="Agent or referring customer"/>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Agent &amp; Commission" name="agent_commission">
+                    <group>
+                        <group>
+                            <field name="agent_id" string="Level 1 (Seller)"/>
+                            <field name="upline_partner_id" string="Level 2 (Upline)"/>
+                        </group>
+                        <group>
+                            <field name="total_commission"/>
+                            <field name="commission_count" invisible="1"/>
+                        </group>
+                    </group>
+                    <field name="commission_ids" readonly="1">
+                        <tree decoration-success="state=='paid'" decoration-muted="state=='cancelled'">
+                            <field name="name"/>
+                            <field name="level"/>
+                            <field name="beneficiary_id"/>
+                            <field name="calc_type"/>
+                            <field name="rate_value"/>
+                            <field name="base_amount"/>
+                            <field name="amount" sum="Total"/>
+                            <field name="state" widget="badge"
+                                   decoration-success="state=='paid'"
+                                   decoration-info="state=='approved'"
+                                   decoration-warning="state=='draft'"/>
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_real_estate_booking_form_agent" model="ir.ui.view">
+        <field name="name">real.estate.booking.form.agent</field>
+        <field name="model">real.estate.booking</field>
+        <field name="inherit_id" ref="view_real_estate_booking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='salesperson_id']" position="after">
+                <field name="agent_id" placeholder="Agent or referring customer"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ===================== PARTNER: agent / referral network ===================== -->
+    <record id="view_partner_form_agent_inherit" model="ir.ui.view">
+        <field name="name">res.partner.form.agent.inherit</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="before">
+                <header groups="real_estate_project_management.group_real_estate_user">
+                    <field name="is_real_estate_customer" invisible="1"/>
+                    <button name="action_create_portal_login" type="object" string="Create Login (ID &amp; Password)"
+                            groups="real_estate_project_management.group_real_estate_sales_manager"/>
+                    <button name="action_open_customer_dashboard" type="object" string="Customer Dashboard"
+                            invisible="not is_real_estate_customer"/>
+                    <button name="action_open_agent_dashboard" type="object" string="Agent Dashboard"
+                            invisible="not is_agent"/>
+                </header>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_referrals" type="object" class="oe_stat_button" icon="fa-sitemap"
+                        invisible="referral_count == 0"
+                        groups="real_estate_project_management.group_real_estate_user">
+                    <field name="referral_count" widget="statinfo" string="Referred"/>
+                </button>
+                <button name="action_view_agent_sales" type="object" class="oe_stat_button" icon="fa-handshake-o"
+                        invisible="agent_sale_count == 0"
+                        groups="real_estate_project_management.group_real_estate_user">
+                    <field name="agent_sale_count" widget="statinfo" string="Sales Made"/>
+                </button>
+                <button name="action_view_commissions" type="object" class="oe_stat_button" icon="fa-percent"
+                        invisible="commission_count == 0"
+                        groups="real_estate_project_management.group_real_estate_user">
+                    <field name="commission_count" widget="statinfo" string="Commissions"/>
+                </button>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Agent &amp; Referral" name="real_estate_agent"
+                      groups="real_estate_project_management.group_real_estate_user">
+                    <group>
+                        <group string="Role">
+                            <field name="is_agent"/>
+                            <field name="agent_code" invisible="not is_agent"/>
+                            <field name="referred_by_id"/>
+                        </group>
+                        <group string="Commission earned (2 layers)">
+                            <field name="commission_total"/>
+                            <field name="commission_paid"/>
+                            <field name="commission_pending"/>
+                        </group>
+                    </group>
+                    <field name="referral_ids" readonly="1">
+                        <tree string="Referred Customers">
+                            <field name="name"/>
+                            <field name="mobile"/>
+                            <field name="email"/>
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_real_estate_agent_partner" model="ir.actions.act_window">
+        <field name="name">Agents</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">tree,kanban,form</field>
+        <field name="domain">[('is_agent', '=', True)]</field>
+        <field name="context">{'default_is_agent': True, 'default_customer_type': 'individual'}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No agents yet</p>
+            <p>Create an agent here, then use "Create Login (ID &amp; Password)" so the agent can sign in to his own dashboard and CRM.</p>
+        </field>
+    </record>
+
+    <!-- ===================== CREATE LOGIN WIZARD ===================== -->
+    <record id="view_real_estate_create_user_wizard_form" model="ir.ui.view">
+        <field name="name">real.estate.create.user.wizard.form</field>
+        <field name="model">real.estate.create.user.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Create Login">
+                <group>
+                    <field name="partner_id" readonly="1"/>
+                    <field name="role" widget="radio"/>
+                    <field name="login"/>
+                    <field name="password"/>
+                </group>
+                <div class="text-muted">
+                    The user will see ONLY their own dashboard (customers) or their own
+                    dashboard + CRM (agents). Note the password now: it cannot be shown again.
+                </div>
+                <footer>
+                    <button name="action_create_user" type="object" string="Create Login" class="btn-primary"/>
+                    <button string="Cancel" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

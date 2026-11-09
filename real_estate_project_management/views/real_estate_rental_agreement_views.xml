@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_real_estate_rental_agreement_tree" model="ir.ui.view">
+        <field name="name">real.estate.rental.agreement.tree</field>
+        <field name="model">real.estate.rental.agreement</field>
+        <field name="arch" type="xml">
+            <tree string="Rental Agreements" decoration-success="status=='active'" decoration-muted="status in ('expired','terminated')">
+                <field name="name"/>
+                <field name="tenant_id"/>
+                <field name="unit_id"/>
+                <field name="start_date"/>
+                <field name="end_date"/>
+                <field name="monthly_total"/>
+                <field name="status" widget="badge"
+                       decoration-success="status=='active'"
+                       decoration-warning="status in ('draft','confirmed')"
+                       decoration-muted="status in ('expired','terminated','renewed')"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_real_estate_rental_agreement_form" model="ir.ui.view">
+        <field name="name">real.estate.rental.agreement.form</field>
+        <field name="model">real.estate.rental.agreement</field>
+        <field name="arch" type="xml">
+            <form string="Rental Agreement">
+                <header>
+                    <button name="action_confirm" type="object" string="Confirm" class="oe_highlight"
+                            invisible="status != 'draft'"/>
+                    <button name="action_activate" type="object" string="Activate" class="oe_highlight"
+                            invisible="status != 'confirmed'"/>
+                    <button name="action_expire" type="object" string="Mark Expired"
+                            invisible="status != 'active'"/>
+                    <button name="action_renew" type="object" string="Renew" class="oe_highlight"
+                            invisible="status not in ('active','expired')"/>
+                    <button name="action_terminate" type="object" string="Terminate"
+                            invisible="status not in ('confirmed','active')"/>
+                    <field name="status" widget="statusbar" statusbar_visible="draft,confirmed,active,expired"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_generate_rent_schedule" type="object"
+                                class="oe_stat_button" icon="fa-calendar-plus-o"
+                                invisible="rent_schedule_count &gt; 0">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Generate</span>
+                                <span class="o_stat_text">Schedule</span>
+                            </div>
+                        </button>
+                        <button name="%(action_real_estate_rent_schedule)d" type="action"
+                                class="oe_stat_button" icon="fa-calendar-check-o"
+                                context="{'search_default_rental_agreement_id': id}">
+                            <field name="rent_schedule_count" widget="statinfo" string="Rent Schedule"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="tenant_id" required="1"/>
+                            <field name="unit_id" required="1"/>
+                            <field name="project_id" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="start_date"/>
+                            <field name="end_date"/>
+                            <field name="payment_day"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="monthly_rent" required="1"/>
+                            <field name="service_charge"/>
+                            <field name="utility_charge"/>
+                            <field name="monthly_total" readonly="1" class="fw-bold"/>
+                        </group>
+                        <group>
+                            <field name="security_deposit"/>
+                            <field name="total_collected" readonly="1"/>
+                            <field name="total_outstanding" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Rent Schedule">
+                            <field name="rent_schedule_ids" readonly="1">
+                                <tree decoration-danger="status=='overdue'" decoration-success="status=='paid'">
+                                    <field name="due_date"/>
+                                    <field name="amount"/>
+                                    <field name="paid_amount"/>
+                                    <field name="due_amount"/>
+                                    <field name="status" widget="badge"
+                                           decoration-success="status=='paid'"
+                                           decoration-danger="status=='overdue'"
+                                           decoration-warning="status=='partial'"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Renewal Terms">
+                            <field name="renewal_terms"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_real_estate_rental_agreement_search" model="ir.ui.view">
+        <field name="name">real.estate.rental.agreement.search</field>
+        <field name="model">real.estate.rental.agreement</field>
+        <field name="arch" type="xml">
+            <search string="Search Rental Agreements">
+                <field name="name"/>
+                <field name="tenant_id"/>
+                <field name="unit_id"/>
+                <group expand="0" string="Group By">
+                    <filter string="Project" name="group_project" context="{'group_by': 'project_id'}"/>
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_real_estate_rental_agreement" model="ir.actions.act_window">
+        <field name="name">Rental Agreements</field>
+        <field name="res_model">real.estate.rental.agreement</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_real_estate_rental_agreement_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first Rental Agreement</p>
+        </field>
+    </record>
+
+</odoo>

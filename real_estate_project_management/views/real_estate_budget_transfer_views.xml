@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_real_estate_budget_transfer_tree" model="ir.ui.view">
+        <field name="name">real.estate.budget.transfer.tree</field>
+        <field name="model">real.estate.budget.transfer</field>
+        <field name="arch" type="xml">
+            <tree string="Budget Transfers" decoration-success="state=='approved'" decoration-muted="state=='rejected'">
+                <field name="name"/>
+                <field name="source_allocation_id"/>
+                <field name="destination_allocation_id"/>
+                <field name="amount"/>
+                <field name="date"/>
+                <field name="state" widget="badge"
+                       decoration-success="state=='approved'"
+                       decoration-warning="state in ('draft','submitted')"
+                       decoration-danger="state=='rejected'"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_real_estate_budget_transfer_form" model="ir.ui.view">
+        <field name="name">real.estate.budget.transfer.form</field>
+        <field name="model">real.estate.budget.transfer</field>
+        <field name="arch" type="xml">
+            <form string="Budget Transfer">
+                <header>
+                    <button name="action_submit" type="object" string="Submit"
+                            class="oe_highlight" invisible="state != 'draft'"/>
+                    <button name="action_approve" type="object" string="Approve"
+                            class="oe_highlight" invisible="state != 'submitted'"/>
+                    <button name="action_reject" type="object" string="Reject"
+                            invisible="state != 'submitted'"/>
+                    <button name="action_reset_to_draft" type="object" string="Reset to Draft"
+                            invisible="state in ('draft','approved')"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="source_allocation_id" required="1"/>
+                            <field name="destination_allocation_id" required="1"/>
+                            <field name="amount"/>
+                        </group>
+                        <group>
+                            <field name="date"/>
+                            <field name="requested_by"/>
+                            <field name="approved_by" readonly="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="reason" placeholder="Why is this transfer needed?"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_real_estate_budget_transfer" model="ir.actions.act_window">
+        <field name="name">Budget Transfers</field>
+        <field name="res_model">real.estate.budget.transfer</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first Budget Transfer</p>
+        </field>
+    </record>
+
+</odoo>

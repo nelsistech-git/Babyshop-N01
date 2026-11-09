@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_real_estate_block_tree" model="ir.ui.view">
+        <field name="name">real.estate.block.tree</field>
+        <field name="model">real.estate.block</field>
+        <field name="arch" type="xml">
+            <tree string="Blocks">
+                <field name="name"/>
+                <field name="block_name"/>
+                <field name="building_id"/>
+                <field name="project_id"/>
+                <field name="floor_count"/>
+                <field name="unit_count"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_real_estate_block_form" model="ir.ui.view">
+        <field name="name">real.estate.block.form</field>
+        <field name="model">real.estate.block</field>
+        <field name="arch" type="xml">
+            <form string="Block">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="block_name"/>
+                        </group>
+                        <group>
+                            <field name="building_id" required="1"/>
+                            <field name="sequence"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_real_estate_block_search" model="ir.ui.view">
+        <field name="name">real.estate.block.search</field>
+        <field name="model">real.estate.block</field>
+        <field name="arch" type="xml">
+            <search string="Search Blocks">
+                <field name="name"/>
+                <field name="block_name"/>
+                <field name="building_id"/>
+                <group expand="0" string="Group By">
+                    <filter string="Building" name="group_building" context="{'group_by': 'building_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_real_estate_block" model="ir.actions.act_window">
+        <field name="name">Blocks</field>
+        <field name="res_model">real.estate.block</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_real_estate_block_search"/>
+    </record>
+
+</odoo>

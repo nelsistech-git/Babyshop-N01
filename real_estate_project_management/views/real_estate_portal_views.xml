@@ -1,0 +1,435 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- =====================================================================
+         CUSTOMER DASHBOARD ("My Dashboard")
+         Everything is read from a per-user snapshot built by
+         real.estate.portal.dashboard.action_open_dashboard(). The generic
+         columns of real.estate.portal.line are re-labelled per list.
+         ===================================================================== -->
+    <record id="view_real_estate_portal_dashboard_customer_form" model="ir.ui.view">
+        <field name="name">real.estate.portal.dashboard.customer.form</field>
+        <field name="model">real.estate.portal.dashboard</field>
+        <field name="arch" type="xml">
+            <form string="My Dashboard" create="false" edit="false" delete="false" duplicate="false">
+                <header>
+                    <button name="action_refresh" type="object" string="Refresh" icon="fa-refresh"/>
+                </header>
+                <sheet>
+                    <field name="currency_id" invisible="1"/>
+                    <field name="commission_count" invisible="1"/>
+                    <field name="projects_count" invisible="1"/>
+                    <div class="oe_title">
+                        <h1>My Dashboard</h1>
+                        <h3 class="text-muted"><field name="partner_name" readonly="1"/></h3>
+                    </div>
+
+                    <h3 class="mt-3">My Payments</h3>
+                    <div class="row text-center mb-3">
+                        <div class="col-3">
+                            <h2><field name="total_value" readonly="1" widget="monetary"/></h2>
+                            <div>Total Property Value</div>
+                        </div>
+                        <div class="col-3">
+                            <h2 class="text-success"><field name="total_paid" readonly="1" widget="monetary"/></h2>
+                            <div>Payment Done</div>
+                        </div>
+                        <div class="col-3">
+                            <h2 class="text-warning"><field name="total_due" readonly="1" widget="monetary"/></h2>
+                            <div>Balance Due</div>
+                        </div>
+                        <div class="col-3">
+                            <h2 class="text-danger"><field name="overdue_amount" readonly="1" widget="monetary"/></h2>
+                            <div>Overdue Now</div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <div class="text-muted">Payment completed</div>
+                            <field name="payment_progress" widget="progressbar" readonly="1"/>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-muted">Next payment</div>
+                            <h4><field name="next_due_date" readonly="1"/> &#160;
+                                <field name="next_due_amount" readonly="1" widget="monetary"/></h4>
+                        </div>
+                    </div>
+                    <div class="row text-center mb-3">
+                        <div class="col-3">
+                            <h2><field name="properties_count" readonly="1"/></h2>
+                            <div>Properties</div>
+                        </div>
+                        <div class="col-3">
+                            <h2 class="text-success"><field name="installments_paid" readonly="1"/></h2>
+                            <div>Installments Paid</div>
+                        </div>
+                        <div class="col-3">
+                            <h2 class="text-info"><field name="installments_pending" readonly="1"/></h2>
+                            <div>Installments Pending</div>
+                        </div>
+                        <div class="col-3">
+                            <h2 class="text-danger"><field name="installments_overdue" readonly="1"/></h2>
+                            <div>Installments Overdue</div>
+                        </div>
+                    </div>
+
+                    <notebook>
+                        <page string="My Properties" name="properties">
+                            <field name="property_line_ids" nolabel="1" readonly="1">
+                                <tree create="0" delete="0" edit="0" no_open="1"
+                                      decoration-danger="state_code == 'overdue'"
+                                      decoration-success="state_code == 'completed'">
+                                    <field name="project_name" string="Project"/>
+                                    <field name="unit_name" string="Unit"/>
+                                    <field name="name" string="Agreement"/>
+                                    <field name="date" string="Agreement Date"/>
+                                    <field name="amount" string="Total Price" sum="Total"/>
+                                    <field name="amount2" string="Paid" sum="Total"/>
+                                    <field name="amount3" string="Balance" sum="Total"/>
+                                    <field name="amount4" string="Overdue" sum="Total"/>
+                                    <field name="percent" string="Paid %" widget="progressbar"/>
+                                    <field name="date2" string="Next Due"/>
+                                    <field name="state_code" column_invisible="1"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                    <field name="state_label" string="Payment Status" widget="badge"
+                                           decoration-success="state_code == 'completed'"
+                                           decoration-info="state_code == 'in_progress'"
+                                           decoration-danger="state_code == 'overdue'"
+                                           decoration-muted="state_code == 'not_started'"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Payment Schedule" name="schedule">
+                            <field name="schedule_line_ids" nolabel="1" readonly="1">
+                                <tree create="0" delete="0" edit="0" no_open="1"
+                                      decoration-danger="state_code == 'overdue'"
+                                      decoration-success="state_code == 'paid'">
+                                    <field name="date" string="Due Date"/>
+                                    <field name="name" string="Installment"/>
+                                    <field name="unit_name" string="Unit"/>
+                                    <field name="ref" string="Agreement" optional="hide"/>
+                                    <field name="amount" string="Amount" sum="Total"/>
+                                    <field name="amount2" string="Paid" sum="Total"/>
+                                    <field name="amount3" string="Outstanding" sum="Total"/>
+                                    <field name="amount4" string="Late Fee" optional="show"/>
+                                    <field name="state_code" column_invisible="1"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                    <field name="state_label" string="Status" widget="badge"
+                                           decoration-success="state_code == 'paid'"
+                                           decoration-danger="state_code == 'overdue'"
+                                           decoration-warning="state_code in ('due_today','partially_paid')"
+                                           decoration-info="state_code == 'upcoming'"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Payments Done" name="payments">
+                            <field name="payment_line_ids" nolabel="1" readonly="1">
+                                <tree create="0" delete="0" edit="0" no_open="1">
+                                    <field name="date" string="Payment Date"/>
+                                    <field name="name" string="Receipt No."/>
+                                    <field name="ref" string="Against"/>
+                                    <field name="unit_name" string="Unit"/>
+                                    <field name="text1" string="Method"/>
+                                    <field name="text2" string="Reference"/>
+                                    <field name="amount" string="Amount" sum="Total Paid"/>
+                                    <field name="state_code" column_invisible="1"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                    <field name="state_label" string="Status" widget="badge"
+                                           decoration-success="state_code == 'paid'"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Project Expenses" name="expenses">
+                            <div class="text-muted mb-2">
+                                Expenses of the project(s) you bought into - the whole project, nothing else.
+                            </div>
+                            <div class="row text-center mb-3">
+                                <div class="col-3">
+                                    <h3><field name="exp_budget" readonly="1" widget="monetary"/></h3>
+                                    <div>Approved Budget</div>
+                                </div>
+                                <div class="col-3">
+                                    <h3 class="text-info"><field name="exp_committed" readonly="1" widget="monetary"/></h3>
+                                    <div>Committed</div>
+                                </div>
+                                <div class="col-3">
+                                    <h3 class="text-danger"><field name="exp_actual" readonly="1" widget="monetary"/></h3>
+                                    <div>Actual Expense</div>
+                                </div>
+                                <div class="col-3">
+                                    <h3 class="text-success"><field name="exp_remaining" readonly="1" widget="monetary"/></h3>
+                                    <div>Remaining Budget</div>
+                                </div>
+                            </div>
+                            <field name="project_line_ids" nolabel="1" readonly="1">
+                                <tree create="0" delete="0" edit="0" no_open="1">
+                                    <field name="project_name" string="Project"/>
+                                    <field name="text1" string="Location"/>
+                                    <field name="state_label" string="Project Status"/>
+                                    <field name="date" string="Planned Completion"/>
+                                    <field name="amount" string="Budget"/>
+                                    <field name="amount2" string="Committed"/>
+                                    <field name="amount3" string="Actual Expense"/>
+                                    <field name="amount4" string="Remaining"/>
+                                    <field name="percent" string="Budget Used %" widget="progressbar"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                </tree>
+                            </field>
+                            <separator string="Expense by Head"/>
+                            <field name="expense_line_ids" nolabel="1" readonly="1">
+                                <tree create="0" delete="0" edit="0" no_open="1">
+                                    <field name="project_name" string="Project"/>
+                                    <field name="name" string="Expense Head"/>
+                                    <field name="amount" string="Allocated" sum="Total"/>
+                                    <field name="amount2" string="Committed" sum="Total"/>
+                                    <field name="amount3" string="Actual" sum="Total"/>
+                                    <field name="amount4" string="Remaining" sum="Total"/>
+                                    <field name="percent" string="Used %" widget="progressbar"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="My Referral Commission" name="commission" invisible="commission_count == 0">
+                            <div class="row text-center mb-3">
+                                <div class="col-4">
+                                    <h3><field name="commission_total" readonly="1" widget="monetary"/></h3>
+                                    <div>Total Commission</div>
+                                </div>
+                                <div class="col-4">
+                                    <h3 class="text-success"><field name="commission_paid" readonly="1" widget="monetary"/></h3>
+                                    <div>Received</div>
+                                </div>
+                                <div class="col-4">
+                                    <h3 class="text-warning"><field name="commission_pending" readonly="1" widget="monetary"/></h3>
+                                    <div>Pending</div>
+                                </div>
+                            </div>
+                            <field name="commission_line_ids" nolabel="1" readonly="1">
+                                <tree create="0" delete="0" edit="0" no_open="1">
+                                    <field name="date" string="Sale Date"/>
+                                    <field name="name" string="Commission No."/>
+                                    <field name="partner_name" string="Buyer you referred"/>
+                                    <field name="project_name" string="Project"/>
+                                    <field name="unit_name" string="Unit"/>
+                                    <field name="text1" string="Layer"/>
+                                    <field name="amount" string="Sale Amount"/>
+                                    <field name="text3" string="Rate"/>
+                                    <field name="amount2" string="My Commission" sum="Total"/>
+                                    <field name="state_code" column_invisible="1"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                    <field name="state_label" string="Status" widget="badge"
+                                           decoration-success="state_code == 'paid'"
+                                           decoration-info="state_code == 'approved'"
+                                           decoration-warning="state_code == 'draft'"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- =====================================================================
+         AGENT DASHBOARD
+         ===================================================================== -->
+    <record id="view_real_estate_portal_dashboard_agent_form" model="ir.ui.view">
+        <field name="name">real.estate.portal.dashboard.agent.form</field>
+        <field name="model">real.estate.portal.dashboard</field>
+        <field name="arch" type="xml">
+            <form string="Agent Dashboard" create="false" edit="false" delete="false" duplicate="false">
+                <header>
+                    <button name="action_refresh" type="object" string="Refresh" icon="fa-refresh"/>
+                    <button name="%(action_real_estate_agent_lead)d" type="action" string="My CRM Pipeline"
+                            class="oe_highlight"/>
+                    <button name="%(action_real_estate_agent_lead_new)d" type="action" string="+ New Lead"/>
+                </header>
+                <sheet>
+                    <field name="currency_id" invisible="1"/>
+                    <div class="oe_title">
+                        <h1>Agent Dashboard</h1>
+                        <h3 class="text-muted"><field name="partner_name" readonly="1"/></h3>
+                    </div>
+
+                    <h3 class="mt-3">My Business</h3>
+                    <div class="row text-center mb-3">
+                        <div class="col-3">
+                            <h2><field name="customers_count" readonly="1"/></h2>
+                            <div>My Customers</div>
+                        </div>
+                        <div class="col-3">
+                            <h2><field name="sales_count" readonly="1"/></h2>
+                            <div>Sales Made</div>
+                        </div>
+                        <div class="col-3">
+                            <h2><field name="total_value" readonly="1" widget="monetary"/></h2>
+                            <div>Sales Value</div>
+                        </div>
+                        <div class="col-3">
+                            <h2 class="text-danger"><field name="overdue_amount" readonly="1" widget="monetary"/></h2>
+                            <div>Customers' Overdue</div>
+                        </div>
+                    </div>
+
+                    <h3>My Commission (2 layers)</h3>
+                    <div class="row text-center mb-3">
+                        <div class="col-2">
+                            <h2><field name="commission_total" readonly="1" widget="monetary"/></h2>
+                            <div>Total</div>
+                        </div>
+                        <div class="col-2">
+                            <h2 class="text-primary"><field name="commission_l1_total" readonly="1" widget="monetary"/></h2>
+                            <div>Level 1 (My sales)</div>
+                        </div>
+                        <div class="col-3">
+                            <h2 class="text-info"><field name="commission_l2_total" readonly="1" widget="monetary"/></h2>
+                            <div>Level 2 (Referral network)</div>
+                        </div>
+                        <div class="col-2">
+                            <h2 class="text-success"><field name="commission_paid" readonly="1" widget="monetary"/></h2>
+                            <div>Received</div>
+                        </div>
+                        <div class="col-3">
+                            <h2 class="text-warning"><field name="commission_pending" readonly="1" widget="monetary"/></h2>
+                            <div>Pending</div>
+                        </div>
+                    </div>
+
+                    <h3>My CRM</h3>
+                    <div class="row text-center mb-3">
+                        <div class="col-3">
+                            <h2><field name="open_leads" readonly="1"/></h2>
+                            <div>Open Leads</div>
+                        </div>
+                        <div class="col-3">
+                            <h2 class="text-danger"><field name="followups_due" readonly="1"/></h2>
+                            <div>Follow-ups Due</div>
+                        </div>
+                        <div class="col-3">
+                            <h2 class="text-success"><field name="won_leads" readonly="1"/></h2>
+                            <div>Won</div>
+                        </div>
+                        <div class="col-3">
+                            <h2><field name="pipeline_value" readonly="1" widget="monetary"/></h2>
+                            <div>Pipeline Value</div>
+                        </div>
+                    </div>
+
+                    <notebook>
+                        <page string="My Customers" name="customers">
+                            <field name="customer_line_ids" nolabel="1" readonly="1">
+                                <tree create="0" delete="0" edit="0" no_open="1"
+                                      decoration-danger="state_code == 'overdue'"
+                                      decoration-success="state_code == 'completed'">
+                                    <field name="name" string="Customer"/>
+                                    <field name="text1" string="Phone"/>
+                                    <field name="text2" string="Email" optional="hide"/>
+                                    <field name="text3" string="Relation"/>
+                                    <field name="project_name" string="Project"/>
+                                    <field name="unit_name" string="Unit" optional="show"/>
+                                    <field name="amount" string="Purchase Value" sum="Total"/>
+                                    <field name="amount2" string="Paid" sum="Total"/>
+                                    <field name="amount3" string="Balance" sum="Total"/>
+                                    <field name="amount4" string="Overdue" sum="Total"/>
+                                    <field name="date2" string="Next Due"/>
+                                    <field name="state_code" column_invisible="1"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                    <field name="state_label" string="Payment Status" widget="badge"
+                                           decoration-success="state_code == 'completed'"
+                                           decoration-info="state_code == 'in_progress'"
+                                           decoration-danger="state_code == 'overdue'"
+                                           decoration-muted="state_code == 'not_started'"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="My Sales" name="sales">
+                            <field name="sale_line_ids" nolabel="1" readonly="1">
+                                <tree create="0" delete="0" edit="0" no_open="1"
+                                      decoration-danger="state_code == 'overdue'">
+                                    <field name="date" string="Date"/>
+                                    <field name="name" string="Agreement"/>
+                                    <field name="partner_name" string="Customer"/>
+                                    <field name="project_name" string="Project"/>
+                                    <field name="unit_name" string="Unit"/>
+                                    <field name="amount" string="Net Price" sum="Total"/>
+                                    <field name="amount2" string="Collected" sum="Total"/>
+                                    <field name="amount3" string="Balance" sum="Total"/>
+                                    <field name="amount4" string="My Commission" sum="Total"/>
+                                    <field name="percent" string="Paid %" widget="progressbar"/>
+                                    <field name="state_code" column_invisible="1"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                    <field name="state_label" string="Payment Status" widget="badge"
+                                           decoration-success="state_code == 'completed'"
+                                           decoration-info="state_code == 'in_progress'"
+                                           decoration-danger="state_code == 'overdue'"
+                                           decoration-muted="state_code == 'not_started'"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="My Commission" name="commission">
+                            <field name="commission_line_ids" nolabel="1" readonly="1">
+                                <tree create="0" delete="0" edit="0" no_open="1">
+                                    <field name="date" string="Sale Date"/>
+                                    <field name="name" string="Commission No."/>
+                                    <field name="text1" string="Layer"/>
+                                    <field name="ref" string="Agreement"/>
+                                    <field name="partner_name" string="Buyer"/>
+                                    <field name="text2" string="Sold By"/>
+                                    <field name="project_name" string="Project"/>
+                                    <field name="unit_name" string="Unit"/>
+                                    <field name="amount" string="Sale Amount"/>
+                                    <field name="text3" string="Rate"/>
+                                    <field name="amount2" string="My Commission" sum="Total"/>
+                                    <field name="date2" string="Paid On" optional="show"/>
+                                    <field name="state_code" column_invisible="1"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                    <field name="state_label" string="Status" widget="badge"
+                                           decoration-success="state_code == 'paid'"
+                                           decoration-info="state_code == 'approved'"
+                                           decoration-warning="state_code == 'draft'"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Follow-ups" name="followups">
+                            <field name="followup_line_ids" nolabel="1" readonly="1">
+                                <tree create="0" delete="0" edit="0" no_open="1"
+                                      decoration-danger="state_code == 'overdue'"
+                                      decoration-warning="state_code == 'due_today'">
+                                    <field name="date" string="Follow-up Date"/>
+                                    <field name="name" string="Lead"/>
+                                    <field name="partner_name" string="Contact"/>
+                                    <field name="text1" string="Phone"/>
+                                    <field name="text2" string="Stage"/>
+                                    <field name="project_name" string="Project"/>
+                                    <field name="amount" string="Expected Value"/>
+                                    <field name="state_code" column_invisible="1"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                    <field name="state_label" string="When" widget="badge"
+                                           decoration-danger="state_code == 'overdue'"
+                                           decoration-warning="state_code == 'due_today'"
+                                           decoration-info="state_code == 'upcoming'"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Server actions: create a fresh snapshot for the logged-in user and open it -->
+    <record id="action_server_customer_dashboard" model="ir.actions.server">
+        <field name="name">My Dashboard</field>
+        <field name="model_id" ref="model_real_estate_portal_dashboard"/>
+        <field name="state">code</field>
+        <field name="code">action = model.action_open_dashboard('customer')</field>
+    </record>
+
+    <record id="action_server_agent_dashboard" model="ir.actions.server">
+        <field name="name">Agent Dashboard</field>
+        <field name="model_id" ref="model_real_estate_portal_dashboard"/>
+        <field name="state">code</field>
+        <field name="code">action = model.action_open_dashboard('agent')</field>
+    </record>
+
+</odoo>
