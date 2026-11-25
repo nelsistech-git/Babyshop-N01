@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- A4 Landscape, tight margins - the requisition form is a wide 12-column sheet -->
+    <record id="paperformat_payment_requisition" model="report.paperformat">
+        <field name="name">Payment Requisition (A4 Landscape)</field>
+        <field name="format">A4</field>
+        <field name="orientation">Landscape</field>
+        <field name="margin_top">12</field>
+        <field name="margin_bottom">10</field>
+        <field name="margin_left">8</field>
+        <field name="margin_right">8</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">0</field>
+        <field name="dpi">96</field>
+        <!-- never auto-scale the page down because of one wide cell -->
+        <field name="disable_shrinking" eval="True"/>
+    </record>
+
+    <template id="report_requisition_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-set="company" t-value="o.company_id"/>
+                <t t-set="lines" t-value="o.line_ids.sorted(lambda l: (l.sequence, l.id))"/>
+                <div class="article" style="font-family:Arial, Helvetica, sans-serif; font-size:9px; color:#000;">
+                    <style>
+                        .pr-tbl { width:100%; border-collapse:collapse; table-layout:fixed; }
+                        .pr-tbl th, .pr-tbl td { border:1px solid #000; padding:2px 3px; vertical-align:middle; line-height:1.25; word-wrap:break-word; overflow:hidden; }
+                        .pr-tbl th { background:#d9d9d9; text-align:center; font-weight:bold; }
+                        .pr-tbl td.n { text-align:right; white-space:nowrap; }
+                        .pr-tbl td.c { text-align:center; }
+                        .pr-tbl tr { page-break-inside:avoid; }
+                        .pr-tbl tr.tot td { font-weight:bold; }
+                        .pr-info { border-collapse:collapse; font-size:10px; }
+                        .pr-info td { border:1px solid #000; padding:2px 5px; }
+                        .pr-sign { width:100%; margin-top:42px; text-align:center; font-size:10px; page-break-inside:avoid; }
+                        .pr-sign td { width:25%; vertical-align:top; }
+                    </style>
+
+                    <!-- Title -->
+                    <div style="text-align:center; margin-bottom:8px;">
+                        <div style="font-size:20px; font-weight:bold;" t-esc="company.name"/>
+                        <div style="font-size:11px; font-weight:bold; text-decoration:underline;">Payment requisition Form</div>
+                    </div>
+
+                    <!-- Req. Date / Req. No. / Prepared By box -->
+                    <table class="pr-info" style="margin-bottom:6px;">
+                        <tr>
+                            <td>Req. Date:</td>
+                            <td style="min-width:90px;"><span t-esc="o.request_date" t-options="{'widget': 'date', 'format': 'd-MMM-yy'}"/></td>
+                        </tr>
+                        <tr>
+                            <td>Req. No.:</td>
+                            <td><span t-esc="o.name"/></td>
+                        </tr>
+                        <tr>
+                            <td>Prepared By:</td>
+                            <td><span t-esc="o.prepared_by_id.name"/></td>
+                        </tr>
+                    </table>
+
+                    <!-- Lines -->
+                    <table class="pr-tbl">
+                        <colgroup>
+                            <col style="width:3%"/>
+                            <col style="width:16%"/>
+                            <col style="width:6.5%"/>
+                            <col style="width:6%"/>
+                            <col style="width:5.5%"/>
+                            <col style="width:5.5%"/>
+                            <col style="width:6.5%"/>
+                            <col style="width:7%"/>
+                            <col style="width:4%"/>
+                            <col style="width:5.5%"/>
+                            <col style="width:6%"/>
+                            <col style="width:28.5%"/>
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th>Sl. No.</th>
+                                <th>Name of Benificiary/Vendor/Party</th>
+                                <th>Bill Amount</th>
+                                <th>Deduction/ (Adv. Adj.)</th>
+                                <th>WHIT (Tk.)</th>
+                                <th>WHVAT (Tk.)</th>
+                                <th>Net Payment (Tk.)</th>
+                                <th>Payment Mode</th>
+                                <th>Bank Name</th>
+                                <th>Inst. No.</th>
+                                <th>Value date</th>
+                                <th>Purpose</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="lines" t-as="line">
+                                <tr>
+                                    <td class="c"><span t-esc="line_index + 1"/></td>
+                                    <td><span t-esc="line.partner_id.name"/></td>
+                                    <td class="n"><span t-esc="'{:,.0f}'.format(line.bill_amount) if line.bill_amount else ''"/></td>
+                                    <td class="n"><span t-esc="'{:,.0f}'.format(line.deduction_amount) if line.deduction_amount else ''"/></td>
+                                    <td class="n"><span t-esc="'{:,.0f}'.format(line.wht_amount) if line.wht_amount else '-'"/></td>
+                                    <td class="n"><span t-esc="'{:,.0f}'.format(line.whvat_amount) if line.whvat_amount else '-'"/></td>
+                                    <td class="n"><span t-esc="'{:,.0f}'.format(line.net_payment) if line.net_payment else '-'"/></td>
+                                    <td class="c"><span t-esc="dict(line._fields['payment_mode'].selection).get(line.payment_mode)"/></td>
+                                    <td class="c"><span t-esc="line.own_bank_bank_id.pr_short_label()"/></td>
+                                    <td class="c"><span t-esc="line.instrument_no"/></td>
+                                    <td class="c"><span t-esc="line.value_date" t-options="{'widget': 'date', 'format': 'd-MMM-yy'}"/></td>
+                                    <td><span t-esc="line.report_purpose()"/></td>
+                                </tr>
+                            </t>
+                            <tr class="tot">
+                                <td class="c" colspan="2">Total</td>
+                                <td class="n"><span t-esc="'{:,.0f}'.format(o.total_bill_amount)"/></td>
+                                <td class="n"><span t-esc="'{:,.0f}'.format(o.total_deduction)"/></td>
+                                <td class="n"><span t-esc="'{:,.0f}'.format(o.total_wht)"/></td>
+                                <td class="n"><span t-esc="'{:,.0f}'.format(o.total_whvat)"/></td>
+                                <td class="n"><span t-esc="'{:,.0f}'.format(o.total_net_payment)"/></td>
+                                <td colspan="5"/>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Signatures: Prepared / Checked / Reviewed / Approved -->
+                    <t t-set="hof_user" t-value="o.approved_by_id if o.final_approver_role == 'hof' else False"/>
+                    <t t-set="exec_user" t-value="o.approved_by_id if o.final_approver_role == 'exec' else False"/>
+                    <table class="pr-sign">
+                        <tr>
+                            <td>
+                                <div style="border-top:1px solid #000; margin:0 18px; padding-top:2px;"><strong>Prepared By</strong></div>
+                                <div t-esc="o.prepared_by_id.name"/>
+                                <div t-esc="o.prepared_by_id.employee_id.job_title or o.prepared_by_id.employee_id.job_id.name"/>
+                            </td>
+                            <td>
+                                <div style="border-top:1px solid #000; margin:0 18px; padding-top:2px;"><strong>Checked By</strong></div>
+                                <div t-esc="o.lm_approved_by_id.name"/>
+                                <div t-esc="o.lm_approved_by_id.employee_id.job_title or o.lm_approved_by_id.employee_id.job_id.name"/>
+                            </td>
+                            <td>
+                                <div style="border-top:1px solid #000; margin:0 18px; padding-top:2px;"><strong>Reviewed By</strong></div>
+                                <div t-esc="hof_user.name if hof_user else ''"/>
+                                <div t-if="hof_user" t-esc="hof_user.employee_id.job_title or hof_user.employee_id.job_id.name"/>
+                            </td>
+                            <td>
+                                <div style="border-top:1px solid #000; margin:0 18px; padding-top:2px;"><strong>Approved By</strong></div>
+                                <div t-esc="exec_user.name if exec_user else ''"/>
+                                <div t-if="exec_user" t-esc="exec_user.employee_id.job_title or exec_user.employee_id.job_id.name"/>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>

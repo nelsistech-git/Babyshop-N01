@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="module_category_payment_request" model="ir.module.category">
+            <field name="name">Payment Request</field>
+            <field name="sequence">25</field>
+        </record>
+
+        <!-- Preparer: base create/edit access for Payment Requests still in
+             Draft. The approval chain itself (2026-09-13) no longer uses
+             module-specific Checker/Reviewer/Approver groups - it reuses
+             the shared Line Manager / Head of Finance & Accounts groups
+             (product_vendor_details.group_vendor_line_manager /
+             group_vendor_hof) and the Executive group
+             (purchase_vendor_pi.group_po_executive), so one person's role
+             assignment covers Vendor Onboarding, Purchase Orders and
+             Payment Requests all at once. See payment_request.py's
+             action_lm_approve / action_hof_approve / action_exec_approve. -->
+        <record id="group_payment_request_user" model="res.groups">
+            <field name="name">Preparer</field>
+            <field name="category_id" ref="module_category_payment_request"/>
+        </record>
+
+        <!-- Odoo's default install user (typically the admin performing this
+             upgrade) gets Preparer access so nothing is blocked out of the
+             box - assign the real Line Manager / Head of Finance & Accounts
+             / Executive users afterwards in Settings > Users (the same
+             three groups already used for Vendor Onboarding and Purchase
+             Orders), per BBBL's actual approval chain. As with those two
+             modules, an Administrator (base.group_system) can always act
+             at every approval step regardless of group membership. -->
+        <record id="base.user_admin" model="res.users">
+            <field name="groups_id" eval="[(4, ref('group_payment_request_user'))]"/>
+        </record>
+
+    </data>
+</odoo>

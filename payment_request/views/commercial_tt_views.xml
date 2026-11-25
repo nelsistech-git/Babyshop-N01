@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_commercial_tt_form_payment_request_inherit" model="ir.ui.view">
+        <field name="name">commercial.tt.form.payment.request.inherit</field>
+        <field name="model">commercial.tt</field>
+        <field name="inherit_id" ref="commercial.view_commercial_tt_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//field[@name='state']" position="after">
+                <field name="payment_request_id" invisible="1"/>
+            </xpath>
+
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_payment_request" type="object" class="oe_stat_button"
+                        icon="fa-university" invisible="not payment_request_id">
+                    <div class="o_stat_info">
+                        <span class="o_stat_text">Payment</span>
+                        <span class="o_stat_text">Request</span>
+                    </div>
+                </button>
+            </xpath>
+
+            <xpath expr="//button[@name='action_forward']" position="after">
+                <button name="action_forward_to_accounting" string="Forward to Accounting" type="object"
+                        invisible="payment_request_id or state not in ('forwarded', 'done')"
+                        help="Creates a Payment Request line pre-filled from this TT, so it goes through the same approval chain and accounting posting as every other vendor payment."/>
+            </xpath>
+
+        </field>
+    </record>
+</odoo>

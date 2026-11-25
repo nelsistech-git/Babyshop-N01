@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Mushak 6.6 - one certificate per supplier, each printed in 2 identical copies (1st / 2nd),
+         every certificate on its own page. Margins (left 1.25in / right 1in) come from the
+         paper format "Mushak 6.6" in report_actions.xml. -->
+    <template id="report_mushak66_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="request">
+                <t t-set="company" t-value="request.company_id"/>
+                <t t-set="o" t-value="request"/>
+                <t t-set="vat_lines" t-value="request.line_ids.filtered(lambda l: l.whvat_amount &gt; 0)"/>
+                <t t-set="copy_labels" t-value="['১ম কপি', '২য় কপি']"/>
+                <t t-set="certs" t-value="[(g, c) for g in vat_lines.grouped(lambda l: l.partner_id.id).values() for c in range(len(copy_labels))]"/>
+                <t t-set="fmt" t-value="lambda x: ('{:,.2f}'.format(x or 0)[:-3] if '{:,.2f}'.format(x or 0).endswith('.00') else '{:,.2f}'.format(x or 0))"/>
+                <t t-call="web.basic_layout">
+                    <t t-call="payment_request.mushak66_font_css"/>
+                    <style>
+                        .m66, .m66 * { font-family: 'NotoSansBengaliPR', 'Noto Sans Bengali', sans-serif; color:#000; }
+                        .m66 { font-size: 9.5pt; line-height: 1.35; }
+                        .m66 table { border-collapse: collapse; width: 100%; }
+                        .m66 .plain td { border: none; padding: 1px 2px; vertical-align: top; }
+                        .m66 .grid th, .m66 .grid td { border: 1px solid #000; padding: 3px 4px; font-size: 8.5pt; text-align: center; vertical-align: middle; }
+                        .m66 .grid td.val { padding: 14px 4px; }
+                        .m66 .grid td.num { text-align: center; }
+                        .m66 p { margin: 0; text-align: justify; }
+                    </style>
+                    <t t-foreach="certs" t-as="cert">
+                        <t t-set="group" t-value="cert[0]"/>
+                        <t t-set="partner_lines" t-value="group"/>
+                        <t t-set="cert_no" t-value="group[0].vds_certificate_no or request.vds_certificate_no"/>
+                        <div class="m66" t-attf-style="{{ 'page-break-before: always;' if (request_index or cert_index) else '' }}">
+
+                            <!-- Header: emblem | government / NBR | form no + copy -->
+                            <table class="plain" style="margin-bottom:4px;">
+                                <tr>
+                                    <td style="width:18%;"><t t-call="payment_request.mushak66_logo"/></td>
+                                    <td style="width:64%; text-align:center; padding-top:4px;">
+                                        <div style="font-size:10pt;">গণপ্রজাতন্ত্রী বাংলাদেশ সরকার</div>
+                                        <div style="font-size:12.5pt; font-weight:bold;">জাতীয় রাজস্ব বোর্ড</div>
+                                    </td>
+                                    <td style="width:18%; text-align:right; padding-top:4px;">
+                                        <div style="font-weight:bold;">মূসক - ৬.৬</div>
+                                        <div style="font-weight:bold;"><t t-esc="copy_labels[cert[1]]"/></div>
+                                    </td>
+                                </tr>
+                            </table>
+                            <div style="text-align:center; margin-top:8px;">
+                                <div style="font-size:12pt; font-weight:bold;">উৎসে কর কর্তন সনদপত্র</div>
+                                <div style="font-size:10pt;">বিধি ৪০ এর উপ-বিধি (১) এর দফা (চ) দ্রষ্টব্য</div>
+                            </div>
+
+                            <table class="plain" style="margin-top:26px;">
+                                <tr>
+                                    <td style="width:46%;">উৎসে কর কর্তনকারী সত্তার নাম</td>
+                                    <td style="width:3%;">:</td>
+                                    <td><t t-esc="company.name"/></td>
+                                </tr>
+                                <tr>
+                                    <td>উৎসে কর কর্তনকারী সত্তার ঠিকানা</td>
+                                    <td>:</td>
+                                    <td><t t-esc="company.pr_get_address_text()"/></td>
+                                </tr>
+                                <tr>
+                                    <td>উৎসে কর কর্তনকারী সত্তার বি আই এন (প্রযোজ্য ক্ষেত্রে)</td>
+                                    <td>:</td>
+                                    <td><t t-esc="company.pr_vds_company_bin or '-'"/></td>
+                                </tr>
+                            </table>
+
+                            <table class="plain" style="margin-top:22px;">
+                                <tr>
+                                    <td style="width:60%;">উৎসে কর কর্তন সনদপত্র নং &#160;:&#160;&#160;&#160;&#160; <t t-esc="cert_no"/></td>
+                                    <td>জারির তারিখ &#160;:&#160;&#160;&#160;&#160;&#160;&#160;
+                                        <t t-esc="request.vds_certificate_date and request.vds_certificate_date.strftime('%d-%m-%y')"/></td>
+                                </tr>
+                            </table>
+
+                            <p style="margin-top:14px; font-size:8.5pt;">
+                                এই মর্মে প্রত্যয়ন করা যাইতেছে যে, আইনের ধারা ৪৯ অনুযায়ী উৎসে কর কর্তনযোগ্য সরবরাহ হইতে প্রযোজ্য মূল্য সংযোজন কর বাবদ
+                                উৎসে কর কর্তন করা হইল। কর্তনকৃত মূল্য সংযোজন করের অর্থ বুক ট্রান্সফার / (✓)ট্রেজারি চালান
+                                <t t-esc="request.challan_no or '..............'"/>
+                                দাখিলপত্র/বৃদ্ধিকারী সমন্বয়ের এর মাধ্যমে সরকারি কোষাগারে জমা প্রদান করা হইয়াছে কপি এতদসংগে সংযুক্ত করা হইল (প্রযোজ্য ক্ষেত্রে)।
+                            </p>
+
+                            <table class="grid" style="margin-top:26px;">
+                                <colgroup>
+                                    <col style="width:9%"/><col style="width:21%"/><col style="width:12%"/>
+                                    <col style="width:15%"/><col style="width:13%"/><col style="width:10%"/>
+                                    <col style="width:10%"/><col style="width:10%"/>
+                                </colgroup>
+                                <thead>
+                                    <tr>
+                                        <th rowspan="3">ক্রমিক নং:</th>
+                                        <th colspan="4">সরবরাহকারীর</th>
+                                        <th rowspan="3">মোট<br/>সরবরাহ<br/>মূল্য ১<br/>(টাকায়)</th>
+                                        <th rowspan="3">মূসকের<br/>পরিমাণ<br/>(টাকা)</th>
+                                        <th rowspan="3">উৎসে<br/>কর্তনকৃত<br/>মূসকের<br/>পরিমাণ<br/>(টাকা)</th>
+                                    </tr>
+                                    <tr>
+                                        <th rowspan="2">নাম</th>
+                                        <th rowspan="2">বি আই এন</th>
+                                        <th colspan="2">সংশ্লিষ্ট কর চালানপত্র</th>
+                                    </tr>
+                                    <tr>
+                                        <th>নম্বর</th>
+                                        <th>ইস্যুর তারিখ</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="partner_lines" t-as="line">
+                                        <td class="val"><t t-esc="line_index + 1"/></td>
+                                        <td class="val"><t t-esc="line.partner_id.name"/></td>
+                                        <td class="val"><t t-esc="line.vendor_bin or line.partner_id.vat or '0'"/></td>
+                                        <td class="val"><t t-esc="line.vat_challan_no or '-'"/></td>
+                                        <td class="val"><t t-esc="line.vat_challan_date and line.vat_challan_date.strftime('%d-%b-%y') or '-'"/></td>
+                                        <td class="val num"><t t-esc="fmt(line.bill_amount)"/></td>
+                                        <td class="val num"><t t-esc="fmt(line.vat_amount or line.whvat_amount)"/></td>
+                                        <td class="val num"><t t-esc="fmt(line.whvat_amount)"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="5"><strong>Total</strong></td>
+                                        <td class="num"><strong><t t-esc="fmt(sum(partner_lines.mapped('bill_amount')))"/></strong></td>
+                                        <td class="num"><strong><t t-esc="fmt(sum(partner_lines.mapped(lambda l: l.vat_amount or l.whvat_amount)))"/></strong></td>
+                                        <td class="num"><strong><t t-esc="fmt(sum(partner_lines.mapped('whvat_amount')))"/></strong></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <table class="plain" style="margin-top:22px; width:70%;">
+                                <tr><td>ক্ষমতাপ্রাপ্ত কর্মকর্তার –</td></tr>
+                                <tr><td style="padding-top:14px;">স্বাক্ষর :</td></tr>
+                                <tr><td style="padding-top:30px;">নাম &#160;&#160;&#160;&#160;&#160;:&#160;&#160;&#160;
+                                    <strong><t t-esc="company.pr_signatory_name or '-'"/></strong><br/>
+                                    <span style="padding-left:62px;"><strong><t t-esc="company.pr_signatory_designation or ''"/></strong></span><br/>
+                                    <span style="padding-left:62px;"><t t-esc="company.name"/></span>
+                                </td></tr>
+                            </table>
+                            <p style="margin-top:10px; font-size:9pt;">১ মূল্য ও সম্পূরক শুল্ক (যদি থাকে) সহ মূল্য।</p>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

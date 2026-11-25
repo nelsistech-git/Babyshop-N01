@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_payment_request_res_config_settings" model="ir.ui.view">
+            <field name="name">res.config.settings.payment.request</field>
+            <field name="model">res.config.settings</field>
+            <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//form" position="inside">
+                    <app data-string="Payment Request" string="Payment Request" name="payment_request">
+
+                        <!-- Added company_id to evaluate domains correctly -->
+                        <field name="company_id" invisible="1"/>
+
+                        <block title="Bank Details" name="pr_bank_block">
+                            <setting string="Own Bank Account" help="Debited for RTGS/BEFTN transfers - must be a bank account saved on the company's own Contact record.">
+                                <!-- Overridden the domain here to use company_id instead of partner_id -->
+                                <field name="pr_own_bank_id" domain="[('company_id', '=', company_id)]"/>
+                            </setting>
+                            <setting string="Own Bank Branch">
+                                <field name="pr_own_bank_branch"/>
+                            </setting>
+                            <setting string="Signatory Name" help="Shown as Account Holder on the RTGS Application.">
+                                <field name="pr_signatory_name"/>
+                            </setting>
+                            <setting string="Signatory Designation">
+                                <field name="pr_signatory_designation"/>
+                            </setting>
+                            <setting string="BEFTN 2nd Signatory Name" help="BEFTN letters carry two authorized signatories - leave blank if yours only needs one.">
+                                <field name="pr_signatory_name_2"/>
+                            </setting>
+                            <setting string="BEFTN 2nd Signatory Designation">
+                                <field name="pr_signatory_designation_2"/>
+                            </setting>
+                            <setting string="Company BIN (VAT Registration)" help="Printed as the deducting entity's BIN on the Mushak 6.6 VDS Certificate.">
+                                <field name="pr_vds_company_bin"/>
+                            </setting>
+                        </block>
+                        <block title="Accounting (Create Vendor Payment)" name="pr_accounting_block">
+                            <setting string="Payment Request Journal">
+                                <field name="pr_journal_id"/>
+                            </setting>
+                            <setting string="Bank Account" help="Credited when a vendor payment is posted.">
+                                <field name="pr_bank_account_id"/>
+                            </setting>
+                            <setting string="TDS (WHT) Payable Account">
+                                <field name="pr_tds_payable_account_id"/>
+                            </setting>
+                            <setting string="VDS (WHVAT) Payable Account">
+                                <field name="pr_vds_payable_account_id"/>
+                            </setting>
+                            <setting string="Auto-Link from Chart of Accounts">
+                                <button name="action_pr_setup_chart_of_accounts" type="object"
+                                        string="Auto-Link Chart of Accounts" class="btn-secondary"/>
+                            </setting>
+                        </block>
+                    </app>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="action_payment_request_config_settings" model="ir.actions.act_window">
+            <field name="name">Payment Request Settings</field>
+            <field name="res_model">res.config.settings</field>
+            <field name="view_mode">form</field>
+            <field name="target">inline</field>
+            <field name="context">{'module': 'payment_request'}</field>
+        </record>
+
+    </data>
+</odoo>

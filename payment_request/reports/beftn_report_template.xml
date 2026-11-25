@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_beftn_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="request">
+                <t t-set="company" t-value="request.company_id"/>
+                <t t-set="beftn_lines" t-value="request.line_ids.filtered(lambda l: l.payment_mode == 'beftn')"/>
+                <t t-foreach="beftn_lines.grouped(lambda l: (l.own_bank_id.id, l.own_bank_branch_id.id)).values()" t-as="group_lines">
+                    <t t-set="debit_bank" t-value="group_lines[0].own_bank_id"/>
+                    <t t-set="debit_branch" t-value="group_lines[0].own_bank_branch_id"/>
+                    <t t-set="total" t-value="sum(group_lines.mapped('net_payment'))"/>
+
+                    <!-- Letterhead = the supplied "Letter Head Pad" (MTAILOR logo + company name header, address footer).
+                         Header/footer sit in thead/tfoot so they repeat on every printed page. -->
+                    <div class="article bf-wrap" style="font-family:Arial, Helvetica, sans-serif; color:#000;">
+                    <style>
+                        .bf-wrap table, .bf-wrap thead, .bf-wrap tbody, .bf-wrap tfoot, .bf-wrap tr, .bf-wrap td, .bf-wrap th { border:0 !important; }
+                        .bf-wrap table.bf-data { border-collapse:collapse; width:100%; font-size:11.5px; }
+                        .bf-wrap table.bf-data th, .bf-wrap table.bf-data td { border:1px solid #000 !important; padding:5px 6px; vertical-align:middle; line-height:1.3; }
+                        .bf-wrap table.bf-data th { background-color:#e6e6e6; font-size:11px; font-weight:bold; text-align:center; word-break:normal; overflow-wrap:normal; }
+                        .bf-wrap table.bf-data td.bf-nw { white-space:nowrap; }
+                        .bf-wrap table.bf-data td.bf-c { text-align:center; }
+                        .bf-wrap table.bf-data td.bf-r { text-align:right; white-space:nowrap; }
+                        .bf-wrap table.bf-data tr.bf-total td { background-color:#f2f2f2; font-weight:bold; }
+                    </style>
+                    <table t-attf-style="width:100%; border-collapse:collapse; height:290mm; #{'page-break-after:always;' if not group_lines_last else ''}">
+                        <thead style="display:table-header-group;">
+                            <tr><td style="padding:0; line-height:0; vertical-align:top;">
+                                <img t-att-src="request._beftn_letterhead_uri('header')" style="width:100%; display:block;"/>
+                            </td></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td style="padding:4mm 18mm 0 18mm; vertical-align:top;">
+                        <div style="font-size:13px;">
+
+                            <table style="width:100%; margin-bottom:16px;">
+                                <tr>
+                                    <td><strong>Ref:</strong> <span t-esc="request.beftn_ref"/></td>
+                                    <td class="text-end">
+                                        <strong>Date:</strong>
+                                        <span t-esc="(request.bank_forward_date or request.request_date)" t-options="{'widget': 'date'}"/>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <p style="margin-bottom:16px;">
+                                The Manager<br/>
+                                <strong t-esc="(debit_bank.bank_id.name or 'Commercial Bank of Ceylon PLC')"/><br/>
+                                <span t-esc="debit_branch.name"/>, Dhaka.
+                            </p>
+
+                            <p style="margin-bottom:12px;">
+                                <strong><u>Subject: Request for Fund Transfer Through BEFTN</u></strong>
+                            </p>
+
+                            <p>Dear Sir,</p>
+                            <p style="text-align:justify;">
+                                We do hereby request you to transfer funds through BEFTN to the beneficiary's
+                                account as mentioned below to the debit of our account no.
+                                <strong t-esc="debit_bank.acc_number or '-'"/>
+                                maintained with your branch under advice to us.
+                            </p>
+
+                            <!-- Optional columns are printed only when at least one line has data, so empty "-" columns never waste width. -->
+                            <t t-set="show_inv_ref" t-value="bool(group_lines.filtered(lambda l: l.invoice_ref or l.invoice_date))"/>
+                            <t t-set="show_inv_desc" t-value="bool(group_lines.filtered(lambda l: l.purpose))"/>
+                            <t t-set="show_section" t-value="bool(group_lines.filtered(lambda l: l.section_name))"/>
+                            <t t-set="ncols" t-value="6 + (1 if show_inv_ref else 0) + (1 if show_inv_desc else 0) + (1 if show_section else 0)"/>
+
+                            <table class="bf-data" style="margin-top:10px;">
+                                <thead>
+                                    <tr>
+                                        <th style="width:4%;">SL</th>
+                                        <th>Receiver Name</th>
+                                        <th>Routing No</th>
+                                        <th>Account No</th>
+                                        <th t-if="show_inv_ref">Invoice Ref / Date</th>
+                                        <th t-if="show_inv_desc">Invoice Description</th>
+                                        <th>Payment Description</th>
+                                        <th t-if="show_section">Section</th>
+                                        <th>Amount (BDT)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="group_lines" t-as="line" style="page-break-inside:avoid;">
+                                        <td class="bf-c"><span t-esc="line_index + 1"/></td>
+                                        <td><span t-esc="line.partner_id.name"/></td>
+                                        <td class="bf-c bf-nw"><span t-esc="line.beneficiary_bank_routing_no or '-'"/></td>
+                                        <td class="bf-c bf-nw"><span t-esc="line.beneficiary_account_number or '-'"/></td>
+                                        <td t-if="show_inv_ref">
+                                            <span t-if="line.invoice_ref" t-esc="line.invoice_ref"/>
+                                            <br t-if="line.invoice_ref and line.invoice_date"/>
+                                            <span t-if="line.invoice_date" t-esc="line.invoice_date" t-options="{'widget': 'date'}"/>
+                                            <span t-if="not line.invoice_ref and not line.invoice_date">-</span>
+                                        </td>
+                                        <td t-if="show_inv_desc"><span t-esc="line.purpose or '-'"/></td>
+                                        <td><span t-esc="line.payment_description or '-'"/></td>
+                                        <td t-if="show_section"><span t-esc="line.section_name or '-'"/></td>
+                                        <td class="bf-r"><span t-esc="'{:,.2f}'.format(line.net_payment)"/></td>
+                                    </tr>
+                                    <tr class="bf-total">
+                                        <td t-att-colspan="ncols - 1" style="text-align:right;">Total</td>
+                                        <td class="bf-r"><span t-esc="'{:,.2f}'.format(total)"/></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <p style="margin-top:6px;">
+                                <strong>In words:</strong>
+                                <span t-esc="company.currency_id.amount_to_text(total)"/>
+                            </p>
+
+                            <p t-if="request.challan_no or request.challan_date">
+                                Challan No.: <strong t-esc="request.challan_no or '-'"/>
+                                &#160;&#160;&#160;
+                                Challan Date:
+                                <strong>
+                                    <span t-if="request.challan_date" t-esc="request.challan_date" t-options="{'widget': 'date'}"/>
+                                    <span t-else="">-</span>
+                                </strong>
+                            </p>
+
+                            <p>In this connection, charges if any may be debited from our above account.</p>
+                            <p>Best Regards,</p>
+
+                            <!-- Signatures: below Tk 250,000 = two "Authorized Signatory" (no name / designation);
+                                 Tk 250,000 and above = one signatory on the left (as before). -->
+                            <table t-if="total &lt; 250000" style="width:100%; margin-top:60px; border:none; page-break-inside:avoid;">
+                                <tr>
+                                    <td style="width:50%; border:none; vertical-align:top;">
+                                        <div style="border-top:1px solid #000; width:220px; padding-top:4px;">
+                                            <strong>Authorized Signatory</strong>
+                                        </div>
+                                    </td>
+                                    <td style="width:50%; border:none; vertical-align:top;">
+                                        <div style="border-top:1px solid #000; width:220px; padding-top:4px; margin-left:auto;">
+                                            <strong>Authorized Signatory</strong>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                            <table t-else="" style="width:100%; margin-top:60px; border:none; page-break-inside:avoid;">
+                                <tr>
+                                    <td style="width:50%; border:none; vertical-align:top;">
+                                        <div style="border-top:1px solid #000; width:220px; padding-top:4px;">
+                                            <strong>Authorized Signatory</strong><br/>
+                                            <span t-esc="company.pr_signatory_name or ''"/>
+                                        </div>
+                                    </td>
+                                    <td style="width:50%; border:none;"/>
+                                </tr>
+                            </table>
+                        </div>
+                            </td></tr>
+                        </tbody>
+                        <tfoot style="display:table-footer-group;">
+                            <tr><td style="padding:0; line-height:0; vertical-align:bottom;">
+                                <img t-att-src="request._beftn_letterhead_uri('footer')" style="width:100%; display:block;"/>
+                            </td></tr>
+                        </tfoot>
+                    </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

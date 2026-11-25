@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Mushak 6.6: A4 portrait, LEFT 1.25 inch (31.75 mm), RIGHT 1 inch (25.4 mm), top/bottom 1 inch -->
+    <record id="paperformat_mushak66" model="report.paperformat">
+        <field name="name">Mushak 6.6 (A4, L 1.25in / R 1in)</field>
+        <field name="format">A4</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">25.4</field>
+        <field name="margin_bottom">25.4</field>
+        <field name="margin_left">31.75</field>
+        <field name="margin_right">25.4</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">0</field>
+        <field name="dpi">96</field>
+        <field name="disable_shrinking" eval="True"/>
+    </record>
+
+    <!-- BEFTN letter: zero page margins - the letterhead header/footer are drawn inside the template itself -->
+    <record id="paperformat_beftn_letter" model="report.paperformat">
+        <field name="name">BEFTN Letter (A4, letterhead)</field>
+        <field name="format">A4</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">0</field>
+        <field name="margin_bottom">0</field>
+        <field name="margin_left">0</field>
+        <field name="margin_right">0</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">0</field>
+        <field name="dpi">96</field>
+        <field name="disable_shrinking" eval="True"/>
+    </record>
+
+    <!-- Payment Requisition (internal form) -->
+    <record id="action_report_requisition" model="ir.actions.report">
+        <field name="name">Payment Requisition</field>
+        <field name="model">payment.request</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">payment_request.report_requisition_document</field>
+        <field name="report_file">payment_request.report_requisition_document</field>
+        <field name="paperformat_id" ref="payment_request.paperformat_payment_requisition"/>
+        <field name="print_report_name">'Payment Requisition - %s' % (object.name)</field>
+        <field name="binding_model_id" ref="payment_request.model_payment_request"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- RTGS Report Action -->
+    <record id="action_report_rtgs" model="ir.actions.report">
+        <field name="name">RTGS Application</field>
+        <field name="model">payment.request</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">payment_request.report_rtgs_document</field>
+        <field name="report_file">payment_request.report_rtgs_document</field>
+        <field name="print_report_name">'RTGS Application - %s' % (object.name)</field>
+        <field name="binding_model_id" ref="payment_request.model_payment_request"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- BEFTN Report Action -->
+    <record id="action_report_beftn" model="ir.actions.report">
+        <field name="name">BEFTN Request Letter</field>
+        <field name="model">payment.request</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">payment_request.report_beftn_document</field>
+        <field name="report_file">payment_request.report_beftn_document</field>
+        <field name="paperformat_id" ref="payment_request.paperformat_beftn_letter"/>
+        <field name="print_report_name">'BEFTN Request Letter - %s' % (object.name)</field>
+        <field name="binding_model_id" ref="payment_request.model_payment_request"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- Mushak 6.6 VDS Certificate Report Action -->
+    <record id="action_report_mushak66" model="ir.actions.report">
+        <field name="name">Mushak 6.6 VDS Certificate</field>
+        <field name="model">payment.request</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">payment_request.report_mushak66_document</field>
+        <field name="report_file">payment_request.report_mushak66_document</field>
+        <field name="paperformat_id" ref="payment_request.paperformat_mushak66"/>
+        <field name="print_report_name">'Mushak 6.6 VDS Certificate - %s' % (object.name)</field>
+        <field name="binding_model_id" ref="payment_request.model_payment_request"/>
+        <field name="binding_type">report</field>
+    </record>
+
+</odoo>

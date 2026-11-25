@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_rtgs_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="request">
+                <t t-set="company" t-value="request.company_id"/>
+                <t t-foreach="request.line_ids.filtered(lambda l: l.payment_mode == 'rtgs')" t-as="line">
+                    <div class="page" t-attf-style="font-family: 'Times New Roman', Times, serif; {{ 'page-break-before: always;' if (request_index or line_index) else '' }}">
+                        <h2 class="text-center" style="margin-bottom:0;">
+                            <span t-esc="(line.own_bank_id.bank_id.name or 'COMMERCIAL BANK OF CEYLON PLC').upper()"/>
+                        </h2>
+                        <h4 class="text-center">Application for BD-RTGS Fund Transfer</h4>
+
+                        <p class="mt-4">Application Date: <span t-esc="(request.bank_forward_date or request.request_date)" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/></p>
+
+                        <p>
+                            The Manager<br/>
+                            <span t-esc="line.own_bank_branch_id.name"/>
+                        </p>
+
+                        <table class="table table-bordered mt-3" style="border: 1px solid #000;">
+                            <tr>
+                                <td style="width:50%; background-color:#ddd;"><strong>Originating Customer Details:</strong></td>
+                                <td style="width:50%; background-color:#ddd;"><strong>Receiving Customer Details:</strong></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <strong>Account Title:</strong><br/>
+                                    <span t-esc="company.name"/>
+                                </td>
+                                <td>
+                                    <strong>Account Title:</strong><br/>
+                                    <span t-esc="line.partner_id.name"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <strong>Account Number:</strong><br/>
+                                    <span t-esc="line.own_bank_id.acc_number or '-'"/>
+                                </td>
+                                <td>
+                                    <strong>Account Number:</strong><br/>
+                                    <span t-esc="line.beneficiary_account_number or '-'"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <strong>Account Branch:</strong><br/>
+                                    <span t-esc="line.own_bank_branch_id.name or '-'"/>
+                                </td>
+                                <td>
+                                    <strong>Bank Name:</strong><br/>
+                                    <span t-esc="line.beneficiary_bank_name or '-'"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <strong>Value Date:</strong><br/>
+                                    <span t-esc="line.value_date" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/>
+                                </td>
+                                <td>
+                                    <strong>Branch Name:</strong><br/>
+                                    <span t-esc="line.beneficiary_bank_branch or '-'"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <strong>Amount:</strong><br/>
+                                    BDT <span t-esc="'{:,.2f}'.format(line.net_payment)"/>
+                                    <br/><strong>Amount in words:</strong><br/>
+                                    <span t-esc="line.amount_in_words"/>
+                                </td>
+                                <td>
+                                    <strong>Beneficiary Address:</strong><br/>
+                                    <span t-esc="line.beneficiary_address or '-'"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Currency:</strong> BDT</td>
+                                <td>
+                                    <strong>Vendor BIN:</strong>
+                                    <span t-esc="line.vendor_bin or line.partner_id.vat or '-'"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <strong>Narration:</strong><br/>
+                                    <span t-esc="line.purpose or '-'"/>
+                                </td>
+                                <td>
+                                    <strong>Narration:</strong><br/>
+                                    Receiving Bank's <strong>Routing No.: <span t-esc="line.beneficiary_bank_routing_no or '-'"/></strong>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <strong>Description of Payment:</strong><br/>
+                                    <span t-esc="line.payment_description or '-'"/>
+                                </td>
+                                <td>
+                                    <strong>Section Name:</strong><br/>
+                                    <span t-esc="line.section_name or '-'"/>
+                                </td>
+                            </tr>
+                            <tr t-if="line.request_id.challan_no or line.request_id.challan_date">
+                                <td>
+                                    <strong>Challan No.:</strong>
+                                    <span t-esc="line.request_id.challan_no or '-'"/>
+                                </td>
+                                <td>
+                                    <strong>Challan Date:</strong>
+                                    <span t-if="line.request_id.challan_date" t-esc="line.request_id.challan_date" t-options="{'widget': 'date'}"/>
+                                    <span t-if="not line.request_id.challan_date">-</span>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <div class="mt-5" style="margin-top: 60px !important;">
+                            <p>_______________________________</p>
+                            <p>Account Holder's Signature</p>
+                            <p>
+                                <span t-if="company.pr_signatory_name" t-esc="company.pr_signatory_name"/>
+                                <span t-if="company.pr_signatory_name"><br/></span>
+                                <span t-esc="company.pr_signatory_designation or 'Chief Executive Officer'"/><br/>
+                                <span t-esc="company.name"/>
+                            </p>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>
