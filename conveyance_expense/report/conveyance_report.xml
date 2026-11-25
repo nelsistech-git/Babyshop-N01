@@ -1,12 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <!-- A4 portrait. Letterhead header starts 1 inch (25.4 mm) from the top: wkhtmltopdf puts the header at
+         (margin_top - header_spacing) = 60.4 - 35 = 25.4 mm. Footer ends ~0.5 inch (12.7 mm) above the bottom
+         edge. Left/right margins stay 1 inch. -->
+    <record id="paperformat_conveyance_sheet" model="report.paperformat">
+        <field name="name">Conveyance Sheet (A4, 1 inch top, 0.5 inch bottom)</field>
+        <field name="format">A4</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">60.4</field>
+        <field name="margin_bottom">24</field>
+        <field name="margin_left">25.4</field>
+        <field name="margin_right">25.4</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">35</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <!-- Expenses Report (hr.expense.sheet). Header sits at the same place as before
+         (margin_top - header_spacing = 61.4 - 36 = 25.4 mm). The header block is ~10 mm high, so its
+         bottom rule is at ~35.4 mm and the report title starts about 1.02 in (26 mm) below it
+         (the earlier 0.04 in gap + 1 inch). -->
+    <record id="paperformat_expense_report" model="report.paperformat">
+        <field name="name">Expenses Report (A4, letterhead, title 1 in under header)</field>
+        <field name="format">A4</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">61.4</field>
+        <field name="margin_bottom">24</field>
+        <field name="margin_left">25.4</field>
+        <field name="margin_right">25.4</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">36</field>
+        <field name="dpi">90</field>
+    </record>
+
     <record id="action_report_conveyance_sheet" model="ir.actions.report">
         <field name="name">Conveyance Sheet</field>
         <field name="model">conveyance.sheet</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">conveyance_expense.report_conveyance_sheet_template</field>
         <field name="report_file">conveyance_expense.report_conveyance_sheet_template</field>
+        <field name="paperformat_id" ref="paperformat_conveyance_sheet"/>
         <field name="binding_model_id" ref="model_conveyance_sheet"/>
         <field name="binding_type">report</field>
     </record>

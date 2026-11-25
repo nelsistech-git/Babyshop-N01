@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<!-- Shared letterhead: header and footer are the BBBL letter pad (BBBL_Letterhead_doc.pdf) cropped 1:1 and
+     printed as images (logo + company name + rule / office addresses + contacts), so the print never depends
+     on fonts installed on the server. Each block carries a tiny style reset: wkhtmltopdf renders header and
+     footer as separate pages whose <body class="container"> adds side padding, which would shrink the image
+     and push it off the left edge of the report body. -->
+<template id="letterhead_blocks">
+    <div class="header">
+        <style>body, .container { margin:0 !important; padding:0 !important; max-width:none !important; }</style>
+        <img src="/conveyance_expense/static/src/img/letterhead_header.png"
+             style="display:block; width:100%; height:auto; border:0; margin:0; padding:0;" alt="Bit Body Bangladesh Limited"/>
+    </div>
+    <div class="footer">
+        <style>body, .container { margin:0 !important; padding:0 !important; max-width:none !important; }</style>
+        <img src="/conveyance_expense/static/src/img/letterhead_footer.png"
+             style="display:block; width:100%; height:auto; border:0; margin:0; padding:0;" alt="Registered Office / Factory and Corporate Office"/>
+    </div>
+</template>
+
+<!-- Shared signature row: four equal slots -->
+<template id="letterhead_signatures">
+    <!-- No <table> here: Odoo's report CSS puts a box around tables. Four equal floated columns,
+         each with ONLY a line above its label. -->
+    <div style="margin-top:90px; border:0 !important; overflow:hidden; page-break-inside:avoid;">
+        <div style="float:left; width:25%; box-sizing:border-box; padding:0 12px; border:0 !important; text-align:center;">
+            <div style="border:0 !important; border-top:1px solid #000 !important; padding-top:6px;"><strong>Prepared by</strong></div>
+        </div>
+        <div style="float:left; width:25%; box-sizing:border-box; padding:0 12px; border:0 !important; text-align:center;">
+            <div style="border:0 !important; border-top:1px solid #000 !important; padding-top:6px;"><strong>Checked By</strong></div>
+        </div>
+        <div style="float:left; width:25%; box-sizing:border-box; padding:0 12px; border:0 !important; text-align:center;">
+            <div style="border:0 !important; border-top:1px solid #000 !important; padding-top:6px;"><strong>Authorized by</strong></div>
+        </div>
+        <div style="float:left; width:25%; box-sizing:border-box; padding:0 12px; border:0 !important; text-align:center;">
+            <div style="border:0 !important; border-top:1px solid #000 !important; padding-top:6px;"><strong>Approved By</strong></div>
+        </div>
+    </div>
+</template>
+
+<!-- Replacement of Odoo's standard "Expenses Report" (hr.expense.sheet). ir.actions.report swaps the
+     standard template for this one when that report is printed (see models/ir_actions_report.py). -->
+<template id="report_expense_sheet_custom">
+    <t t-call="web.html_container">
+        <t t-foreach="docs" t-as="o">
+            <t t-call="web.basic_layout">
+
+                <t t-call="conveyance_expense.letterhead_blocks"/>
+
+                <div class="page">
+
+                    <div style="text-align:center; margin:0 0 16px 0; padding:0;">
+                        <h2 style="text-transform:uppercase; font-weight:bold; font-size:14pt; margin:0; padding:0; line-height:1.1;">Expenses Report</h2>
+                        <p style="font-size:10pt; margin:2px 0 0 0;"><strong><span t-esc="o.name"/></strong></p>
+                    </div>
+
+                    <table style="width:100%; border-collapse:collapse; margin-bottom:12px;">
+                        <tr>
+                            <td style="width:50%; padding:4px;"><strong>Ref. No.: </strong><span t-esc="o.sheet_number or ''"/></td>
+                            <td style="width:50%; padding:4px;"><strong>Submission Date: </strong><span t-esc="o.submission_date.strftime('%d-%b-%Y') if o.submission_date else ''"/></td>
+                        </tr>
+                        <tr>
+                            <td style="width:50%; padding:4px;"><strong>Employee: </strong><span t-esc="o.employee_id.name"/></td>
+                            <td style="width:50%; padding:4px;"><strong>Designation: </strong><span t-esc="o.employee_id.job_id.name or ''"/></td>
+                        </tr>
+                        <tr>
+                            <td style="padding:4px;"><strong>Paid by: </strong><span t-esc="dict(o._fields['payment_mode']._description_selection(o.env)).get(o.payment_mode, '')"/></td>
+                            <td style="padding:4px;"><strong>Status: </strong><span t-esc="dict(o._fields['state']._description_selection(o.env)).get(o.state, '')"/></td>
+                        </tr>
+                    </table>
+
+                    <table class="table table-sm table-bordered"
+                           style="width:100%; border-collapse:collapse; border:1px solid #000; font-size:9px; table-layout:fixed; word-wrap:break-word;">
+                        <thead>
+                            <tr style="background-color:#6C7E7F; color:white;">
+                                <th style="width:6%;  padding:5px 3px; border:1px solid #000; text-align:center;">SL</th>
+                                <th style="width:13%; padding:5px 3px; border:1px solid #000;">Date</th>
+                                <th style="width:20%; padding:5px 3px; border:1px solid #000;">Reference No.</th>
+                                <th style="width:25%; padding:5px 3px; border:1px solid #000;">Name</th>
+                                <th style="width:22%; padding:5px 3px; border:1px solid #000;">Purpose</th>
+                                <th style="width:14%; padding:5px 3px; border:1px solid #000; text-align:right;">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="conveyance_rows(o)" t-as="row">
+                                <tr style="border:1px solid #000; page-break-inside:avoid;">
+                                    <td style="padding:4px 3px; border:1px solid #000; text-align:center;"><span t-esc="row['sl']"/></td>
+                                    <td style="padding:4px 3px; border:1px solid #000;"><span t-esc="row['date']"/></td>
+                                    <td style="padding:4px 3px; border:1px solid #000;"><span t-esc="row['reference']"/></td>
+                                    <td style="padding:4px 3px; border:1px solid #000;"><span t-esc="row['name']"/></td>
+                                    <td style="padding:4px 3px; border:1px solid #000;"><span t-esc="row['purpose']"/></td>
+                                    <td style="padding:4px 3px; border:1px solid #000; text-align:right;"><span t-esc="'{:,.2f}'.format(row['amount'])"/></td>
+                                </tr>
+                            </t>
+                        </tbody>
+                        <tfoot>
+                            <tr style="background-color:#D9E1F2; font-weight:bold;">
+                                <td colspan="5" style="padding:5px 3px; border:1px solid #000; text-align:right;">Total Amount (BDT):</td>
+                                <td style="padding:5px 3px; border:1px solid #000; text-align:right;"><span t-esc="'{:,.2f}'.format(o.total_amount)"/></td>
+                            </tr>
+                            <tr style="font-weight:bold;">
+                                <td colspan="6" style="padding:5px 3px; border:1px solid #000; text-align:left;">Amount in Word: <span t-esc="bdt_words(o.total_amount)"/></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+
+                    <t t-call="conveyance_expense.letterhead_signatures"/>
+
+                </div>
+            </t>
+        </t>
+    </t>
+</template>
+
+</odoo>

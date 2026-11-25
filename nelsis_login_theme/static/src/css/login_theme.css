@@ -1,0 +1,374 @@
+/* =========================================================================
+   Nelsis Login Theme
+   Scoped entirely through :has(form.oe_login_form) so it only ever affects
+   the page that actually renders the login form (never signup, reset
+   password, the database manager, or the backend/Kanban views - those live
+   under a completely different asset bundle and never match this selector).
+
+   :has() ships in every evergreen browser released since ~2023 (Chrome/Edge
+   105+, Safari 15.4+, Firefox 121+), which covers desktop and mobile alike,
+   so this degrades safely rather than needing a browser-specific fork.
+   ========================================================================= */
+
+:root {
+  --nlt-blue: #0167a1;
+  --nlt-purple: #572e63;
+  --nlt-card-radius: 28px;
+}
+
+/* Defensive only on the login page itself (never site-wide - this bundle
+   also loads on other frontend pages, and we must never change sizing
+   there): guarantees width+padding math is predictable even if a given
+   project's own theme resets box-sizing globally. */
+body:has(form.oe_login_form) *,
+body:has(form.oe_login_form) *::before,
+body:has(form.oe_login_form) *::after {
+  box-sizing: border-box;
+}
+
+/* ---- page canvas ------------------------------------------------------ */
+body:has(form.oe_login_form) {
+  min-height: 100vh;
+  min-height: 100dvh; /* mobile browsers (address bar show/hide) - ignored where unsupported */
+  overflow-x: hidden;
+  background: linear-gradient(135deg, #241a3d 0%, #572e63 45%, #8a3f6d 70%, #c97a7a 100%);
+}
+
+/* Fixed, full-viewport blurred "glassy" background layer.
+   inset:0 pins it to the viewport itself (position:fixed) so it always
+   spans the full width/height on any monitor, tablet or phone and never
+   scrolls away, even when the form content is tall enough to scroll. */
+.o_nelsis_login_bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background-color: #241a3d; /* fallback tone: no gap/flash before the image paints or if it fails to load */
+}
+/* The image is deliberately oversized (110% + negative inset) with
+   object-fit:cover so it always fills the box completely regardless of the
+   uploaded picture's own aspect ratio (portrait phone photo, ultra-wide
+   banner, square logo, ...) or the viewport's aspect ratio (tall mobile
+   screen vs. wide monitor) - no cropping gaps, no stretching, ever. The
+   extra 5% overscan also keeps the blur filter from revealing a hard edge. */
+.o_nelsis_bg_img {
+  position: absolute;
+  inset: -5%;
+  width: 110%;
+  height: 110%;
+  min-width: 110%;
+  min-height: 110%;
+  object-fit: cover;
+  object-position: center;
+  filter: blur(40px) saturate(1.25) brightness(0.85);
+  transform: translateZ(0); /* own compositing layer: avoids blur repaint glitches while scrolling */
+}
+.o_nelsis_bg_overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 8, 30, 0.25);
+}
+
+/* ---- turn the login form's own parent into the two-column glass card --
+   We don't know (and don't rely on) that parent's class name: :has() lets
+   us select "whatever element directly contains the login form" instead,
+   so this keeps working across Odoo versions and other login-page add-ons. */
+body:has(form.oe_login_form) *:has(> form.oe_login_form.o_nelsis_login_form) {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-areas:
+    "header right"
+    "form   right"
+    "footer right";
+  align-content: start;
+  width: min(960px, 92vw);
+  max-width: 100%;
+  margin: clamp(16px, 5vh, 64px) auto;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.90);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: var(--nlt-card-radius);
+  box-shadow: 0 30px 70px rgba(15, 5, 30, 0.4);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+/* ---- neutralize Odoo's OWN login card chrome (verified against Odoo 17
+   core: web.login_layout wraps the form in
+   .container.py-5 > .card.mx-auto.bg-100.o_database_list[style="max-width:300px"]
+   > .card-body). That inline "max-width: 300px" sits on a GRANDPARENT of the
+   element we just grid-ified above, so without this override our ~960px-wide
+   two-column card would be centered against a 300px-wide box and either
+   overflow off-center or get clipped depending on the surrounding theme.
+   An inline style can only be beaten with !important. We also drop the
+   card's own background/border so our own glass surface is the only one
+   visible, and zero the container's default vertical padding since our
+   card already manages its own margin. */
+body:has(form.oe_login_form) .card:has(.o_nelsis_login_form) {
+  max-width: none !important;
+  width: 100% !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+body:has(form.oe_login_form) .container:has(.o_nelsis_login_form) {
+  padding: 0 !important;
+  max-width: 100% !important;
+}
+
+/* hide Odoo's default chrome around the login form we are replacing.
+   Important: we hide the whole WRAPPER element (found via :has()), not just
+   the logo image / links inside it - Odoo still renders that wrapper's own
+   padding/border-top/border-bottom even when empty, which would otherwise
+   leave a stray blank bar with a hairline border inside our card, and -
+   once the card above becomes `display:grid` - an unstyled wrapper div left
+   in place would also compete for a grid cell it isn't supposed to have. */
+body:has(form.oe_login_form) .card-body > div:has(> img[src*="company_logo"]),
+body:has(form.oe_login_form) .card-body > div:has(> a[href*="/web/database/manager"]),
+body:has(form.oe_login_form) .card-body > div:has(> a[href="https://www.odoo.com"]),
+body:has(form.oe_login_form) .card-body > div:has(> a[href^="/web/signup"]) {
+  display: none !important;
+}
+/* older Odoo versions (pre-17, different template markup) used these
+   direct hooks - kept for backward compatibility, harmless where absent */
+body:has(form.oe_login_form) img[src*="company_logo"],
+body:has(form.oe_login_form) img[src*="/web/binary/company_logo"],
+body:has(form.oe_login_form) a[href*="/web/database/manager"],
+body:has(form.oe_login_form) a[href="https://www.odoo.com"],
+body:has(form.oe_login_form) a[href^="/web/signup"],
+body:has(form.oe_login_form) hr,
+body:has(form.oe_login_form) .oe_login_manage_db,
+body:has(form.oe_login_form) .oe_footer_seperator {
+  display: none !important;
+}
+/* hide the "Powered by Odoo" line (web.brand_promotion) together with its
+   wrapper, so its border-top hairline / spacing disappear as well */
+body:has(form.oe_login_form) .o_brand_promotion,
+body:has(form.oe_login_form) .card-body > div:has(> .o_brand_promotion),
+body:has(form.oe_login_form) .card-body > div:has(.o_brand_promotion),
+body:has(form.oe_login_form) div:has(> a[href*="odoo.com?utm_source"]),
+body:has(form.oe_login_form) div:has(> span > a[href*="odoo.com?utm_source"]) {
+  display: none !important;
+}
+/* hide the paragraph that only exists to introduce the sign-up link */
+body:has(form.oe_login_form) p:has(> a[href^="/web/signup"]),
+body:has(form.oe_login_form) div:has(> a[href^="/web/signup"]) {
+  display: none !important;
+}
+
+/* ---- the multi-database selector Odoo shows when the server has more
+   than one database (.card-body > form > .mb-3:has(#db)) is real content
+   inside the form itself, so it already inherits our form styling; this
+   just keeps its "Select" button legible against the glass card. */
+form.oe_login_form.o_nelsis_login_form .input-group .btn {
+  border-radius: 12px;
+  background: var(--nlt-blue);
+  border-color: var(--nlt-blue);
+}
+
+/* ---- left column: header / form / footer ------------------------------ */
+.o_nelsis_login_header {
+  grid-area: header;
+  padding: 48px 48px 8px 48px;
+  text-align: center;
+}
+.o_nelsis_login_logo {
+  max-height: 56px;
+  max-width: 220px;
+  object-fit: contain;
+  margin-bottom: 18px;
+}
+.o_nelsis_login_title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0 0 6px 0;
+}
+.o_nelsis_login_subtitle {
+  font-size: 14px;
+  color: #6b6b7a;
+  margin: 0;
+}
+
+form.oe_login_form.o_nelsis_login_form {
+  grid-area: form;
+  padding: 8px 48px 24px 48px;
+  margin: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+form.oe_login_form.o_nelsis_login_form label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #33334a;
+  margin-bottom: 4px;
+}
+form.oe_login_form.o_nelsis_login_form input.form-control,
+form.oe_login_form.o_nelsis_login_form input[type="text"],
+form.oe_login_form.o_nelsis_login_form input[type="email"],
+form.oe_login_form.o_nelsis_login_form input[type="password"] {
+  border-radius: 12px;
+  border: 1px solid #e2e2ea;
+  background: #f4f4f7;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  width: 100%;
+}
+form.oe_login_form.o_nelsis_login_form input.form-control:focus,
+form.oe_login_form.o_nelsis_login_form input:focus {
+  border-color: var(--nlt-blue);
+  box-shadow: 0 0 0 3px rgba(1, 103, 161, 0.15);
+  outline: none;
+}
+form.oe_login_form.o_nelsis_login_form button[type="submit"] {
+  width: 100%;
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-top: 6px;
+  background: #14141f;
+  border-color: #14141f;
+  font-weight: 600;
+}
+form.oe_login_form.o_nelsis_login_form button[type="submit"]:hover {
+  background: var(--nlt-purple);
+  border-color: var(--nlt-purple);
+}
+form.oe_login_form.o_nelsis_login_form a {
+  color: var(--nlt-blue);
+}
+
+.o_nelsis_login_footer {
+  grid-area: footer;
+  padding: 8px 48px 32px 48px;
+  text-align: center;
+  font-size: 12px;
+  color: #8a8a9a;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.o_nelsis_powered_by {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.o_nelsis_powered_by img {
+  height: 16px;
+  width: auto;
+  object-fit: contain;
+}
+
+/* ---- right column: side panel media ------------------------------------ */
+.o_nelsis_login_right {
+  grid-area: right;
+  position: relative;
+  min-height: 100%;
+  background: linear-gradient(160deg, var(--nlt-blue), var(--nlt-purple));
+  overflow: hidden;
+}
+.o_nelsis_right_media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.o_nelsis_right_overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  padding: 32px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.55) 100%);
+}
+.o_nelsis_right_caption {
+  color: #fff;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.3;
+  margin: 0;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+}
+
+/* ---- responsive: collapse to a single column on small/mobile screens -- */
+@media (max-width: 860px) {
+  body:has(form.oe_login_form) *:has(> form.oe_login_form.o_nelsis_login_form) {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "right"
+      "header"
+      "form"
+      "footer";
+    width: 94vw;
+    margin: clamp(12px, 3vh, 40px) auto;
+    max-height: none;
+  }
+  .o_nelsis_login_right {
+    min-height: 200px;
+  }
+  .o_nelsis_login_header,
+  form.oe_login_form.o_nelsis_login_form,
+  .o_nelsis_login_footer {
+    padding-left: 28px;
+    padding-right: 28px;
+  }
+}
+
+/* ---- extra safety on small phones (≤480px) so nothing feels cramped --
+   Stays a floating card (never forced full-viewport height) so short
+   content never leaves a dead, empty gap below the footer - the blurred
+   background stays visible around it exactly like on larger screens. */
+@media (max-width: 480px) {
+  body:has(form.oe_login_form) *:has(> form.oe_login_form.o_nelsis_login_form) {
+    width: 100%;
+    margin: 0;
+    border-radius: 0; /* edge-to-edge card reads as intentional, not clipped */
+  }
+  .o_nelsis_login_header {
+    padding: max(28px, env(safe-area-inset-top)) 20px 8px 20px;
+  }
+  form.oe_login_form.o_nelsis_login_form,
+  .o_nelsis_login_footer {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  .o_nelsis_login_footer {
+    padding-bottom: max(24px, env(safe-area-inset-bottom));
+  }
+  .o_nelsis_login_title {
+    font-size: 24px;
+  }
+  .o_nelsis_login_right {
+    min-height: 160px;
+  }
+}
+
+/* ---- very short / landscape mobile screens - keep the card from being
+   taller than the viewport can comfortably show without feeling broken -- */
+@media (max-height: 480px) and (orientation: landscape) {
+  body:has(form.oe_login_form) *:has(> form.oe_login_form.o_nelsis_login_form) {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    grid-template-areas:
+      "header right"
+      "form   right"
+      "footer right";
+    margin: 12px auto;
+  }
+  .o_nelsis_login_right {
+    min-height: 100%;
+  }
+  .o_nelsis_login_header {
+    padding: 20px 32px 4px 32px;
+  }
+  form.oe_login_form.o_nelsis_login_form,
+  .o_nelsis_login_footer {
+    padding: 4px 32px;
+  }
+}

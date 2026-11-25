@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="rule_adjustment_own" model="ir.rule">
+        <field name="name">Adjustment: own records</field>
+        <field name="model_id" ref="model_employee_advance_adjustment"/>
+        <field name="domain_force">[('employee_id.user_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('employee_advance.group_advance_user'))]"/>
+    </record>
+    <record id="rule_adjustment_all" model="ir.rule">
+        <field name="name">Adjustment: supervisor and accounts see all</field>
+        <field name="model_id" ref="model_employee_advance_adjustment"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('employee_advance.group_advance_manager')), (4, ref('employee_advance.group_advance_accountant'))]"/>
+    </record>
+    <record id="rule_adjustment_company" model="ir.rule">
+        <field name="name">Adjustment: multi-company</field>
+        <field name="model_id" ref="model_employee_advance_adjustment"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_adjustment_line_own" model="ir.rule">
+        <field name="name">Adjustment line: own records</field>
+        <field name="model_id" ref="model_employee_advance_adjustment_line"/>
+        <field name="domain_force">[('adjustment_id.employee_id.user_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('employee_advance.group_advance_user'))]"/>
+    </record>
+    <record id="rule_adjustment_line_all" model="ir.rule">
+        <field name="name">Adjustment line: supervisor and accounts see all</field>
+        <field name="model_id" ref="model_employee_advance_adjustment_line"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('employee_advance.group_advance_manager')), (4, ref('employee_advance.group_advance_accountant'))]"/>
+    </record>
+    <record id="rule_adjustment_line_company" model="ir.rule">
+        <field name="name">Adjustment line: multi-company</field>
+        <field name="model_id" ref="model_employee_advance_adjustment_line"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    </record>
+</odoo>

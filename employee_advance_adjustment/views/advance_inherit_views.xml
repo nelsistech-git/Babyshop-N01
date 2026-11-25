@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_employee_advance_form_adjustment" model="ir.ui.view">
+        <field name="name">employee.advance.form.adjustment</field>
+        <field name="model">employee.advance</field>
+        <field name="inherit_id" ref="employee_advance.view_employee_advance_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_create_adjustment" string="Adjust Advance" type="object"
+                        class="btn-primary" invisible="state != 'paid'"/>
+            </xpath>
+            <xpath expr="//field[@name='state']" position="attributes">
+                <attribute name="statusbar_visible">draft,submitted,approved,paid,closed</attribute>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Adjustment" name="adjustment">
+                    <field name="adjustment_ids" readonly="1">
+                        <tree>
+                            <field name="name"/>
+                            <field name="date"/>
+                            <field name="expense_total"/>
+                            <field name="refund_amount"/>
+                            <field name="payable_amount"/>
+                            <field name="state" widget="badge"/>
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

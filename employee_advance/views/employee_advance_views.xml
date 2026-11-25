@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_employee_advance_tree" model="ir.ui.view">
+        <field name="name">employee.advance.tree</field>
+        <field name="model">employee.advance</field>
+        <field name="arch" type="xml">
+            <tree decoration-muted="state == 'cancel'" decoration-success="state == 'paid'">
+                <field name="name"/>
+                <field name="date"/>
+                <field name="employee_id"/>
+                <field name="department_id" optional="show"/>
+                <field name="purpose"/>
+                <field name="advance_account_id" optional="hide"/>
+                <field name="amount" sum="Total"/>
+                <field name="company_id" column_invisible="True"/>
+                <field name="currency_id" column_invisible="True"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_employee_advance_form" model="ir.ui.view">
+        <field name="name">employee.advance.form</field>
+        <field name="model">employee.advance</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_submit" string="Submit to Supervisor" type="object"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_approve" string="Approve and Forward to Accounts" type="object"
+                            class="btn-primary" groups="employee_advance.group_advance_manager"
+                            invisible="state != 'submitted'"/>
+                    <button name="action_return" string="Return" type="object"
+                            groups="employee_advance.group_advance_manager"
+                            invisible="state != 'submitted'"/>
+                    <button name="action_pay" string="Final Check and Post Entry" type="object"
+                            class="btn-primary" groups="employee_advance.group_advance_accountant"
+                            invisible="state != 'approved' or requires_payment_request"/>
+                    <button name="action_create_payment_request" string="Send to Payment Request" type="object"
+                            class="btn-primary" groups="employee_advance.group_advance_accountant"
+                            invisible="state != 'approved' or not requires_payment_request or payment_request_id"/>
+                    <button name="action_return" string="Return" type="object"
+                            groups="employee_advance.group_advance_accountant"
+                            invisible="state != 'approved'"/>
+                    <button name="action_cancel" string="Cancel" type="object"
+                            invisible="state not in ('draft', 'submitted', 'approved')"/>
+                    <button name="action_draft" string="Reset to Draft" type="object"
+                            invisible="state != 'cancel'"/>
+                    <button name="action_reset_paid_to_draft" string="Reset to Draft" type="object"
+                            groups="employee_advance.group_advance_accountant"
+                            confirm="The advance entry will be reversed and the advance goes back to Draft. Continue?"
+                            invisible="state != 'paid'"/>
+                    <button name="action_print_advance_claim" string="Print Advance Claim Sheet" type="object"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,paid"/>
+                </header>
+                <sheet>
+                    <field name="requires_payment_request" invisible="1"/>
+                    <div class="alert alert-info" role="alert"
+                         invisible="not requires_payment_request or state != 'approved'">
+                        This advance is above the cash limit. It is paid from the bank account selected in a
+                        <b>Payment Request</b> (Payment Requests &gt; Due for Payment).
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Employee">
+                            <field name="employee_id" readonly="1" force_save="1"/>
+                            <field name="job_title"/>
+                            <field name="department_id"/>
+                            <field name="work_contact_id"/>
+                        </group>
+                        <group string="Advance">
+                            <field name="date" readonly="state != 'draft'"/>
+                            <field name="journal_id" readonly="1" force_save="1"/>
+                            <field name="purpose" readonly="state != 'draft'"/>
+                            <field name="advance_account_id" readonly="state != 'draft'"
+                                   options="{'no_create': True}"/>
+                            <field name="amount" readonly="state != 'draft'"/>
+                            <!-- company_id must NOT be restricted to a group: it is used
+                                 in the domain of advance_account_id / cash_account_id -->
+                            <field name="company_id" readonly="1" invisible="1"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="remark" placeholder="Remark (required when returning)"
+                               readonly="state not in ('submitted', 'approved')"/>
+                    </group>
+                    <notebook>
+                        <page string="Accounting" name="accounting"
+                              groups="employee_advance.group_advance_accountant">
+                            <group>
+                                <field name="cash_account_id" readonly="state != 'approved'"
+                                       invisible="requires_payment_request"
+                                       options="{'no_create': True}"/>
+                                <field name="payment_request_id" invisible="not payment_request_id"/>
+                                <field name="payment_move_id"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_employee_advance_search" model="ir.ui.view">
+        <field name="name">employee.advance.search</field>
+        <field name="model">employee.advance</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="department_id"/>
+                <field name="purpose"/>
+                <filter name="to_check" string="Supervisor to Check" domain="[('state', '=', 'submitted')]"/>
+                <filter name="to_post" string="Accounts to Post" domain="[('state', '=', 'approved')]"/>
+                <filter name="paid" string="Advance Paid" domain="[('state', '=', 'paid')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_employee" string="Employee" context="{'group_by': 'employee_id'}"/>
+                    <filter name="group_dept" string="Department" context="{'group_by': 'department_id'}"/>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_employee_advance_my" model="ir.actions.act_window">
+        <field name="name">My Advances</field>
+        <field name="res_model">employee.advance</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('employee_id.user_id', '=', uid)]</field>
+    </record>
+
+    <record id="action_employee_advance_check" model="ir.actions.act_window">
+        <field name="name">Advances to Check</field>
+        <field name="res_model">employee.advance</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_employee_advance_search"/>
+        <field name="context">{'search_default_to_check': 1}</field>
+    </record>
+
+    <record id="action_employee_advance_post" model="ir.actions.act_window">
+        <field name="name">Advances to Post</field>
+        <field name="res_model">employee.advance</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_employee_advance_search"/>
+        <field name="context">{'search_default_to_post': 1}</field>
+    </record>
+</odoo>

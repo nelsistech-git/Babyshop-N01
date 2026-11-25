@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="hr_expense_bulk_wizard_view_form" model="ir.ui.view">
+        <field name="name">hr.expense.bulk.wizard.form</field>
+        <field name="model">hr.expense.bulk.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Bulk Expense" class="o_bulk_expense_form">
+                <group>
+                    <group>
+                        <field name="name"/>
+                        <field name="product_id" options="{'no_create': True}"/>
+                        <field name="payment_mode" widget="radio"/>
+                    </group>
+                    <group>
+                        <field name="date"/>
+                        <field name="company_id" groups="base.group_multi_company"
+                               options="{'no_create': True}"/>
+                    </group>
+                </group>
+                <field name="line_ids" nolabel="1">
+                    <tree editable="bottom">
+                        <field name="employee_id" options="{'no_create': True}"/>
+                        <field name="date"/>
+                        <field name="from_location"/>
+                        <field name="to_location"/>
+                        <field name="purpose" optional="show"/>
+                        <field name="transport"/>
+                        <field name="customer_id" optional="show" options="{'no_create': True}"/>
+                        <field name="conveyance_amount" sum="Total"/>
+                        <field name="food_bill" sum="Total"/>
+                        <field name="others_cost" optional="hide"/>
+                        <field name="amount" sum="Total"/>
+                        <field name="total_amount" sum="Total"/>
+                        <field name="remarks" optional="show"/>
+                    </tree>
+                </field>
+                <footer>
+                    <button name="action_create_expenses" string="Create Expenses"
+                            type="object" class="btn-primary" data-hotkey="q"/>
+                    <button string="Discard" class="btn-secondary" special="cancel" data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_hr_expense_bulk_wizard" model="ir.actions.act_window">
+        <field name="name">Bulk Expense</field>
+        <field name="res_model">hr.expense.bulk.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'dialog_size': 'extra-large'}</field>
+    </record>
+
+    <menuitem
+        id="menu_hr_expense_bulk"
+        name="Bulk Expense"
+        parent="hr_expense.menu_hr_expense_root"
+        action="action_hr_expense_bulk_wizard"
+        groups="base.group_user"
+        sequence="15"
+    />
+
+</odoo>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Journal Voucher / EDF Journal PDF: the Total row sits inside the main table, so it lines up
+         with the Debit / Credit columns; each total is in its own box with a gap between them.
+         Done here (Conveyance Expense) so custom_account_day_book itself stays untouched. -->
+
+    <template id="journal_entry_total_box" inherit_id="custom_account_day_book.journal_entry_template_report_view">
+        <xpath expr="//table[.//strong[normalize-space(text())='Total:']]" position="replace"/>
+        <xpath expr="//tbody[hasclass('consumed_tbody')]" position="after">
+            <tbody class="voucher_total_tbody">
+                <tr>
+                    <td colspan="5" class="text-right" style="border-top:none; vertical-align:middle;"><strong>Total:</strong></td>
+                    <td class="text-right" style="border-top:none; padding:6px 10px;">
+                        <span style="display:inline-block; border:1px solid #000; padding:3px 8px; font-weight:bold; white-space:nowrap;"><t t-esc="'{0:,.2f}'.format(total)"/></span>
+                    </td>
+                    <td class="text-right" style="border-top:none; padding:6px 10px; background-color: white !important;">
+                        <span style="display:inline-block; border:1px solid #000; padding:3px 8px; font-weight:bold; white-space:nowrap;"><t t-esc="'{0:,.2f}'.format(total1)"/></span>
+                    </td>
+                </tr>
+            </tbody>
+        </xpath>
+    </template>
+
+    <template id="voucher_total_box" inherit_id="custom_account_day_book.voucher_report_tmpl_view">
+        <xpath expr="//table[.//strong[normalize-space(text())='Total:']]" position="replace"/>
+        <xpath expr="//tbody[hasclass('consumed_tbody')]" position="after">
+            <tbody class="voucher_total_tbody">
+                <tr>
+                    <td colspan="5" class="text-right" style="border-top:none; vertical-align:middle;"><strong>Total:</strong></td>
+                    <td class="text-right" style="border-top:none; padding:6px 10px;">
+                        <span style="display:inline-block; border:1px solid #000; padding:3px 8px; font-weight:bold; white-space:nowrap;"><t t-esc="'{0:,.2f}'.format(total)"/></span>
+                    </td>
+                    <td class="text-right" style="border-top:none; padding:6px 10px; background-color: white !important;">
+                        <span style="display:inline-block; border:1px solid #000; padding:3px 8px; font-weight:bold; white-space:nowrap;"><t t-esc="'{0:,.2f}'.format(total1)"/></span>
+                    </td>
+                </tr>
+            </tbody>
+        </xpath>
+    </template>
+</odoo>

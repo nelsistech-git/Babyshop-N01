@@ -3,7 +3,11 @@
 <template id="report_conveyance_sheet_template">
     <t t-call="web.html_container">
         <t t-foreach="docs" t-as="doc">
-            <t t-call="web.external_layout">
+            <t t-set="company" t-value="doc.company_id or doc.employee_id.company_id"/>
+            <t t-call="web.basic_layout">
+
+                <t t-call="conveyance_expense.letterhead_blocks"/>
+
                 <div class="page">
 
                     <div style="text-align:center; margin-bottom:16px;">
@@ -17,89 +21,65 @@
                             <td style="width:50%; padding:4px;"><strong>Designation: </strong><span t-esc="doc.designation.name or ''"/></td>
                         </tr>
                         <tr>
-                            <td style="padding:4px;"><strong>Date From: </strong><span t-esc="str(doc.date_from) if doc.date_from else ''"/></td>
-                            <td style="padding:4px;"><strong>Date To: </strong><span t-esc="str(doc.date_to) if doc.date_to else ''"/></td>
+                            <td style="padding:4px;"><strong>Date From: </strong><span t-esc="doc.date_from.strftime('%d-%b-%Y') if doc.date_from else ''"/></td>
+                            <td style="padding:4px;"><strong>Date To: </strong><span t-esc="doc.date_to.strftime('%d-%b-%Y') if doc.date_to else ''"/></td>
                         </tr>
                         <tr>
                             <td colspan="2" style="padding:4px;"><strong>Status: </strong><span t-esc="dict(doc._fields['state'].selection).get(doc.state, '')"/></td>
                         </tr>
                     </table>
 
-                    <table style="width:100%; border-collapse:collapse; font-size:10px;">
+                    <!-- ============ LINE ITEMS ============
+                         Every row and every cell has a 1px solid black border so each line is clearly separated. -->
+                    <table class="table table-sm table-bordered"
+                           style="width:100%; border-collapse:collapse; border:1px solid #000; font-size:8px; table-layout:fixed; word-wrap:break-word;">
                         <thead>
                             <tr style="background-color:#6C7E7F; color:white;">
-                                <th style="width:4%; padding:5px; border:1px solid #999; text-align:center;">SL</th>
-                                <th style="width:7%; padding:5px; border:1px solid #999;">Date</th>
-                                <th style="width:7%; padding:5px; border:1px solid #999;">From</th>
-                                <th style="width:7%; padding:5px; border:1px solid #999;">To</th>
-                                <th style="width:8%; padding:5px; border:1px solid #999;">Purpose</th>
-                                <th style="width:7%; padding:5px; border:1px solid #999;">Transport</th>
-                                <th style="width:8%; padding:5px; border:1px solid #999;">Customer</th>
-                                <th style="width:8%; padding:5px; border:1px solid #999; text-align:right;">Conv. Amount</th>
-                                <th style="width:7%; padding:5px; border:1px solid #999; text-align:right;">Food Bill</th>
-                                <th style="width:8%; padding:5px; border:1px solid #999;">Others Cost</th>
-                                <th style="width:7%; padding:5px; border:1px solid #999; text-align:right;">Amount</th>
-                                <th style="width:8%; padding:5px; border:1px solid #999; text-align:right;">Total Amount</th>
-                                <th style="width:9%; padding:5px; border:1px solid #999;">Remarks</th>
+                                <th style="width:4%;  padding:5px 3px; border:1px solid #000; text-align:center;">SL</th>
+                                <th style="width:9%;  padding:5px 3px; border:1px solid #000;">Date</th>
+                                <th style="width:11%; padding:5px 3px; border:1px solid #000;">Reference No.</th>
+                                <th style="width:8%;  padding:5px 3px; border:1px solid #000;">From</th>
+                                <th style="width:8%;  padding:5px 3px; border:1px solid #000;">To</th>
+                                <th style="width:12%; padding:5px 3px; border:1px solid #000;">Purpose</th>
+                                <th style="width:8%;  padding:5px 3px; border:1px solid #000;">Transport</th>
+                                <th style="width:9%;  padding:5px 3px; border:1px solid #000; text-align:right;">Conv. Amount</th>
+                                <th style="width:7%;  padding:5px 3px; border:1px solid #000; text-align:right;">Food Bill</th>
+                                <th style="width:8%;  padding:5px 3px; border:1px solid #000;">Others Cost</th>
+                                <th style="width:7%;  padding:5px 3px; border:1px solid #000; text-align:right;">Amount</th>
+                                <th style="width:9%;  padding:5px 3px; border:1px solid #000; text-align:right;">Total Amount</th>
                             </tr>
                         </thead>
                         <tbody>
+                            <!-- SL auto-increments 1, 2, 3 ... (line_index is 0-based) -->
                             <t t-foreach="doc.line_ids" t-as="line">
-                                <tr>
-                                    <td style="padding:4px; border:1px solid #ccc; text-align:center;"><span t-esc="line_index + 1"/></td>
-                                    <td style="padding:4px; border:1px solid #ccc;"><span t-esc="str(line.date) if line.date else ''"/></td>
-                                    <td style="padding:4px; border:1px solid #ccc;"><span t-esc="line.from_location or ''"/></td>
-                                    <td style="padding:4px; border:1px solid #ccc;"><span t-esc="line.to_location or ''"/></td>
-                                    <td style="padding:4px; border:1px solid #ccc;"><span t-esc="line.purpose or ''"/></td>
-                                    <td style="padding:4px; border:1px solid #ccc;"><span t-esc="dict(line._fields['transport'].selection).get(line.transport, '')"/></td>
-                                    <td style="padding:4px; border:1px solid #ccc;"><span t-esc="line.customer_id.name or ''"/></td>
-                                    <td style="padding:4px; border:1px solid #ccc; text-align:right;"><span t-esc="'{:,.2f}'.format(line.conveyance_amount)"/></td>
-                                    <td style="padding:4px; border:1px solid #ccc; text-align:right;"><span t-esc="'{:,.2f}'.format(line.food_bill)"/></td>
-                                    <td style="padding:4px; border:1px solid #ccc;"><span t-esc="line.others_cost or ''"/></td>
-                                    <td style="padding:4px; border:1px solid #ccc; text-align:right;"><span t-esc="'{:,.2f}'.format(line.amount)"/></td>
-                                    <td style="padding:4px; border:1px solid #ccc; text-align:right;"><span t-esc="'{:,.2f}'.format(line.total_amount)"/></td>
-                                    <td style="padding:4px; border:1px solid #ccc;"><span t-esc="line.remarks or ''"/></td>
+                                <tr style="border:1px solid #000; page-break-inside:avoid;">
+                                    <td style="padding:4px 3px; border:1px solid #000; text-align:center;"><span t-esc="line_index + 1"/></td>
+                                    <td style="padding:4px 3px; border:1px solid #000;"><span t-esc="line.date.strftime('%d-%b-%Y') if line.date else ''"/></td>
+                                    <td style="padding:4px 3px; border:1px solid #000;"><span t-esc="line.x_receipt_reference or ''"/></td>
+                                    <td style="padding:4px 3px; border:1px solid #000;"><span t-esc="line.from_location or ''"/></td>
+                                    <td style="padding:4px 3px; border:1px solid #000;"><span t-esc="line.to_location or ''"/></td>
+                                    <td style="padding:4px 3px; border:1px solid #000;"><span t-esc="line.purpose or ''"/></td>
+                                    <td style="padding:4px 3px; border:1px solid #000;"><span t-esc="dict(line._fields['transport'].selection).get(line.transport, '')"/></td>
+                                    <td style="padding:4px 3px; border:1px solid #000; text-align:right;"><span t-esc="'{:,.2f}'.format(line.conveyance_amount)"/></td>
+                                    <td style="padding:4px 3px; border:1px solid #000; text-align:right;"><span t-esc="'{:,.2f}'.format(line.food_bill)"/></td>
+                                    <td style="padding:4px 3px; border:1px solid #000;"><span t-esc="line.others_cost or ''"/></td>
+                                    <td style="padding:4px 3px; border:1px solid #000; text-align:right;"><span t-esc="'{:,.2f}'.format(line.amount)"/></td>
+                                    <td style="padding:4px 3px; border:1px solid #000; text-align:right;"><span t-esc="'{:,.2f}'.format(line.total_amount)"/></td>
                                 </tr>
                             </t>
                         </tbody>
                         <tfoot>
                             <tr style="background-color:#D9E1F2; font-weight:bold;">
-                                <td colspan="12" style="padding:5px; border:1px solid #ccc; text-align:right;">Total Amount (BDT):</td>
-                                <td style="padding:5px; border:1px solid #ccc; text-align:right;"><span t-esc="'{:,.2f}'.format(doc.total_amount)"/></td>
+                                <td colspan="11" style="padding:5px 3px; border:1px solid #000; text-align:right;">Total Amount (BDT):</td>
+                                <td style="padding:5px 3px; border:1px solid #000; text-align:right;"><span t-esc="'{:,.2f}'.format(doc.total_amount)"/></td>
+                            </tr>
+                            <tr style="font-weight:bold;">
+                                <td colspan="12" style="padding:5px 3px; border:1px solid #000; text-align:left;">Amount in Word: <span t-esc="doc.amount_in_words"/></td>
                             </tr>
                         </tfoot>
                     </table>
 
-                    <!-- Signature Section -->
-                    <table style="width:100%; margin-top:60px; border-collapse:collapse;">
-                        <tr>
-                            <td style="width:20%; text-align:center; padding:10px;">
-                                <div style="border-top:1px solid black; margin-top:40px; padding-top:8px;">
-                                    <strong>Claimed By</strong>
-                                </div>
-                            </td>
-                            <td style="width:20%; text-align:center; padding:10px;">
-                                <div style="border-top:1px solid black; margin-top:40px; padding-top:8px;">
-                                    <strong>Checked By Dept. Head</strong>
-                                </div>
-                            </td>
-                            <td style="width:20%; text-align:center; padding:10px;">
-                                <div style="border-top:1px solid black; margin-top:40px; padding-top:8px;">
-                                    <strong>App. By Management</strong>
-                                </div>
-                            </td>
-                            <td style="width:20%; text-align:center; padding:10px;">
-                                <div style="border-top:1px solid black; margin-top:40px; padding-top:8px;">
-                                    <strong>Processed By Accounts</strong>
-                                </div>
-                            </td>
-                            <td style="width:20%; text-align:center; padding:10px;">
-                                <div style="border-top:1px solid black; margin-top:40px; padding-top:8px;">
-                                    <strong>Authorized By CFO</strong>
-                                </div>
-                            </td>
-                        </tr>
-                    </table>
+                    <t t-call="conveyance_expense.letterhead_signatures"/>
 
                 </div>
             </t>

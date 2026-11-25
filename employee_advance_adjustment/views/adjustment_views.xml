@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_adjustment_tree" model="ir.ui.view">
+        <field name="name">employee.advance.adjustment.tree</field>
+        <field name="model">employee.advance.adjustment</field>
+        <field name="arch" type="xml">
+            <tree decoration-muted="state == 'cancel'" decoration-success="state == 'done'">
+                <field name="name"/>
+                <field name="date"/>
+                <field name="advance_id"/>
+                <field name="employee_id"/>
+                <field name="department_id" optional="show"/>
+                <field name="advance_amount" sum="Total"/>
+                <field name="expense_total" sum="Total"/>
+                <field name="refund_amount" sum="Total" optional="show"/>
+                <field name="payable_amount" sum="Total" optional="show"/>
+                <field name="company_id" column_invisible="True"/>
+                <field name="currency_id" column_invisible="True"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_adjustment_form" model="ir.ui.view">
+        <field name="name">employee.advance.adjustment.form</field>
+        <field name="model">employee.advance.adjustment</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_submit" string="Submit to Supervisor" type="object"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_check" string="Checked: Forward to Accounts" type="object"
+                            class="btn-primary" groups="employee_advance.group_advance_manager"
+                            invisible="state != 'submitted'"/>
+                    <button name="action_return" string="Return" type="object"
+                            groups="employee_advance.group_advance_manager"
+                            invisible="state != 'submitted'"/>
+                    <button name="action_post_entry" string="Final Check and Post Entry" type="object"
+                            class="btn-primary" groups="employee_advance.group_advance_accountant"
+                            invisible="state != 'checked'"/>
+                    <button name="action_return" string="Return" type="object"
+                            groups="employee_advance.group_advance_accountant"
+                            invisible="state != 'checked'"/>
+                    <button name="action_pay_excess" string="Pay Excess Amount" type="object"
+                            class="btn-primary" groups="employee_advance.group_advance_accountant"
+                            invisible="state != 'payable'"/>
+                    <button name="action_cancel" string="Cancel" type="object"
+                            invisible="state not in ('draft', 'submitted')"/>
+                    <button name="action_draft" string="Reset to Draft" type="object"
+                            invisible="state != 'cancel'"/>
+                    <button name="%(action_report_adjustment)d" string="Print" type="action"
+                            invisible="state == 'cancel'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,submitted,checked,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Employee">
+                            <field name="advance_id" readonly="state != 'draft'"
+                                   options="{'no_create': True}"/>
+                            <field name="employee_id"/>
+                            <field name="job_title"/>
+                            <field name="department_id"/>
+                            <field name="work_contact_id"/>
+                        </group>
+                        <group string="Adjustment">
+                            <field name="date" readonly="state != 'draft'"/>
+                            <field name="journal_id" readonly="1" force_save="1"/>
+                            <field name="advance_account_id"/>
+                            <field name="advance_amount"/>
+                            <!-- company_id must NOT be restricted to a group: it is used
+                                 in the domain of cash_account_id / advance_account_id -->
+                            <field name="company_id" invisible="1"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="remark" placeholder="Remark (required when returning)"
+                               readonly="state not in ('submitted', 'checked')"/>
+                    </group>
+                    <notebook>
+                        <page string="Expenses" name="expenses">
+                            <field name="line_ids" readonly="state != 'draft'">
+                                <tree editable="bottom">
+                                    <field name="date"/>
+                                    <field name="account_id"
+                                           domain="[('company_id', '=', company_id), ('account_type', 'in', ('expense', 'expense_direct_cost', 'expense_depreciation')), ('deprecated', '=', False)]"
+                                           options="{'no_create': True}"/>
+                                    <field name="name"/>
+                                    <field name="amount" sum="Total"/>
+                                    <field name="company_id" column_invisible="True"/>
+                                    <field name="currency_id" column_invisible="True"/>
+                                </tree>
+                            </field>
+                            <group class="oe_subtotal_footer oe_right">
+                                <field name="expense_total"/>
+                                <field name="refund_amount"/>
+                                <field name="payable_amount"/>
+                            </group>
+                        </page>
+                        <page string="Accounting" name="accounting"
+                              groups="employee_advance.group_advance_accountant">
+                            <group>
+                                <field name="cash_account_id"
+                                       readonly="state not in ('checked', 'payable')"
+                                       options="{'no_create': True}"/>
+                                <field name="adjust_move_id"/>
+                                <field name="excess_move_id"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_adjustment_search" model="ir.ui.view">
+        <field name="name">employee.advance.adjustment.search</field>
+        <field name="model">employee.advance.adjustment</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="advance_id"/>
+                <field name="employee_id"/>
+                <field name="department_id"/>
+                <filter name="to_check" string="Supervisor to Check" domain="[('state', '=', 'submitted')]"/>
+                <filter name="to_post" string="Accounts to Post" domain="[('state', '=', 'checked')]"/>
+                <filter name="payable" string="Payable Pending" domain="[('state', '=', 'payable')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_employee" string="Employee" context="{'group_by': 'employee_id'}"/>
+                    <filter name="group_dept" string="Department" context="{'group_by': 'department_id'}"/>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_adjustment_my" model="ir.actions.act_window">
+        <field name="name">My Adjustments</field>
+        <field name="res_model">employee.advance.adjustment</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('employee_id.user_id', '=', uid)]</field>
+    </record>
+    <record id="action_adjustment_check" model="ir.actions.act_window">
+        <field name="name">Adjustments to Check</field>
+        <field name="res_model">employee.advance.adjustment</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_adjustment_search"/>
+        <field name="context">{'search_default_to_check': 1}</field>
+    </record>
+    <record id="action_adjustment_post" model="ir.actions.act_window">
+        <field name="name">Adjustments to Post</field>
+        <field name="res_model">employee.advance.adjustment</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_adjustment_search"/>
+        <field name="context">{'search_default_to_post': 1}</field>
+    </record>
+</odoo>

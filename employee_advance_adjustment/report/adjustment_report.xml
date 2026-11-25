@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Same A4 paper format and the same hard-coded letterhead header/footer as the Advance Claim Sheet
+         (both come from the employee_advance module; nothing is read from the Company record). -->
+    <record id="action_report_adjustment" model="ir.actions.report">
+        <field name="name">Advance Adjustment Sheet</field>
+        <field name="model">employee.advance.adjustment</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">employee_advance_adjustment.report_adjustment_template</field>
+        <field name="report_file">employee_advance_adjustment.report_adjustment_template</field>
+        <field name="print_report_name">'Advance Adjustment Sheet - %s' % (object.name or '')</field>
+        <field name="paperformat_id" ref="employee_advance.paperformat_advance_claim"/>
+        <field name="binding_model_id" ref="model_employee_advance_adjustment"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_adjustment_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.basic_layout">
+
+                    <!-- Letterhead header + footer (hard-coded, same as the attached pad) -->
+                    <t t-call="employee_advance.letterhead_header_footer"/>
+
+                    <div class="page">
+                        <div style="text-align:center; margin:0 0 16px 0; padding:0;">
+                            <h2 style="text-transform:uppercase; font-weight:bold; font-size:14pt; margin:0; padding:0; line-height:1.1;">Advance Adjustment Sheet</h2>
+                            <p style="font-size:10pt; margin:2px 0 0 0;"><strong><span t-esc="o.name"/></strong></p>
+                        </div>
+
+                        <table style="width:100%; border-collapse:collapse; margin-bottom:12px;">
+                            <tr>
+                                <td style="width:50%; padding:4px;"><strong>Employee: </strong><span t-esc="o.employee_id.name"/></td>
+                                <td style="width:50%; padding:4px;"><strong>Designation: </strong><span t-esc="o.job_title or ''"/></td>
+                            </tr>
+                            <tr>
+                                <td style="padding:4px;"><strong>Department: </strong><span t-esc="o.department_id.complete_name or o.department_id.name or ''"/></td>
+                                <td style="padding:4px;"><strong>Date: </strong><span t-esc="o.date.strftime('%d-%b-%Y') if o.date else ''"/></td>
+                            </tr>
+                            <tr>
+                                <td style="padding:4px;"><strong>Advance No: </strong><span t-esc="o.advance_id.name or ''"/></td>
+                                <td style="padding:4px;"><strong>Advance Head: </strong><span t-esc="o.advance_account_id.display_name or ''"/></td>
+                            </tr>
+                            <tr>
+                                <td style="padding:4px;"><strong>Advance Amount: </strong><span t-esc="'{:,.2f}'.format(o.advance_amount)"/> BDT</td>
+                                <td style="padding:4px;"><strong>Status: </strong><span t-esc="dict(o._fields['state']._description_selection(o.env)).get(o.state, '')"/></td>
+                            </tr>
+                        </table>
+
+                        <table class="table table-sm table-bordered"
+                               style="width:100%; border-collapse:collapse; border:1px solid #000; font-size:9px; table-layout:fixed; word-wrap:break-word;">
+                            <thead>
+                                <tr style="background-color:#6C7E7F; color:white;">
+                                    <th style="width:7%;  padding:5px 3px; border:1px solid #000; text-align:center;">SL</th>
+                                    <th style="width:15%; padding:5px 3px; border:1px solid #000;">Date</th>
+                                    <th style="width:30%; padding:5px 3px; border:1px solid #000;">Expense Head</th>
+                                    <th style="width:32%; padding:5px 3px; border:1px solid #000;">Description</th>
+                                    <th style="width:16%; padding:5px 3px; border:1px solid #000; text-align:right;">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="o.line_ids.sorted(lambda l: (l.date, l.id))" t-as="l">
+                                    <tr style="border:1px solid #000;">
+                                        <td style="padding:4px 3px; border:1px solid #000; text-align:center;"><span t-esc="l_index + 1"/></td>
+                                        <td style="padding:4px 3px; border:1px solid #000;"><span t-esc="l.date.strftime('%d-%b-%Y') if l.date else ''"/></td>
+                                        <td style="padding:4px 3px; border:1px solid #000;"><span t-esc="l.account_id.display_name or ''"/></td>
+                                        <td style="padding:4px 3px; border:1px solid #000;"><span t-esc="l.name or ''"/></td>
+                                        <td style="padding:4px 3px; border:1px solid #000; text-align:right;"><span t-esc="'{:,.2f}'.format(l.amount)"/></td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                            <tfoot>
+                                <tr style="background-color:#D9E1F2; font-weight:bold;">
+                                    <td colspan="4" style="padding:5px 3px; border:1px solid #000; text-align:right;">Total Expense Amount (BDT):</td>
+                                    <td style="padding:5px 3px; border:1px solid #000; text-align:right;"><span t-esc="'{:,.2f}'.format(o.expense_total)"/></td>
+                                </tr>
+                                <tr style="font-weight:bold;">
+                                    <td colspan="4" style="padding:5px 3px; border:1px solid #000; text-align:right;">Advance Amount (BDT):</td>
+                                    <td style="padding:5px 3px; border:1px solid #000; text-align:right;"><span t-esc="'{:,.2f}'.format(o.advance_amount)"/></td>
+                                </tr>
+                                <tr t-if="o.refund_amount" style="font-weight:bold;">
+                                    <td colspan="4" style="padding:5px 3px; border:1px solid #000; text-align:right;">Cash Refund by Employee (BDT):</td>
+                                    <td style="padding:5px 3px; border:1px solid #000; text-align:right;"><span t-esc="'{:,.2f}'.format(o.refund_amount)"/></td>
+                                </tr>
+                                <tr t-if="o.payable_amount" style="font-weight:bold;">
+                                    <td colspan="4" style="padding:5px 3px; border:1px solid #000; text-align:right;">Payable to Employee (BDT):</td>
+                                    <td style="padding:5px 3px; border:1px solid #000; text-align:right;"><span t-esc="'{:,.2f}'.format(o.payable_amount)"/></td>
+                                </tr>
+                                <tr style="font-weight:bold;">
+                                    <td colspan="5" style="padding:5px 3px; border:1px solid #000; text-align:left;">Amount in Word: <span t-esc="o.expense_total_in_words"/></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+
+                        <!-- Signatures: four floated columns (no table, so no box around them) -->
+                        <div style="margin-top:90px; border:0 !important; overflow:hidden; page-break-inside:avoid;">
+                            <div style="float:left; width:25%; box-sizing:border-box; padding:0 12px; border:0 !important; text-align:center;">
+                                <div style="border:0 !important; border-top:1px solid #000 !important; padding-top:6px;"><strong>Prepared by</strong></div>
+                            </div>
+                            <div style="float:left; width:25%; box-sizing:border-box; padding:0 12px; border:0 !important; text-align:center;">
+                                <div style="border:0 !important; border-top:1px solid #000 !important; padding-top:6px;"><strong>Checked By</strong></div>
+                            </div>
+                            <div style="float:left; width:25%; box-sizing:border-box; padding:0 12px; border:0 !important; text-align:center;">
+                                <div style="border:0 !important; border-top:1px solid #000 !important; padding-top:6px;"><strong>Authorized by</strong></div>
+                            </div>
+                            <div style="float:left; width:25%; box-sizing:border-box; padding:0 12px; border:0 !important; text-align:center;">
+                                <div style="border:0 !important; border-top:1px solid #000 !important; padding-top:6px;"><strong>Approved By</strong></div>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

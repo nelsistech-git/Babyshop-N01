@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!--
+        Design note: we deliberately do NOT touch the internals of the
+        core login <form> (its input names, csrf token, redirect handling,
+        error/message display, reset-password link, etc. are all Odoo core
+        authentication mechanics). We only:
+          1) tag the form with an extra class as a CSS hook,
+          2) insert new sibling blocks immediately before/after it
+             (logo/title on one side, side-panel media + footer on the
+             other), and
+          3) let CSS Grid lay all of it out into the two-column design.
+        This keeps the module safe across minor core updates: even if
+        Odoo's internal login form markup changes slightly, our anchor
+        (the "oe_login_form" class, present on every Odoo version) still
+        exists, so the module keeps installing and rendering correctly.
+
+        The full-bleed blurred background is deliberately NOT inserted here
+        (see login_theme_bg_hook below instead). Inserting it as a sibling
+        of the form would put it *inside* web.login_layout's own
+        ".card-body" - and that card is given `backdrop-filter` by our own
+        CSS to get the frosted-glass look. backdrop-filter (like transform/
+        filter) makes its element the CSS containing block for any
+        `position: fixed` descendant, so a background layer placed inside
+        the card would be pinned to the *card's own box* instead of the
+        viewport - which is exactly the "background doesn't cover the
+        screen" bug this module used to have. Anchoring it outside the
+        card entirely (one template up) avoids that trap altogether.
+    -->
+    <template id="login_theme_hook" inherit_id="web.login" name="Nelsis Login Theme">
+
+        <xpath expr="//form[hasclass('oe_login_form')]" position="attributes">
+            <attribute name="class" add="o_nelsis_login_form" separator=" "/>
+        </xpath>
+
+        <xpath expr="//form[hasclass('oe_login_form')]" position="before">
+            <t t-set="nlt_cfg" t-value="request.env['login.theme.config'].sudo().get_config()"/>
+
+            <div class="o_nelsis_login_header">
+                <img t-if="nlt_cfg.company_logo" class="o_nelsis_login_logo"
+                     t-attf-src="/nelsis_login_theme/media/company_logo" alt="Logo"/>
+                <h1 class="o_nelsis_login_title" t-if="nlt_cfg.welcome_title">
+                    <t t-esc="nlt_cfg.welcome_title"/>
+                </h1>
+                <p class="o_nelsis_login_subtitle" t-if="nlt_cfg.welcome_subtitle">
+                    <t t-esc="nlt_cfg.welcome_subtitle"/>
+                </p>
+            </div>
+        </xpath>
+
+        <xpath expr="//form[hasclass('oe_login_form')]" position="after">
+            <div class="o_nelsis_login_footer">
+                <span class="o_nelsis_copyright" t-if="nlt_cfg.copyright_text">
+                    <t t-esc="nlt_cfg.copyright_text"/>
+                </span>
+                <span class="o_nelsis_powered_by" t-if="nlt_cfg.powered_by_text or nlt_cfg.powered_by_image">
+                    <img t-if="nlt_cfg.powered_by_image" t-attf-src="/nelsis_login_theme/media/powered_by_image" alt=""/>
+                    <t t-if="nlt_cfg.powered_by_text" t-esc="nlt_cfg.powered_by_text"/>
+                </span>
+            </div>
+
+            <div class="o_nelsis_login_right">
+                <video t-if="nlt_cfg.media_type == 'video' and nlt_cfg.media_video"
+                       class="o_nelsis_right_media" autoplay="autoplay" muted="muted"
+                       loop="loop" playsinline="playsinline">
+                    <source t-attf-src="/nelsis_login_theme/media/media_video"/>
+                </video>
+                <img t-elif="nlt_cfg.media_type == 'image' and nlt_cfg.media_image"
+                     class="o_nelsis_right_media"
+                     t-attf-src="/nelsis_login_theme/media/media_image" alt=""/>
+
+                <div class="o_nelsis_right_overlay">
+                    <p class="o_nelsis_right_caption" t-if="nlt_cfg.media_caption">
+                        <t t-esc="nlt_cfg.media_caption"/>
+                    </p>
+                </div>
+            </div>
+        </xpath>
+
+    </template>
+
+    <!--
+        Background layer, anchored one template up from the form (against
+        web.login_layout instead of web.login) specifically so it lands
+        OUTSIDE the ".card"/".card-body" our other template wraps in
+        backdrop-filter. This is the outermost element web.login_layout's
+        own arch exposes to view inheritance - the wrapwrap/main/header/
+        footer chrome above it belongs to web.frontend_layout/web.layout,
+        one t-call further out, and isn't reachable from here (t-call is a
+        runtime composition, not a view-inheritance relationship, so xpath
+        can only ever reach elements that are literally written in the
+        template arch being inherited).
+
+        web.login_layout is also used by web.login_successful (and other
+        auth pages that reuse it); that's fine, this div renders inert
+        there since our CSS is entirely gated on body:has(form.oe_login_form)
+        and those pages have no such form.
+    -->
+    <template id="login_theme_bg_hook" inherit_id="web.login_layout" name="Nelsis Login Theme - Background">
+
+        <xpath expr="//div[hasclass('container')]" position="before">
+            <t t-set="nlt_cfg_bg" t-value="request.env['login.theme.config'].sudo().get_config()"/>
+            <t t-set="nlt_bg_field_bg" t-value="'background_image' if nlt_cfg_bg.background_image else ('media_image' if (nlt_cfg_bg.media_type == 'image' and nlt_cfg_bg.media_image) else False)"/>
+
+            <div class="o_nelsis_login_bg" t-if="nlt_bg_field_bg">
+                <img class="o_nelsis_bg_img"
+                     t-attf-src="/nelsis_login_theme/media/#{nlt_bg_field_bg}" alt=""/>
+                <div class="o_nelsis_bg_overlay"/>
+            </div>
+        </xpath>
+
+    </template>
+
+</odoo>
