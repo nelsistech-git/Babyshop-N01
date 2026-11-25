@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_hr_expense_sheet_form_payment_limit" model="ir.ui.view">
+        <field name="name">hr.expense.sheet.form.payment.limit</field>
+        <field name="model">hr.expense.sheet</field>
+        <field name="inherit_id" ref="hr_expense.view_hr_expense_sheet_form"/>
+        <field name="arch" type="xml">
+            <!-- Above the limit: no direct payment, only via Payment Request -->
+            <xpath expr="//button[@name='action_register_payment']" position="attributes">
+                <attribute name="invisible" add="requires_payment_request" separator=" or "/>
+            </xpath>
+            <xpath expr="//button[@name='action_register_payment']" position="after">
+                <button name="action_create_payment_request" type="object"
+                        string="Send to Payment Request" class="oe_highlight"
+                        invisible="not requires_payment_request or state not in ('approve', 'post') or payment_request_id"/>
+            </xpath>
+            <xpath expr="//sheet" position="before">
+                <field name="requires_payment_request" invisible="1"/>
+                <div class="alert alert-info" role="alert"
+                     invisible="not requires_payment_request or state not in ('approve', 'post')">
+                    This report is above the direct-payment limit. It is paid through a
+                    <b>Payment Request</b> (Payment Requests &gt; Due for Payment).
+                    <field name="payment_request_id" readonly="1" invisible="not payment_request_id"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

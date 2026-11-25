@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Reusable signature footer. Expects the record in `o`. -->
+    <template id="signature_block" name="Signature Block (Prepared by / Checked by / HoF / CEO)">
+        <table style="width:100%; border:none; margin-top:70px; page-break-inside:avoid;">
+            <tr>
+                <t t-foreach="['Prepared by', 'Checked by', 'HoF', 'CEO']" t-as="sign_label">
+                    <td style="width:25%; text-align:center; vertical-align:bottom; border:none; padding:0 14px; background-color:white;">
+                        <div style="min-height:20px; font-size:12px;">
+                            <t t-if="sign_label == 'Prepared by' and o and o.create_uid">
+                                <span t-esc="o.create_uid.name"/>
+                            </t>
+                        </div>
+                        <div style="border-top:1px solid #000; padding-top:3px;">
+                            <strong t-esc="sign_label"/>
+                        </div>
+                    </td>
+                </t>
+            </tr>
+        </table>
+    </template>
+</odoo>

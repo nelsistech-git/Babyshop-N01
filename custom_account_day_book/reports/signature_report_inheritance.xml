@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- 1. Voucher (account.move "Print" with a voucher journal format) -->
+    <template id="voucher_report_tmpl_view_signature"
+              inherit_id="custom_account_day_book.voucher_report_tmpl_view">
+        <xpath expr="//span[hasclass('tab_one')]" position="replace">
+            <t t-call="custom_account_day_book.signature_block"/>
+        </xpath>
+    </template>
+
+    <!-- 2. Journal entry / Vendor bill "Print": approval info + supporting documents + signatures -->
+    <template id="journal_entry_template_report_view_signature"
+              inherit_id="custom_account_day_book.journal_entry_template_report_view">
+        <xpath expr="//div[hasclass('row_one')]" position="replace">
+            <t t-call="custom_account_day_book.signature_block"/>
+        </xpath>
+        <xpath expr="//div[hasclass('row_two')]" position="replace"/>
+    </template>
+
+    <!-- 3. Payment receipt / payment voucher (re-applied after custom_account_day_book's own override) -->
+    <template id="report_payment_receipt_document_signature"
+              inherit_id="account.report_payment_receipt_document" priority="99">
+        <xpath expr="(//t[@t-if=&quot;o.partner_type == 'supplier'&quot;])[last()]" position="replace">
+            <t t-call="custom_account_day_book.signature_block"/>
+        </xpath>
+        <xpath expr="(//t[@t-if=&quot;o.partner_type == 'customer'&quot;])[last()]" position="replace"/>
+    </template>
+
+    <!-- 4. Customer invoice / vendor bill PDF (account.move) -->
+    <template id="report_invoice_document_signature" inherit_id="account.report_invoice_document">
+        <xpath expr="//div[hasclass('page')]" position="inside">
+            <t t-call="custom_account_day_book.signature_block"/>
+        </xpath>
+    </template>
+</odoo>

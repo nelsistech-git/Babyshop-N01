@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Universal letterhead pad: Bit Body Bangladesh Limited (MTAILOR).
+         It is forced on every company (see res.company) so every PDF printed or downloaded
+         from Accounting / Inventory uses this single format. -->
+    <template id="external_layout_mtailor" name="MTAILOR Letterhead Layout">
+        <t t-if="not o" t-set="o" t-value="doc"/>
+        <t t-if="not company">
+            <t t-if="company_id">
+                <t t-set="company" t-value="company_id"/>
+            </t>
+            <t t-elif="o and 'company_id' in o and o.company_id.sudo()">
+                <t t-set="company" t-value="o.company_id.sudo()"/>
+            </t>
+            <t t-else="">
+                <t t-set="company" t-value="res_company"/>
+            </t>
+        </t>
+
+        <!-- ================= HEADER =================
+             Plain divs only (no table, no box). Only an underline below the header.
+             Logo at left, company name right beside it (bottom aligned).
+             Gap from the top edge of the page to the header = 0.09 inch (header_top_pad can override). -->
+        <div t-attf-class="header o_company_#{company.id}_layout"
+             t-attf-style="font-family: 'Times New Roman', Times, serif; border: 0 !important; padding: #{header_top_pad or '0.09in'} 0 4px 0; border-bottom: 1.5px solid #000 !important; text-align: left; white-space: nowrap;">
+            <div style="display: inline-block; vertical-align: bottom; text-align: left; border: 0 !important;">
+                <img t-if="company.letterhead_logo" t-att-src="image_data_uri(company.letterhead_logo)"
+                     style="max-height:15mm; max-width:60mm; border: 0;" alt="Logo"/>
+                <span t-else=""
+                      style="display:inline-block; background-color:#1f3d4a; color:#ffffff; padding:5px 12px 5px 10px; font-family:Arial, Helvetica, sans-serif; font-size:20px; letter-spacing:1px; line-height:1;">
+                    <b>M</b>TAILOR
+                </span>
+            </div>
+            <div style="display: inline-block; vertical-align: bottom; text-align: left; margin-left: 8mm; border: 0 !important;">
+                <span style="font-family: Arial, Helvetica, sans-serif; font-size: 27pt; font-weight: bold; color: #3a3a3c; line-height: 1; white-space: nowrap;"
+                      t-esc="company.letterhead_name or 'Bit Body Bangladesh Limited'"/>
+            </div>
+        </div>
+
+        <!-- ================= BODY ================= -->
+        <div t-attf-class="article o_report_layout_standard o_company_#{company.id}_layout"
+             t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id"
+             t-att-data-oe-lang="o and o.env.context.get('lang')">
+            <div class="pt-1">
+                <t t-call="web.address_layout"/>
+            </div>
+            <t t-out="0"/>
+        </div>
+
+        <!-- ================= FOOTER =================
+             Text falls back to the pad's fixed wording, so the footer can never print empty. -->
+        <div t-attf-class="footer o_company_#{company.id}_layout"
+             style="font-family:'Times New Roman', Times, serif; color:#1b2a6b; text-align:center;">
+            <div style="border-top:1px solid #000; padding-top:3px; font-size:10px; line-height:1.45;">
+                <div>
+                    <b>Registered Office:</b>
+                    <span t-esc="company.letterhead_registered_office or 'House # B-1 (First Floor), Plot # 11/A-1, Gulshan -2, Dhaka-1212'"/>
+                </div>
+                <div>
+                    <b>Factory &amp; Corporate Office:</b>
+                    <span t-esc="company.letterhead_corporate_office or 'Sattar Bhaban, Plot- 224 &amp; 226, Bogabari Bazaar, Alia Madrasha, Ashulia, Dhaka-1349, Bangladesh'"/>
+                </div>
+                <div style="font-family:Arial, Helvetica, 'DejaVu Sans', sans-serif; font-size:13px; margin-top:2px;">
+                    <span style="font-family:'DejaVu Sans', Arial, sans-serif;">&#9742;</span>
+                    <span t-esc="company.letterhead_phone or '+8801911908653'"/>,&#160;
+                    <span style="font-family:'DejaVu Sans', Arial, sans-serif;">&#9993;</span>
+                    <span style="text-decoration:underline;" t-esc="company.letterhead_email or 'bbbl@mtailor.com'"/>&#160;&#160;
+                    <span style="font-family:'DejaVu Sans', Arial, sans-serif;">&#8853;</span>
+                    <span style="text-decoration:underline;" t-esc="company.letterhead_website or 'www.mtailor.com'"/>
+                </div>
+                <div t-if="report_type == 'pdf'"
+                     style="font-family:Arial, Helvetica, sans-serif; font-size:8px; color:#777;">
+                    Page:
+                    <span class="page"/>
+                    /
+                    <span class="topage"/>
+                </div>
+            </div>
+        </div>
+    </template>
+</odoo>

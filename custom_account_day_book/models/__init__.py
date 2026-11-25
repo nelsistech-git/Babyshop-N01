@@ -6,3 +6,8 @@ from . import inherited_res_partner_inherit_day_book
 from . import budget_particular_settings
 from . import budget_particular
 from . import month_wise_account_summary_report_list
+from . import support_doc
+from . import res_company
+from . import res_users
+from . import account_move_bill_workflow
+from . import payment_register

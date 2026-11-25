@@ -14,6 +14,7 @@
         'security/ir.model.access.csv',
         'views/cheque_book_view.xml',
         'views/day_book_view.xml',
+        'views/hide_bill_fields_views.xml',
         'views/inherited_res_partner_inherit_day_book.xml',
         'views/inherited_account_journal_inherit_custom_account_day_book_view.xml',
         'views/budget_particular_settings_views.xml',

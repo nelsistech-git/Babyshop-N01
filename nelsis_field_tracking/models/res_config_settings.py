@@ -21,7 +21,7 @@ class ResConfigSettings(models.TransientModel):
     nelsis_fcm_api_key = fields.Char(string='Firebase API Key', config_parameter='nelsis.fcm_api_key')
     nelsis_fcm_app_id = fields.Char(string='Firebase App ID', config_parameter='nelsis.fcm_app_id')
     nelsis_fcm_sender_id = fields.Char(string='Firebase Sender ID', config_parameter='nelsis.fcm_sender_id')
-    nelsis_fcm_service_account = fields.Text(string='Service account JSON', config_parameter='nelsis.fcm_service_account')
+    nelsis_fcm_service_account = fields.Char(string='Service account JSON', config_parameter='nelsis.fcm_service_account')
 
     def _compute_fcm_project_note(self):
         pid = self.env['nelsis.fcm'].project_id()

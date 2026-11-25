@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_payment_due_item_tree" model="ir.ui.view">
+        <field name="name">payment.due.item.tree</field>
+        <field name="model">payment.due.item</field>
+        <field name="arch" type="xml">
+            <tree string="Due for Payment" create="0" edit="0" delete="0"
+                  decoration-danger="is_overdue and state == 'pending'"
+                  decoration-muted="state == 'requested'">
+                <header>
+                    <button name="action_create_payment_request" type="object"
+                            string="Create Payment Request" class="btn-primary"/>
+                </header>
+                <field name="due_date"/>
+                <field name="source_type" string="Type"/>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="ref" optional="show"/>
+                <field name="amount" sum="Total"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="is_overdue" column_invisible="1"/>
+                <field name="request_id" optional="show"/>
+                <field name="state" widget="badge"
+                       decoration-success="state in ('requested', 'paid')" decoration-warning="state == 'pending'"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_payment_due_item_search" model="ir.ui.view">
+        <field name="name">payment.due.item.search</field>
+        <field name="model">payment.due.item</field>
+        <field name="arch" type="xml">
+            <search string="Due for Payment">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="ref"/>
+                <filter name="pending" string="Pending" domain="[('state', '=', 'pending')]"/>
+                <filter name="requested" string="In Payment Request" domain="[('state', '=', 'requested')]"/>
+                <filter name="paid" string="Paid (history)" domain="[('state', '=', 'paid')]"/>
+                <separator/>
+                <filter name="bills" string="Vendor Bills" domain="[('source_type', '=', 'bill')]"/>
+                <filter name="expenses" string="Expenses" domain="[('source_type', '=', 'expense')]"/>
+                <separator/>
+                <filter name="overdue" string="Overdue"
+                        domain="[('due_date', '&lt;', context_today().strftime('%Y-%m-%d')), ('state', '=', 'pending')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_type" string="Type" context="{'group_by': 'source_type'}"/>
+                    <filter name="group_partner" string="Vendor / Employee" context="{'group_by': 'partner_id'}"/>
+                    <filter name="group_due" string="Due Date" context="{'group_by': 'due_date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Menu entry: refresh the rows, then open the window -->
+    <record id="action_payment_due_item_open" model="ir.actions.server">
+        <field name="name">Due for Payment</field>
+        <field name="model_id" ref="model_payment_due_item"/>
+        <field name="state">code</field>
+        <field name="code">action = model.action_open_due_items()</field>
+    </record>
+</odoo>
