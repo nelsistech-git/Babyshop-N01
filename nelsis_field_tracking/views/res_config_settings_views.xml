@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_nelsis" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.nelsis</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app string="Field Force" name="nelsis_field_tracking" groups="nelsis_field_tracking.group_nelsis_manager">
+                    <block title="Google Maps">
+                        <setting string="Google Maps API Key" help="Used for the Live Map and address lookup. Leave empty to use OpenStreetMap.">
+                            <field name="nelsis_google_maps_key" password="True"/>
+                        </setting>
+                    </block>
+                    <block title="GPS Tracking">
+                        <setting string="Tracking interval (seconds)"><field name="nelsis_track_interval_sec"/></setting>
+                        <setting string="Minimum movement (metres)"><field name="nelsis_track_distance_m"/></setting>
+                        <setting string="Maximum accepted GPS error (metres)"><field name="nelsis_max_accuracy_m"/></setting>
+                        <setting string="Mark employee offline after (minutes)"><field name="nelsis_stale_minutes"/></setting>
+                        <setting string="Keep tracking data (days)"><field name="nelsis_retention_days"/></setting>
+                    </block>
+                    <block title="Attendance Rules">
+                        <setting string="Geofence mode"><field name="nelsis_geofence_mode"/></setting>
+                        <setting string="Block mock / fake GPS"><field name="nelsis_block_mock"/></setting>
+                        <setting string="Selfie required on punch"><field name="nelsis_require_photo_punch"/></setting>
+                        <setting string="Allowed phone clock difference (seconds)"><field name="nelsis_time_tolerance_sec"/></setting>
+                    </block>
+                    <block title="Push Notifications (Firebase)">
+                        <setting string="Status" help="Paste the service account key below. Announcements are always visible in the app; Firebase makes the phone ring even when the app is closed.">
+                            <field name="nelsis_fcm_project_note" readonly="1"/>
+                        </setting>
+                        <setting string="Service account JSON" help="Firebase console > Project settings > Service accounts > Generate new private key. Paste the whole file.">
+                            <field name="nelsis_fcm_service_account" widget="text" nolabel="1"/>
+                        </setting>
+                        <setting string="Android app: API key"><field name="nelsis_fcm_api_key"/></setting>
+                        <setting string="Android app: App ID (1:123:android:abc)"><field name="nelsis_fcm_app_id"/></setting>
+                        <setting string="Sender ID (project number)"><field name="nelsis_fcm_sender_id"/></setting>
+                    </block>
+                    <block title="Security">
+                        <setting string="App session length (days)"><field name="nelsis_token_days"/></setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+    <record id="nelsis_settings_action" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module': 'nelsis_field_tracking'}</field>
+    </record>
+</odoo>

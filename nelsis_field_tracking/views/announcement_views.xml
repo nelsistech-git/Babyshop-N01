@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="nelsis_announcement_tree" model="ir.ui.view">
+        <field name="name">nelsis.announcement.tree</field>
+        <field name="model">nelsis.announcement</field>
+        <field name="arch" type="xml">
+            <tree decoration-muted="state == 'draft'">
+                <field name="name"/><field name="audience"/><field name="sent_date"/>
+                <field name="state" widget="badge" decoration-success="state == 'sent'"/>
+                <field name="push_state" widget="badge"/>
+                <field name="push_ok"/><field name="push_total"/>
+            </tree>
+        </field>
+    </record>
+    <record id="nelsis_announcement_form" model="ir.ui.view">
+        <field name="name">nelsis.announcement.form</field>
+        <field name="model">nelsis.announcement</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_send" type="object" string="Send to all users" class="btn-primary"
+                            invisible="state != 'draft'" confirm="Send this announcement to the employees' phones now?"/>
+                    <button name="action_resend_push" type="object" string="Send notification again"
+                            invisible="state != 'sent'"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name" readonly="state == 'sent'" placeholder="e.g. Office closed on Friday"/>
+                            <field name="audience" readonly="state == 'sent'"/>
+                            <field name="department_ids" widget="many2many_tags" invisible="audience != 'department'" readonly="state == 'sent'"/>
+                            <field name="employee_ids" widget="many2many_tags" invisible="audience != 'employee'" readonly="state == 'sent'"/>
+                        </group>
+                        <group>
+                            <field name="expire_date"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="recipient_count"/>
+                            <field name="sent_date"/><field name="sent_by_id"/>
+                        </group>
+                    </group>
+                    <group string="Message (shown in the phone notification)">
+                        <field name="body" nolabel="1" colspan="2" readonly="state == 'sent'"
+                               placeholder="Write the text every employee will see..."/>
+                    </group>
+                    <group string="Push delivery" invisible="state == 'draft'">
+                        <field name="push_state"/><field name="push_ok"/><field name="push_total"/>
+                        <field name="push_error" colspan="2" invisible="not push_error"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="nelsis_announcement_action" model="ir.actions.act_window">
+        <field name="name">Announcements</field>
+        <field name="res_model">nelsis.announcement</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="nelsis_ai_insight_tree" model="ir.ui.view">
+        <field name="name">nelsis.ai.insight.tree</field>
+        <field name="model">nelsis.ai.insight</field>
+        <field name="arch" type="xml">
+            <tree decoration-danger="severity == '3' and state == 'open'" decoration-muted="state == 'dismissed'">
+                <field name="date"/><field name="employee_id"/><field name="name"/>
+                <field name="kind" widget="badge"/>
+                <field name="severity" widget="badge" decoration-danger="severity == '3'" decoration-warning="severity == '2'"/>
+                <field name="score"/><field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+    <record id="nelsis_ai_insight_form" model="ir.ui.view">
+        <field name="name">nelsis.ai.insight.form</field>
+        <field name="model">nelsis.ai.insight</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_explain" type="object" string="Explain with AI" class="btn-primary" icon="fa-magic"/>
+                    <button name="action_open_source" type="object" string="Open source / map" invisible="not employee_id"/>
+                    <button name="action_review" type="object" string="Mark reviewed" invisible="state != 'open'"/>
+                    <button name="action_dismiss" type="object" string="Dismiss" invisible="state != 'open'"/>
+                    <button name="action_reopen" type="object" string="Reopen" invisible="state == 'open'"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <h1><field name="name"/></h1>
+                    <group>
+                        <group><field name="employee_id"/><field name="department_id"/><field name="date"/></group>
+                        <group><field name="kind"/><field name="severity"/><field name="score" widget="progressbar"/></group>
+                    </group>
+                    <group string="Details"><field name="description" nolabel="1"/></group>
+                    <group string="AI"><field name="ai_explanation" nolabel="1"/></group>
+                </sheet>
+                <div class="oe_chatter"><field name="message_ids"/></div>
+            </form>
+        </field>
+    </record>
+    <record id="nelsis_ai_insight_search" model="ir.ui.view">
+        <field name="name">nelsis.ai.insight.search</field>
+        <field name="model">nelsis.ai.insight</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/><field name="employee_id"/>
+                <filter name="open" string="Open" domain="[('state', '=', 'open')]"/>
+                <filter name="high" string="High risk" domain="[('severity', '=', '3')]"/>
+                <filter name="no_digest" string="Hide digests" domain="[('kind', '!=', 'digest')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="g_kind" string="Type" context="{'group_by': 'kind'}"/>
+                    <filter name="g_emp" string="Employee" context="{'group_by': 'employee_id'}"/>
+                    <filter name="g_sev" string="Severity" context="{'group_by': 'severity'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    <record id="nelsis_ai_insight_graph" model="ir.ui.view">
+        <field name="name">nelsis.ai.insight.graph</field>
+        <field name="model">nelsis.ai.insight</field>
+        <field name="arch" type="xml">
+            <graph type="bar"><field name="kind"/><field name="severity"/></graph>
+        </field>
+    </record>
+    <record id="nelsis_ai_insight_action" model="ir.actions.act_window">
+        <field name="name">AI Insights</field>
+        <field name="res_model">nelsis.ai.insight</field>
+        <field name="view_mode">tree,form,graph</field>
+        <field name="context">{'search_default_open': 1, 'search_default_no_digest': 1}</field>
+    </record>
+    <record id="nelsis_ai_scan_server_action" model="ir.actions.server">
+        <field name="name">Run AI scan now</field>
+        <field name="model_id" ref="model_nelsis_ai_insight"/>
+        <field name="state">code</field>
+        <field name="code">model.env['nelsis.ai.engine'].scan(days=14)</field>
+    </record>
+</odoo>

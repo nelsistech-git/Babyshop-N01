@@ -1,0 +1,38 @@
+{
+    'name': 'Nelsis Field Force - Attendance, GPS Tracking & Live Map',
+    'version': '17.0.1.3.0',
+    'category': 'Human Resources/Attendances',
+    'summary': 'Mobile attendance punch, real-time GPS tracking, offline sync, live Google/OSM map, '
+               'geofencing, analytics dashboard and secure REST API for the Nelsis Expense app.',
+    'author': 'Nelsis Tech',
+    'license': 'LGPL-3',
+    'depends': ['base', 'hr', 'hr_attendance', 'mail'],
+    'data': [
+        'security/security.xml',
+        'security/ir.model.access.csv',
+        'data/cron.xml',
+        'views/work_site_views.xml',
+        'views/location_log_views.xml',
+        'views/presence_views.xml',
+        'views/attendance_views.xml',
+        'views/employee_views.xml',
+        'views/api_token_views.xml',
+        'views/announcement_views.xml',
+        'views/res_config_settings_views.xml',
+        'views/client_actions.xml',
+        'views/menus.xml',
+    ],
+    'assets': {
+        'web.assets_backend': [
+            'nelsis_field_tracking/static/src/scss/nelsis.scss',
+            'nelsis_field_tracking/static/src/js/map_adapters.js',
+            'nelsis_field_tracking/static/src/js/live_map.js',
+            'nelsis_field_tracking/static/src/xml/live_map.xml',
+            'nelsis_field_tracking/static/src/js/dashboard.js',
+            'nelsis_field_tracking/static/src/xml/dashboard.xml',
+        ],
+    },
+    'images': ['static/description/icon.png'],
+    'application': True,
+    'installable': True,
+}

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="nelsis_attendance_tree" model="ir.ui.view">
+        <field name="name">nelsis.attendance.tree</field>
+        <field name="model">hr.attendance</field>
+        <field name="arch" type="xml">
+            <tree create="0" decoration-danger="nl_geo_status in ('outside', 'mock')">
+                <field name="employee_id"/>
+                <field name="check_in"/>
+                <field name="check_out"/>
+                <field name="worked_hours" widget="float_time" sum="Total"/>
+                <field name="nl_geo_status" widget="badge" decoration-success="nl_geo_status in ('inside', 'field')"
+                       decoration-danger="nl_geo_status in ('outside', 'mock')" decoration-warning="nl_geo_status == 'no_site'"/>
+                <field name="nl_in_trust" widget="badge" optional="show" decoration-success="nl_in_trust == 'ok'"
+                       decoration-warning="nl_in_trust == 'delayed'" decoration-danger="nl_in_trust == 'drift'"/>
+                <field name="nl_in_genuine" widget="boolean" optional="show"/>
+                <field name="nl_in_offline" optional="show"/>
+                <field name="nl_in_address" optional="hide"/>
+            </tree>
+        </field>
+    </record>
+    <record id="nelsis_attendance_form" model="ir.ui.view">
+        <field name="name">nelsis.attendance.form</field>
+        <field name="model">hr.attendance</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group><field name="employee_id"/><field name="check_in"/><field name="check_out"/>
+                            <field name="worked_hours" widget="float_time"/><field name="nl_geo_status"/></group>
+                    </group>
+                    <group>
+                        <group string="Punch In">
+                            <field name="in_latitude"/><field name="in_longitude"/><field name="nl_in_accuracy"/>
+                            <field name="nl_in_address"/><field name="nl_in_site_id"/><field name="nl_in_distance_m"/>
+                            <field name="nl_in_device_time"/><field name="nl_in_trust"/><field name="nl_in_offline"/>
+                            <field name="nl_in_mock"/><field name="nl_in_genuine"/>
+                            <field name="nl_in_photo" widget="image" options="{'size': [160, 160]}"/>
+                        </group>
+                        <group string="Punch Out">
+                            <field name="out_latitude"/><field name="out_longitude"/><field name="nl_out_accuracy"/>
+                            <field name="nl_out_address"/><field name="nl_out_site_id"/><field name="nl_out_distance_m"/>
+                            <field name="nl_out_device_time"/><field name="nl_out_trust"/><field name="nl_out_offline"/>
+                            <field name="nl_out_mock"/><field name="nl_out_genuine"/>
+                            <field name="nl_out_photo" widget="image" options="{'size': [160, 160]}"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="nelsis_attendance_search" model="ir.ui.view">
+        <field name="name">nelsis.attendance.search</field>
+        <field name="model">hr.attendance</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="employee_id"/>
+                <filter name="app" string="Mobile punches" domain="[('nl_is_app', '=', True)]"/>
+                <filter name="outside" string="Outside work site" domain="[('nl_geo_status', '=', 'outside')]"/>
+                <filter name="mock" string="Mock GPS" domain="[('nl_geo_status', '=', 'mock')]"/>
+                <filter name="offline" string="Punched offline" domain="[('nl_in_offline', '=', True)]"/>
+                <filter name="open" string="Currently in" domain="[('check_out', '=', False)]"/>
+                <group expand="0" string="Group By">
+                    <filter name="g_emp" string="Employee" context="{'group_by': 'employee_id'}"/>
+                    <filter name="g_day" string="Day" context="{'group_by': 'check_in:day'}"/>
+                    <filter name="g_geo" string="Location check" context="{'group_by': 'nl_geo_status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    <record id="nelsis_attendance_action" model="ir.actions.act_window">
+        <field name="name">Mobile Attendance</field>
+        <field name="res_model">hr.attendance</field>
+        <field name="view_mode">tree,form,pivot,graph</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'tree', 'view_id': ref('nelsis_attendance_tree')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('nelsis_attendance_form')})]"/>
+        <field name="search_view_id" ref="nelsis_attendance_search"/>
+        <field name="context">{'search_default_app': 1}</field>
+    </record>
+</odoo>

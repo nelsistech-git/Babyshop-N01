@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="nelsis_location_log_tree" model="ir.ui.view">
+        <field name="name">nelsis.location.log.tree</field>
+        <field name="model">nelsis.location.log</field>
+        <field name="arch" type="xml">
+            <tree create="0" decoration-danger="not is_genuine" decoration-warning="time_trust == 'delayed'">
+                <field name="employee_id"/>
+                <field name="device_time" string="Phone Time"/>
+                <field name="server_time" string="Server Time"/>
+                <field name="time_trust" widget="badge" decoration-success="time_trust == 'ok'"
+                       decoration-warning="time_trust == 'delayed'" decoration-danger="time_trust == 'drift'"/>
+                <field name="delay_min" optional="show"/>
+                <field name="latitude" optional="hide"/><field name="longitude" optional="hide"/>
+                <field name="accuracy" optional="show"/>
+                <field name="source" widget="badge"/>
+                <field name="is_mock" optional="show"/>
+                <field name="is_genuine" widget="boolean"/>
+                <field name="distance_m" optional="hide"/>
+                <field name="battery" optional="show"/>
+                <field name="address" optional="hide"/>
+            </tree>
+        </field>
+    </record>
+    <record id="nelsis_location_log_form" model="ir.ui.view">
+        <field name="name">nelsis.location.log.form</field>
+        <field name="model">nelsis.location.log</field>
+        <field name="arch" type="xml">
+            <form create="0">
+                <sheet>
+                    <group>
+                        <group string="Who / Where">
+                            <field name="employee_id"/><field name="source"/>
+                            <field name="latitude"/><field name="longitude"/><field name="accuracy"/>
+                            <field name="address"/><field name="attendance_id"/>
+                        </group>
+                        <group string="Time &amp; Authenticity (True / False)">
+                            <field name="device_time"/><field name="server_time"/><field name="delay_min"/>
+                            <field name="time_trust"/><field name="is_offline_sync"/>
+                            <field name="is_mock"/><field name="is_teleport"/><field name="low_accuracy"/>
+                            <field name="is_genuine"/><field name="battery"/><field name="distance_m"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="nelsis_location_log_search" model="ir.ui.view">
+        <field name="name">nelsis.location.log.search</field>
+        <field name="model">nelsis.location.log</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="employee_id"/><field name="department_id"/>
+                <filter name="today" string="Today" domain="[('log_date', '=', context_today().strftime('%Y-%m-%d'))]"/>
+                <separator/>
+                <filter name="fake" string="Not genuine (False)" domain="[('is_genuine', '=', False)]"/>
+                <filter name="genuine" string="Genuine (True)" domain="[('is_genuine', '=', True)]"/>
+                <filter name="mock" string="Mock GPS" domain="[('is_mock', '=', True)]"/>
+                <filter name="offline" string="Synced late (offline)" domain="[('is_offline_sync', '=', True)]"/>
+                <filter name="drift" string="Clock mismatch" domain="[('time_trust', '=', 'drift')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="g_emp" string="Employee" context="{'group_by': 'employee_id'}"/>
+                    <filter name="g_day" string="Day" context="{'group_by': 'log_date:day'}"/>
+                    <filter name="g_src" string="Source" context="{'group_by': 'source'}"/>
+                    <filter name="g_trust" string="Time Check" context="{'group_by': 'time_trust'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    <record id="nelsis_location_log_pivot" model="ir.ui.view">
+        <field name="name">nelsis.location.log.pivot</field>
+        <field name="model">nelsis.location.log</field>
+        <field name="arch" type="xml">
+            <pivot>
+                <field name="employee_id" type="row"/>
+                <field name="log_date" interval="day" type="col"/>
+                <field name="distance_m" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+    <record id="nelsis_location_log_graph" model="ir.ui.view">
+        <field name="name">nelsis.location.log.graph</field>
+        <field name="model">nelsis.location.log</field>
+        <field name="arch" type="xml">
+            <graph type="bar">
+                <field name="employee_id"/>
+                <field name="distance_m" type="measure"/>
+            </graph>
+        </field>
+    </record>
+    <record id="nelsis_location_log_action" model="ir.actions.act_window">
+        <field name="name">Location Logs</field>
+        <field name="res_model">nelsis.location.log</field>
+        <field name="view_mode">tree,pivot,graph,form</field>
+        <field name="context">{'search_default_today': 1}</field>
+    </record>
+</odoo>

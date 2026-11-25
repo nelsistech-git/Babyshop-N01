@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Sheet form: Map verification page -->
+    <record id="conveyance_sheet_form_nelsis" model="ir.ui.view">
+        <field name="name">conveyance.sheet.form.nelsis</field>
+        <field name="model">conveyance.sheet</field>
+        <field name="inherit_id" ref="conveyance_expense.conveyance_sheet_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Map Verification" name="nelsis_map">
+                    <group>
+                        <group>
+                            <field name="nl_geo_ok" widget="boolean"/>
+                            <field name="nl_mismatch_count"/>
+                        </group>
+                        <group>
+                            <button name="action_geo_verify" type="object" string="Verify with GPS track"
+                                    class="btn-primary" icon="fa-map-marker"/>
+                        </group>
+                    </group>
+                    <field name="line_ids" readonly="1">
+                        <tree decoration-danger="nl_geo_status in ('mismatch', 'suspicious')"
+                              decoration-success="nl_geo_status == 'verified'">
+                            <field name="date"/><field name="from_location"/><field name="to_location"/>
+                            <field name="total_amount"/>
+                            <field name="nl_claimed_km"/><field name="nl_geo_km"/>
+                            <field name="nl_geo_points" optional="hide"/><field name="nl_geo_bad_points" optional="hide"/>
+                            <field name="nl_geo_status" widget="badge"
+                                   decoration-success="nl_geo_status == 'verified'"
+                                   decoration-danger="nl_geo_status in ('mismatch', 'suspicious')"
+                                   decoration-warning="nl_geo_status == 'no_data'"/>
+                            <field name="nl_geo_note"/>
+                            <field name="nl_dup_bill" optional="show"/>
+                            <button name="action_open_map" type="object" icon="fa-map" string="See on map"/>
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Dedicated analysis list over all lines -->
+    <record id="nelsis_tada_line_tree" model="ir.ui.view">
+        <field name="name">nelsis.tada.line.tree</field>
+        <field name="model">conveyance.sheet.line</field>
+        <field name="arch" type="xml">
+            <tree create="0" edit="0" delete="0" decoration-danger="nl_geo_status in ('mismatch', 'suspicious')"
+                  decoration-success="nl_geo_status == 'verified'">
+                <field name="nl_employee_id"/>
+                <field name="sheet_id"/>
+                <field name="date"/>
+                <field name="from_location"/><field name="to_location"/>
+                <field name="total_amount" sum="Total"/>
+                <field name="nl_claimed_km"/><field name="nl_geo_km"/>
+                <field name="nl_geo_status" widget="badge" decoration-success="nl_geo_status == 'verified'"
+                       decoration-danger="nl_geo_status in ('mismatch', 'suspicious')"
+                       decoration-warning="nl_geo_status in ('no_data', 'pending')"/>
+                <field name="nl_geo_ok" widget="boolean"/>
+                <field name="nl_geo_note"/>
+                <field name="nl_dup_bill"/>
+                <field name="nl_sheet_state" widget="badge"/>
+                <button name="action_open_map" type="object" icon="fa-map" string="See on map"/>
+                <button name="action_geo_verify" type="object" icon="fa-refresh" string="Re-verify"/>
+            </tree>
+        </field>
+    </record>
+    <record id="nelsis_tada_line_search" model="ir.ui.view">
+        <field name="name">nelsis.tada.line.search</field>
+        <field name="model">conveyance.sheet.line</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="nl_employee_id"/><field name="sheet_id"/>
+                <filter name="mismatch" string="Mismatch (False)" domain="[('nl_geo_status', '=', 'mismatch')]"/>
+                <filter name="suspicious" string="Suspicious data" domain="[('nl_geo_status', '=', 'suspicious')]"/>
+                <filter name="verified" string="Verified (True)" domain="[('nl_geo_status', '=', 'verified')]"/>
+                <filter name="nodata" string="No GPS data" domain="[('nl_geo_status', '=', 'no_data')]"/>
+                <filter name="dup" string="Duplicate bill" domain="[('nl_dup_bill', '=', True)]"/>
+                <group expand="0" string="Group By">
+                    <filter name="g_emp" string="Employee" context="{'group_by': 'nl_employee_id'}"/>
+                    <filter name="g_status" string="Map check" context="{'group_by': 'nl_geo_status'}"/>
+                    <filter name="g_month" string="Month" context="{'group_by': 'date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    <record id="nelsis_tada_line_pivot" model="ir.ui.view">
+        <field name="name">nelsis.tada.line.pivot</field>
+        <field name="model">conveyance.sheet.line</field>
+        <field name="arch" type="xml">
+            <pivot>
+                <field name="nl_employee_id" type="row"/>
+                <field name="nl_geo_status" type="col"/>
+                <field name="total_amount" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+    <record id="nelsis_tada_line_graph" model="ir.ui.view">
+        <field name="name">nelsis.tada.line.graph</field>
+        <field name="model">conveyance.sheet.line</field>
+        <field name="arch" type="xml">
+            <graph type="bar" stacked="1">
+                <field name="nl_employee_id"/>
+                <field name="nl_geo_status"/>
+                <field name="total_amount" type="measure"/>
+            </graph>
+        </field>
+    </record>
+    <record id="nelsis_tada_line_action" model="ir.actions.act_window">
+        <field name="name">TA/DA vs Map</field>
+        <field name="res_model">conveyance.sheet.line</field>
+        <field name="view_mode">tree,pivot,graph</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'tree', 'view_id': ref('nelsis_tada_line_tree')}),
+            (0, 0, {'view_mode': 'pivot', 'view_id': ref('nelsis_tada_line_pivot')}),
+            (0, 0, {'view_mode': 'graph', 'view_id': ref('nelsis_tada_line_graph')})]"/>
+        <field name="search_view_id" ref="nelsis_tada_line_search"/>
+        <field name="context">{'search_default_mismatch': 1}</field>
+    </record>
+</odoo>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hr_employee_form_nelsis" model="ir.ui.view">
+        <field name="name">hr.employee.form.nelsis</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <button name="action_open_live_map" type="object" class="oe_stat_button" icon="fa-map-marker"
+                        groups="nelsis_field_tracking.group_nelsis_manager">
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_text">Live Map</span>
+                    </div>
+                </button>
+                <button name="action_open_location_logs" type="object" class="oe_stat_button" icon="fa-road"
+                        groups="nelsis_field_tracking.group_nelsis_manager">
+                    <field name="nl_log_count" widget="statinfo" string="GPS Logs"/>
+                </button>
+            </div>
+            <xpath expr="//notebook" position="inside">
+                <page name="nelsis_tracking" string="Field Tracking" groups="nelsis_field_tracking.group_nelsis_manager">
+                    <group>
+                        <group string="Settings">
+                            <field name="nl_tracking_enabled"/>
+                            <field name="nl_field_staff"/>
+                            <field name="nl_site_ids" widget="many2many_tags"/>
+                        </group>
+                        <group string="Last Known">
+                            <field name="nl_is_online"/>
+                            <field name="nl_last_sync"/><field name="nl_last_device_time"/>
+                            <field name="nl_last_lat"/><field name="nl_last_lng"/>
+                            <field name="nl_last_battery"/><field name="nl_last_app_version"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

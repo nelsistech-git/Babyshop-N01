@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="nelsis_field_tracking.Dashboard">
+        <div class="o_nelsis_dash">
+            <div class="nl-hero">
+                <div>
+                    <h1>Field Force Analysis</h1>
+                    <p>Attendance, live tracking, expenses and advances in one view.</p>
+                </div>
+                <div class="d-flex gap-2 align-items-center flex-wrap">
+                    <input type="date" t-att-value="state.from" t-on-change="(ev) => this.onChange('from', ev)"/>
+                    <input type="date" t-att-value="state.to" t-on-change="(ev) => this.onChange('to', ev)"/>
+                    <select t-on-change="(ev) => this.onChange('dept', ev)" t-if="state.data">
+                        <option value="">All departments</option>
+                        <t t-foreach="state.data.departments" t-as="d" t-key="d.id"><option t-att-value="d.id" t-esc="d.name"/></t>
+                    </select>
+                    <button class="nl-btn" style="border:0;border-radius:10px;padding:6px 14px;background:#fff;color:#3b2a9c;font-weight:700" t-on-click="openMap">Open Live Map</button>
+                </div>
+            </div>
+            <t t-if="state.data and state.data.kpis">
+                <div class="nl-grid">
+                    <div class="nl-card blue"><div class="ico"><i class="fa fa-users"/></div><div class="lbl">Employees</div><div class="val" t-esc="state.data.kpis.employees"/></div>
+                    <div class="nl-card green"><div class="ico"><i class="fa fa-check"/></div><div class="lbl">Present today</div><div class="val" t-esc="state.data.kpis.present_today"/></div>
+                    <div class="nl-card violet"><div class="ico"><i class="fa fa-signal"/></div><div class="lbl">Online now</div><div class="val" t-esc="state.data.kpis.online_now"/></div>
+                    <div class="nl-card amber"><div class="ico"><i class="fa fa-plug"/></div><div class="lbl">Offline now</div><div class="val" t-esc="state.data.kpis.offline_now"/></div>
+                    <div class="nl-card red"><div class="ico"><i class="fa fa-exclamation-triangle"/></div><div class="lbl">Fake / false data</div><div class="val" t-esc="state.data.kpis.flags"/></div>
+                    <div class="nl-card amber"><div class="ico"><i class="fa fa-map-pin"/></div><div class="lbl">Outside geofence</div><div class="val" t-esc="state.data.kpis.outside_geofence"/></div>
+                    <div class="nl-card blue"><div class="ico"><i class="fa fa-road"/></div><div class="lbl">Distance (km)</div><div class="val" t-esc="state.data.kpis.distance_km"/></div>
+                    <t t-if="state.data.expense_kpis">
+                        <div class="nl-card violet"><div class="ico"><i class="fa fa-money"/></div><div class="lbl">TA/DA claimed</div><div class="val" t-esc="fmt(state.data.expense_kpis.claimed)"/></div>
+                        <div class="nl-card red"><div class="ico"><i class="fa fa-map"/></div><div class="lbl">Map mismatches</div><div class="val" t-esc="state.data.expense_kpis.mismatch"/></div>
+                        <div class="nl-card amber"><div class="ico"><i class="fa fa-hourglass-half"/></div><div class="lbl">Advance outstanding</div><div class="val" t-esc="fmt(state.data.expense_kpis.advance_outstanding)"/></div>
+                    </t>
+                    <t t-if="state.data.ai_kpis">
+                        <div class="nl-card violet"><div class="ico"><i class="fa fa-magic"/></div><div class="lbl">Open AI insights</div><div class="val" t-esc="state.data.ai_kpis.open"/></div>
+                        <div class="nl-card red"><div class="ico"><i class="fa fa-bolt"/></div><div class="lbl">High risk</div><div class="val" t-esc="state.data.ai_kpis.high"/></div>
+                    </t>
+                </div>
+                <div class="nl-charts">
+                    <div class="nl-chart"><h4>Attendance trend</h4><div class="box"><canvas t-ref="trend"/></div></div>
+                    <div class="nl-chart"><h4>Data authenticity flags</h4><div class="box"><canvas t-ref="flags"/></div></div>
+                    <div class="nl-chart"><h4>Top worked hours</h4><div class="box"><canvas t-ref="hours"/></div></div>
+                    <div class="nl-chart"><h4>Top distance travelled (km)</h4><div class="box"><canvas t-ref="dist"/></div></div>
+                    <div class="nl-chart" t-if="state.data.expense_by_state"><h4>TA/DA by status (BDT)</h4><div class="box"><canvas t-ref="exp"/></div></div>
+                    <div class="nl-chart" t-if="state.data.advance_by_state"><h4>Advances by status (BDT)</h4><div class="box"><canvas t-ref="adv"/></div></div>
+                </div>
+            </t>
+            <div t-elif="state.loading" class="text-center p-5 text-muted">Loading…</div>
+            <div t-else="" class="alert alert-warning">You need the Field Force Administrator role to see this dashboard.</div>
+        </div>
+    </t>
+</templates>

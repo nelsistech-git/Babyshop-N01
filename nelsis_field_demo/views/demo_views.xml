@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="nelsis_demo_wizard_form" model="ir.ui.view">
+        <field name="name">nelsis.demo.wizard.form</field>
+        <field name="model">nelsis.demo.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Demo data">
+                <field name="demo_exists" invisible="1"/>
+                <div class="alert alert-info" role="alert">
+                    <strong>Generate / Regenerate</strong> deletes the previous demo records and creates a fresh story
+                    that ends <em>today</em> (live map positions, "online" status and today's punches are relative to
+                    the current time). Your own data is never touched.
+                </div>
+                <group string="Now in the database">
+                    <field name="summary" nolabel="1" readonly="1" colspan="2"/>
+                </group>
+                <group string="Sign in to the mobile app / Odoo with" invisible="not demo_exists">
+                    <field name="accounts" nolabel="1" readonly="1" colspan="2"/>
+                </group>
+                <group string="Last run" invisible="not result">
+                    <field name="result" nolabel="1" readonly="1" colspan="2"/>
+                </group>
+                <footer>
+                    <button name="action_generate" type="object" class="btn-primary"
+                            string="Generate / Regenerate demo data"
+                            confirm="This replaces existing demo records (not your real data). Continue?"/>
+                    <button name="action_remove" type="object" class="btn-secondary" string="Remove demo data"
+                            invisible="not demo_exists"
+                            confirm="Delete all demo records?"/>
+                    <button string="Close" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="nelsis_demo_wizard_action" model="ir.actions.act_window">
+        <field name="name">Demo Data</field>
+        <field name="res_model">nelsis.demo.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_nelsis_demo" name="Demo Data" parent="nelsis_field_tracking.menu_nelsis_config"
+              sequence="90" action="nelsis_demo_wizard_action"
+              groups="nelsis_field_tracking.group_nelsis_manager"/>
+</odoo>

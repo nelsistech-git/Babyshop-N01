@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="nelsis_presence_log_tree" model="ir.ui.view">
+        <field name="name">nelsis.presence.log.tree</field>
+        <field name="model">nelsis.presence.log</field>
+        <field name="arch" type="xml">
+            <tree create="0" edit="0" decoration-danger="state == 'offline'" decoration-success="state == 'online'">
+                <field name="employee_id"/>
+                <field name="state" widget="badge" decoration-success="state == 'online'" decoration-danger="state == 'offline'"/>
+                <field name="kind"/>
+                <field name="device_time" string="Phone Time"/>
+                <field name="server_time"/>
+            </tree>
+        </field>
+    </record>
+    <record id="nelsis_presence_log_search" model="ir.ui.view">
+        <field name="name">nelsis.presence.log.search</field>
+        <field name="model">nelsis.presence.log</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="employee_id"/>
+                <filter name="offline" string="Offline" domain="[('state', '=', 'offline')]"/>
+                <filter name="online" string="Online" domain="[('state', '=', 'online')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="g_emp" string="Employee" context="{'group_by': 'employee_id'}"/>
+                    <filter name="g_day" string="Day" context="{'group_by': 'log_date:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    <record id="nelsis_presence_log_action" model="ir.actions.act_window">
+        <field name="name">Online / Offline History</field>
+        <field name="res_model">nelsis.presence.log</field>
+        <field name="view_mode">tree</field>
+    </record>
+</odoo>

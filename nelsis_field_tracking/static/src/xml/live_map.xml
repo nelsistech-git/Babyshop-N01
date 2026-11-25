@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="nelsis_field_tracking.LiveMap">
+        <div class="o_nelsis_map">
+            <aside class="nl-side">
+                <div class="nl-head">
+                    <h2><i class="fa fa-map-marker"/> Live Map</h2>
+                    <small><t t-esc="state.provider"/> · updated <t t-esc="state.updated"/></small>
+                    <div class="nl-kpis">
+                        <div class="nl-kpi" t-att-class="{active: state.filter === 'all'}" t-on-click="() => this.setFilter('all')"><b t-esc="state.summary.total || 0"/><span>All</span></div>
+                        <div class="nl-kpi" t-att-class="{active: state.filter === 'online'}" t-on-click="() => this.setFilter('online')"><b t-esc="state.summary.online || 0"/><span>Online</span></div>
+                        <div class="nl-kpi" t-att-class="{active: state.filter === 'offline'}" t-on-click="() => this.setFilter('offline')"><b t-esc="state.summary.offline || 0"/><span>Offline</span></div>
+                        <div class="nl-kpi" t-att-class="{active: state.filter === 'flagged'}" t-on-click="() => this.setFilter('flagged')"><b t-esc="state.summary.flagged || 0"/><span>Flagged</span></div>
+                    </div>
+                </div>
+                <div class="nl-filters">
+                    <input type="search" placeholder="Search employee…" t-model="state.search" t-on-input="onFilterChange"/>
+                    <div class="nl-row">
+                        <input type="date" t-att-value="state.date" t-on-change="onDateChange"/>
+                        <select t-on-change="onDeptChange">
+                            <option value="">All departments</option>
+                            <t t-foreach="state.departments" t-as="d" t-key="d.id">
+                                <option t-att-value="d.id" t-esc="d.name"/>
+                            </t>
+                        </select>
+                    </div>
+                    <div class="nl-row">
+                        <button class="nl-btn ghost" t-att-class="{'nl-btn': state.filter === 'in'}" t-on-click="() => this.setFilter(state.filter === 'in' ? 'all' : 'in')">Punched in (<t t-esc="state.summary.punched_in || 0"/>)</button>
+                    </div>
+                </div>
+                <div class="nl-live" t-on-click="toggleAuto" style="cursor:pointer">
+                    <span class="dot" t-att-style="state.auto ? '' : 'background:#94a3b8;animation:none'"/>
+                    <t t-if="state.auto">Real-time · refreshing every 15 s</t><t t-else="">Paused · click to resume</t>
+                </div>
+                <div class="nl-list">
+                    <div t-if="state.error" class="alert alert-warning" t-esc="state.error"/>
+                    <t t-foreach="filtered" t-as="e" t-key="e.id">
+                        <div class="nl-emp" t-att-class="{active: e.id === state.selectedId}" t-on-click="() => this.select(e.id)">
+                            <img class="av" t-attf-src="/web/image/hr.employee/{{e.id}}/avatar_128" alt=""/>
+                            <div class="meta">
+                                <div class="nm" t-esc="e.name"/>
+                                <div class="sub"><t t-esc="e.job || e.department"/> · <t t-esc="ago(e.last_seen)"/></div>
+                                <div class="badges">
+                                    <span class="nl-badge" t-att-class="e.online ? 'ok' : 'off'" t-esc="e.online ? 'Online' : 'Offline'"/>
+                                    <span class="nl-badge in" t-if="e.attendance === 'punched_in'">Punched in</span>
+                                    <span class="nl-badge" t-if="e.attendance === 'punched_out'">Out</span>
+                                    <span class="nl-badge bad" t-if="e.flags"><t t-esc="e.flags"/> flags</span>
+                                    <span class="nl-badge warn" t-if="e.lat === null">No location</span>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                    <div t-if="!filtered.length and !state.loading" class="text-muted text-center p-4">No employees match.</div>
+                </div>
+            </aside>
+            <main class="nl-main">
+                <div class="nl-canvas" t-ref="canvas"/>
+                <div class="nl-panel" t-if="selected">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div><h3 t-esc="selected.name"/><small class="text-muted"><t t-esc="selected.job"/> <t t-if="selected.department">· <t t-esc="selected.department"/></t></small></div>
+                        <button class="nl-btn ghost" t-on-click="closePanel">✕</button>
+                    </div>
+                    <table class="mt-2">
+                        <tr><td>Status</td><td><span class="nl-badge" t-att-class="selected.online ? 'ok' : 'off'" t-esc="selected.online ? 'Online' : 'Offline'"/> <span class="nl-badge in" t-esc="statusLabel(selected)"/></td></tr>
+                        <tr><td>Last seen</td><td><t t-esc="ago(selected.last_seen)"/> (<t t-esc="fmtDT(selected.last_seen)"/>)</td></tr>
+                        <tr><td>Last GPS fix</td><td><t t-esc="fmtDT(selected.last_fix)"/></td></tr>
+                        <tr><td>Check in / out</td><td><t t-esc="fmtT(selected.check_in)"/> → <t t-esc="selected.check_out ? fmtT(selected.check_out) : '…'"/></td></tr>
+                        <tr><td>Battery</td><td><t t-esc="selected.battery"/> %</td></tr>
+                        <tr><td>App version</td><td t-esc="selected.app_version || '—'"/></tr>
+                        <tr t-if="routeStats"><td>Distance</td><td><t t-esc="routeStats.km"/> km · <t t-esc="routeStats.total"/> points</td></tr>
+                        <tr t-if="routeStats"><td>Genuine data</td>
+                            <td><span class="nl-badge" t-att-class="routeStats.bad ? 'bad' : 'ok'"><t t-esc="routeStats.bad ? routeStats.bad + ' FALSE' : 'TRUE'"/></span>
+                                <span class="nl-badge warn" t-if="routeStats.late"><t t-esc="routeStats.late"/> offline-synced</span></td></tr>
+                    </table>
+                    <div class="tl" t-if="state.route and state.route.presence.length">
+                        <b>Online / offline today</b>
+                        <t t-foreach="state.route.presence" t-as="p" t-key="p_index">
+                            <div class="tl-row">
+                                <span class="nl-badge" t-att-class="p.state === 'online' ? 'ok' : 'off'" t-esc="p.state"/>
+                                <span t-esc="fmtT(p.time)"/>
+                                <small class="text-muted" t-if="p.kind === 'signal_lost'">(no signal)</small>
+                            </div>
+                        </t>
+                    </div>
+                    <div class="d-flex gap-2 mt-3">
+                        <button class="nl-btn" t-on-click="openLogs">GPS logs</button>
+                        <button class="nl-btn ghost" t-on-click="openEmployee">Employee</button>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </t>
+</templates>
